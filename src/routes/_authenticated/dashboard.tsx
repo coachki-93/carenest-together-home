@@ -597,7 +597,8 @@ function DashboardPage() {
           </section>
 
           {/* Care team */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="care-team">
+
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.onShift")}</h3>
               <Button
