@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          all_day: boolean
+          child_id: string | null
+          color: string | null
+          created_at: string
+          created_by: string
+          ends_at: string | null
+          family_id: string
+          id: string
+          kind: Database["public"]["Enums"]["appointment_kind"]
+          location: string | null
+          notes: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          all_day?: boolean
+          child_id?: string | null
+          color?: string | null
+          created_at?: string
+          created_by: string
+          ends_at?: string | null
+          family_id: string
+          id?: string
+          kind?: Database["public"]["Enums"]["appointment_kind"]
+          location?: string | null
+          notes?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          all_day?: boolean
+          child_id?: string | null
+          color?: string | null
+          created_at?: string
+          created_by?: string
+          ends_at?: string | null
+          family_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["appointment_kind"]
+          location?: string | null
+          notes?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       children: {
         Row: {
           allergies: string | null
@@ -496,6 +562,7 @@ export type Database = {
     }
     Enums: {
       account_type: "family" | "caregiver"
+      appointment_kind: "appointment" | "therapy" | "task" | "other"
       invite_status: "pending" | "accepted" | "revoked"
       med_log_status: "given" | "skipped" | "missed"
       med_route:
@@ -643,6 +710,7 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["family", "caregiver"],
+      appointment_kind: ["appointment", "therapy", "task", "other"],
       invite_status: ["pending", "accepted", "revoked"],
       med_log_status: ["given", "skipped", "missed"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
