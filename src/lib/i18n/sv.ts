@@ -274,6 +274,7 @@ export const sv = {
     resumeChild: "Lägg till barnets profil för att komma igång.",
     resumeMed: "Lägg till första medicinen så schemat fylls.",
     resumeInvite: "Bjud in en vårdgivare för att dela på vården.",
+    resumeDismiss: "Dölj",
   },
   vitals: {
     title: "Värden & loggar",
@@ -336,15 +337,6 @@ export const sv = {
     calmMorning: "Lugn, leende",
     noneRecorded: "Inga registrerade",
     handoverNote: "Vätskebalansen ser bra ut — fortsätt följa upp i eftermiddag.",
-  },
-  stub: {
-    comingSoon: "Kommer härnäst",
-    scheduleBody: "Full kalender med mediciner, måltider, terapier och vila kommer hit.",
-    vitalsBody: "Trendgrafer för puls, SpO₂, temperatur, anfall och vätska kommer hit.",
-    handoverBody: "Skapa och dela varma överlämningar med anteckningar, värden och vad man ska hålla koll på.",
-    childBody: "Visa och uppdatera barnets profil, diagnoser, läkare och nödkontakter.",
-    caregiversBody: "Bjud in vårdgivare, hantera roller och se vem som är på pass.",
-    settingsBody: "Inställningar för aviseringar, konto, språk och integritet samlas här.",
   },
   handoverPage: {
     subtitle: "Varma passanteckningar till nästa vårdgivare",

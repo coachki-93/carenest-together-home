@@ -274,6 +274,7 @@ export const en = {
     resumeChild: "Add your child's profile to get started.",
     resumeMed: "Add your first medication so the schedule has something on it.",
     resumeInvite: "Invite a caregiver to share the care load.",
+    resumeDismiss: "Dismiss",
   },
   vitals: {
     title: "Vitals & logs",
@@ -336,15 +337,6 @@ export const en = {
     calmMorning: "Calm, smiling",
     noneRecorded: "None recorded",
     handoverNote: "Hydration looking good — keep tracking fluids this afternoon.",
-  },
-  stub: {
-    comingSoon: "Coming next",
-    scheduleBody: "Full calendar with medications, feeds, therapies and rest windows lands here.",
-    vitalsBody: "Trend charts for heart rate, SpO₂, temperature, seizures and fluids will live here.",
-    handoverBody: "Build and share warm shift handovers with notes, vitals and what to watch.",
-    childBody: "View and update your child's profile, diagnoses, doctors and emergency contacts.",
-    caregiversBody: "Invite caregivers, manage roles and see who is on shift.",
-    settingsBody: "Notifications, account, language and privacy settings will live here.",
   },
   handoverPage: {
     subtitle: "Warm shift notes for the next caregiver",
