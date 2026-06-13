@@ -307,8 +307,45 @@ function SettingsPage() {
           </form>
         </section>
 
+        {/* Help & onboarding */}
+        <section className="card-soft p-6 md:p-8 space-y-4">
+          <header className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+              <HelpCircle className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold">{t("settingsPage.helpTitle")}</h2>
+              <p className="text-sm text-muted-foreground">{t("settingsPage.helpSub")}</p>
+            </div>
+          </header>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="rounded-xl h-auto py-3 justify-start"
+              onClick={() => {
+                resetTour(user?.id);
+                navigate({ to: "/dashboard", search: { tour: 1 } as never });
+              }}
+            >
+              <Sparkles className="size-4" />
+              <span className="text-left">{t("settingsPage.replayTour")}</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-xl h-auto py-3 justify-start"
+              onClick={() =>
+                navigate({ to: "/onboarding/child", search: { step: 1 } })
+              }
+            >
+              <HelpCircle className="size-4" />
+              <span className="text-left">{t("settingsPage.restartWizard")}</span>
+            </Button>
+          </div>
+        </section>
+
         {/* Sign out */}
         <section className="card-soft p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
           <div>
             <h2 className="text-lg font-bold">{t("settingsPage.signOutTitle")}</h2>
             <p className="text-sm text-muted-foreground">
