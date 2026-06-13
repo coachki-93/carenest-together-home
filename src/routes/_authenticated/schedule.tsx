@@ -1,9 +1,45 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Pill, CheckCircle2, X, Plus, Clock, Undo2, CalendarClock } from "lucide-react";
+import {
+  Pill,
+  CheckCircle2,
+  X,
+  Plus,
+  Clock,
+  Undo2,
+  ChevronLeft,
+  ChevronRight,
+  CalendarDays,
+  MapPin,
+  Stethoscope,
+  Sparkles,
+  ClipboardList,
+  Calendar as CalendarIcon,
+  Trash2,
+  Pencil,
+} from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,11 +62,56 @@ import {
   buildTodaysDoses,
   type ScheduledDose,
 } from "@/lib/data/medications";
+import {
+  APPOINTMENT_KINDS,
+  useAppointments,
+  useCreateAppointment,
+  useUpdateAppointment,
+  useDeleteAppointment,
+  type Appointment,
+  type AppointmentKind,
+} from "@/lib/data/appointments";
 
 export const Route = createFileRoute("/_authenticated/schedule")({
   head: () => ({ meta: [{ title: "Schedule — CareNest" }] }),
   component: SchedulePage,
 });
+
+function startOfDay(d: Date) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+function addDays(d: Date, n: number) {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+}
+function toDateInput(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function toTimeInput(d: Date) {
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+function toLocalDateTime(date: string, time: string) {
+  const [y, m, d] = date.split("-").map(Number);
+  const [hh, mm] = time.split(":").map(Number);
+  return new Date(y, (m ?? 1) - 1, d ?? 1, hh ?? 0, mm ?? 0, 0, 0);
+}
+function isSameDay(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+type TimelineItem =
+  | { kind: "dose"; key: string; at: Date; dose: ScheduledDose }
+  | { kind: "appt"; key: string; at: Date; appt: Appointment };
 
 function SchedulePage() {
   const { t, i18n } = useTranslation();
@@ -40,33 +121,54 @@ function SchedulePage() {
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
 
-  const { startOfDay, endOfDay, todayLabel } = useMemo(() => {
-    const s = new Date();
-    s.setHours(0, 0, 0, 0);
-    const e = new Date(s);
-    e.setDate(e.getDate() + 1);
+  const [day, setDay] = useState<Date>(() => startOfDay(new Date()));
+  const dayEnd = useMemo(() => addDays(day, 1), [day]);
+  const isToday = isSameDay(day, new Date());
+
+  const dayLabel = useMemo(() => {
     const fmt = new Intl.DateTimeFormat(i18n.language, {
       weekday: "long",
       day: "numeric",
       month: "long",
     });
-    return { startOfDay: s, endOfDay: e, todayLabel: fmt.format(s) };
-  }, [i18n.language]);
+    return fmt.format(day);
+  }, [i18n.language, day]);
 
-  const { data: logs = [] } = useMedLogs(familyId, startOfDay, endOfDay);
-  const doses = useMemo(() => buildTodaysDoses(meds, logs), [meds, logs]);
+  const { data: logs = [] } = useMedLogs(familyId, day, dayEnd);
+  const { data: appointments = [] } = useAppointments(familyId, day, dayEnd);
+  const doses = useMemo(
+    () => (isToday ? buildTodaysDoses(meds, logs) : []),
+    [meds, logs, isToday],
+  );
+
+  const timeline = useMemo<TimelineItem[]>(() => {
+    const items: TimelineItem[] = [];
+    for (const d of doses) {
+      items.push({ kind: "dose", key: d.key, at: d.scheduled_for, dose: d });
+    }
+    for (const a of appointments) {
+      items.push({ kind: "appt", key: a.id, at: new Date(a.starts_at), appt: a });
+    }
+    return items.sort((x, y) => x.at.getTime() - y.at.getTime());
+  }, [doses, appointments]);
 
   const logDose = useLogDose();
   const deleteLog = useDeleteLog();
+  const createAppt = useCreateAppointment();
+  const updateAppt = useUpdateAppointment();
+  const deleteAppt = useDeleteAppointment();
+
   const [confirm, setConfirm] = useState<
     { dose: ScheduledDose; status: "given" | "skipped" } | null
   >(null);
+  const [apptOpen, setApptOpen] = useState(false);
+  const [editing, setEditing] = useState<Appointment | null>(null);
+  const [confirmDeleteAppt, setConfirmDeleteAppt] = useState<Appointment | null>(null);
 
   const now = new Date();
-  const stats = {
-    given: doses.filter((d) => d.log?.status === "given").length,
-    total: doses.length,
-  };
+  const stats = isToday
+    ? { given: doses.filter((d) => d.log?.status === "given").length, total: doses.length }
+    : null;
 
   const submitConfirm = async () => {
     if (!confirm || !familyId || !child) return;
@@ -88,66 +190,177 @@ function SchedulePage() {
     setConfirm(null);
   };
 
+  function openCreateAppt() {
+    setEditing(null);
+    setApptOpen(true);
+  }
+
+  function openEditAppt(a: Appointment) {
+    setEditing(a);
+    setApptOpen(true);
+  }
+
+  async function handleDeleteAppt() {
+    if (!confirmDeleteAppt) return;
+    try {
+      await deleteAppt.mutateAsync(confirmDeleteAppt.id);
+      toast.success(t("scheduleEvents.deleted"));
+      setConfirmDeleteAppt(null);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
   return (
     <DashboardLayout
       title={t("schedule.title")}
-      subtitle={todayLabel}
+      subtitle={dayLabel}
       actions={
-        <Button asChild variant="outline" className="rounded-full">
-          <Link to="/medications">
-            <Plus className="size-4" /> {t("schedule.addMedication")}
-          </Link>
-        </Button>
-      }
-    >
-      <div className="card-soft p-5 mb-6 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{t("dashboard.progress")}</p>
-          <p className="text-2xl font-extrabold">
-            {stats.given} / {stats.total}{" "}
-            <span className="text-base font-semibold text-muted-foreground">
-              {t("dashboard.tasks")}
-            </span>
-          </p>
-        </div>
-        <div className="size-14 rounded-2xl bg-primary-soft text-primary flex items-center justify-center">
-          <CalendarClock className="size-7" />
-        </div>
-      </div>
-
-      {doses.length === 0 ? (
-        <div className="card-soft p-10 text-center max-w-md mx-auto">
-          <div className="size-16 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto mb-4">
-            <Pill className="size-7" />
-          </div>
-          <h2 className="text-xl font-extrabold mb-2">{t("schedule.noScheduled")}</h2>
-          <p className="text-muted-foreground mb-6">{t("schedule.noScheduledBody")}</p>
-          <Button asChild className="rounded-full">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            className="rounded-full gap-1.5 font-semibold"
+            onClick={openCreateAppt}
+            disabled={!familyId}
+          >
+            <Plus className="size-4" /> {t("scheduleEvents.new")}
+          </Button>
+          <Button asChild size="sm" variant="outline" className="rounded-full">
             <Link to="/medications">
-              <Plus className="size-4" /> {t("schedule.addMedication")}
+              <Pill className="size-4" /> {t("schedule.addMedication")}
             </Link>
           </Button>
         </div>
+      }
+    >
+      <div className="card-soft p-3 mb-5 flex items-center justify-between gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          onClick={() => setDay(addDays(day, -1))}
+          aria-label="Previous day"
+        >
+          <ChevronLeft className="size-5" />
+        </Button>
+        <div className="flex-1 text-center">
+          <p className="font-extrabold text-base">{dayLabel}</p>
+          {!isToday && (
+            <Button
+              variant="link"
+              size="sm"
+              className="h-auto p-0 text-xs"
+              onClick={() => setDay(startOfDay(new Date()))}
+            >
+              {t("schedule.today")}
+            </Button>
+          )}
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          onClick={() => setDay(addDays(day, 1))}
+          aria-label="Next day"
+        >
+          <ChevronRight className="size-5" />
+        </Button>
+      </div>
+
+      {stats && stats.total > 0 && (
+        <div className="card-soft p-5 mb-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{t("dashboard.progress")}</p>
+            <p className="text-2xl font-extrabold">
+              {stats.given} / {stats.total}{" "}
+              <span className="text-base font-semibold text-muted-foreground">
+                {t("dashboard.tasks")}
+              </span>
+            </p>
+          </div>
+          <div className="size-14 rounded-2xl bg-primary-soft text-primary flex items-center justify-center">
+            <CalendarDays className="size-7" />
+          </div>
+        </div>
+      )}
+
+      {timeline.length === 0 ? (
+        <div className="card-soft p-10 text-center max-w-md mx-auto">
+          <div className="size-16 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto mb-4">
+            <CalendarIcon className="size-7" />
+          </div>
+          <h2 className="text-xl font-extrabold mb-2">{t("scheduleEvents.emptyTitle")}</h2>
+          <p className="text-muted-foreground mb-6">{t("scheduleEvents.emptyBody")}</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button className="rounded-full" onClick={openCreateAppt} disabled={!familyId}>
+              <Plus className="size-4" /> {t("scheduleEvents.new")}
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link to="/medications">
+                <Pill className="size-4" /> {t("schedule.addMedication")}
+              </Link>
+            </Button>
+          </div>
+        </div>
       ) : (
         <ol className="space-y-3">
-          {doses.map((d) => (
-            <DoseRow
-              key={d.key}
-              dose={d}
-              now={now}
-              onMark={(status) => setConfirm({ dose: d, status })}
-              onUndo={() => {
-                if (d.log) {
-                  deleteLog.mutate(d.log.id, {
-                    onSuccess: () => toast.success(t("schedule.doseUndone")),
-                    onError: (e) => toast.error((e as Error).message),
-                  });
-                }
-              }}
-            />
-          ))}
+          {timeline.map((item) =>
+            item.kind === "dose" ? (
+              <DoseRow
+                key={item.key}
+                dose={item.dose}
+                now={now}
+                onMark={(status) => setConfirm({ dose: item.dose, status })}
+                onUndo={() => {
+                  if (item.dose.log) {
+                    deleteLog.mutate(item.dose.log.id, {
+                      onSuccess: () => toast.success(t("schedule.doseUndone")),
+                      onError: (e) => toast.error((e as Error).message),
+                    });
+                  }
+                }}
+              />
+            ) : (
+              <AppointmentRow
+                key={item.key}
+                appt={item.appt}
+                onEdit={() => openEditAppt(item.appt)}
+                onDelete={() => setConfirmDeleteAppt(item.appt)}
+                canManage={item.appt.created_by === user?.id || membership?.role === "owner"}
+              />
+            ),
+          )}
         </ol>
       )}
+
+      <AppointmentDialog
+        open={apptOpen}
+        onOpenChange={(o) => {
+          setApptOpen(o);
+          if (!o) setEditing(null);
+        }}
+        defaultDay={day}
+        familyId={familyId}
+        childId={child?.id ?? null}
+        userId={user?.id ?? null}
+        editing={editing}
+        onSave={async (values, id) => {
+          try {
+            if (id) {
+              await updateAppt.mutateAsync({ id, patch: values });
+              toast.success(t("scheduleEvents.updated"));
+            } else {
+              await createAppt.mutateAsync(values as never);
+              toast.success(t("scheduleEvents.created"));
+            }
+            setApptOpen(false);
+            setEditing(null);
+          } catch (e) {
+            toast.error((e as Error).message);
+          }
+        }}
+        saving={createAppt.isPending || updateAppt.isPending}
+      />
 
       <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
         <AlertDialogContent>
@@ -180,6 +393,31 @@ function SchedulePage() {
               {confirm?.status === "given"
                 ? t("schedule.confirmGive")
                 : t("schedule.confirmSkip")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!confirmDeleteAppt}
+        onOpenChange={(o) => !o && setConfirmDeleteAppt(null)}
+      >
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("scheduleEvents.confirmDeleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("scheduleEvents.confirmDeleteBody", {
+                title: confirmDeleteAppt?.title ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDeleteAppt}
+            >
+              {t("scheduleEvents.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -252,7 +490,8 @@ function DoseRow({
               className="rounded-full"
               onClick={() => onMark("skipped")}
             >
-              <X className="size-4" /> <span className="hidden sm:inline">{t("schedule.skip")}</span>
+              <X className="size-4" />{" "}
+              <span className="hidden sm:inline">{t("schedule.skip")}</span>
             </Button>
             <Button size="sm" className="rounded-full" onClick={() => onMark("given")}>
               <CheckCircle2 className="size-4" />{" "}
@@ -274,6 +513,317 @@ function DoseRow({
         )}
       </div>
     </li>
+  );
+}
+
+function AppointmentRow({
+  appt,
+  onEdit,
+  onDelete,
+  canManage,
+}: {
+  appt: Appointment;
+  onEdit: () => void;
+  onDelete: () => void;
+  canManage: boolean;
+}) {
+  const { t, i18n } = useTranslation();
+  const tone = kindTone(appt.kind);
+  const start = new Date(appt.starts_at);
+  const end = appt.ends_at ? new Date(appt.ends_at) : null;
+  const timeFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    [i18n.language],
+  );
+
+  return (
+    <li className="card-soft p-4 flex items-center gap-4">
+      <div className="text-center shrink-0 w-16">
+        {appt.all_day ? (
+          <div className="text-xs font-bold uppercase text-muted-foreground">
+            {t("scheduleEvents.allDay")}
+          </div>
+        ) : (
+          <>
+            <div className="text-xl font-extrabold tabular-nums">{timeFmt.format(start)}</div>
+            {end && (
+              <div className="text-[10px] text-muted-foreground tabular-nums">
+                {timeFmt.format(end)}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div
+        className="size-12 rounded-2xl flex items-center justify-center shrink-0"
+        style={{ backgroundColor: tone.bg, color: tone.fg }}
+      >
+        <KindIcon kind={appt.kind} className="size-6" />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="font-extrabold truncate">{appt.title}</h3>
+          <span
+            className="text-[10px] font-bold uppercase rounded-full px-2 py-0.5"
+            style={{ backgroundColor: tone.bg, color: tone.fg }}
+          >
+            {t(`scheduleEvents.kind.${appt.kind}`)}
+          </span>
+        </div>
+        {appt.location && (
+          <p className="text-sm text-muted-foreground truncate flex items-center gap-1.5">
+            <MapPin className="size-3.5" /> {appt.location}
+          </p>
+        )}
+        {appt.notes && (
+          <p className="text-xs text-muted-foreground truncate mt-0.5">{appt.notes}</p>
+        )}
+      </div>
+
+      {canManage && (
+        <div className="flex gap-1 shrink-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={onEdit}
+            aria-label={t("scheduleEvents.edit")}
+          >
+            <Pencil className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full text-muted-foreground hover:text-destructive"
+            onClick={onDelete}
+            aria-label={t("scheduleEvents.delete")}
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
+      )}
+    </li>
+  );
+}
+
+function AppointmentDialog({
+  open,
+  onOpenChange,
+  defaultDay,
+  familyId,
+  childId,
+  userId,
+  editing,
+  onSave,
+  saving,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  defaultDay: Date;
+  familyId: string | undefined | null;
+  childId: string | null;
+  userId: string | null;
+  editing: Appointment | null;
+  onSave: (values: {
+    family_id: string;
+    child_id: string | null;
+    created_by: string;
+    title: string;
+    notes: string | null;
+    location: string | null;
+    kind: AppointmentKind;
+    starts_at: string;
+    ends_at: string | null;
+    all_day: boolean;
+  }, id?: string) => void | Promise<void>;
+  saving: boolean;
+}) {
+  const { t } = useTranslation();
+
+  const [title, setTitle] = useState("");
+  const [kind, setKind] = useState<AppointmentKind>("appointment");
+  const [date, setDate] = useState(toDateInput(defaultDay));
+  const [time, setTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("");
+  const [allDay, setAllDay] = useState(false);
+  const [location, setLocation] = useState("");
+  const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    if (editing) {
+      const s = new Date(editing.starts_at);
+      const e = editing.ends_at ? new Date(editing.ends_at) : null;
+      setTitle(editing.title);
+      setKind(editing.kind);
+      setDate(toDateInput(s));
+      setTime(toTimeInput(s));
+      setEndTime(e ? toTimeInput(e) : "");
+      setAllDay(editing.all_day);
+      setLocation(editing.location ?? "");
+      setNotes(editing.notes ?? "");
+    } else {
+      setTitle("");
+      setKind("appointment");
+      setDate(toDateInput(defaultDay));
+      setTime("09:00");
+      setEndTime("");
+      setAllDay(false);
+      setLocation("");
+      setNotes("");
+    }
+  }, [open, editing, defaultDay]);
+
+  function handleSubmit() {
+    if (!familyId || !userId) return;
+    const trimmed = title.trim();
+    if (!trimmed) {
+      toast.error(t("scheduleEvents.titleRequired"));
+      return;
+    }
+    const startDt = allDay
+      ? toLocalDateTime(date, "00:00")
+      : toLocalDateTime(date, time || "00:00");
+    const endDt =
+      !allDay && endTime ? toLocalDateTime(date, endTime) : null;
+    if (endDt && endDt <= startDt) {
+      toast.error(t("scheduleEvents.endAfterStart"));
+      return;
+    }
+    onSave(
+      {
+        family_id: familyId,
+        child_id: childId,
+        created_by: userId,
+        title: trimmed,
+        notes: notes.trim() || null,
+        location: location.trim() || null,
+        kind,
+        starts_at: startDt.toISOString(),
+        ends_at: endDt ? endDt.toISOString() : null,
+        all_day: allDay,
+      },
+      editing?.id,
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="rounded-2xl max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {editing ? t("scheduleEvents.editTitle") : t("scheduleEvents.newTitle")}
+          </DialogTitle>
+          <DialogDescription>{t("scheduleEvents.newBody")}</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div>
+            <Label className="font-semibold">{t("scheduleEvents.fields.title")}</Label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={t("scheduleEvents.placeholders.title")}
+              className="rounded-xl mt-1.5"
+            />
+          </div>
+          <div>
+            <Label className="font-semibold">{t("scheduleEvents.fields.kind")}</Label>
+            <Select value={kind} onValueChange={(v) => setKind(v as AppointmentKind)}>
+              <SelectTrigger className="rounded-xl mt-1.5">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {APPOINTMENT_KINDS.map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {t(`scheduleEvents.kind.${k}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="all-day"
+              checked={allDay}
+              onCheckedChange={(c) => setAllDay(c === true)}
+            />
+            <Label htmlFor="all-day" className="font-semibold">
+              {t("scheduleEvents.allDay")}
+            </Label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-1">
+              <Label className="font-semibold">{t("scheduleEvents.fields.date")}</Label>
+              <Input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="rounded-xl mt-1.5"
+              />
+            </div>
+            {!allDay && (
+              <>
+                <div>
+                  <Label className="font-semibold">{t("scheduleEvents.fields.start")}</Label>
+                  <Input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className="rounded-xl mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label className="font-semibold">{t("scheduleEvents.fields.end")}</Label>
+                  <Input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="rounded-xl mt-1.5"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <div>
+            <Label className="font-semibold">{t("scheduleEvents.fields.location")}</Label>
+            <Input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder={t("scheduleEvents.placeholders.location")}
+              className="rounded-xl mt-1.5"
+            />
+          </div>
+          <div>
+            <Label className="font-semibold">{t("scheduleEvents.fields.notes")}</Label>
+            <Textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={t("scheduleEvents.placeholders.notes")}
+              rows={3}
+              className="rounded-xl mt-1.5"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" className="rounded-full" onClick={() => onOpenChange(false)}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            className="rounded-full font-bold"
+            onClick={handleSubmit}
+            disabled={saving}
+          >
+            {saving ? t("common.saving") : t("scheduleEvents.save")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -321,5 +871,31 @@ function routeKey(r: string): string {
       return "Inhaled";
     default:
       return "Other";
+  }
+}
+
+function KindIcon({ kind, className }: { kind: AppointmentKind; className?: string }) {
+  switch (kind) {
+    case "appointment":
+      return <Stethoscope className={className} />;
+    case "therapy":
+      return <Sparkles className={className} />;
+    case "task":
+      return <ClipboardList className={className} />;
+    default:
+      return <CalendarIcon className={className} />;
+  }
+}
+
+function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
+  switch (kind) {
+    case "appointment":
+      return { bg: "#DBEAFE", fg: "#1D4ED8" };
+    case "therapy":
+      return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "task":
+      return { bg: "#DCFCE7", fg: "#15803D" };
+    default:
+      return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
 }
