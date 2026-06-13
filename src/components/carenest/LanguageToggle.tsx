@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Languages } from "lucide-react";
 import {
@@ -15,6 +16,10 @@ const LANGS = [
 
 export function LanguageToggle({ compact = false }: { compact?: boolean }) {
   const { i18n, t } = useTranslation();
+  // Defer client-only language state until after mount to avoid SSR hydration mismatch
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const current = LANGS.find((l) => i18n.language?.startsWith(l.code)) ?? LANGS[0];
 
   return (
@@ -24,12 +29,12 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
           variant="ghost"
           size={compact ? "icon" : "sm"}
           className="rounded-full gap-2"
-          aria-label={t("common.language")}
+          aria-label={mounted ? t("common.language") : "Language"}
         >
           <Languages className="size-4" />
           {!compact && (
-            <span className="text-sm font-semibold">
-              {current.flag} {current.code.toUpperCase()}
+            <span className="text-sm font-semibold" suppressHydrationWarning>
+              {mounted ? `${current.flag} ${current.code.toUpperCase()}` : "🇬🇧 EN"}
             </span>
           )}
         </Button>
@@ -43,7 +48,7 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
           >
             <span>{l.flag}</span>
             <span className="font-medium">{l.label}</span>
-            {current.code === l.code && (
+            {mounted && current.code === l.code && (
               <span className="ml-auto text-primary text-xs">●</span>
             )}
           </DropdownMenuItem>
