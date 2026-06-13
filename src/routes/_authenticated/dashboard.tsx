@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
   Pill,
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT } from "@/lib/data/vitals";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — CareNest" }] }),
@@ -77,7 +78,14 @@ const TYPE_STYLES: Record<TaskType, { icon: typeof Pill; bg: string; fg: string 
 function DashboardPage() {
   const { t, i18n } = useTranslation();
   const { data: profile } = useProfile();
+  const { data: membership } = useMyMembership();
   const { data: child } = useChild();
+  const { data: latestVitals } = useLatestVitals(membership?.family_id);
+  const { data: fluidsToday } = useVitals(membership?.family_id, {
+    types: ["fluids"],
+    sinceHours: 24,
+  });
+  const navigate = useNavigate();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [confirmTask, setConfirmTask] = useState<Task | null>(null);
 
@@ -251,19 +259,84 @@ function DashboardPage() {
         <div className="space-y-6">
           {/* Vitals snapshot */}
           <section className="card-soft p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-extrabold">{t("dashboard.vitalsSnapshot")}</h3>
-              <span className="text-xs text-muted-foreground">{t("dashboard.lastLogged", { time: "07:45" })}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <VitalTile icon={Heart} label={t("vitals.heartRate")} value="92" unit="bpm" tone="primary" />
-              <VitalTile icon={Activity} label={t("vitals.spo2")} value="97" unit="%" tone="success" />
-              <VitalTile icon={Thermometer} label={t("vitals.temp")} value="36.8" unit="°C" tone="warning" />
-              <VitalTile icon={Droplet} label={t("vitals.fluids")} value="420" unit="ml" tone="lavender" />
-            </div>
-            <Button variant="outline" className="w-full mt-4 rounded-full font-bold">
-              {t("dashboard.logVitals")}
-            </Button>
+            {(() => {
+              const hr = latestVitals?.get("heart_rate");
+              const spo2 = latestVitals?.get("spo2");
+              const temp = latestVitals?.get("temperature");
+              const fluidsTotal = (fluidsToday ?? []).reduce(
+                (sum, v) => sum + Number(v.value ?? 0),
+                0,
+              );
+              const mostRecent = [hr, spo2, temp]
+                .filter((v): v is NonNullable<typeof v> => !!v)
+                .sort((a, b) => +new Date(b.logged_at) - +new Date(a.logged_at))[0];
+              const lastTime = mostRecent
+                ? new Date(mostRecent.logged_at).toLocaleTimeString(
+                    i18n.language === "sv" ? "sv-SE" : "en-US",
+                    { hour: "2-digit", minute: "2-digit" },
+                  )
+                : "—";
+              const fmt = (n: number) =>
+                Number.isFinite(n) ? (Math.abs(n) >= 10 ? n.toFixed(0) : n.toFixed(1)) : "—";
+              const toneFor = (
+                type: "heart_rate" | "spo2" | "temperature",
+                v: number | undefined,
+                fallback: "primary" | "success" | "warning" | "lavender",
+              ): "primary" | "success" | "warning" | "lavender" => {
+                if (v === undefined) return fallback;
+                const s = vitalStatus(type, v);
+                if (s === "ok") return "success";
+                if (s === "low" || s === "high") return "warning";
+                return fallback;
+              };
+              return (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-extrabold">{t("dashboard.vitalsSnapshot")}</h3>
+                    <span className="text-xs text-muted-foreground">
+                      {t("dashboard.lastLogged", { time: lastTime })}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <VitalTile
+                      icon={Heart}
+                      label={t("vitals.heartRate")}
+                      value={hr ? fmt(Number(hr.value)) : "—"}
+                      unit={hr?.unit ?? DEFAULT_UNIT.heart_rate}
+                      tone={toneFor("heart_rate", hr ? Number(hr.value) : undefined, "primary")}
+                    />
+                    <VitalTile
+                      icon={Activity}
+                      label={t("vitals.spo2")}
+                      value={spo2 ? fmt(Number(spo2.value)) : "—"}
+                      unit={spo2?.unit ?? DEFAULT_UNIT.spo2}
+                      tone={toneFor("spo2", spo2 ? Number(spo2.value) : undefined, "success")}
+                    />
+                    <VitalTile
+                      icon={Thermometer}
+                      label={t("vitals.temp")}
+                      value={temp ? fmt(Number(temp.value)) : "—"}
+                      unit={temp?.unit ?? DEFAULT_UNIT.temperature}
+                      tone={toneFor("temperature", temp ? Number(temp.value) : undefined, "warning")}
+                    />
+                    <VitalTile
+                      icon={Droplet}
+                      label={t("vitals.fluids")}
+                      value={fluidsTotal > 0 ? String(Math.round(fluidsTotal)) : "—"}
+                      unit={DEFAULT_UNIT.fluids}
+                      tone="lavender"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4 rounded-full font-bold"
+                    onClick={() => navigate({ to: "/vitals" })}
+                  >
+                    {t("dashboard.logVitals")}
+                  </Button>
+                </>
+              );
+            })()}
           </section>
 
           {/* Handover preview */}
