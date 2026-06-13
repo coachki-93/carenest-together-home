@@ -274,6 +274,7 @@ export const en = {
     resumeChild: "Add your child's profile to get started.",
     resumeMed: "Add your first medication so the schedule has something on it.",
     resumeInvite: "Invite a caregiver to share the care load.",
+    resumeDismiss: "Dismiss",
   },
   vitals: {
     title: "Vitals & logs",

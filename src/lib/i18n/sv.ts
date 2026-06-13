@@ -274,6 +274,7 @@ export const sv = {
     resumeChild: "Lägg till barnets profil för att komma igång.",
     resumeMed: "Lägg till första medicinen så schemat fylls.",
     resumeInvite: "Bjud in en vårdgivare för att dela på vården.",
+    resumeDismiss: "Dölj",
   },
   vitals: {
     title: "Värden & loggar",
