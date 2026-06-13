@@ -29,7 +29,8 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
           variant="ghost"
           size={compact ? "icon" : "sm"}
           className="rounded-full gap-2"
-          aria-label={mounted ? t("common.language") : "Language"}
+          aria-label={t("common.language")}
+          suppressHydrationWarning
         >
           <Languages className="size-4" />
           {!compact && (
