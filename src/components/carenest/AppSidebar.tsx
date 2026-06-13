@@ -56,7 +56,7 @@ export function AppSidebar() {
           )}
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent data-tour="sidebar">
         <SidebarGroup>
           {!collapsed && <SidebarGroupLabel>{t("nav.care")}</SidebarGroupLabel>}
           <SidebarGroupContent>
