@@ -18,7 +18,14 @@ import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedChildRouteImport } from './routes/_authenticated/child'
+import { Route as AuthenticatedCaregiversRouteImport } from './routes/_authenticated/caregivers'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
 
@@ -66,9 +73,44 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedVitalsRoute = AuthenticatedVitalsRouteImport.update({
+  id: '/vitals',
+  path: '/vitals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHandoverRoute = AuthenticatedHandoverRouteImport.update({
+  id: '/handover',
+  path: '/handover',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedChildRoute = AuthenticatedChildRouteImport.update({
+  id: '/child',
+  path: '/child',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCaregiversRoute = AuthenticatedCaregiversRouteImport.update({
+  id: '/caregivers',
+  path: '/caregivers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOnboardingChildRoute =
@@ -87,7 +129,14 @@ const AuthenticatedOnboardingCaregiverRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/caregivers': typeof AuthenticatedCaregiversRoute
+  '/child': typeof AuthenticatedChildRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/schedule': typeof AuthenticatedScheduleRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -100,7 +149,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/caregivers': typeof AuthenticatedCaregiversRoute
+  '/child': typeof AuthenticatedChildRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/schedule': typeof AuthenticatedScheduleRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -115,7 +171,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/_authenticated/caregivers': typeof AuthenticatedCaregiversRoute
+  '/_authenticated/child': typeof AuthenticatedChildRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -130,7 +193,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/caregivers'
+    | '/child'
+    | '/dashboard'
+    | '/handover'
     | '/home'
+    | '/schedule'
+    | '/settings'
+    | '/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -143,7 +213,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/caregivers'
+    | '/child'
+    | '/dashboard'
+    | '/handover'
     | '/home'
+    | '/schedule'
+    | '/settings'
+    | '/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -157,7 +234,14 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/caregivers'
+    | '/_authenticated/child'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/handover'
     | '/_authenticated/home'
+    | '/_authenticated/schedule'
+    | '/_authenticated/settings'
+    | '/_authenticated/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -241,11 +325,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/vitals': {
+      id: '/_authenticated/vitals'
+      path: '/vitals'
+      fullPath: '/vitals'
+      preLoaderRoute: typeof AuthenticatedVitalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/schedule': {
+      id: '/_authenticated/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof AuthenticatedScheduleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/handover': {
+      id: '/_authenticated/handover'
+      path: '/handover'
+      fullPath: '/handover'
+      preLoaderRoute: typeof AuthenticatedHandoverRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/child': {
+      id: '/_authenticated/child'
+      path: '/child'
+      fullPath: '/child'
+      preLoaderRoute: typeof AuthenticatedChildRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/caregivers': {
+      id: '/_authenticated/caregivers'
+      path: '/caregivers'
+      fullPath: '/caregivers'
+      preLoaderRoute: typeof AuthenticatedCaregiversRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/onboarding/child': {
@@ -266,13 +399,27 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCaregiversRoute: typeof AuthenticatedCaregiversRoute
+  AuthenticatedChildRoute: typeof AuthenticatedChildRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
   AuthenticatedOnboardingCaregiverRoute: typeof AuthenticatedOnboardingCaregiverRoute
   AuthenticatedOnboardingChildRoute: typeof AuthenticatedOnboardingChildRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCaregiversRoute: AuthenticatedCaregiversRoute,
+  AuthenticatedChildRoute: AuthenticatedChildRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
   AuthenticatedOnboardingCaregiverRoute: AuthenticatedOnboardingCaregiverRoute,
   AuthenticatedOnboardingChildRoute: AuthenticatedOnboardingChildRoute,
 }
