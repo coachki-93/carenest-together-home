@@ -30,13 +30,18 @@ export function useVitals(
   familyId: string | undefined | null,
   opts?: { types?: VitalType[]; sinceHours?: number; limit?: number },
 ) {
-  const since = opts?.sinceHours
-    ? new Date(Date.now() - opts.sinceHours * 3600 * 1000).toISOString()
-    : null;
+  const sinceHours = opts?.sinceHours;
   return useQuery({
-    queryKey: ["vitals", familyId, opts?.types, since, opts?.limit],
+    // NOTE: do NOT put the computed `since` ISO string in the key — it
+    // changes every render (Date.now ticks) and would cause React Query to
+    // create a brand-new query every render, so data never reaches the
+    // component. Key on the stable inputs instead.
+    queryKey: ["vitals", familyId, opts?.types, sinceHours, opts?.limit],
     enabled: !!familyId,
     queryFn: async () => {
+      const since = sinceHours
+        ? new Date(Date.now() - sinceHours * 3600 * 1000).toISOString()
+        : null;
       let q = supabase
         .from("vitals")
         .select("*")
