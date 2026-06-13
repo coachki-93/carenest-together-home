@@ -33,6 +33,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT } from "@/lib/data/vitals";
+import { useLatestHandover } from "@/lib/data/handovers";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — CareNest" }] }),
@@ -85,6 +86,7 @@ function DashboardPage() {
     types: ["fluids"],
     sinceHours: 24,
   });
+  const { data: latestHandover } = useLatestHandover(membership?.family_id);
   const navigate = useNavigate();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [confirmTask, setConfirmTask] = useState<Task | null>(null);
@@ -341,24 +343,62 @@ function DashboardPage() {
 
           {/* Handover preview */}
           <section className="card-soft p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-extrabold">{t("dashboard.handover")}</h3>
-              <span className="text-xs font-semibold text-primary bg-primary-soft rounded-full px-2.5 py-1">
-                {t("dashboard.shiftEndsIn", { time: "2h 15m" })}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              {t("dashboard.handoverIntro")}
-            </p>
-            <ul className="space-y-2 text-sm">
-              <HandoverItem label={t("dashboard.sleep")} value={t("demo.sleptWell")} />
-              <HandoverItem label={t("dashboard.mood")} value={t("demo.calmMorning")} />
-              <HandoverItem label={t("dashboard.seizures")} value={t("demo.noneRecorded")} />
-              <HandoverItem label={t("dashboard.notes")} value={t("demo.handoverNote")} />
-            </ul>
-            <Button variant="secondary" className="w-full mt-4 rounded-full font-bold">
-              {t("dashboard.openHandover")}
-            </Button>
+            {(() => {
+              const fmt = new Intl.DateTimeFormat(
+                i18n.language === "sv" ? "sv-SE" : "en-US",
+                { weekday: "short", hour: "2-digit", minute: "2-digit" },
+              );
+              return (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-extrabold">{t("dashboard.handover")}</h3>
+                    {latestHandover && (
+                      <span className="text-xs font-semibold text-primary bg-primary-soft rounded-full px-2.5 py-1">
+                        {fmt.format(new Date(latestHandover.created_at))}
+                      </span>
+                    )}
+                  </div>
+                  {latestHandover ? (
+                    <>
+                      {latestHandover.summary && (
+                        <p className="text-sm mb-3 italic">"{latestHandover.summary}"</p>
+                      )}
+                      <ul className="space-y-2 text-sm">
+                        {latestHandover.sleep && (
+                          <HandoverItem label={t("dashboard.sleep")} value={latestHandover.sleep} />
+                        )}
+                        {latestHandover.mood && (
+                          <HandoverItem label={t("dashboard.mood")} value={latestHandover.mood} />
+                        )}
+                        {latestHandover.seizures && (
+                          <HandoverItem
+                            label={t("dashboard.seizures")}
+                            value={latestHandover.seizures}
+                          />
+                        )}
+                        {latestHandover.notes && (
+                          <HandoverItem
+                            label={t("dashboard.notes")}
+                            value={latestHandover.notes}
+                          />
+                        )}
+                      </ul>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t("dashboard.handoverIntro")}
+                    </p>
+                  )}
+                  <Button
+                    variant="secondary"
+                    className="w-full mt-4 rounded-full font-bold"
+                    onClick={() => navigate({ to: "/handover" })}
+                  >
+                    {t("dashboard.openHandover")}
+                  </Button>
+                </>
+              );
+            })()}
           </section>
 
           {/* Care team */}

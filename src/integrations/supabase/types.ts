@@ -123,6 +123,78 @@ export type Database = {
           },
         ]
       }
+      handovers: {
+        Row: {
+          author_id: string
+          child_id: string | null
+          created_at: string
+          family_id: string
+          fluids: string | null
+          id: string
+          meds: string | null
+          mood: string | null
+          notes: string | null
+          seizures: string | null
+          shift: Database["public"]["Enums"]["shift_label"]
+          shift_end: string | null
+          shift_start: string | null
+          sleep: string | null
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          child_id?: string | null
+          created_at?: string
+          family_id: string
+          fluids?: string | null
+          id?: string
+          meds?: string | null
+          mood?: string | null
+          notes?: string | null
+          seizures?: string | null
+          shift?: Database["public"]["Enums"]["shift_label"]
+          shift_end?: string | null
+          shift_start?: string | null
+          sleep?: string | null
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          child_id?: string | null
+          created_at?: string
+          family_id?: string
+          fluids?: string | null
+          id?: string
+          meds?: string | null
+          mood?: string | null
+          notes?: string | null
+          seizures?: string | null
+          shift?: Database["public"]["Enums"]["shift_label"]
+          shift_end?: string | null
+          shift_start?: string | null
+          sleep?: string | null
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handovers_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handovers_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invites: {
         Row: {
           accepted_at: string | null
@@ -430,6 +502,7 @@ export type Database = {
         | "inhaled"
         | "other"
       member_role: "owner" | "caregiver"
+      shift_label: "morning" | "afternoon" | "night" | "custom"
       vital_type:
         | "heart_rate"
         | "spo2"
@@ -570,6 +643,7 @@ export const Constants = {
       med_log_status: ["given", "skipped", "missed"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
+      shift_label: ["morning", "afternoon", "night", "custom"],
       vital_type: [
         "heart_rate",
         "spo2",
