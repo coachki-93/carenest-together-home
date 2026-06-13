@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Loader2, LogOut, User, Lock, Globe, Palette } from "lucide-react";
+import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles } from "lucide-react";
+import { resetTour } from "@/lib/onboarding/tour-state";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
 import {
