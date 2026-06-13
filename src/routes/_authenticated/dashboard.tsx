@@ -536,7 +536,8 @@ function DashboardPage() {
           </section>
 
           {/* Handover preview */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="handover">
+
             {(() => {
               const fmt = new Intl.DateTimeFormat(
                 i18n.language === "sv" ? "sv-SE" : "en-US",
