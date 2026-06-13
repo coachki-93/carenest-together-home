@@ -291,7 +291,38 @@ function DashboardPage() {
         </Button>
       }
     >
+      {(() => {
+        const isOwner = profile?.account_type === "family";
+        const hasChild = !!child;
+        const hasMeds = meds.length > 0;
+        const hasInviteOrTeam = members.length > 1 || invites.length > 0;
+        const setupComplete = hasChild && hasMeds && hasInviteOrTeam;
+        if (!isOwner || setupComplete) return null;
+        return (
+          <Link
+            to="/onboarding/child"
+            search={{ step: hasChild ? (hasMeds ? 4 : 3) : 2 }}
+            className="card-soft mb-6 p-4 flex items-center gap-3 hover:shadow-soft transition-shadow border border-primary/30 bg-primary-soft/30"
+          >
+            <div className="size-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+              <Sparkles className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold">{t("dashboard.resumeTitle")}</div>
+              <div className="text-sm text-muted-foreground">
+                {!hasChild
+                  ? t("dashboard.resumeChild")
+                  : !hasMeds
+                    ? t("dashboard.resumeMed")
+                    : t("dashboard.resumeInvite")}
+              </div>
+            </div>
+            <ChevronRight className="size-5 text-muted-foreground shrink-0" />
+          </Link>
+        );
+      })()}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
         {/* LEFT — main column */}
         <div className="xl:col-span-2 space-y-6">
           {/* Hero greeting card */}
