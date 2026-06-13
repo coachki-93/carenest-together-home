@@ -17,6 +17,7 @@ import {
   Stethoscope,
   CalendarClock,
   Sparkles,
+  X,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -133,6 +134,33 @@ function DashboardPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
+  const dismissKey = user?.id ? `carenest.resume.dismissed.${user.id}` : null;
+  const [resumeDismissed, setResumeDismissed] = useState<boolean>(() => {
+    if (typeof window === "undefined" || !dismissKey) return false;
+    try {
+      return window.localStorage.getItem(dismissKey) === "1";
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    if (typeof window === "undefined" || !dismissKey) return;
+    try {
+      setResumeDismissed(window.localStorage.getItem(dismissKey) === "1");
+    } catch {
+      /* ignore */
+    }
+  }, [dismissKey]);
+  function dismissResume() {
+    if (dismissKey) {
+      try {
+        window.localStorage.setItem(dismissKey, "1");
+      } catch {
+        /* ignore */
+      }
+    }
+    setResumeDismissed(true);
+  }
 
   // Guided tour state
   const [tourOpen, setTourOpen] = useState(false);
@@ -298,28 +326,39 @@ function DashboardPage() {
         const hasMeds = meds.length > 0;
         const hasInviteOrTeam = members.length > 1 || invites.length > 0;
         const setupComplete = hasChild && hasMeds && hasInviteOrTeam;
-        if (!isOwner || setupComplete) return null;
+        if (!isOwner || setupComplete || resumeDismissed) return null;
         return (
-          <Link
-            to="/onboarding/child"
-            search={{ step: hasChild ? (hasMeds ? 4 : 3) : 2 }}
-            className="card-soft mb-6 p-4 flex items-center gap-3 hover:shadow-soft transition-shadow border border-primary/30 bg-primary-soft/30"
-          >
-            <div className="size-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-              <Sparkles className="size-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-bold">{t("dashboard.resumeTitle")}</div>
-              <div className="text-sm text-muted-foreground">
-                {!hasChild
-                  ? t("dashboard.resumeChild")
-                  : !hasMeds
-                    ? t("dashboard.resumeMed")
-                    : t("dashboard.resumeInvite")}
+          <div className="card-soft mb-6 p-4 flex items-center gap-3 border border-primary/30 bg-primary-soft/30">
+            <Link
+              to="/onboarding/child"
+              search={{ step: hasChild ? (hasMeds ? 4 : 3) : 2 }}
+              className="flex items-center gap-3 flex-1 min-w-0 hover:opacity-90 transition-opacity"
+            >
+              <div className="size-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+                <Sparkles className="size-5" />
               </div>
-            </div>
-            <ChevronRight className="size-5 text-muted-foreground shrink-0" />
-          </Link>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold">{t("dashboard.resumeTitle")}</div>
+                <div className="text-sm text-muted-foreground">
+                  {!hasChild
+                    ? t("dashboard.resumeChild")
+                    : !hasMeds
+                      ? t("dashboard.resumeMed")
+                      : t("dashboard.resumeInvite")}
+                </div>
+              </div>
+              <ChevronRight className="size-5 text-muted-foreground shrink-0" />
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full shrink-0"
+              onClick={dismissResume}
+              aria-label={t("dashboard.resumeDismiss")}
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
         );
       })()}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
