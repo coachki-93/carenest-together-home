@@ -40,6 +40,7 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const { t } = useTranslation();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -47,12 +48,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="card-soft max-w-md text-center p-10">
-        <h1 className="text-xl font-semibold tracking-tight">
-          Something didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Take a breath — try again or head home.
-        </p>
+        <h1 className="text-xl font-semibold tracking-tight">{t("error.title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("error.body")}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -61,13 +58,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
-            Try again
+            {t("error.tryAgain")}
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-full border border-input bg-card px-5 py-2.5 text-sm font-semibold hover:bg-accent"
           >
-            Go home
+            {t("error.goHome")}
           </a>
         </div>
       </div>
