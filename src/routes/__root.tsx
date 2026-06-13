@@ -13,7 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
-import { hydrateClientLanguage } from "@/lib/i18n";
+import { resolveClientLanguage, setI18nLanguage } from "@/lib/i18n";
+import { parseLangFromCookieHeader, type Lang } from "@/lib/i18n/cookie";
 import { useTranslation } from "react-i18next";
 
 function NotFoundComponent() {
@@ -73,6 +74,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // beforeLoad runs on both server and client BEFORE the route renders.
+  // We resolve the user's language here so SSR + first client paint match.
+  beforeLoad: async () => {
+    let lang: Lang = "en";
+    if (typeof window === "undefined") {
+      // Server: read cookie from incoming request
+      try {
+        const { getRequestHeader } = await import("@tanstack/react-start/server");
+        const cookieHeader = getRequestHeader("cookie") ?? null;
+        lang = parseLangFromCookieHeader(cookieHeader) ?? "en";
+      } catch {
+        lang = "en";
+      }
+    } else {
+      lang = resolveClientLanguage();
+    }
+    setI18nLanguage(lang);
+    return { lang };
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -128,7 +148,6 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    hydrateClientLanguage();
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();

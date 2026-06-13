@@ -333,6 +333,63 @@ export type Database = {
         }
         Relationships: []
       }
+      vitals: {
+        Row: {
+          child_id: string
+          created_at: string
+          family_id: string
+          id: string
+          logged_at: string
+          logged_by: string | null
+          notes: string | null
+          unit: string
+          updated_at: string
+          value: number
+          vital_type: Database["public"]["Enums"]["vital_type"]
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          family_id: string
+          id?: string
+          logged_at?: string
+          logged_by?: string | null
+          notes?: string | null
+          unit: string
+          updated_at?: string
+          value: number
+          vital_type: Database["public"]["Enums"]["vital_type"]
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          logged_at?: string
+          logged_by?: string | null
+          notes?: string | null
+          unit?: string
+          updated_at?: string
+          value?: number
+          vital_type?: Database["public"]["Enums"]["vital_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vitals_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vitals_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -373,6 +430,14 @@ export type Database = {
         | "inhaled"
         | "other"
       member_role: "owner" | "caregiver"
+      vital_type:
+        | "heart_rate"
+        | "spo2"
+        | "temperature"
+        | "weight"
+        | "seizure"
+        | "fluids"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -505,6 +570,15 @@ export const Constants = {
       med_log_status: ["given", "skipped", "missed"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
+      vital_type: [
+        "heart_rate",
+        "spo2",
+        "temperature",
+        "weight",
+        "seizure",
+        "fluids",
+        "other",
+      ],
     },
   },
 } as const
