@@ -1,0 +1,149 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+export type Child = Database["public"]["Tables"]["children"]["Row"];
+export type ChildUpdate = Database["public"]["Tables"]["children"]["Update"];
+export type FamilyMember = Database["public"]["Tables"]["family_members"]["Row"];
+export type Invite = Database["public"]["Tables"]["invites"]["Row"];
+export type MemberRole = Database["public"]["Enums"]["member_role"];
+
+export interface MemberWithProfile extends FamilyMember {
+  profile: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+    avatar_color: string | null;
+  } | null;
+}
+
+export function useUpdateChild() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: ChildUpdate }) => {
+      const { data, error } = await supabase
+        .from("children")
+        .update(patch)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["family-child"] });
+    },
+  });
+}
+
+export function useFamilyMembers(familyId: string | undefined | null) {
+  return useQuery({
+    queryKey: ["family-members", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data: members, error } = await supabase
+        .from("family_members")
+        .select("*")
+        .eq("family_id", familyId!)
+        .order("joined_at", { ascending: true });
+      if (error) throw error;
+
+      const ids = (members ?? []).map((m) => m.user_id);
+      if (ids.length === 0) return [] as MemberWithProfile[];
+
+      const { data: profiles, error: pErr } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url, avatar_color")
+        .in("id", ids);
+      if (pErr) throw pErr;
+
+      const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+      return (members ?? []).map((m) => ({
+        ...m,
+        profile: byId.get(m.user_id) ?? null,
+      })) as MemberWithProfile[];
+    },
+  });
+}
+
+export function useInvites(familyId: string | undefined | null) {
+  return useQuery({
+    queryKey: ["invites", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invites")
+        .select("*")
+        .eq("family_id", familyId!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Invite[];
+    },
+  });
+}
+
+function generateCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  const arr = new Uint8Array(8);
+  crypto.getRandomValues(arr);
+  for (let i = 0; i < 8; i++) s += alphabet[arr[i] % alphabet.length];
+  return s;
+}
+
+export function useCreateInvite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      familyId,
+      createdBy,
+      daysValid = 14,
+    }: {
+      familyId: string;
+      createdBy: string;
+      daysValid?: number;
+    }) => {
+      const expires = new Date();
+      expires.setDate(expires.getDate() + daysValid);
+      const { data, error } = await supabase
+        .from("invites")
+        .insert({
+          family_id: familyId,
+          created_by: createdBy,
+          code: generateCode(),
+          expires_at: expires.toISOString(),
+          status: "pending",
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Invite;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["invites"] }),
+  });
+}
+
+export function useRevokeInvite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("invites")
+        .update({ status: "revoked" })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["invites"] }),
+  });
+}
+
+export function useRemoveMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("family_members").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["family-members"] }),
+  });
+}
