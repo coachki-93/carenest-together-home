@@ -16,15 +16,12 @@ import { Toaster } from "@/components/ui/sonner";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { resolveClientLanguage, setI18nLanguage } from "@/lib/i18n";
 import { type Lang } from "@/lib/i18n/cookie";
+import { resolveLanguageServer } from "@/lib/i18n/resolve.server";
 import { useTranslation } from "react-i18next";
 
 const resolveLanguageIso = createIsomorphicFn()
   .client((): Lang => resolveClientLanguage())
-  .server((): Lang => {
-    // Dynamic require so the server-only module is not pulled into client bundle.
-    const { resolveLanguageServer } = require("@/lib/i18n/resolve.server") as typeof import("@/lib/i18n/resolve.server");
-    return resolveLanguageServer();
-  });
+  .server((): Lang => resolveLanguageServer());
 
 function NotFoundComponent() {
   const { t } = useTranslation();
