@@ -84,8 +84,8 @@ function ChildOnboarding() {
         diagnosis: parsed.data.diagnosis || null,
         allergies: parsed.data.allergies || null,
         photo_url: photoPath,
-        emergency_contacts: cleanContacts,
-        doctors: cleanDoctors,
+        emergency_contacts: cleanContacts as unknown as Record<string, unknown>[],
+        doctors: cleanDoctors as unknown as Record<string, unknown>[],
       });
       if (cErr) throw cErr;
 
