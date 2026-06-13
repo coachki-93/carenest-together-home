@@ -13,9 +13,15 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { createIsomorphicFn } from "@tanstack/react-start";
 import { resolveClientLanguage, setI18nLanguage } from "@/lib/i18n";
-import { parseLangFromCookieHeader, type Lang } from "@/lib/i18n/cookie";
+import { type Lang } from "@/lib/i18n/cookie";
+import { resolveLanguageServer } from "@/lib/i18n/resolve.server";
 import { useTranslation } from "react-i18next";
+
+const resolveLanguageIso = createIsomorphicFn()
+  .client((): Lang => resolveClientLanguage())
+  .server((): Lang => resolveLanguageServer());
 
 function NotFoundComponent() {
   const { t } = useTranslation();
@@ -77,19 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   // beforeLoad runs on both server and client BEFORE the route renders.
   // We resolve the user's language here so SSR + first client paint match.
   beforeLoad: async () => {
-    let lang: Lang = "en";
-    if (typeof window === "undefined") {
-      // Server: read cookie from incoming request
-      try {
-        const { getRequestHeader } = await import("@tanstack/react-start/server");
-        const cookieHeader = getRequestHeader("cookie") ?? null;
-        lang = parseLangFromCookieHeader(cookieHeader) ?? "en";
-      } catch {
-        lang = "en";
-      }
-    } else {
-      lang = resolveClientLanguage();
-    }
+    const lang: Lang = resolveLanguageIso();
     setI18nLanguage(lang);
     return { lang };
   },
