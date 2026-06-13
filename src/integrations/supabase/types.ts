@@ -489,6 +489,10 @@ export type Database = {
           status: Database["public"]["Enums"]["invite_status"]
         }[]
       }
+      shares_family_with: {
+        Args: { _me: string; _other_user: string }
+        Returns: boolean
+      }
     }
     Enums: {
       account_type: "family" | "caregiver"
