@@ -44,10 +44,19 @@ import {
   type ScheduledDose,
 } from "@/lib/data/medications";
 import { useAppointments, type Appointment } from "@/lib/data/appointments";
-import { useFamilyMembers } from "@/lib/data/family";
+import { useFamilyMembers, useInvites } from "@/lib/data/family";
+import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
+import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
+import { Link } from "@tanstack/react-router";
+import { z } from "zod";
+
+const dashboardSearch = z.object({
+  tour: z.coerce.number().int().optional(),
+});
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — CareNest" }] }),
+  validateSearch: dashboardSearch,
   component: DashboardPage,
 });
 
