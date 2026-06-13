@@ -108,7 +108,7 @@ function AcceptInvite({ code, familyName, status }: { code: string; familyName: 
 
   async function accept() {
     setAccepting(true);
-    const { error } = await supabase.rpc("accept_invite", { _code: code, _display_color: null });
+    const { error } = await supabase.rpc("accept_invite", { _code: code });
     setAccepting(false);
     if (error) {
       toast.error(error.message);
