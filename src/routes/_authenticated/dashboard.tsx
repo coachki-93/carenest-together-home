@@ -120,6 +120,7 @@ function DashboardPage() {
   const { data: fluidsToday } = useVitals(familyId, { types: ["fluids"], sinceHours: 24 });
   const { data: latestHandover } = useLatestHandover(familyId);
   const { data: members = [] } = useFamilyMembers(familyId);
+  const { data: invites = [] } = useInvites(familyId);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
   const todayEnd = useMemo(() => endOfDay(new Date()), []);
@@ -129,7 +130,61 @@ function DashboardPage() {
 
   const logDose = useLogDose();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
+
+  // Guided tour state
+  const [tourOpen, setTourOpen] = useState(false);
+  useEffect(() => {
+    if (!user?.id) return;
+    if (search.tour === 1) {
+      resetTour(user.id);
+      setTourOpen(true);
+      // Clear the param so reloads don't re-open.
+      navigate({ to: "/dashboard", search: {}, replace: true });
+      return;
+    }
+    if (!isTourDone(user.id)) {
+      const tm = window.setTimeout(() => setTourOpen(true), 400);
+      return () => window.clearTimeout(tm);
+    }
+  }, [user?.id, search.tour, navigate]);
+
+  const tourSteps: TourStep[] = useMemo(
+    () => [
+      {
+        target: '[data-tour="today-schedule"]',
+        titleKey: "tour.scheduleTitle",
+        bodyKey: "tour.scheduleBody",
+      },
+      {
+        target: '[data-tour="vitals"]',
+        titleKey: "tour.vitalsTitle",
+        bodyKey: "tour.vitalsBody",
+      },
+      {
+        target: '[data-tour="handover"]',
+        titleKey: "tour.handoverTitle",
+        bodyKey: "tour.handoverBody",
+      },
+      {
+        target: '[data-tour="care-team"]',
+        titleKey: "tour.teamTitle",
+        bodyKey: "tour.teamBody",
+      },
+      {
+        target: '[data-tour="sidebar"]',
+        titleKey: "tour.navTitle",
+        bodyKey: "tour.navBody",
+      },
+    ],
+    [],
+  );
+
+  function closeTour() {
+    if (user?.id) markTourDone(user.id);
+    setTourOpen(false);
+  }
 
   const greeting = useMemo(() => {
     const h = new Date().getHours();
