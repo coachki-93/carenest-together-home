@@ -652,6 +652,13 @@ function DashboardPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <GuidedTour
+        open={tourOpen}
+        steps={tourSteps}
+        onClose={closeTour}
+        onFinish={closeTour}
+      />
     </DashboardLayout>
   );
 }
