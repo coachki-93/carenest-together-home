@@ -16,6 +16,7 @@ import {
   Briefcase,
   Stethoscope,
   CalendarClock,
+  Sparkles,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
