@@ -33,6 +33,7 @@ export function AppSidebar() {
   const items = [
     { title: t("nav.dashboard"), url: "/dashboard", icon: LayoutDashboard },
     { title: t("nav.schedule"), url: "/schedule", icon: CalendarClock },
+    { title: t("nav.medications"), url: "/medications", icon: Pill },
     { title: t("nav.vitals"), url: "/vitals", icon: Activity },
     { title: t("nav.handover"), url: "/handover", icon: ClipboardList },
   ];
