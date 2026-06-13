@@ -13,9 +13,18 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { createIsomorphicFn } from "@tanstack/react-start";
 import { resolveClientLanguage, setI18nLanguage } from "@/lib/i18n";
-import { parseLangFromCookieHeader, type Lang } from "@/lib/i18n/cookie";
+import { type Lang } from "@/lib/i18n/cookie";
 import { useTranslation } from "react-i18next";
+
+const resolveLanguageIso = createIsomorphicFn()
+  .client((): Lang => resolveClientLanguage())
+  .server((): Lang => {
+    // Dynamic require so the server-only module is not pulled into client bundle.
+    const { resolveLanguageServer } = require("@/lib/i18n/resolve.server") as typeof import("@/lib/i18n/resolve.server");
+    return resolveLanguageServer();
+  });
 
 function NotFoundComponent() {
   const { t } = useTranslation();
