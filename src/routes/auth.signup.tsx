@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { Loader2, Mail } from "lucide-react";
+import { useTranslation, Trans } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
@@ -20,21 +21,8 @@ export const Route = createFileRoute("/auth/signup")({
   component: SignUpPage,
 });
 
-const formSchema = z
-  .object({
-    fullName: z.string().trim().min(1, "Please enter your first name").max(80),
-    email: z.string().trim().email("Enter a valid email"),
-    password: z.string().min(8, "Use at least 8 characters").max(72),
-    confirm: z.string(),
-    agree: z.boolean(),
-  })
-  .refine((v) => v.password === v.confirm, {
-    path: ["confirm"],
-    message: "Passwords don't match",
-  })
-  .refine((v) => v.agree, { path: ["agree"], message: "Please agree to continue" });
-
 function SignUpPage() {
+  const { t } = useTranslation();
   const { invite } = useSearch({ from: "/auth/signup" });
   const navigate = useNavigate();
   const isCaregiver = !!invite;
@@ -51,11 +39,22 @@ function SignUpPage() {
     if (invite) localStorage.setItem("carenest:pending_invite", invite);
   }, [invite]);
 
+  const formSchema = z
+    .object({
+      fullName: z.string().trim().min(1, t("auth.nameRequired")).max(80),
+      email: z.string().trim().email(t("auth.invalidEmail")),
+      password: z.string().min(8, t("auth.use8")).max(72),
+      confirm: z.string(),
+      agree: z.boolean(),
+    })
+    .refine((v) => v.password === v.confirm, { path: ["confirm"], message: t("auth.passwordMismatch") })
+    .refine((v) => v.agree, { path: ["agree"], message: t("auth.pleaseAgree") });
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = formSchema.safeParse({ fullName, email, password, confirm, agree });
     if (!parsed.success) {
-      toast.error(parsed.error.errors[0]?.message ?? "Please check your details");
+      toast.error(parsed.error.errors[0]?.message ?? "");
       return;
     }
     setSubmitting(true);
@@ -83,7 +82,7 @@ function SignUpPage() {
       redirect_uri: window.location.origin + "/auth/login",
     });
     if (result.error) {
-      toast.error("Sign-in failed. Please try again.");
+      toast.error(t("auth.oauthFailed"));
       return;
     }
     if (result.redirected) return;
@@ -96,13 +95,16 @@ function SignUpPage() {
         <div className="mx-auto rounded-full bg-primary-soft size-14 flex items-center justify-center">
           <Mail className="size-6 text-primary" />
         </div>
-        <h1 className="text-2xl font-bold">Check your inbox</h1>
+        <h1 className="text-2xl font-bold">{t("auth.checkInbox")}</h1>
         <p className="text-muted-foreground text-sm">
-          We sent a confirmation link to <span className="font-semibold text-foreground">{sentTo}</span>.
-          Tap it to verify your email, then log in.
+          <Trans
+            i18nKey="auth.checkInboxBody"
+            values={{ email: sentTo }}
+            components={{ 1: <span className="font-semibold text-foreground" /> }}
+          />
         </p>
         <Button asChild className="rounded-full w-full h-12">
-          <Link to="/auth/login">Continue to log in</Link>
+          <Link to="/auth/login">{t("auth.continueLogin")}</Link>
         </Button>
       </div>
     );
@@ -112,98 +114,72 @@ function SignUpPage() {
     <div className="card-soft p-8 space-y-6">
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">
-          {isCaregiver ? "Join as a caregiver" : "Create your family account"}
+          {isCaregiver ? t("auth.signupTitleCaregiver") : t("auth.signupTitleFamily")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {isCaregiver
-            ? "You've been invited to help care for a child."
-            : "A calm space for your whole care team."}
+          {isCaregiver ? t("auth.signupSubCaregiver") : t("auth.signupSubFamily")}
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("google")}>
-          <GoogleIcon /> Google
+          <GoogleIcon /> {t("common.google")}
         </Button>
         <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("apple")}>
-          <AppleIcon /> Apple
+          <AppleIcon /> {t("common.apple")}
         </Button>
       </div>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
         <div className="relative flex justify-center text-xs uppercase tracking-wider">
-          <span className="bg-card px-3 text-muted-foreground">or with email</span>
+          <span className="bg-card px-3 text-muted-foreground">{t("common.orWithEmail")}</span>
         </div>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="fullName">First name</Label>
+          <Label htmlFor="fullName">{t("common.firstName")}</Label>
           <Input
-            id="fullName"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Sam"
-            className="h-12 rounded-xl"
-            autoComplete="given-name"
-            required
+            id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)}
+            placeholder="Sam" className="h-12 rounded-xl" autoComplete="given-name" required
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("common.email")}</Label>
           <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className="h-12 rounded-xl"
-            autoComplete="email"
-            required
+            id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com" className="h-12 rounded-xl" autoComplete="email" required
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("common.password")}</Label>
           <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="At least 8 characters"
-            className="h-12 rounded-xl"
-            autoComplete="new-password"
-            required
+            id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+            placeholder={t("auth.atLeast8")} className="h-12 rounded-xl" autoComplete="new-password" required
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="confirm">Confirm password</Label>
+          <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
           <Input
-            id="confirm"
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            className="h-12 rounded-xl"
-            autoComplete="new-password"
-            required
+            id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)}
+            className="h-12 rounded-xl" autoComplete="new-password" required
           />
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(!!v)} className="mt-0.5" />
-          <span className="text-muted-foreground">
-            I agree to the Terms and Privacy Policy.
-          </span>
+          <span className="text-muted-foreground">{t("auth.agreeTerms")}</span>
         </label>
         <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold">
           {submitting && <Loader2 className="size-4 animate-spin" />}
-          {submitting ? "Creating account…" : "Create account"}
+          {submitting ? t("auth.creatingAccount") : t("auth.create")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("auth.alreadyAccount")}{" "}
         <Link to="/auth/login" className="text-primary font-semibold hover:underline">
-          Log in
+          {t("auth.logIn")}
         </Link>
       </p>
     </div>
