@@ -270,6 +270,10 @@ export const en = {
     noMembers: "No caregivers yet.",
     owner: "Family owner",
     viewer: "Viewer",
+    resumeTitle: "Finish setting up CareNest",
+    resumeChild: "Add your child's profile to get started.",
+    resumeMed: "Add your first medication so the schedule has something on it.",
+    resumeInvite: "Invite a caregiver to share the care load.",
   },
   vitals: {
     title: "Vitals & logs",
