@@ -343,7 +343,8 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="today-schedule">
+
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.todaysSchedule")}</h3>
               <Button
