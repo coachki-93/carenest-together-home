@@ -8,19 +8,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { I18N_STORAGE_KEY } from "@/lib/i18n";
+import { writeLangCookieClient, type Lang } from "@/lib/i18n/cookie";
 
 const LANGS = [
-  { code: "en", label: "English", flag: "🇬🇧" },
-  { code: "sv", label: "Svenska", flag: "🇸🇪" },
-] as const;
+  { code: "en" as const, label: "English", flag: "🇬🇧" },
+  { code: "sv" as const, label: "Svenska", flag: "🇸🇪" },
+];
 
 export function LanguageToggle({ compact = false }: { compact?: boolean }) {
   const { i18n, t } = useTranslation();
-  // Defer client-only language state until after mount to avoid SSR hydration mismatch
+  // Defer client-only language label until after mount to avoid SSR mismatch
+  // on the trigger button text (cookies on first SSR may not match toggle paint timing).
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const current = LANGS.find((l) => i18n.language?.startsWith(l.code)) ?? LANGS[0];
+
+  function pick(code: Lang) {
+    writeLangCookieClient(code);
+    try {
+      window.localStorage.setItem(I18N_STORAGE_KEY, code);
+    } catch {
+      // ignore
+    }
+    void i18n.changeLanguage(code);
+  }
 
   return (
     <DropdownMenu>
@@ -44,7 +57,7 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
         {LANGS.map((l) => (
           <DropdownMenuItem
             key={l.code}
-            onClick={() => i18n.changeLanguage(l.code)}
+            onClick={() => pick(l.code)}
             className="rounded-lg cursor-pointer gap-2"
           >
             <span>{l.flag}</span>
