@@ -86,6 +86,7 @@ function DashboardPage() {
     types: ["fluids"],
     sinceHours: 24,
   });
+  const { data: latestHandover } = useLatestHandover(membership?.family_id);
   const navigate = useNavigate();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [confirmTask, setConfirmTask] = useState<Task | null>(null);
