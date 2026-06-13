@@ -3,9 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
   Pill,
-  Utensils,
   Activity,
-  Moon,
   Heart,
   Thermometer,
   Droplet,
@@ -14,12 +12,16 @@ import {
   Plus,
   Sun,
   ChevronRight,
+  Calendar,
+  Briefcase,
+  Stethoscope,
+  CalendarClock,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { useProfile, useMyMembership } from "@/lib/auth/use-profile";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,20 +36,30 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT } from "@/lib/data/vitals";
 import { useLatestHandover } from "@/lib/data/handovers";
+import {
+  buildTodaysDoses,
+  useMedications,
+  useMedLogs,
+  useLogDose,
+  type ScheduledDose,
+} from "@/lib/data/medications";
+import { useAppointments, type Appointment } from "@/lib/data/appointments";
+import { useFamilyMembers } from "@/lib/data/family";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — CareNest" }] }),
   component: DashboardPage,
 });
 
-type TaskType = "medication" | "feed" | "therapy" | "sleep";
-interface Task {
+type TaskKind = "medication" | "appointment" | "therapy" | "task" | "other";
+interface TaskItem {
   id: string;
   time: string;
   title: string;
   detail: string;
-  type: TaskType;
-  done?: boolean;
+  type: TaskKind;
+  done: boolean;
+  source: { kind: "dose"; dose: ScheduledDose } | { kind: "appt"; appt: Appointment };
 }
 
 function useChild() {
@@ -69,27 +81,46 @@ function useChild() {
   });
 }
 
-const TYPE_STYLES: Record<TaskType, { icon: typeof Pill; bg: string; fg: string }> = {
+const TYPE_STYLES: Record<TaskKind, { icon: typeof Pill; bg: string; fg: string }> = {
   medication: { icon: Pill, bg: "bg-primary-soft", fg: "text-primary" },
-  feed: { icon: Utensils, bg: "bg-warning/20", fg: "text-warning-foreground" },
+  appointment: { icon: Stethoscope, bg: "bg-warning/20", fg: "text-warning-foreground" },
   therapy: { icon: Activity, bg: "bg-success/20", fg: "text-success-foreground" },
-  sleep: { icon: Moon, bg: "bg-lavender-deep/40", fg: "text-accent-foreground" },
+  task: { icon: Briefcase, bg: "bg-lavender-deep/40", fg: "text-accent-foreground" },
+  other: { icon: Calendar, bg: "bg-secondary", fg: "text-foreground" },
 };
+
+function startOfDay(d: Date) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+function endOfDay(d: Date) {
+  const x = startOfDay(d);
+  x.setDate(x.getDate() + 1);
+  return x;
+}
 
 function DashboardPage() {
   const { t, i18n } = useTranslation();
+  const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
+  const familyId = membership?.family_id;
   const { data: child } = useChild();
-  const { data: latestVitals } = useLatestVitals(membership?.family_id);
-  const { data: fluidsToday } = useVitals(membership?.family_id, {
-    types: ["fluids"],
-    sinceHours: 24,
-  });
-  const { data: latestHandover } = useLatestHandover(membership?.family_id);
+  const { data: latestVitals } = useLatestVitals(familyId);
+  const { data: fluidsToday } = useVitals(familyId, { types: ["fluids"], sinceHours: 24 });
+  const { data: latestHandover } = useLatestHandover(familyId);
+  const { data: members = [] } = useFamilyMembers(familyId);
+
+  const todayStart = useMemo(() => startOfDay(new Date()), []);
+  const todayEnd = useMemo(() => endOfDay(new Date()), []);
+  const { data: meds = [] } = useMedications(familyId);
+  const { data: logs = [] } = useMedLogs(familyId, todayStart, todayEnd);
+  const { data: appointments = [] } = useAppointments(familyId, todayStart, todayEnd);
+
+  const logDose = useLogDose();
   const navigate = useNavigate();
-  const [completed, setCompleted] = useState<Set<string>>(new Set());
-  const [confirmTask, setConfirmTask] = useState<Task | null>(null);
+  const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
 
   const greeting = useMemo(() => {
     const h = new Date().getHours();
@@ -108,25 +139,74 @@ function DashboardPage() {
     [i18n.language],
   );
 
-  // Placeholder tasks — persisted logging arrives in a later step
-  const tasks: Task[] = [
-    { id: "1", time: "08:00", type: "medication", title: t("demo.med.keppra"), detail: "250mg • " + t("demo.oral") },
-    { id: "2", time: "08:30", type: "feed", title: t("demo.feed.breakfast"), detail: "200ml • " + t("demo.viaTube") },
-    { id: "3", time: "10:00", type: "therapy", title: t("demo.therapy.physio"), detail: "30 min • " + t("demo.withMaria") },
-    { id: "4", time: "12:00", type: "medication", title: t("demo.med.baclofen"), detail: "10mg • " + t("demo.oral") },
-    { id: "5", time: "12:30", type: "feed", title: t("demo.feed.lunch"), detail: "220ml • " + t("demo.viaTube") },
-    { id: "6", time: "14:00", type: "sleep", title: t("demo.rest"), detail: t("demo.napWindow") },
-    { id: "7", time: "16:00", type: "medication", title: t("demo.med.keppra"), detail: "250mg • " + t("demo.oral") },
-    { id: "8", time: "18:30", type: "feed", title: t("demo.feed.dinner"), detail: "220ml • " + t("demo.viaTube") },
-  ];
-  const visibleTasks = tasks.map((tk) => ({ ...tk, done: completed.has(tk.id) }));
-  const doneCount = visibleTasks.filter((t) => t.done).length;
-  const nextTask = visibleTasks.find((t) => !t.done);
+  const tasks: TaskItem[] = useMemo(() => {
+    const items: TaskItem[] = [];
+    const doses = buildTodaysDoses(meds, logs);
+    const fmtTime = (d: Date) =>
+      d.toLocaleTimeString(i18n.language === "sv" ? "sv-SE" : "en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
-  function confirmDone() {
-    if (!confirmTask) return;
-    setCompleted((prev) => new Set(prev).add(confirmTask.id));
-    toast.success(t("dashboard.taskLogged", { title: confirmTask.title }));
+    for (const d of doses) {
+      const dose = d.medication;
+      const amount = dose.dose_amount ?? "";
+      const unit = dose.dose_unit ?? "";
+      const detail = [amount && unit ? `${amount} ${unit}` : amount || unit, dose.route]
+        .filter(Boolean)
+        .join(" • ");
+      items.push({
+        id: `dose-${d.key}`,
+        time: d.time,
+        title: dose.name,
+        detail,
+        type: "medication",
+        done: d.log?.status === "given",
+        source: { kind: "dose", dose: d },
+      });
+    }
+
+    for (const a of appointments) {
+      const at = new Date(a.starts_at);
+      const time = a.all_day ? t("dashboard.allDay") : fmtTime(at);
+      const detail = [a.location, a.notes].filter(Boolean).join(" • ");
+      items.push({
+        id: `appt-${a.id}`,
+        time,
+        title: a.title,
+        detail,
+        type: (a.kind as TaskKind) ?? "other",
+        done: false,
+        source: { kind: "appt", appt: a },
+      });
+    }
+
+    return items.sort((a, b) => a.time.localeCompare(b.time));
+  }, [meds, logs, appointments, i18n.language, t]);
+
+  const doneCount = tasks.filter((tk) => tk.done).length;
+  const totalCount = tasks.length;
+  const nextTask = tasks.find((tk) => !tk.done);
+
+  async function confirmDone() {
+    if (!confirmTask || !familyId || !child) return;
+    if (confirmTask.source.kind !== "dose") {
+      setConfirmTask(null);
+      return;
+    }
+    try {
+      await logDose.mutateAsync({
+        family_id: familyId,
+        child_id: child.id,
+        medication_id: confirmTask.source.dose.medication.id,
+        scheduled_for: confirmTask.source.dose.scheduled_for.toISOString(),
+        status: "given",
+        given_by: user?.id ?? null,
+      });
+      toast.success(t("dashboard.taskLogged", { title: confirmTask.title }));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
     setConfirmTask(null);
   }
 
@@ -138,7 +218,11 @@ function DashboardPage() {
       title={t("dashboard.today")}
       subtitle={today}
       actions={
-        <Button size="sm" className="rounded-full gap-1.5 font-semibold">
+        <Button
+          size="sm"
+          className="rounded-full gap-1.5 font-semibold"
+          onClick={() => navigate({ to: "/schedule" })}
+        >
           <Plus className="size-4" /> {t("dashboard.logEvent")}
         </Button>
       }
@@ -169,7 +253,7 @@ function DashboardPage() {
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-3xl font-extrabold">{doneCount}</span>
                   <span className="text-muted-foreground font-semibold">
-                    / {visibleTasks.length} {t("dashboard.tasks")}
+                    / {totalCount} {t("dashboard.tasks")}
                   </span>
                 </div>
               </div>
@@ -177,7 +261,7 @@ function DashboardPage() {
                 <div className="h-3 rounded-full bg-secondary overflow-hidden">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-primary to-lavender-deep transition-all duration-500"
-                    style={{ width: `${(doneCount / visibleTasks.length) * 100}%` }}
+                    style={{ width: `${totalCount ? (doneCount / totalCount) * 100 : 0}%` }}
                   />
                 </div>
               </div>
@@ -198,62 +282,106 @@ function DashboardPage() {
           <section className="card-soft p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.todaysSchedule")}</h3>
-              <Button variant="ghost" size="sm" className="rounded-full text-primary font-semibold">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full text-primary font-semibold"
+                onClick={() => navigate({ to: "/schedule" })}
+              >
                 {t("dashboard.viewFull")} <ChevronRight className="size-4" />
               </Button>
             </div>
-            <ul className="space-y-2">
-              {visibleTasks.map((task) => {
-                const style = TYPE_STYLES[task.type];
-                const Icon = style.icon;
-                return (
-                  <li
-                    key={task.id}
-                    className={cn(
-                      "group flex items-center gap-3 md:gap-4 rounded-2xl border border-border/60 p-3 md:p-4 transition-all",
-                      task.done ? "bg-success/5 opacity-70" : "bg-card hover:shadow-soft",
-                    )}
+            {tasks.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+                <CalendarClock className="size-8 mx-auto text-muted-foreground mb-2" />
+                <p className="font-bold mb-1">{t("dashboard.emptyTitle")}</p>
+                <p className="text-sm text-muted-foreground mb-4">{t("dashboard.emptyBody")}</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => navigate({ to: "/medications" })}
                   >
-                    <div className="flex items-center gap-1.5 text-sm font-bold text-muted-foreground w-14 shrink-0">
-                      <Clock className="size-3.5" />
-                      {task.time}
-                    </div>
-                    <div
+                    {t("dashboard.addMedication")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full"
+                    onClick={() => navigate({ to: "/schedule" })}
+                  >
+                    {t("dashboard.addEvent")}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <ul className="space-y-2">
+                {tasks.map((task) => {
+                  const style = TYPE_STYLES[task.type];
+                  const Icon = style.icon;
+                  const isDose = task.source.kind === "dose";
+                  return (
+                    <li
+                      key={task.id}
                       className={cn(
-                        "size-11 rounded-2xl flex items-center justify-center shrink-0",
-                        style.bg,
+                        "group flex items-center gap-3 md:gap-4 rounded-2xl border border-border/60 p-3 md:p-4 transition-all",
+                        task.done ? "bg-success/5 opacity-70" : "bg-card hover:shadow-soft",
                       )}
                     >
-                      <Icon className={cn("size-5", style.fg)} />
-                    </div>
-                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 text-sm font-bold text-muted-foreground w-14 shrink-0">
+                        <Clock className="size-3.5" />
+                        {task.time}
+                      </div>
                       <div
                         className={cn(
-                          "font-bold truncate",
-                          task.done && "line-through text-muted-foreground",
+                          "size-11 rounded-2xl flex items-center justify-center shrink-0",
+                          style.bg,
                         )}
                       >
-                        {task.title}
+                        <Icon className={cn("size-5", style.fg)} />
                       </div>
-                      <div className="text-sm text-muted-foreground truncate">{task.detail}</div>
-                    </div>
-                    {task.done ? (
-                      <div className="flex items-center gap-1.5 text-success-foreground bg-success/20 rounded-full px-3 py-1.5 text-sm font-bold">
-                        <CheckCircle2 className="size-4" /> {t("dashboard.done")}
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className={cn(
+                            "font-bold truncate",
+                            task.done && "line-through text-muted-foreground",
+                          )}
+                        >
+                          {task.title}
+                        </div>
+                        {task.detail && (
+                          <div className="text-sm text-muted-foreground truncate">
+                            {task.detail}
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <Button
-                        size="sm"
-                        className="rounded-full font-bold"
-                        onClick={() => setConfirmTask(task)}
-                      >
-                        {t("dashboard.markDone")}
-                      </Button>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+                      {task.done ? (
+                        <div className="flex items-center gap-1.5 text-success-foreground bg-success/20 rounded-full px-3 py-1.5 text-sm font-bold">
+                          <CheckCircle2 className="size-4" /> {t("dashboard.done")}
+                        </div>
+                      ) : isDose ? (
+                        <Button
+                          size="sm"
+                          className="rounded-full font-bold"
+                          onClick={() => setConfirmTask(task)}
+                        >
+                          {t("dashboard.markDone")}
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-full font-bold"
+                          onClick={() => navigate({ to: "/schedule" })}
+                        >
+                          {t("dashboard.open")}
+                        </Button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </section>
         </div>
 
@@ -403,11 +531,38 @@ function DashboardPage() {
 
           {/* Care team */}
           <section className="card-soft p-6">
-            <h3 className="text-lg font-extrabold mb-4">{t("dashboard.onShift")}</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-extrabold">{t("dashboard.onShift")}</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full text-primary font-semibold"
+                onClick={() => navigate({ to: "/caregivers" })}
+              >
+                {t("dashboard.manage")} <ChevronRight className="size-4" />
+              </Button>
+            </div>
             <div className="space-y-3">
-              <CareMember name={profile?.full_name ?? "—"} role={t("dashboard.youLabel")} color="#6C63FF" you />
-              <CareMember name="Maria L." role={t("dashboard.therapist")} color="#7BC4A4" />
-              <CareMember name="Jonas P." role={t("dashboard.caregiver")} color="#F2A65A" />
+              {members.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("dashboard.noMembers")}</p>
+              ) : (
+                members.map((m) => (
+                  <CareMember
+                    key={m.id}
+                    name={m.profile?.full_name ?? "—"}
+                    role={
+                      m.role === "owner"
+                        ? t("dashboard.owner")
+                        : m.role === "caregiver"
+                          ? t("dashboard.caregiver")
+                          : t("dashboard.viewer")
+                    }
+                    color={m.profile?.avatar_color ?? m.display_color ?? "#6C63FF"}
+                    avatarUrl={m.profile?.avatar_url ?? null}
+                    you={m.user_id === user?.id}
+                  />
+                ))
+              )}
             </div>
           </section>
         </div>
@@ -479,11 +634,13 @@ function CareMember({
   name,
   role,
   color,
+  avatarUrl,
   you,
 }: {
   name: string;
   role: string;
   color: string;
+  avatarUrl?: string | null;
   you?: boolean;
 }) {
   const initials = name
@@ -494,19 +651,27 @@ function CareMember({
     .join("");
   return (
     <div className="flex items-center gap-3">
-      <div
-        className="size-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-        style={{ backgroundColor: color }}
-      >
-        {initials || "•"}
-      </div>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={name}
+          className="size-10 rounded-full object-cover shrink-0"
+        />
+      ) : (
+        <div
+          className="size-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
+          style={{ backgroundColor: color }}
+        >
+          {initials || "•"}
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <div className="font-bold truncate">{name}</div>
         <div className="text-xs text-muted-foreground">{role}</div>
       </div>
       {you && (
         <span className="text-xs font-bold text-primary bg-primary-soft rounded-full px-2 py-0.5">
-          {you ? "•" : ""}
+          ·
         </span>
       )}
     </div>
