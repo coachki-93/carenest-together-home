@@ -2,9 +2,11 @@ import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession, useProfile, useMyMembership } from "@/lib/auth/use-profile";
 import { Logo } from "@/components/carenest/Logo";
+import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
 import { AvatarColorPicker, AVATAR_COLORS, initials } from "@/components/carenest/AvatarColorPicker";
 import { Button } from "@/components/ui/button";
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/onboarding/caregiver")({
 });
 
 function CaregiverOnboarding() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useSession();
   const profile = useProfile();
@@ -30,7 +33,7 @@ function CaregiverOnboarding() {
   const save = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not signed in");
-      if (!name.trim()) throw new Error("Please enter your name");
+      if (!name.trim()) throw new Error(t("onboardingCaregiver.namePh"));
       const { error } = await supabase.from("profiles").update({
         full_name: name.trim(),
         avatar_url: avatarPath,
@@ -39,7 +42,6 @@ function CaregiverOnboarding() {
       }).eq("id", user.id);
       if (error) throw error;
 
-      // Also save the color on family_members row if joined.
       if (membership.data?.id) {
         await supabase.from("family_members")
           .update({ display_color: color })
@@ -47,7 +49,7 @@ function CaregiverOnboarding() {
       }
     },
     onSuccess: () => {
-      toast.success("Profile saved");
+      toast.success(t("onboardingCaregiver.saved"));
       navigate({ to: "/home" });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -56,15 +58,18 @@ function CaregiverOnboarding() {
   return (
     <div className="min-h-screen px-4 py-10">
       <div className="max-w-xl mx-auto space-y-8">
-        <header className="text-center space-y-3">
-          <Logo size={44} className="justify-center" />
-          <h1 className="text-3xl md:text-4xl font-extrabold">Welcome, caregiver</h1>
+        <header className="flex items-center justify-between">
+          <Logo size={40} withWordmark />
+          <LanguageToggle />
+        </header>
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl md:text-4xl font-extrabold">{t("onboardingCaregiver.title")}</h1>
           <p className="text-muted-foreground">
             {membership.data?.families?.name
-              ? `You've joined ${membership.data.families.name}. Set up your profile so the family knows it's you.`
-              : "Set up your profile so the family knows it's you."}
+              ? t("onboardingCaregiver.subJoined", { family: membership.data.families.name })
+              : t("onboardingCaregiver.sub")}
           </p>
-        </header>
+        </div>
 
         <form
           onSubmit={(e) => { e.preventDefault(); save.mutate(); }}
@@ -88,17 +93,17 @@ function CaregiverOnboarding() {
                 >
                   {initials(name || "?")}
                 </div>
-                <p className="text-xs text-muted-foreground">Or pick a color</p>
+                <p className="text-xs text-muted-foreground">{t("onboardingCaregiver.pickColor")}</p>
                 <AvatarColorPicker value={color} onChange={setColor} />
               </div>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="name" className="text-sm font-semibold">Your name</Label>
+            <Label htmlFor="name" className="text-sm font-semibold">{t("common.fullName")}</Label>
             <Input
               id="name" value={name} onChange={(e) => setName(e.target.value)}
-              className="h-12 rounded-xl" placeholder="What should the family call you?"
+              className="h-12 rounded-xl" placeholder={t("onboardingCaregiver.namePh")}
               required
             />
           </div>
@@ -106,7 +111,7 @@ function CaregiverOnboarding() {
           <Button type="submit" disabled={save.isPending}
             className="w-full rounded-full h-12 text-base font-semibold">
             {save.isPending && <Loader2 className="size-4 animate-spin" />}
-            {save.isPending ? "Saving…" : "Finish setup"}
+            {save.isPending ? t("common.saving") : t("onboardingCaregiver.finish")}
           </Button>
         </form>
       </div>

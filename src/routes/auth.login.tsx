@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
@@ -14,31 +15,32 @@ export const Route = createFileRoute("/auth/login")({
   component: LoginPage,
 });
 
-const schema = z.object({
-  email: z.string().trim().email("Enter a valid email"),
-  password: z.string().min(1, "Enter your password"),
-});
-
 function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const schema = z.object({
+    email: z.string().trim().email(t("auth.invalidEmail")),
+    password: z.string().min(1, t("auth.passwordRequired")),
+  });
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = schema.safeParse({ email, password });
     if (!parsed.success) {
-      toast.error(parsed.error.errors[0]?.message ?? "Please check your details");
+      toast.error(parsed.error.errors[0]?.message ?? "");
       return;
     }
     setSubmitting(true);
     const { error } = await supabase.auth.signInWithPassword(parsed.data);
     setSubmitting(false);
     if (error) {
-      toast.error(error.message === "Email not confirmed"
-        ? "Please confirm your email first — check your inbox."
-        : "Email or password is incorrect.");
+      toast.error(
+        error.message === "Email not confirmed" ? t("auth.confirmFirst") : t("auth.badCreds"),
+      );
       return;
     }
     navigate({ to: "/home" });
@@ -49,7 +51,7 @@ function LoginPage() {
       redirect_uri: window.location.origin + "/auth/login",
     });
     if (result.error) {
-      toast.error("Sign-in failed. Please try again.");
+      toast.error(t("auth.oauthFailed"));
       return;
     }
     if (result.redirected) return;
@@ -59,29 +61,29 @@ function LoginPage() {
   return (
     <div className="card-soft p-8 space-y-6">
       <div className="space-y-1.5 text-center">
-        <h1 className="text-2xl font-extrabold">Welcome back</h1>
-        <p className="text-sm text-muted-foreground">Log in to continue caring.</p>
+        <h1 className="text-2xl font-extrabold">{t("auth.welcomeBack")}</h1>
+        <p className="text-sm text-muted-foreground">{t("auth.loginSubtitle")}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("google")}>
-          <GoogleIcon /> Google
+          <GoogleIcon /> {t("common.google")}
         </Button>
         <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("apple")}>
-          <AppleIcon /> Apple
+          <AppleIcon /> {t("common.apple")}
         </Button>
       </div>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
         <div className="relative flex justify-center text-xs uppercase tracking-wider">
-          <span className="bg-card px-3 text-muted-foreground">or with email</span>
+          <span className="bg-card px-3 text-muted-foreground">{t("common.orWithEmail")}</span>
         </div>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("common.email")}</Label>
           <Input
             id="email" type="email" autoComplete="email" required
             value={email} onChange={(e) => setEmail(e.target.value)}
@@ -90,9 +92,9 @@ function LoginPage() {
         </div>
         <div className="space-y-1.5">
           <div className="flex items-baseline justify-between">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("common.password")}</Label>
             <Link to="/auth/forgot-password" className="text-xs text-primary font-semibold hover:underline">
-              Forgot?
+              {t("auth.forgot")}
             </Link>
           </div>
           <Input
@@ -103,14 +105,14 @@ function LoginPage() {
         </div>
         <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold">
           {submitting && <Loader2 className="size-4 animate-spin" />}
-          {submitting ? "Logging in…" : "Log in"}
+          {submitting ? t("auth.loggingIn") : t("auth.logIn")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        New to CareNest?{" "}
+        {t("auth.newHere")}{" "}
         <Link to="/auth/signup" className="text-primary font-semibold hover:underline">
-          Create an account
+          {t("auth.createAccount")}
         </Link>
       </p>
     </div>

@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Heart } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth/use-profile";
 import { Logo } from "@/components/carenest/Logo";
+import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -14,8 +16,8 @@ export const Route = createFileRoute("/invite/$code")({
 });
 
 function InvitePage() {
+  const { t } = useTranslation();
   const { code } = Route.useParams();
-  const navigate = useNavigate();
   const { session, loading } = useSession();
 
   const invite = useQuery({
@@ -28,7 +30,6 @@ function InvitePage() {
     enabled: !!session,
   });
 
-  // Stash the code so post-signup we can complete the join.
   useEffect(() => {
     if (code) localStorage.setItem("carenest:pending_invite", code);
   }, [code]);
@@ -46,16 +47,14 @@ function InvitePage() {
       <Center>
         <div className="card-soft p-8 w-full max-w-md space-y-5 text-center">
           <Logo size={48} className="mx-auto" />
-          <h1 className="text-2xl font-extrabold">You've been invited</h1>
-          <p className="text-muted-foreground text-sm">
-            Create your caregiver account to accept this invite.
-          </p>
+          <h1 className="text-2xl font-extrabold">{t("invite.youInvited")}</h1>
+          <p className="text-muted-foreground text-sm">{t("invite.createCgAccount")}</p>
           <div className="flex flex-col gap-2">
             <Button asChild className="rounded-full h-12">
-              <Link to="/auth/signup" search={{ invite: code }}>Create caregiver account</Link>
+              <Link to="/auth/signup" search={{ invite: code }}>{t("invite.createCgBtn")}</Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full h-12">
-              <Link to="/auth/login">I already have an account</Link>
+              <Link to="/auth/login">{t("invite.haveAccountBtn")}</Link>
             </Button>
           </div>
         </div>
@@ -71,12 +70,10 @@ function InvitePage() {
     return (
       <Center>
         <div className="card-soft p-8 w-full max-w-md text-center space-y-4">
-          <h1 className="text-2xl font-extrabold">Invite not found</h1>
-          <p className="text-muted-foreground text-sm">
-            Double-check the code with the family that invited you.
-          </p>
+          <h1 className="text-2xl font-extrabold">{t("invite.notFound")}</h1>
+          <p className="text-muted-foreground text-sm">{t("invite.notFoundSub")}</p>
           <Button asChild className="rounded-full h-12 w-full">
-            <Link to="/invite">Try another code</Link>
+            <Link to="/invite">{t("invite.tryAnother")}</Link>
           </Button>
         </div>
       </Center>
@@ -87,6 +84,7 @@ function InvitePage() {
 }
 
 function AcceptInvite({ code, familyName, status }: { code: string; familyName: string; status: string }) {
+  const { t } = useTranslation();
   const [accepting, setAccepting] = useState(false);
   const navigate = useNavigate();
 
@@ -94,12 +92,10 @@ function AcceptInvite({ code, familyName, status }: { code: string; familyName: 
     return (
       <Center>
         <div className="card-soft p-8 w-full max-w-md text-center space-y-4">
-          <h1 className="text-2xl font-extrabold">This invite isn't active</h1>
-          <p className="text-muted-foreground text-sm">
-            Ask the family to send you a new one.
-          </p>
+          <h1 className="text-2xl font-extrabold">{t("invite.notActive")}</h1>
+          <p className="text-muted-foreground text-sm">{t("invite.notActiveSub")}</p>
           <Button asChild className="rounded-full h-12 w-full">
-            <Link to="/home">Go to CareNest</Link>
+            <Link to="/home">{t("invite.goHome")}</Link>
           </Button>
         </div>
       </Center>
@@ -115,7 +111,7 @@ function AcceptInvite({ code, familyName, status }: { code: string; familyName: 
       return;
     }
     localStorage.removeItem("carenest:pending_invite");
-    toast.success(`Welcome to ${familyName}!`);
+    toast.success(t("invite.welcome", { name: familyName }));
     navigate({ to: "/onboarding/caregiver" });
   }
 
@@ -126,14 +122,12 @@ function AcceptInvite({ code, familyName, status }: { code: string; familyName: 
           <Heart className="size-7 text-primary fill-current" />
         </div>
         <h1 className="text-2xl font-extrabold">
-          Join <span className="text-primary">{familyName}</span>
+          {t("invite.joinFamily")} <span className="text-primary">{familyName}</span>
         </h1>
-        <p className="text-muted-foreground text-sm">
-          You'll be added as a caregiver and can help with the daily care schedule.
-        </p>
+        <p className="text-muted-foreground text-sm">{t("invite.joinBody")}</p>
         <Button onClick={accept} disabled={accepting} className="rounded-full h-12 w-full text-base font-semibold">
           {accepting && <Loader2 className="size-4 animate-spin" />}
-          {accepting ? "Joining…" : "Accept invite"}
+          {accepting ? t("invite.joining") : t("invite.accept")}
         </Button>
       </div>
     </Center>
@@ -143,7 +137,10 @@ function AcceptInvite({ code, familyName, status }: { code: string; familyName: 
 function Center({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="px-8 pt-6"><Logo size={40} withWordmark /></header>
+      <header className="px-8 pt-6 flex items-center justify-between">
+        <Logo size={40} withWordmark />
+        <LanguageToggle />
+      </header>
       <main className="flex-1 flex items-center justify-center px-4">{children}</main>
     </div>
   );
