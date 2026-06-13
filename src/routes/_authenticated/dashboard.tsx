@@ -453,7 +453,8 @@ function DashboardPage() {
         {/* RIGHT — sidebar column */}
         <div className="space-y-6">
           {/* Vitals snapshot */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="vitals">
+
             {(() => {
               const hr = latestVitals?.get("heart_rate");
               const spo2 = latestVitals?.get("spo2");
