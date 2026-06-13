@@ -489,6 +489,14 @@ function StepFirstMedication({
   const [doseUnit, setDoseUnit] = useState("mg");
   const [time, setTime] = useState("08:00");
 
+  // If the user skipped step 2 (no child yet), there's nothing to attach a med
+  // to — skip this step automatically once the child query has settled.
+  useEffect(() => {
+    if (!child.isFetched) return;
+    if (!child.data) onSkip();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [child.isFetched, child.data?.id]);
+
   const create = useMutation({
     mutationFn: async () => {
       if (!user || !familyId || !child.data) throw new Error("Setup incomplete");
