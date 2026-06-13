@@ -170,6 +170,136 @@ export type Database = {
           },
         ]
       }
+      med_logs: {
+        Row: {
+          child_id: string
+          created_at: string
+          family_id: string
+          given_at: string | null
+          given_by: string | null
+          id: string
+          medication_id: string
+          notes: string | null
+          scheduled_for: string
+          status: Database["public"]["Enums"]["med_log_status"]
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          family_id: string
+          given_at?: string | null
+          given_by?: string | null
+          id?: string
+          medication_id: string
+          notes?: string | null
+          scheduled_for: string
+          status?: Database["public"]["Enums"]["med_log_status"]
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          family_id?: string
+          given_at?: string | null
+          given_by?: string | null
+          id?: string
+          medication_id?: string
+          notes?: string | null
+          scheduled_for?: string
+          status?: Database["public"]["Enums"]["med_log_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "med_logs_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_logs_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_logs_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medications: {
+        Row: {
+          active: boolean
+          child_id: string
+          color: string | null
+          created_at: string
+          created_by: string | null
+          dose_amount: number | null
+          dose_unit: string | null
+          family_id: string
+          id: string
+          instructions: string | null
+          name: string
+          route: Database["public"]["Enums"]["med_route"]
+          times: string[]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          child_id: string
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          dose_amount?: number | null
+          dose_unit?: string | null
+          family_id: string
+          id?: string
+          instructions?: string | null
+          name: string
+          route?: Database["public"]["Enums"]["med_route"]
+          times?: string[]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          child_id?: string
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          dose_amount?: number | null
+          dose_unit?: string | null
+          family_id?: string
+          id?: string
+          instructions?: string | null
+          name?: string
+          route?: Database["public"]["Enums"]["med_route"]
+          times?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medications_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medications_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
@@ -234,6 +364,14 @@ export type Database = {
     Enums: {
       account_type: "family" | "caregiver"
       invite_status: "pending" | "accepted" | "revoked"
+      med_log_status: "given" | "skipped" | "missed"
+      med_route:
+        | "oral"
+        | "g_tube"
+        | "injection"
+        | "topical"
+        | "inhaled"
+        | "other"
       member_role: "owner" | "caregiver"
     }
     CompositeTypes: {
@@ -364,6 +502,8 @@ export const Constants = {
     Enums: {
       account_type: ["family", "caregiver"],
       invite_status: ["pending", "accepted", "revoked"],
+      med_log_status: ["given", "skipped", "missed"],
+      med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
     },
   },
