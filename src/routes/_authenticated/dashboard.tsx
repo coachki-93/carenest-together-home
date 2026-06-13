@@ -33,6 +33,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT } from "@/lib/data/vitals";
+import { useLatestHandover } from "@/lib/data/handovers";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — CareNest" }] }),
