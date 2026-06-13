@@ -270,6 +270,10 @@ export const sv = {
     noMembers: "Inga vårdgivare ännu.",
     owner: "Familjeägare",
     viewer: "Läsare",
+    resumeTitle: "Slutför installationen av CareNest",
+    resumeChild: "Lägg till barnets profil för att komma igång.",
+    resumeMed: "Lägg till första medicinen så schemat fylls.",
+    resumeInvite: "Bjud in en vårdgivare för att dela på vården.",
   },
   vitals: {
     title: "Värden & loggar",
