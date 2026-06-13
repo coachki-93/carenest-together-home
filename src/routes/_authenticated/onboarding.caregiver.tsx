@@ -50,7 +50,7 @@ function CaregiverOnboarding() {
     },
     onSuccess: () => {
       toast.success(t("onboardingCaregiver.saved"));
-      navigate({ to: "/home" });
+      navigate({ to: "/dashboard", search: { tour: 1 } as never });
     },
     onError: (e: Error) => toast.error(e.message),
   });

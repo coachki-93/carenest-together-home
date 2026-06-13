@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -16,6 +16,7 @@ import {
   Briefcase,
   Stethoscope,
   CalendarClock,
+  Sparkles,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -44,10 +45,19 @@ import {
   type ScheduledDose,
 } from "@/lib/data/medications";
 import { useAppointments, type Appointment } from "@/lib/data/appointments";
-import { useFamilyMembers } from "@/lib/data/family";
+import { useFamilyMembers, useInvites } from "@/lib/data/family";
+import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
+import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
+import { Link } from "@tanstack/react-router";
+import { z } from "zod";
+
+const dashboardSearch = z.object({
+  tour: z.coerce.number().int().optional(),
+});
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — CareNest" }] }),
+  validateSearch: dashboardSearch,
   component: DashboardPage,
 });
 
@@ -111,6 +121,7 @@ function DashboardPage() {
   const { data: fluidsToday } = useVitals(familyId, { types: ["fluids"], sinceHours: 24 });
   const { data: latestHandover } = useLatestHandover(familyId);
   const { data: members = [] } = useFamilyMembers(familyId);
+  const { data: invites = [] } = useInvites(familyId);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
   const todayEnd = useMemo(() => endOfDay(new Date()), []);
@@ -120,7 +131,61 @@ function DashboardPage() {
 
   const logDose = useLogDose();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
+
+  // Guided tour state
+  const [tourOpen, setTourOpen] = useState(false);
+  useEffect(() => {
+    if (!user?.id) return;
+    if (search.tour === 1) {
+      resetTour(user.id);
+      setTourOpen(true);
+      // Clear the param so reloads don't re-open.
+      navigate({ to: "/dashboard", search: {}, replace: true });
+      return;
+    }
+    if (!isTourDone(user.id)) {
+      const tm = window.setTimeout(() => setTourOpen(true), 400);
+      return () => window.clearTimeout(tm);
+    }
+  }, [user?.id, search.tour, navigate]);
+
+  const tourSteps: TourStep[] = useMemo(
+    () => [
+      {
+        target: '[data-tour="today-schedule"]',
+        titleKey: "tour.scheduleTitle",
+        bodyKey: "tour.scheduleBody",
+      },
+      {
+        target: '[data-tour="vitals"]',
+        titleKey: "tour.vitalsTitle",
+        bodyKey: "tour.vitalsBody",
+      },
+      {
+        target: '[data-tour="handover"]',
+        titleKey: "tour.handoverTitle",
+        bodyKey: "tour.handoverBody",
+      },
+      {
+        target: '[data-tour="care-team"]',
+        titleKey: "tour.teamTitle",
+        bodyKey: "tour.teamBody",
+      },
+      {
+        target: '[data-tour="sidebar"]',
+        titleKey: "tour.navTitle",
+        bodyKey: "tour.navBody",
+      },
+    ],
+    [],
+  );
+
+  function closeTour() {
+    if (user?.id) markTourDone(user.id);
+    setTourOpen(false);
+  }
 
   const greeting = useMemo(() => {
     const h = new Date().getHours();
@@ -227,7 +292,38 @@ function DashboardPage() {
         </Button>
       }
     >
+      {(() => {
+        const isOwner = profile?.account_type === "family";
+        const hasChild = !!child;
+        const hasMeds = meds.length > 0;
+        const hasInviteOrTeam = members.length > 1 || invites.length > 0;
+        const setupComplete = hasChild && hasMeds && hasInviteOrTeam;
+        if (!isOwner || setupComplete) return null;
+        return (
+          <Link
+            to="/onboarding/child"
+            search={{ step: hasChild ? (hasMeds ? 4 : 3) : 2 }}
+            className="card-soft mb-6 p-4 flex items-center gap-3 hover:shadow-soft transition-shadow border border-primary/30 bg-primary-soft/30"
+          >
+            <div className="size-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+              <Sparkles className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold">{t("dashboard.resumeTitle")}</div>
+              <div className="text-sm text-muted-foreground">
+                {!hasChild
+                  ? t("dashboard.resumeChild")
+                  : !hasMeds
+                    ? t("dashboard.resumeMed")
+                    : t("dashboard.resumeInvite")}
+              </div>
+            </div>
+            <ChevronRight className="size-5 text-muted-foreground shrink-0" />
+          </Link>
+        );
+      })()}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
         {/* LEFT — main column */}
         <div className="xl:col-span-2 space-y-6">
           {/* Hero greeting card */}
@@ -279,7 +375,8 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="today-schedule">
+
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.todaysSchedule")}</h3>
               <Button
@@ -388,7 +485,8 @@ function DashboardPage() {
         {/* RIGHT — sidebar column */}
         <div className="space-y-6">
           {/* Vitals snapshot */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="vitals">
+
             {(() => {
               const hr = latestVitals?.get("heart_rate");
               const spo2 = latestVitals?.get("spo2");
@@ -470,7 +568,8 @@ function DashboardPage() {
           </section>
 
           {/* Handover preview */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="handover">
+
             {(() => {
               const fmt = new Intl.DateTimeFormat(
                 i18n.language === "sv" ? "sv-SE" : "en-US",
@@ -530,7 +629,8 @@ function DashboardPage() {
           </section>
 
           {/* Care team */}
-          <section className="card-soft p-6">
+          <section className="card-soft p-6" data-tour="care-team">
+
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.onShift")}</h3>
               <Button
@@ -584,6 +684,13 @@ function DashboardPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <GuidedTour
+        open={tourOpen}
+        steps={tourSteps}
+        onClose={closeTour}
+        onFinish={closeTour}
+      />
     </DashboardLayout>
   );
 }
