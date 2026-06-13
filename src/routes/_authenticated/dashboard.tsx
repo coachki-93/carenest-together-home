@@ -78,7 +78,14 @@ const TYPE_STYLES: Record<TaskType, { icon: typeof Pill; bg: string; fg: string 
 function DashboardPage() {
   const { t, i18n } = useTranslation();
   const { data: profile } = useProfile();
+  const { data: membership } = useMyMembership();
   const { data: child } = useChild();
+  const { data: latestVitals } = useLatestVitals(membership?.family_id);
+  const { data: fluidsToday } = useVitals(membership?.family_id, {
+    types: ["fluids"],
+    sinceHours: 24,
+  });
+  const navigate = useNavigate();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [confirmTask, setConfirmTask] = useState<Task | null>(null);
 
