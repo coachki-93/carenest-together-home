@@ -85,7 +85,7 @@ function MedicationsPage() {
     <DashboardLayout
       title={t("meds.title")}
       subtitle={child ? t("meds.subtitle", { name: child.name }) : undefined}
-      action={
+      actions={
         child ? (
           <Button onClick={() => setCreating(true)} className="rounded-full">
             <Plus className="size-4" /> {t("meds.addNew")}
