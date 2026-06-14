@@ -409,6 +409,7 @@ function SchedulePage() {
                   starts_at: values.starts_at,
                   ends_at: values.ends_at,
                   all_day: values.all_day,
+                  reminder_minutes: values.reminder_minutes,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
@@ -428,6 +429,7 @@ function SchedulePage() {
                     // keep clock-time + duration changes for the series
                     starts_at: values.starts_at,
                     ends_at: values.ends_at,
+                    reminder_minutes: values.reminder_minutes,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
