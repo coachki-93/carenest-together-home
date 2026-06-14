@@ -452,6 +452,8 @@ export const en = {
   caregiversPage: {
     subtitle: "Your care team and pending invites.",
     members: "Care team",
+    accounts: "Caregiver accounts",
+    roleOrg: "Organisation",
     invitesTitle: "Pending invites",
     noMembers: "No members yet.",
     noPending: "No pending invites — create one to add a caregiver.",
