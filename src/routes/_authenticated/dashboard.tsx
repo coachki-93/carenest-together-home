@@ -118,18 +118,19 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
-  const { data: child } = useChild();
-  const { data: latestVitals } = useLatestVitals(familyId);
+  const { data: child, isLoading: childLoading } = useChild();
+  const { data: latestVitals, isLoading: vitalsLoading } = useLatestVitals(familyId);
   const { data: fluidsToday } = useVitals(familyId, { types: ["fluids"], sinceHours: 24 });
-  const { data: latestHandover } = useLatestHandover(familyId);
-  const { data: members = [] } = useFamilyMembers(familyId);
+  const { data: latestHandover, isLoading: handoverLoading } = useLatestHandover(familyId);
+  const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
   const { data: invites = [] } = useInvites(familyId);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
   const todayEnd = useMemo(() => endOfDay(new Date()), []);
-  const { data: meds = [] } = useMedications(familyId);
-  const { data: logs = [] } = useMedLogs(familyId, todayStart, todayEnd);
-  const { data: appointments = [] } = useAppointments(familyId, todayStart, todayEnd);
+  const { data: meds = [], isLoading: medsLoading } = useMedications(familyId);
+  const { data: logs = [], isLoading: logsLoading } = useMedLogs(familyId, todayStart, todayEnd);
+  const { data: appointments = [], isLoading: apptsLoading } = useAppointments(familyId, todayStart, todayEnd);
+  const scheduleLoading = !!familyId && (medsLoading || logsLoading || apptsLoading || childLoading);
 
   const logDose = useLogDose();
   const navigate = useNavigate();
