@@ -227,11 +227,19 @@ function DashboardPage() {
   const scheduleLoading = !!familyId && (medsLoading || logsLoading || apptsLoading || childLoading);
 
   const logDose = useLogDose();
+  const deleteLog = useDeleteLog();
+  const logAppt = useLogAppointmentCompletion();
+  const deleteApptCompletion = useDeleteAppointmentCompletion();
+  const { data: completions = [] } = useAppointmentCompletions(familyId, todayStart, todayEnd);
+  const { data: caregiverProfilesForActions = [] } = useCaregiverProfiles(familyId);
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    task: TaskItem;
+    action: TaskAction;
+  } | null>(null);
   const dismissKey = user?.id ? `carenest.resume.dismissed.${user.id}` : null;
   const [resumeDismissed, setResumeDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined" || !dismissKey) return false;
