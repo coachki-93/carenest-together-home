@@ -112,7 +112,7 @@ export function TaskActionDialog({
       postponedTo = new Date(y, (m ?? 1) - 1, d, hh ?? 0, mm ?? 0, 0, 0);
     }
     await onConfirm({
-      action,
+      action: act,
       caregiverProfileId: showProfile ? profileId : null,
       reason: trimmedReason ? trimmedReason : null,
       postponedTo,
