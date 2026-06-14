@@ -57,6 +57,8 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
+import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { ByProfile } from "@/components/carenest/ByProfile";
 import {
   useFamilyChild,
   useMedications,
@@ -147,6 +149,7 @@ function SchedulePage() {
   const familyId = membership?.family_id;
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
+  const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
 
   const [day, setDay] = useState<Date>(() => startOfDay(new Date()));
   const dayEnd = useMemo(() => addDays(day, 1), [day]);
@@ -209,6 +212,7 @@ function SchedulePage() {
         scheduled_for: confirm.dose.scheduled_for.toISOString(),
         status: confirm.status,
         given_by: user?.id ?? null,
+        caregiver_profile_id: activeCaregiverId ?? null,
       });
       toast.success(
         confirm.status === "given" ? t("schedule.doseLogged") : t("schedule.doseSkipped"),
@@ -541,6 +545,8 @@ function DoseRow({
   onUndo: () => void;
 }) {
   const { t } = useTranslation();
+  const { user } = useSession();
+  const { data: membership } = useMyMembership();
   const status = dose.log?.status;
   const isOverdue = !status && dose.scheduled_for < now;
   const med = dose.medication;
@@ -581,6 +587,16 @@ function DoseRow({
         </p>
         {med.instructions && (
           <p className="text-xs text-muted-foreground truncate mt-0.5">{med.instructions}</p>
+        )}
+        {status && dose.log && (
+          <div className="text-xs text-muted-foreground mt-1">
+            <ByProfile
+              familyId={membership?.family_id}
+              caregiverProfileId={dose.log.caregiver_profile_id}
+              authorUserId={dose.log.given_by}
+              viewerUserId={user?.id}
+            />
+          </div>
         )}
       </div>
 

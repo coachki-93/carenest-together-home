@@ -33,7 +33,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { useMyMembership, useProfile } from "@/lib/auth/use-profile";
+import { useMyMembership, useProfile, useSession } from "@/lib/auth/use-profile";
+import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { ByProfile } from "@/components/carenest/ByProfile";
 import {
   SHIFT_LABELS,
   useCreateHandover,
@@ -58,8 +60,13 @@ function defaultShift(): ShiftLabel {
 
 function HandoverPage() {
   const { t, i18n } = useTranslation();
+  const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
+  const { activeId: activeCaregiverId } = useActiveCaregiverProfile(
+    membership?.family_id,
+    user?.id,
+  );
   const { data: handovers, isLoading } = useHandovers(membership?.family_id);
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
@@ -108,6 +115,7 @@ function HandoverPage() {
       await createHandover.mutateAsync({
         family_id: membership.family_id,
         author_id: profile.id,
+        caregiver_profile_id: activeCaregiverId ?? null,
         shift: form.shift,
         summary: form.summary || null,
         sleep: form.sleep || null,
@@ -212,9 +220,12 @@ function HandoverPage() {
 
               <div className="mt-4 pt-4 border-t border-border/60 flex items-center gap-2 text-xs text-muted-foreground">
                 <User className="size-3.5" />
-                {h.author_id === profile?.id
-                  ? t("handoverPage.byYou")
-                  : t("handoverPage.byCaregiver")}
+                <ByProfile
+                  familyId={membership?.family_id}
+                  caregiverProfileId={h.caregiver_profile_id}
+                  authorUserId={h.author_id}
+                  viewerUserId={user?.id}
+                />
               </div>
             </li>
           ))}

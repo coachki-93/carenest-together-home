@@ -515,6 +515,11 @@ export const sv = {
     onShift: "på pass",
     countBadge: "{{count}} vårdprofiler",
   },
+  byProfile: {
+    by: "Av",
+    you: "du",
+    unknown: "Vårdgivare",
+  },
   activeProfile: {
     actingAs: "Agerar som",
     pick: "Välj profil",
