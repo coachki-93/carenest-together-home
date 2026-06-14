@@ -302,7 +302,7 @@ export const sv = {
     saved: "Värde loggat",
     valueRequired: "Ange ett numeriskt värde",
     noReadings: "Inga värden ännu",
-    noReadingsBody: "Logga första värdet för att starta trendgrafen.",
+    noReadingsBody: "Logga första värdet så börjar trenden bygga upp sig här.",
     trendLast: "Senaste {{count}} timmar",
     range: "Period",
     range24h: "24h",
