@@ -194,6 +194,12 @@ export const en = {
     deleted: "Shift deleted",
     errorTime: "End must be after start",
     errorCaregiver: "Pick a caregiver",
+    errorProfile: "Pick a caregiver profile",
+    caregiverProfile: "Caregiver profile",
+    noProfiles: "No caregiver profiles yet",
+    addProfilesFirst: "Add caregiver profiles on the Care team page to start scheduling shifts.",
+    unassigned: "Unassigned",
+    unassignedHint: "Legacy shifts with no profile linked",
     dow: {
       sun: "Sun",
       mon: "Mon",
