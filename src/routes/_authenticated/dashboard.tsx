@@ -48,8 +48,9 @@ import {
 } from "@/lib/data/medications";
 import { useAppointments, type Appointment } from "@/lib/data/appointments";
 import { useFamilyMembers, useInvites } from "@/lib/data/family";
-import { useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
+import { useCaregiverProfiles, useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
@@ -126,6 +127,26 @@ function DashboardPage() {
   const { data: latestHandover, isLoading: handoverLoading } = useLatestHandover(familyId);
   const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
   const { data: invites = [] } = useInvites(familyId);
+  const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
+  const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
+
+  // Tick every minute so the current/next shift stays accurate.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNowTick(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const { currentShift, nextShift } = useMemo(() => {
+    const now = new Date(nowTick);
+    const horizon = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const occs = expandShifts(shifts, now, horizon).sort(
+      (a, b) => a.start.getTime() - b.start.getTime(),
+    );
+    const current = occs.find((o) => o.start <= now && o.end > now) ?? null;
+    const next = occs.find((o) => o.start > now) ?? null;
+    return { currentShift: current, nextShift: next };
+  }, [shifts, nowTick]);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
   const todayEnd = useMemo(() => endOfDay(new Date()), []);
@@ -715,53 +736,61 @@ function DashboardPage() {
             })()}
           </section>
 
-          {/* Care team */}
+          {/* On shift now / Next shift */}
           <section className="card-soft p-6" data-tour="care-team">
-
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.onShift")}</h3>
               <Button
                 variant="ghost"
                 size="sm"
                 className="rounded-full text-primary font-semibold"
-                onClick={() => navigate({ to: "/caregivers" })}
+                onClick={() => navigate({ to: "/shifts" })}
               >
                 {t("dashboard.manage")} <ChevronRight className="size-4" />
               </Button>
             </div>
-            <div className="space-y-3">
-              {membersLoading ? (
-                Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="size-10 rounded-full" />
-                    <div className="flex-1 space-y-1.5">
-                      <Skeleton className="h-4 w-32 rounded" />
-                      <Skeleton className="h-3 w-20 rounded" />
-                    </div>
+            <div className="space-y-4">
+              {shiftsLoading ? (
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-10 rounded-full" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-4 w-32 rounded" />
+                    <Skeleton className="h-3 w-20 rounded" />
                   </div>
-                ))
-              ) : members.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("dashboard.noMembers")}</p>
+                </div>
               ) : (
-                members.map((m) => (
-                  <CareMember
-                    key={m.id}
-                    name={m.profile?.full_name ?? "—"}
-                    role={
-                      m.role === "owner"
-                        ? t("dashboard.owner")
-                        : m.role === "caregiver"
-                          ? t("dashboard.caregiver")
-                          : t("dashboard.viewer")
-                    }
-                    color={m.profile?.avatar_color ?? m.display_color ?? "#6C63FF"}
-                    avatarUrl={m.profile?.avatar_url ?? null}
-                    you={m.user_id === user?.id}
+                <>
+                  <ShiftSlot
+                    label={t("dashboard.onShift")}
+                    shift={currentShift}
+                    emptyLabel={t("dashboard.noOneOnShift")}
+                    members={members}
+                    profiles={caregiverProfiles}
+                    youUserId={user?.id}
+                    youLabel={t("dashboard.youLabel")}
+                    unassignedLabel={t("dashboard.shiftUnassigned")}
+                    locale={i18n.language === "sv" ? "sv-SE" : "en-US"}
+                    t={t}
+                    accent
                   />
-                ))
+                  <div className="border-t border-border/60" />
+                  <ShiftSlot
+                    label={t("dashboard.nextShift")}
+                    shift={nextShift}
+                    emptyLabel={t("dashboard.noUpcomingShift")}
+                    members={members}
+                    profiles={caregiverProfiles}
+                    youUserId={user?.id}
+                    youLabel={t("dashboard.youLabel")}
+                    unassignedLabel={t("dashboard.shiftUnassigned")}
+                    locale={i18n.language === "sv" ? "sv-SE" : "en-US"}
+                    t={t}
+                  />
+                </>
               )}
             </div>
           </section>
+
         </div>
       </div>
 
@@ -878,6 +907,123 @@ function CareMember({
           ·
         </span>
       )}
+    </div>
+  );
+}
+
+function ShiftSlot({
+  label,
+  shift,
+  emptyLabel,
+  members,
+  profiles,
+  youUserId,
+  youLabel,
+  unassignedLabel,
+  locale,
+  t,
+  accent,
+}: {
+  label: string;
+  shift: ShiftOccurrence | null;
+  emptyLabel: string;
+  members: ReturnType<typeof useFamilyMembers>["data"] extends infer T ? (T extends undefined ? never : T) : never;
+  profiles: ReturnType<typeof useCaregiverProfiles>["data"] extends infer T ? (T extends undefined ? never : T) : never;
+  youUserId: string | undefined;
+  youLabel: string;
+  unassignedLabel: string;
+  locale: string;
+  t: (k: string, opts?: Record<string, unknown>) => string;
+  accent?: boolean;
+}) {
+  const fmtTime = (d: Date) =>
+    d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  const fmtDay = (d: Date) => {
+    const now = new Date();
+    const sameDay =
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrow =
+      d.getFullYear() === tomorrow.getFullYear() &&
+      d.getMonth() === tomorrow.getMonth() &&
+      d.getDate() === tomorrow.getDate();
+    if (sameDay) return "";
+    if (isTomorrow) return locale.startsWith("sv") ? "imorgon · " : "tomorrow · ";
+    return d.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" }) + " · ";
+  };
+
+  if (!shift) {
+    return (
+      <div>
+        <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
+          {label}
+        </div>
+        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
+      </div>
+    );
+  }
+
+  const profile = shift.caregiverProfileId
+    ? profiles.find((p) => p.id === shift.caregiverProfileId) ?? null
+    : null;
+  const member = members.find((m) => m.user_id === shift.caregiverUserId);
+  const orgName = member?.profile?.full_name ?? null;
+
+  const displayName = profile?.name ?? orgName ?? unassignedLabel;
+  const color =
+    profile?.color ?? shift.color ?? member?.profile?.avatar_color ?? member?.display_color ?? "#6C63FF";
+  const subtitle = profile && orgName ? orgName : null;
+  const isYou = !!youUserId && shift.caregiverUserId === youUserId;
+
+  const initials = displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase())
+    .join("");
+
+  const timeStr = t("dashboard.shiftTime", {
+    start: fmtTime(shift.start),
+    end: fmtTime(shift.end),
+  });
+  const prefix = fmtDay(shift.start);
+
+  return (
+    <div>
+      <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
+        {label}
+      </div>
+      <div
+        className={cn(
+          "flex items-center gap-3 rounded-2xl p-3",
+          accent ? "bg-primary-soft/40 border border-primary/20" : "bg-secondary/40",
+        )}
+      >
+        <div
+          className="size-11 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
+          style={{ backgroundColor: color }}
+        >
+          {initials || "•"}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-bold truncate">{displayName}</span>
+            {isYou && (
+              <span className="text-[10px] font-bold text-primary bg-primary-soft rounded-full px-1.5 py-0.5 shrink-0">
+                {youLabel}
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-muted-foreground truncate">
+            {subtitle ? `${subtitle} · ` : ""}
+            {prefix}
+            {timeStr}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
