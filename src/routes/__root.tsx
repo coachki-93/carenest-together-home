@@ -92,20 +92,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#6C63FF" },
-      { title: "CareNest — Care, together" },
+      { title: "CareNest" },
       {
         name: "description",
         content:
           "CareNest helps families coordinate care for medically complex children with their caregivers — warm, calm, and built for the tablet.",
       },
       { name: "author", content: "CareNest" },
-      { property: "og:title", content: "CareNest — Care, together" },
+      { property: "og:title", content: "CareNest" },
       {
         property: "og:description",
         content: "A care coordination space for families and the caregivers who support them.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "CareNest" },
+      { name: "description", content: "CareNest Connect is a web app for coordinating care for medically complex children." },
+      { property: "og:description", content: "CareNest Connect is a web app for coordinating care for medically complex children." },
+      { name: "twitter:description", content: "CareNest Connect is a web app for coordinating care for medically complex children." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/cBl2WZ7i79QvY3RvzaEMrSXg8Q12/social-images/social-1781400597271-CARE.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/cBl2WZ7i79QvY3RvzaEMrSXg8Q12/social-images/social-1781400597271-CARE.webp" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
