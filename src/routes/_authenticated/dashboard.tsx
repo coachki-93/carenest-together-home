@@ -1029,22 +1029,17 @@ function DashboardPage() {
         </div>
       </div>
 
-      <AlertDialog open={!!confirmTask} onOpenChange={(o) => !o && setConfirmTask(null)}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("dashboard.confirmTitle")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {confirmTask && t("dashboard.confirmBody", { title: confirmTask.title })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-full">{t("common.cancel")}</AlertDialogCancel>
-            <AlertDialogAction className="rounded-full" onClick={confirmDone}>
-              {t("dashboard.yesLog")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <TaskActionDialog
+        open={!!pendingAction}
+        onOpenChange={(o) => !o && setPendingAction(null)}
+        action={pendingAction?.action ?? null}
+        title={pendingAction?.task.title ?? ""}
+        scheduledFor={pendingAction?.task.scheduledFor ?? new Date()}
+        profiles={caregiverProfilesForActions}
+        defaultProfileId={suggestedCaregiverId ?? activeCaregiverId ?? null}
+        onConfirm={handleTaskAction}
+        submitting={logDose.isPending || logAppt.isPending}
+      />
 
       <GuidedTour
         open={tourOpen}
