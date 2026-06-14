@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Plus, Trash2, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
+import { initials } from "@/components/carenest/AvatarColorPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMyMembership, useProfile } from "@/lib/auth/use-profile";
-import { useFamilyMembers, type MemberWithProfile } from "@/lib/data/family";
+import { useFamilyMembers } from "@/lib/data/family";
+import { useCaregiverProfiles, type CaregiverProfile } from "@/lib/data/caregiver-profiles";
 import {
   expandShifts,
   startOfWeek,
@@ -51,6 +53,8 @@ const SHIFT_COLORS = [
   "#b8e8e0",
 ];
 
+const UNASSIGNED_KEY = "__unassigned__";
+
 function toLocalDateTimeInput(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -69,11 +73,12 @@ function ShiftsPage() {
   const isOwner = membership?.role === "owner";
 
   const { data: members } = useFamilyMembers(familyId);
+  const { data: profiles } = useCaregiverProfiles(familyId);
   const { data: shifts } = useShifts(familyId);
 
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
   const [editing, setEditing] = useState<ShiftRow | null>(null);
-  const [creating, setCreating] = useState<{ caregiverId?: string; date?: Date } | null>(
+  const [creating, setCreating] = useState<{ profileId?: string; date?: Date } | null>(
     null,
   );
 
@@ -83,19 +88,22 @@ function ShiftsPage() {
     return d;
   }, [weekStart]);
 
-  const days = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(weekStart);
-      d.setDate(d.getDate() + i);
-      return d;
-    });
-  }, [weekStart]);
+  const days = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() + i);
+        return d;
+      }),
+    [weekStart],
+  );
 
-  const occurrences = useMemo(() => {
-    return expandShifts(shifts ?? [], weekStart, weekEnd);
-  }, [shifts, weekStart, weekEnd]);
+  const occurrences = useMemo(
+    () => expandShifts(shifts ?? [], weekStart, weekEnd),
+    [shifts, weekStart, weekEnd],
+  );
 
-  const occByMemberDay = useMemo(() => {
+  const occByProfileDay = useMemo(() => {
     const map = new Map<string, ShiftOccurrence[]>();
     for (const occ of occurrences) {
       const dayIdx = Math.floor(
@@ -103,7 +111,7 @@ function ShiftsPage() {
           weekStart.getTime()) /
           (24 * 3600 * 1000),
       );
-      const key = `${occ.caregiverUserId}:${dayIdx}`;
+      const key = `${occ.caregiverProfileId ?? UNASSIGNED_KEY}:${dayIdx}`;
       const list = map.get(key) ?? [];
       list.push(occ);
       map.set(key, list);
@@ -144,9 +152,9 @@ function ShiftsPage() {
     setWeekStart(d);
   }
 
-  function openCreate(caregiverId?: string, date?: Date) {
+  function openCreate(profileId?: string, date?: Date) {
     if (!isOwner) return;
-    setCreating({ caregiverId, date });
+    setCreating({ profileId, date });
     setEditing(null);
   }
 
@@ -158,7 +166,17 @@ function ShiftsPage() {
     setCreating(null);
   }
 
-  const caregivers = members ?? [];
+  const activeProfiles = (profiles ?? []).filter((p) => p.is_active);
+  const accountById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const m of members ?? []) {
+      const name = m.profile?.full_name?.trim() || t("caregiversPage.unnamed");
+      map.set(m.user_id, name);
+    }
+    return map;
+  }, [members, t]);
+
+  const hasUnassigned = occurrences.some((o) => !o.caregiverProfileId);
 
   return (
     <DashboardLayout
@@ -218,23 +236,22 @@ function ShiftsPage() {
         </div>
 
         {/* Grid */}
-        {caregivers.length === 0 ? (
+        {activeProfiles.length === 0 && !hasUnassigned ? (
           <div className="card-soft p-10 text-center">
             <CalendarClock className="size-10 text-muted-foreground mx-auto mb-3" />
-            <p className="font-semibold">{t("shiftsPage.noCaregivers")}</p>
-            <p className="text-sm text-muted-foreground">{t("shiftsPage.inviteFirst")}</p>
+            <p className="font-semibold">{t("shiftsPage.noProfiles")}</p>
+            <p className="text-sm text-muted-foreground">{t("shiftsPage.addProfilesFirst")}</p>
           </div>
         ) : (
           <div className="card-soft overflow-x-auto">
             <div className="min-w-[860px]">
               {/* Header row */}
-              <div className="grid grid-cols-[200px_repeat(7,1fr)] border-b border-border/60">
+              <div className="grid grid-cols-[220px_repeat(7,1fr)] border-b border-border/60">
                 <div className="p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  {t("shiftsPage.caregiver")}
+                  {t("shiftsPage.caregiverProfile")}
                 </div>
                 {days.map((d) => {
-                  const isToday =
-                    d.toDateString() === new Date().toDateString();
+                  const isToday = d.toDateString() === new Date().toDateString();
                   return (
                     <div
                       key={d.toISOString()}
@@ -254,20 +271,30 @@ function ShiftsPage() {
                 })}
               </div>
 
-              {/* Caregiver rows */}
-              {caregivers.map((m) => (
-                <CaregiverRow
-                  key={m.id}
-                  member={m}
+              {/* Profile rows */}
+              {activeProfiles.map((p) => (
+                <ProfileRow
+                  key={p.id}
+                  profile={p}
+                  accountName={accountById.get(p.account_user_id) ?? ""}
                   days={days}
-                  weekStart={weekStart}
-                  occByMemberDay={occByMemberDay}
+                  occByProfileDay={occByProfileDay}
                   isOwner={!!isOwner}
                   onCreate={openCreate}
                   onEdit={openEdit}
                   timeFmt={timeFmt}
                 />
               ))}
+
+              {hasUnassigned && (
+                <UnassignedRow
+                  days={days}
+                  occByProfileDay={occByProfileDay}
+                  isOwner={!!isOwner}
+                  onEdit={openEdit}
+                  timeFmt={timeFmt}
+                />
+              )}
             </div>
           </div>
         )}
@@ -285,9 +312,10 @@ function ShiftsPage() {
           }}
           familyId={familyId}
           userId={profile.id}
-          caregivers={caregivers}
+          profiles={activeProfiles}
+          accountById={accountById}
           existing={editing}
-          initialCaregiverId={creating?.caregiverId}
+          initialProfileId={creating?.profileId}
           initialDate={creating?.date}
         />
       )}
@@ -295,56 +323,47 @@ function ShiftsPage() {
   );
 }
 
-function CaregiverRow({
-  member,
+function ProfileRow({
+  profile,
+  accountName,
   days,
-  weekStart,
-  occByMemberDay,
+  occByProfileDay,
   isOwner,
   onCreate,
   onEdit,
   timeFmt,
 }: {
-  member: MemberWithProfile;
+  profile: CaregiverProfile;
+  accountName: string;
   days: Date[];
-  weekStart: Date;
-  occByMemberDay: Map<string, ShiftOccurrence[]>;
+  occByProfileDay: Map<string, ShiftOccurrence[]>;
   isOwner: boolean;
-  onCreate: (caregiverId: string, date: Date) => void;
+  onCreate: (profileId: string, date: Date) => void;
   onEdit: (occ: ShiftOccurrence) => void;
   timeFmt: Intl.DateTimeFormat;
 }) {
   const { t } = useTranslation();
-  const name = member.profile?.full_name?.trim() || t("caregiversPage.unnamed");
-  const initials = name
-    .split(/\s+/)
-    .map((p) => p[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-  const bg = member.display_color || member.profile?.avatar_color || "var(--primary-soft)";
-
   return (
-    <div className="grid grid-cols-[200px_repeat(7,1fr)] border-b border-border/60 last:border-b-0">
+    <div className="grid grid-cols-[220px_repeat(7,1fr)] border-b border-border/60 last:border-b-0">
       <div className="p-3 flex items-center gap-2 min-w-0">
         <div
-          className="size-8 rounded-full flex items-center justify-center font-bold text-xs flex-none"
-          style={{ background: bg }}
+          className="size-9 rounded-full flex items-center justify-center font-bold text-xs text-white flex-none"
+          style={{ background: profile.color }}
         >
-          <span className="text-primary">{initials || "·"}</span>
+          {initials(profile.name) || "·"}
         </div>
         <div className="min-w-0">
-          <div className="font-semibold text-sm truncate">{name}</div>
-          {member.role === "owner" && (
-            <div className="text-[10px] font-bold uppercase text-primary">
-              {t("caregiversPage.roleOwner")}
+          <div className="font-semibold text-sm truncate">{profile.name}</div>
+          {accountName && (
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">
+              {accountName}
             </div>
           )}
         </div>
       </div>
       {days.map((d, dayIdx) => {
-        const key = `${member.user_id}:${dayIdx}`;
-        const list = occByMemberDay.get(key) ?? [];
+        const key = `${profile.id}:${dayIdx}`;
+        const list = occByProfileDay.get(key) ?? [];
         const isToday = d.toDateString() === new Date().toDateString();
         return (
           <div
@@ -365,20 +384,18 @@ function CaregiverRow({
                   isOwner && "hover:brightness-95 cursor-pointer",
                   !isOwner && "cursor-default",
                 )}
-                style={{ background: occ.color ?? "var(--primary-soft)" }}
+                style={{ background: occ.color ?? profile.color }}
               >
                 <div className="font-bold truncate">
                   {timeFmt.format(occ.start)} – {timeFmt.format(occ.end)}
                 </div>
-                {occ.category && (
-                  <div className="truncate opacity-80">{occ.category}</div>
-                )}
+                {occ.category && <div className="truncate opacity-80">{occ.category}</div>}
               </button>
             ))}
             {isOwner && (
               <button
                 type="button"
-                onClick={() => onCreate(member.user_id, d)}
+                onClick={() => onCreate(profile.id, d)}
                 className="absolute inset-0 opacity-0 group-hover/cell:opacity-100 flex items-center justify-center text-muted-foreground hover:bg-muted/30 transition rounded"
                 aria-label={t("shiftsPage.addShift")}
               >
@@ -392,23 +409,85 @@ function CaregiverRow({
   );
 }
 
+function UnassignedRow({
+  days,
+  occByProfileDay,
+  isOwner,
+  onEdit,
+  timeFmt,
+}: {
+  days: Date[];
+  occByProfileDay: Map<string, ShiftOccurrence[]>;
+  isOwner: boolean;
+  onEdit: (occ: ShiftOccurrence) => void;
+  timeFmt: Intl.DateTimeFormat;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="grid grid-cols-[220px_repeat(7,1fr)] border-t-2 border-dashed border-border/60">
+      <div className="p-3 flex items-center gap-2 min-w-0">
+        <div className="size-9 rounded-full flex items-center justify-center font-bold text-xs flex-none bg-muted text-muted-foreground">
+          ?
+        </div>
+        <div className="min-w-0">
+          <div className="font-semibold text-sm truncate">{t("shiftsPage.unassigned")}</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            {t("shiftsPage.unassignedHint")}
+          </div>
+        </div>
+      </div>
+      {days.map((d, dayIdx) => {
+        const key = `${UNASSIGNED_KEY}:${dayIdx}`;
+        const list = occByProfileDay.get(key) ?? [];
+        return (
+          <div
+            key={d.toISOString()}
+            className="p-1.5 border-l border-border/60 min-h-[88px] space-y-1"
+          >
+            {list.map((occ) => (
+              <button
+                key={occ.id}
+                type="button"
+                onClick={() => onEdit(occ)}
+                disabled={!isOwner}
+                className={cn(
+                  "w-full text-left rounded-lg px-2 py-1.5 text-xs leading-tight transition border border-dashed border-border",
+                  isOwner && "hover:brightness-95 cursor-pointer",
+                )}
+                style={{ background: occ.color ?? "var(--muted)" }}
+              >
+                <div className="font-bold truncate">
+                  {timeFmt.format(occ.start)} – {timeFmt.format(occ.end)}
+                </div>
+                {occ.category && <div className="truncate opacity-80">{occ.category}</div>}
+              </button>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function ShiftDialog({
   open,
   onOpenChange,
   familyId,
   userId,
-  caregivers,
+  profiles,
+  accountById,
   existing,
-  initialCaregiverId,
+  initialProfileId,
   initialDate,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   familyId: string;
   userId: string;
-  caregivers: MemberWithProfile[];
+  profiles: CaregiverProfile[];
+  accountById: Map<string, string>;
   existing: ShiftRow | null;
-  initialCaregiverId?: string;
+  initialProfileId?: string;
   initialDate?: Date;
 }) {
   const { t } = useTranslation();
@@ -429,8 +508,8 @@ function ShiftDialog({
     return d;
   }, [existing, defaultStart]);
 
-  const [caregiverId, setCaregiverId] = useState<string>(
-    existing?.caregiver_user_id ?? initialCaregiverId ?? caregivers[0]?.user_id ?? "",
+  const [profileId, setProfileId] = useState<string>(
+    existing?.caregiver_profile_id ?? initialProfileId ?? profiles[0]?.id ?? "",
   );
   const [startAt, setStartAt] = useState<string>(toLocalDateTimeInput(defaultStart));
   const [endAt, setEndAt] = useState<string>(toLocalDateTimeInput(defaultEnd));
@@ -444,9 +523,7 @@ function ShiftDialog({
     existing?.recurrence_days_of_week ?? [],
   );
   const [until, setUntil] = useState<string>(
-    existing?.recurrence_until
-      ? toLocalDateInput(new Date(existing.recurrence_until))
-      : "",
+    existing?.recurrence_until ? toLocalDateInput(new Date(existing.recurrence_until)) : "",
   );
 
   function toggleDay(dow: number) {
@@ -456,8 +533,9 @@ function ShiftDialog({
   }
 
   async function handleSave() {
-    if (!caregiverId) {
-      toast.error(t("shiftsPage.errorCaregiver"));
+    const selectedProfile = profiles.find((p) => p.id === profileId);
+    if (!selectedProfile) {
+      toast.error(t("shiftsPage.errorProfile"));
       return;
     }
     const sa = new Date(startAt);
@@ -468,7 +546,8 @@ function ShiftDialog({
     }
     const payload = {
       family_id: familyId,
-      caregiver_user_id: caregiverId,
+      caregiver_user_id: selectedProfile.account_user_id,
+      caregiver_profile_id: selectedProfile.id,
       start_at: sa.toISOString(),
       end_at: ea.toISOString(),
       color,
@@ -526,19 +605,34 @@ function ShiftDialog({
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label>{t("shiftsPage.caregiver")}</Label>
-            <Select value={caregiverId} onValueChange={setCaregiverId}>
-              <SelectTrigger className="rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {caregivers.map((m) => (
-                  <SelectItem key={m.user_id} value={m.user_id}>
-                    {m.profile?.full_name?.trim() || t("caregiversPage.unnamed")}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>{t("shiftsPage.caregiverProfile")}</Label>
+            {profiles.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("shiftsPage.noProfiles")}</p>
+            ) : (
+              <Select value={profileId} onValueChange={setProfileId}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {profiles.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="inline-block size-3 rounded-full"
+                          style={{ background: p.color }}
+                        />
+                        {p.name}
+                        {accountById.get(p.account_user_id) && (
+                          <span className="text-xs text-muted-foreground">
+                            · {accountById.get(p.account_user_id)}
+                          </span>
+                        )}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
