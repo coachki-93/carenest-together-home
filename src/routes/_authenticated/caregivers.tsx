@@ -271,6 +271,10 @@ function CareTeamPage() {
             <ul className="grid sm:grid-cols-2 gap-2">
               {profiles.map((p) => {
                 const mine = p.account_user_id === user?.id;
+                const canManage = mine || isOwner;
+                const orgMember = (members ?? []).find((m) => m.user_id === p.account_user_id);
+                const orgName =
+                  orgMember?.profile?.full_name?.trim() || t("caregiversPage.unnamed");
                 return (
                   <li
                     key={p.id}
@@ -284,13 +288,12 @@ function CareTeamPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold truncate">{p.name}</div>
-                      {!p.is_active && (
-                        <span className="text-xs text-muted-foreground">
-                          {t("caregiverProfiles.inactive")}
-                        </span>
-                      )}
+                      <div className="text-xs text-muted-foreground truncate">
+                        {orgName}
+                        {!p.is_active && ` · ${t("caregiverProfiles.inactive")}`}
+                      </div>
                     </div>
-                    {mine && (
+                    {canManage && (
                       <>
                         <Button
                           variant="ghost"
@@ -315,6 +318,9 @@ function CareTeamPage() {
                   </li>
                 );
               })}
+            </ul>
+          )}
+        </section>
             </ul>
           )}
         </section>
