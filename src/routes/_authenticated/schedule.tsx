@@ -545,6 +545,8 @@ function DoseRow({
   onUndo: () => void;
 }) {
   const { t } = useTranslation();
+  const { user } = useSession();
+  const { data: membership } = useMyMembership();
   const status = dose.log?.status;
   const isOverdue = !status && dose.scheduled_for < now;
   const med = dose.medication;
