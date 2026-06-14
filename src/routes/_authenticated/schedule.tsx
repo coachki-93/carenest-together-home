@@ -212,6 +212,7 @@ function SchedulePage() {
         scheduled_for: confirm.dose.scheduled_for.toISOString(),
         status: confirm.status,
         given_by: user?.id ?? null,
+        caregiver_profile_id: activeCaregiverId ?? null,
       });
       toast.success(
         confirm.status === "given" ? t("schedule.doseLogged") : t("schedule.doseSkipped"),
