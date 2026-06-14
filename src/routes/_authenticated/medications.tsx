@@ -177,10 +177,12 @@ function MedicationsPage() {
 
 function MedicationCard({
   med,
+  canEdit,
   onEdit,
   onDelete,
 }: {
   med: Medication;
+  canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -203,14 +205,16 @@ function MedicationCard({
                 {dose || "—"} · {t(`meds.route${routeKey(med.route)}`)}
               </p>
             </div>
-            <div className="flex gap-1">
-              <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
-                <Pencil className="size-4" />
-              </Button>
-              <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
-            </div>
+            {canEdit && (
+              <div className="flex gap-1">
+                <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
+                  <Pencil className="size-4" />
+                </Button>
+                <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
+                  <Trash2 className="size-4 text-destructive" />
+                </Button>
+              </div>
+            )}
           </div>
           {med.instructions && (
             <p className="text-sm text-muted-foreground mt-2">{med.instructions}</p>
