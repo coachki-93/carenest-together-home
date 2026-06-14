@@ -85,15 +85,32 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-type TaskKind = "medication" | "appointment" | "therapy" | "task" | "other";
+type TaskStatus = "pending" | "given" | "skipped" | "postponed" | "missed";
+
+type TaskSource =
+  | { kind: "dose"; dose: ScheduledDose }
+  | {
+      kind: "appt";
+      appt: ExpandedAppointment;
+      completion: AppointmentCompletion | null;
+    };
+
 interface TaskItem {
   id: string;
-  time: string;
+  /** Sort key — ISO time of when it's scheduled (or 00:00 if all-day). */
+  sortKey: number;
+  timeLabel: string;
   title: string;
   detail: string;
-  type: TaskKind;
-  done: boolean;
-  source: { kind: "dose"; dose: ScheduledDose } | { kind: "appt"; appt: Appointment };
+  status: TaskStatus;
+  scheduledFor: Date;
+  isOverdue: boolean;
+  /** Author / caregiver attribution when completed. */
+  byUserId: string | null;
+  byProfileId: string | null;
+  reason: string | null;
+  postponedTo: Date | null;
+  source: TaskSource;
 }
 
 function useChild() {
@@ -115,13 +132,43 @@ function useChild() {
   });
 }
 
-const TYPE_STYLES: Record<TaskKind, { icon: typeof Pill; bg: string; fg: string }> = {
-  medication: { icon: Pill, bg: "bg-primary-soft", fg: "text-primary" },
-  appointment: { icon: Stethoscope, bg: "bg-warning/20", fg: "text-warning-foreground" },
-  therapy: { icon: Activity, bg: "bg-success/20", fg: "text-success-foreground" },
-  task: { icon: Briefcase, bg: "bg-lavender-deep/40", fg: "text-accent-foreground" },
-  other: { icon: Calendar, bg: "bg-secondary", fg: "text-foreground" },
-};
+function kindIcon(kind: AppointmentKind | "medication"): typeof Pill {
+  switch (kind) {
+    case "medication":
+      return Pill;
+    case "appointment":
+      return Stethoscope;
+    case "therapy":
+      return Sparkles;
+    case "task":
+      return ClipboardList;
+    case "meal":
+      return UtensilsCrossed;
+    case "sleep":
+      return Moon;
+    default:
+      return CalendarIcon;
+  }
+}
+
+function kindTone(kind: AppointmentKind | "medication"): { bg: string; fg: string } {
+  switch (kind) {
+    case "medication":
+      return { bg: "#EDE9FE", fg: "#6D28D9" };
+    case "appointment":
+      return { bg: "#DBEAFE", fg: "#1D4ED8" };
+    case "therapy":
+      return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "task":
+      return { bg: "#DCFCE7", fg: "#15803D" };
+    case "meal":
+      return { bg: "#FFEDD5", fg: "#C2410C" };
+    case "sleep":
+      return { bg: "#E0E7FF", fg: "#4338CA" };
+    default:
+      return { bg: "#F3E8FF", fg: "#7C3AED" };
+  }
+}
 
 function startOfDay(d: Date) {
   const x = new Date(d);
