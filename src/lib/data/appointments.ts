@@ -64,6 +64,8 @@ export const APPOINTMENT_KINDS: AppointmentKind[] = [
   "appointment",
   "therapy",
   "task",
+  "meal",
+  "sleep",
   "other",
 ];
 
