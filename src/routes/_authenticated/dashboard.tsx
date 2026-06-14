@@ -127,6 +127,26 @@ function DashboardPage() {
   const { data: latestHandover, isLoading: handoverLoading } = useLatestHandover(familyId);
   const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
   const { data: invites = [] } = useInvites(familyId);
+  const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
+  const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
+
+  // Tick every minute so the current/next shift stays accurate.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNowTick(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const { currentShift, nextShift } = useMemo(() => {
+    const now = new Date(nowTick);
+    const horizon = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const occs = expandShifts(shifts, now, horizon).sort(
+      (a, b) => a.start.getTime() - b.start.getTime(),
+    );
+    const current = occs.find((o) => o.start <= now && o.end > now) ?? null;
+    const next = occs.find((o) => o.start > now) ?? null;
+    return { currentShift: current, nextShift: next };
+  }, [shifts, nowTick]);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
   const todayEnd = useMemo(() => endOfDay(new Date()), []);
