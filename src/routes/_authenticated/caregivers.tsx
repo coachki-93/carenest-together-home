@@ -84,7 +84,7 @@ function CareTeamPage() {
   const [confirmRevoke, setConfirmRevoke] = useState<Invite | null>(null);
   const [confirmRemove, setConfirmRemove] = useState<MemberWithProfile | null>(null);
   const [editingProfile, setEditingProfile] = useState<CaregiverProfile | null>(null);
-  const [creatingProfile, setCreatingProfile] = useState(false);
+  const [creatingProfileFor, setCreatingProfileFor] = useState<string | null>(null);
   const [deletingProfile, setDeletingProfile] = useState<CaregiverProfile | null>(null);
 
   const dateFmt = useMemo(
