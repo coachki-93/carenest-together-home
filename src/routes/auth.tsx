@@ -16,10 +16,7 @@ function AuthLayout() {
       <div className="mx-auto flex min-h-screen max-w-[1400px] flex-col overflow-hidden bg-background lg:min-h-[calc(100vh-3rem)] lg:rounded-3xl lg:shadow-sm lg:flex-row">
         {/* Left: form column */}
         <div className="flex w-full flex-col lg:w-[46%] lg:max-w-[560px]">
-          <header className="flex items-center justify-between px-6 pt-6 lg:px-10 lg:pt-8">
-            <Link to="/" aria-label="CareNest" className="inline-block">
-              <Logo size={36} />
-            </Link>
+          <header className="flex items-center justify-end px-6 pt-6 lg:px-10 lg:pt-8">
             <LanguageToggle />
           </header>
           <main className="flex flex-1 items-center justify-center px-6 py-10 lg:px-10">
