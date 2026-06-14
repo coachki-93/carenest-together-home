@@ -321,9 +321,6 @@ function CareTeamPage() {
             </ul>
           )}
         </section>
-            </ul>
-          )}
-        </section>
 
         {/* Invites */}
         {isOwner && (
