@@ -985,6 +985,7 @@ function AppointmentDialog({
                     <SelectItem value="hourly">{t("scheduleEvents.repeat.hourly")}</SelectItem>
                     <SelectItem value="daily">{t("scheduleEvents.repeat.daily")}</SelectItem>
                     <SelectItem value="weekly">{t("scheduleEvents.repeat.weekly")}</SelectItem>
+                    <SelectItem value="monthly">{t("scheduleEvents.repeat.monthly")}</SelectItem>
                   </SelectContent>
                 </Select>
                 {showInterval && (
@@ -995,7 +996,7 @@ function AppointmentDialog({
                     <Input
                       type="number"
                       min={1}
-                      max={repeat === "hourly" ? 23 : 365}
+                      max={repeat === "hourly" ? 23 : repeat === "monthly" ? 24 : 365}
                       value={interval}
                       onChange={(e) =>
                         setInterval(Math.max(1, Number(e.target.value) || 1))
