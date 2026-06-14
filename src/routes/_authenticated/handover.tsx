@@ -115,6 +115,7 @@ function HandoverPage() {
       await createHandover.mutateAsync({
         family_id: membership.family_id,
         author_id: profile.id,
+        caregiver_profile_id: activeCaregiverId ?? null,
         shift: form.shift,
         summary: form.summary || null,
         sleep: form.sleep || null,
