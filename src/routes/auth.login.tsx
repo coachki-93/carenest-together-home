@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Logo } from "@/components/carenest/Logo";
 
 export const Route = createFileRoute("/auth/login")({
   head: () => ({ meta: [{ title: "Log in — CareNest" }] }),
@@ -60,6 +61,9 @@ function LoginPage() {
 
   return (
     <div className="card-soft p-8 space-y-6">
+      <div className="flex justify-center">
+        <Logo size={120} />
+      </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">{t("auth.welcomeBack")}</h1>
         <p className="text-sm text-muted-foreground">{t("auth.loginSubtitle")}</p>
