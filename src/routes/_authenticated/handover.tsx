@@ -60,8 +60,13 @@ function defaultShift(): ShiftLabel {
 
 function HandoverPage() {
   const { t, i18n } = useTranslation();
+  const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
+  const { activeId: activeCaregiverId } = useActiveCaregiverProfile(
+    membership?.family_id,
+    user?.id,
+  );
   const { data: handovers, isLoading } = useHandovers(membership?.family_id);
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
