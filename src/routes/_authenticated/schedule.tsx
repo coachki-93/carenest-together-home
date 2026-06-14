@@ -1039,6 +1039,48 @@ function AppointmentDialog({
                     </div>
                   </div>
                 )}
+                {showTimesOfDay && (
+                  <div className="space-y-2">
+                    <Label className="text-sm">
+                      {t("scheduleEvents.repeat.timesOfDay")}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {t("scheduleEvents.repeat.timesOfDayHint")}
+                    </p>
+                    <div className="space-y-2">
+                      {timesOfDay.map((tod, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <Input
+                            type="time"
+                            value={tod}
+                            onChange={(e) => updateTimeOfDay(i, e.target.value)}
+                            className="rounded-xl w-32"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full text-muted-foreground hover:text-destructive"
+                            onClick={() => removeTimeOfDay(i)}
+                            aria-label={t("common.remove")}
+                          >
+                            <X className="size-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="rounded-full"
+                        onClick={addTimeOfDay}
+                      >
+                        <Plus className="size-3.5" />
+                        {t("scheduleEvents.repeat.addTime")}
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 {repeat !== "none" && (
                   <p className="text-xs text-muted-foreground">
                     {t("scheduleEvents.repeat.foreverHint")}
@@ -1046,6 +1088,37 @@ function AppointmentDialog({
                 )}
               </div>
             )}
+
+            {/* Reminder */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Bell className="size-4 text-primary" />
+                <Label className="font-semibold">
+                  {t("scheduleEvents.fields.reminder")}
+                </Label>
+              </div>
+              <Select
+                value={reminderMinutes === null ? "none" : String(reminderMinutes)}
+                onValueChange={(v) =>
+                  setReminderMinutes(v === "none" ? null : Number(v))
+                }
+              >
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("scheduleEvents.reminder.none")}</SelectItem>
+                  <SelectItem value="0">{t("scheduleEvents.reminder.atTime")}</SelectItem>
+                  <SelectItem value="5">{t("scheduleEvents.reminder.min5")}</SelectItem>
+                  <SelectItem value="10">{t("scheduleEvents.reminder.min10")}</SelectItem>
+                  <SelectItem value="15">{t("scheduleEvents.reminder.min15")}</SelectItem>
+                  <SelectItem value="30">{t("scheduleEvents.reminder.min30")}</SelectItem>
+                  <SelectItem value="60">{t("scheduleEvents.reminder.hour1")}</SelectItem>
+                  <SelectItem value="120">{t("scheduleEvents.reminder.hour2")}</SelectItem>
+                  <SelectItem value="1440">{t("scheduleEvents.reminder.day1")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             {isInstance && (
               <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">
