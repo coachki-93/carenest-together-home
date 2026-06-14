@@ -33,7 +33,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { useMyMembership, useProfile } from "@/lib/auth/use-profile";
+import { useMyMembership, useProfile, useSession } from "@/lib/auth/use-profile";
+import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { ByProfile } from "@/components/carenest/ByProfile";
 import {
   SHIFT_LABELS,
   useCreateHandover,
