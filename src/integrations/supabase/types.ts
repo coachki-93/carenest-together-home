@@ -33,6 +33,8 @@ export type Database = {
           recurrence_interval: number
           recurrence_override_at: string | null
           recurrence_parent_id: string | null
+          recurrence_times_of_day: string[] | null
+          reminder_minutes: number | null
           starts_at: string
           title: string
           updated_at: string
@@ -55,6 +57,8 @@ export type Database = {
           recurrence_interval?: number
           recurrence_override_at?: string | null
           recurrence_parent_id?: string | null
+          recurrence_times_of_day?: string[] | null
+          reminder_minutes?: number | null
           starts_at: string
           title: string
           updated_at?: string
@@ -77,6 +81,8 @@ export type Database = {
           recurrence_interval?: number
           recurrence_override_at?: string | null
           recurrence_parent_id?: string | null
+          recurrence_times_of_day?: string[] | null
+          reminder_minutes?: number | null
           starts_at?: string
           title?: string
           updated_at?: string
@@ -587,7 +593,13 @@ export type Database = {
     }
     Enums: {
       account_type: "family" | "caregiver"
-      appointment_kind: "appointment" | "therapy" | "task" | "other"
+      appointment_kind:
+        | "appointment"
+        | "therapy"
+        | "task"
+        | "other"
+        | "meal"
+        | "sleep"
       invite_status: "pending" | "accepted" | "revoked"
       med_log_status: "given" | "skipped" | "missed"
       med_route:
@@ -735,7 +747,14 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["family", "caregiver"],
-      appointment_kind: ["appointment", "therapy", "task", "other"],
+      appointment_kind: [
+        "appointment",
+        "therapy",
+        "task",
+        "other",
+        "meal",
+        "sleep",
+      ],
       invite_status: ["pending", "accepted", "revoked"],
       med_log_status: ["given", "skipped", "missed"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
