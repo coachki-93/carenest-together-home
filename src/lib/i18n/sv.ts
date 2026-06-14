@@ -18,6 +18,7 @@ export const sv = {
     google: "Google",
     apple: "Apple",
     addAnother: "Lägg till en till",
+    remove: "Ta bort",
     language: "Språk",
     english: "English",
     swedish: "Svenska",
