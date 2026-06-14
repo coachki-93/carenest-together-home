@@ -641,7 +641,18 @@ function DashboardPage() {
           {/* Handover preview */}
           <section className="card-soft p-6" data-tour="handover">
 
-            {(() => {
+            {handoverLoading ? (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <Skeleton className="h-5 w-32 rounded" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-3/4 mb-2 rounded" />
+                <Skeleton className="h-4 w-2/3 mb-2 rounded" />
+                <Skeleton className="h-4 w-1/2 rounded" />
+                <Skeleton className="w-full h-10 mt-4 rounded-full" />
+              </>
+            ) : (() => {
               const fmt = new Intl.DateTimeFormat(
                 i18n.language === "sv" ? "sv-SE" : "en-US",
                 { weekday: "short", hour: "2-digit", minute: "2-digit" },
