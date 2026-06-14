@@ -420,13 +420,13 @@ function CareTeamPage() {
       </Dialog>
 
       {/* Caregiver profile dialog */}
-      {(creatingProfile || editingProfile) && familyId && user?.id && (
+      {(creatingProfileFor || editingProfile) && familyId && (
         <CaregiverProfileDialog
           familyId={familyId}
-          accountUserId={user.id}
+          accountUserId={editingProfile?.account_user_id ?? creatingProfileFor!}
           profile={editingProfile ?? undefined}
           onClose={() => {
-            setCreatingProfile(false);
+            setCreatingProfileFor(null);
             setEditingProfile(null);
           }}
         />
