@@ -111,8 +111,53 @@ export type Database = {
           },
         ]
       }
+      caregiver_profiles: {
+        Row: {
+          account_user_id: string
+          avatar_url: string | null
+          color: string
+          created_at: string
+          family_id: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          account_user_id: string
+          avatar_url?: string | null
+          color?: string
+          created_at?: string
+          family_id: string
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          account_user_id?: string
+          avatar_url?: string | null
+          color?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregiver_profiles_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       caregiver_shifts: {
         Row: {
+          caregiver_profile_id: string | null
           caregiver_user_id: string
           category: string | null
           color: string | null
@@ -129,6 +174,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          caregiver_profile_id?: string | null
           caregiver_user_id: string
           category?: string | null
           color?: string | null
@@ -145,6 +191,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          caregiver_profile_id?: string | null
           caregiver_user_id?: string
           category?: string | null
           color?: string | null
@@ -161,6 +208,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "caregiver_shifts_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "caregiver_shifts_family_id_fkey"
             columns: ["family_id"]
@@ -282,6 +336,7 @@ export type Database = {
       handovers: {
         Row: {
           author_id: string
+          caregiver_profile_id: string | null
           child_id: string | null
           created_at: string
           family_id: string
@@ -300,6 +355,7 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          caregiver_profile_id?: string | null
           child_id?: string | null
           created_at?: string
           family_id: string
@@ -318,6 +374,7 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          caregiver_profile_id?: string | null
           child_id?: string | null
           created_at?: string
           family_id?: string
@@ -335,6 +392,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "handovers_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "handovers_child_id_fkey"
             columns: ["child_id"]
@@ -362,6 +426,7 @@ export type Database = {
           expires_at: string
           family_id: string
           id: string
+          invited_email: string | null
           status: Database["public"]["Enums"]["invite_status"]
         }
         Insert: {
@@ -374,6 +439,7 @@ export type Database = {
           expires_at?: string
           family_id: string
           id?: string
+          invited_email?: string | null
           status?: Database["public"]["Enums"]["invite_status"]
         }
         Update: {
@@ -386,6 +452,7 @@ export type Database = {
           expires_at?: string
           family_id?: string
           id?: string
+          invited_email?: string | null
           status?: Database["public"]["Enums"]["invite_status"]
         }
         Relationships: [
@@ -400,6 +467,7 @@ export type Database = {
       }
       med_logs: {
         Row: {
+          caregiver_profile_id: string | null
           child_id: string
           created_at: string
           family_id: string
@@ -413,6 +481,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          caregiver_profile_id?: string | null
           child_id: string
           created_at?: string
           family_id: string
@@ -426,6 +495,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          caregiver_profile_id?: string | null
           child_id?: string
           created_at?: string
           family_id?: string
@@ -439,6 +509,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "med_logs_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "med_logs_child_id_fkey"
             columns: ["child_id"]
@@ -648,6 +725,10 @@ export type Database = {
       shares_family_with: {
         Args: { _me: string; _other_user: string }
         Returns: boolean
+      }
+      suggest_caregiver_profile: {
+        Args: { _at?: string; _family_id: string }
+        Returns: string
       }
     }
     Enums: {
