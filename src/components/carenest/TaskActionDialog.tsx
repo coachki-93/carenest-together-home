@@ -71,6 +71,7 @@ export function TaskActionDialog({
   }, [open, defaultProfileId, scheduledFor]);
 
   if (!action) return null;
+  const act: TaskAction = action;
 
   const reasonRequired = action === "skipped" || action === "postponed";
   const showProfile = action === "done";
