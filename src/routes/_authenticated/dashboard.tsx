@@ -781,7 +781,7 @@ function DashboardPage() {
                   <div className="border-t border-border/60" />
                   <ShiftSlot
                     label={t("dashboard.nextShift")}
-                    shift={nextShift}
+                    shifts={nextShifts}
                     emptyLabel={t("dashboard.noUpcomingShift")}
                     members={members}
                     profiles={caregiverProfiles}
