@@ -651,66 +651,148 @@ function DashboardPage() {
             ) : (
               <ul className="space-y-2">
                 {tasks.map((task) => {
-                  const style = TYPE_STYLES[task.type] ?? TYPE_STYLES.other;
-                  const Icon = style.icon;
-                  const isDose = task.source.kind === "dose";
+                  const kind: AppointmentKind | "medication" =
+                    task.source.kind === "dose" ? "medication" : task.source.appt.kind;
+                  const tone = kindTone(kind);
+                  const Icon = kindIcon(kind);
+                  const isCompleted = task.status === "given";
+                  const isSkipped = task.status === "skipped";
+                  const isPostponed = task.status === "postponed";
+                  const isPending = task.status === "pending";
+                  const overdue = task.isOverdue;
                   return (
                     <li
                       key={task.id}
                       className={cn(
-                        "group flex items-center gap-3 md:gap-4 rounded-2xl border border-border/60 p-3 md:p-4 transition-all",
-                        task.done ? "bg-success/5 opacity-70" : "bg-card hover:shadow-soft",
+                        "group flex items-start gap-3 md:gap-4 rounded-2xl border p-3 md:p-4 transition-all",
+                        isCompleted
+                          ? "bg-success/5 border-border/60 opacity-80"
+                          : isSkipped
+                            ? "bg-muted/40 border-border/60"
+                            : isPostponed
+                              ? "bg-warning/10 border-warning/30"
+                              : overdue
+                                ? "bg-destructive/5 border-destructive/40"
+                                : "bg-card border-border/60 hover:shadow-soft",
                       )}
                     >
-                      <div className="flex items-center gap-1.5 text-sm font-bold text-muted-foreground w-14 shrink-0">
-                        <Clock className="size-3.5" />
-                        {task.time}
-                      </div>
                       <div
                         className={cn(
-                          "size-11 rounded-2xl flex items-center justify-center shrink-0",
-                          style.bg,
+                          "flex items-center gap-1.5 text-sm font-bold w-14 shrink-0 pt-1",
+                          overdue ? "text-destructive" : "text-muted-foreground",
                         )}
                       >
-                        <Icon className={cn("size-5", style.fg)} />
+                        <Clock className="size-3.5" />
+                        {task.timeLabel}
+                      </div>
+                      <div
+                        className="size-11 rounded-2xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: tone.bg, color: tone.fg }}
+                      >
+                        <Icon className="size-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div
-                          className={cn(
-                            "font-bold truncate",
-                            task.done && "line-through text-muted-foreground",
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={cn(
+                              "font-bold truncate",
+                              isCompleted && "line-through text-muted-foreground",
+                            )}
+                          >
+                            {task.title}
+                          </span>
+                          {overdue && isPending && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
+                              {t("medications.overdue")}
+                            </span>
                           )}
-                        >
-                          {task.title}
+                          {isSkipped && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+                              {t("medications.statusSkipped")}
+                            </span>
+                          )}
+                          {isPostponed && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-warning-foreground bg-warning/30 rounded-full px-2 py-0.5">
+                              {t("medications.statusPostponed")}
+                            </span>
+                          )}
                         </div>
                         {task.detail && (
                           <div className="text-sm text-muted-foreground truncate">
                             {task.detail}
                           </div>
                         )}
+                        {(isCompleted || isSkipped || isPostponed) && (
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                            <ByProfile
+                              familyId={familyId}
+                              caregiverProfileId={task.byProfileId}
+                              authorUserId={task.byUserId}
+                              viewerUserId={user?.id}
+                            />
+                            {task.reason && (
+                              <span className="italic">"{task.reason}"</span>
+                            )}
+                            {isPostponed && task.postponedTo && (
+                              <span>
+                                →{" "}
+                                {task.postponedTo.toLocaleString(
+                                  i18n.language === "sv" ? "sv-SE" : "en-US",
+                                  { hour: "2-digit", minute: "2-digit", month: "short", day: "numeric" },
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      {task.done ? (
-                        <div className="flex items-center gap-1.5 text-success-foreground bg-success/20 rounded-full px-3 py-1.5 text-sm font-bold">
-                          <CheckCircle2 className="size-4" /> {t("dashboard.done")}
-                        </div>
-                      ) : isDose ? (
-                        <Button
-                          size="sm"
-                          className="rounded-full font-bold"
-                          onClick={() => setConfirmTask(task)}
-                        >
-                          {t("dashboard.markDone")}
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="rounded-full font-bold"
-                          onClick={() => navigate({ to: "/schedule" })}
-                        >
-                          {t("dashboard.open")}
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {isPending ? (
+                          <>
+                            <Button
+                              size="sm"
+                              className="rounded-full font-bold"
+                              onClick={() => setPendingAction({ task, action: "done" })}
+                            >
+                              <CheckCircle2 className="size-4" />
+                              <span className="hidden sm:inline ml-1">
+                                {t("dashboard.markDone")}
+                              </span>
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full font-bold"
+                              onClick={() => setPendingAction({ task, action: "skipped" })}
+                              aria-label={t("medications.skip")}
+                              title={t("medications.skip")}
+                            >
+                              <X className="size-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full font-bold"
+                              onClick={() => setPendingAction({ task, action: "postponed" })}
+                              aria-label={t("medications.postpone")}
+                              title={t("medications.postpone")}
+                            >
+                              <CalendarClock className="size-4" />
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="rounded-full font-semibold text-muted-foreground"
+                            onClick={() => undoTask(task)}
+                          >
+                            <Undo2 className="size-4" />
+                            <span className="hidden sm:inline ml-1">
+                              {t("medications.undo")}
+                            </span>
+                          </Button>
+                        )}
+                      </div>
                     </li>
                   );
                 })}
