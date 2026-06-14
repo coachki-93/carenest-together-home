@@ -1,7 +1,6 @@
-import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Heart, CalendarDays, ShieldCheck } from "lucide-react";
-import { Logo } from "@/components/carenest/Logo";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 
 export const Route = createFileRoute("/auth")({
