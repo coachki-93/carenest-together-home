@@ -48,6 +48,7 @@ import {
 } from "@/lib/data/medications";
 import { useAppointments, type Appointment } from "@/lib/data/appointments";
 import { useFamilyMembers, useInvites } from "@/lib/data/family";
+import { useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
