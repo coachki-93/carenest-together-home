@@ -96,7 +96,7 @@ function ChildOnboarding() {
 
 function ProgressDots({ current, total }: { current: number; total: number }) {
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-1.5 sm:gap-2">
       {Array.from({ length: total }).map((_, i) => {
         const n = i + 1;
         const done = n < current;
@@ -106,10 +106,10 @@ function ProgressDots({ current, total }: { current: number; total: number }) {
             key={n}
             className={`h-2 rounded-full transition-all ${
               active
-                ? "w-10 bg-primary"
+                ? "w-8 sm:w-10 bg-primary"
                 : done
-                  ? "w-4 bg-primary/60"
-                  : "w-4 bg-border"
+                  ? "w-3 sm:w-4 bg-primary/60"
+                  : "w-3 sm:w-4 bg-border"
             }`}
           />
         );
