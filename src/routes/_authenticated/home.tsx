@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfile, useMyMembership } from "@/lib/auth/use-profile";
+import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -14,25 +14,47 @@ export const Route = createFileRoute("/_authenticated/home")({
 function HomeRouter() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useSession();
   const profile = useProfile();
   const membership = useMyMembership();
+  const [processingInvite, setProcessingInvite] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("carenest:pending_invite");
+  });
 
+  // Process any pending invite BEFORE routing, so the user is never
+  // misclassified as a family owner when they arrived via an invite link.
   useEffect(() => {
-    const code = typeof window !== "undefined"
-      ? localStorage.getItem("carenest:pending_invite")
-      : null;
-    if (!code) return;
+    if (!user) return;
+    const code =
+      typeof window !== "undefined"
+        ? localStorage.getItem("carenest:pending_invite")
+        : null;
+    if (!code) {
+      setProcessingInvite(false);
+      return;
+    }
     (async () => {
+      // Force the profile to caregiver so the routing effect can't push
+      // them into family onboarding (which would make them an owner).
+      await supabase
+        .from("profiles")
+        .update({ account_type: "caregiver" })
+        .eq("id", user.id);
+
       const { error } = await supabase.rpc("accept_invite", { _code: code });
       localStorage.removeItem("carenest:pending_invite");
       if (error) toast.error(error.message);
       else toast.success(t("home.inviteAccepted"));
-      profile.refetch();
-      membership.refetch();
+
+      await profile.refetch();
+      await membership.refetch();
+      setProcessingInvite(false);
     })();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (processingInvite) return;
     if (profile.isLoading || membership.isLoading) return;
     const p = profile.data;
     if (!p) return;
@@ -49,7 +71,14 @@ function HomeRouter() {
       return;
     }
     navigate({ to: "/dashboard" });
-  }, [profile.data, membership.data, profile.isLoading, membership.isLoading, navigate]);
+  }, [
+    processingInvite,
+    profile.data,
+    membership.data,
+    profile.isLoading,
+    membership.isLoading,
+    navigate,
+  ]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
