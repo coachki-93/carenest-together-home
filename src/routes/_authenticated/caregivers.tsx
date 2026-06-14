@@ -84,7 +84,7 @@ function CareTeamPage() {
   const [confirmRevoke, setConfirmRevoke] = useState<Invite | null>(null);
   const [confirmRemove, setConfirmRemove] = useState<MemberWithProfile | null>(null);
   const [editingProfile, setEditingProfile] = useState<CaregiverProfile | null>(null);
-  const [creatingProfile, setCreatingProfile] = useState(false);
+  const [creatingProfileFor, setCreatingProfileFor] = useState<string | null>(null);
   const [deletingProfile, setDeletingProfile] = useState<CaregiverProfile | null>(null);
 
   const dateFmt = useMemo(
@@ -158,7 +158,7 @@ function CareTeamPage() {
         <section className="card-soft p-6">
           <div className="flex items-center gap-2 mb-5">
             <Users className="size-5 text-primary" />
-            <h2 className="text-lg font-extrabold">{t("caregiversPage.members")}</h2>
+            <h2 className="text-lg font-extrabold">{t("caregiversPage.accounts")}</h2>
           </div>
           {loadingMembers ? (
             <p className="text-muted-foreground text-sm">{t("common.loading")}</p>
@@ -177,6 +177,9 @@ function CareTeamPage() {
                   .slice(0, 2)
                   .toUpperCase();
                 const bg = m.display_color || m.profile?.avatar_color || "var(--primary-soft)";
+                const accountProfiles = (profiles ?? []).filter(
+                  (p) => p.account_user_id === m.user_id,
+                );
                 return (
                   <li key={m.id} className="flex items-center gap-3 p-3 rounded-2xl bg-muted/40">
                     <div
@@ -199,7 +202,12 @@ function CareTeamPage() {
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-muted-foreground bg-background px-2 py-0.5 rounded-full">
-                            {t("caregiversPage.roleCaregiver")}
+                            {t("caregiversPage.roleOrg")}
+                          </span>
+                        )}
+                        {!isOwnerRow && (
+                          <span className="text-xs font-semibold text-primary bg-primary-soft px-2 py-0.5 rounded-full">
+                            {t("caregiverProfiles.countBadge", { count: accountProfiles.length })}
                           </span>
                         )}
                       </div>
@@ -207,6 +215,16 @@ function CareTeamPage() {
                         {t("caregiversPage.joined", { date: dateFmt.format(new Date(m.joined_at)) })}
                       </p>
                     </div>
+                    {isOwner && !isOwnerRow && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full gap-1"
+                        onClick={() => setCreatingProfileFor(m.user_id)}
+                      >
+                        <Plus className="size-4" /> {t("caregiverProfiles.add")}
+                      </Button>
+                    )}
                     {isOwner && !isOwnerRow && !isMe && (
                       <Button
                         variant="ghost"
@@ -232,11 +250,11 @@ function CareTeamPage() {
               <UserCircle2 className="size-5 text-primary" />
               <h2 className="text-lg font-extrabold">{t("caregiverProfiles.title")}</h2>
             </div>
-            {!isOwner && (
+            {!isOwner && user?.id && (
               <Button
                 size="sm"
                 className="rounded-full gap-1.5 font-semibold"
-                onClick={() => setCreatingProfile(true)}
+                onClick={() => setCreatingProfileFor(user.id)}
               >
                 <Plus className="size-4" /> {t("caregiverProfiles.add")}
               </Button>
@@ -253,6 +271,10 @@ function CareTeamPage() {
             <ul className="grid sm:grid-cols-2 gap-2">
               {profiles.map((p) => {
                 const mine = p.account_user_id === user?.id;
+                const canManage = mine || isOwner;
+                const orgMember = (members ?? []).find((m) => m.user_id === p.account_user_id);
+                const orgName =
+                  orgMember?.profile?.full_name?.trim() || t("caregiversPage.unnamed");
                 return (
                   <li
                     key={p.id}
@@ -266,13 +288,12 @@ function CareTeamPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold truncate">{p.name}</div>
-                      {!p.is_active && (
-                        <span className="text-xs text-muted-foreground">
-                          {t("caregiverProfiles.inactive")}
-                        </span>
-                      )}
+                      <div className="text-xs text-muted-foreground truncate">
+                        {orgName}
+                        {!p.is_active && ` · ${t("caregiverProfiles.inactive")}`}
+                      </div>
                     </div>
-                    {mine && (
+                    {canManage && (
                       <>
                         <Button
                           variant="ghost"
@@ -420,13 +441,13 @@ function CareTeamPage() {
       </Dialog>
 
       {/* Caregiver profile dialog */}
-      {(creatingProfile || editingProfile) && familyId && user?.id && (
+      {(creatingProfileFor || editingProfile) && familyId && (
         <CaregiverProfileDialog
           familyId={familyId}
-          accountUserId={user.id}
+          accountUserId={editingProfile?.account_user_id ?? creatingProfileFor!}
           profile={editingProfile ?? undefined}
           onClose={() => {
-            setCreatingProfile(false);
+            setCreatingProfileFor(null);
             setEditingProfile(null);
           }}
         />

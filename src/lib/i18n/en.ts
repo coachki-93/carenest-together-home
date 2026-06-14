@@ -194,6 +194,12 @@ export const en = {
     deleted: "Shift deleted",
     errorTime: "End must be after start",
     errorCaregiver: "Pick a caregiver",
+    errorProfile: "Pick a caregiver profile",
+    caregiverProfile: "Caregiver profile",
+    noProfiles: "No caregiver profiles yet",
+    addProfilesFirst: "Add caregiver profiles on the Care team page to start scheduling shifts.",
+    unassigned: "Unassigned",
+    unassignedHint: "Legacy shifts with no profile linked",
     dow: {
       sun: "Sun",
       mon: "Mon",
@@ -446,6 +452,8 @@ export const en = {
   caregiversPage: {
     subtitle: "Your care team and pending invites.",
     members: "Care team",
+    accounts: "Caregiver accounts",
+    roleOrg: "Organisation",
     invitesTitle: "Pending invites",
     noMembers: "No members yet.",
     noPending: "No pending invites — create one to add a caregiver.",
@@ -505,6 +513,15 @@ export const en = {
     pickerLabel: "Who did this?",
     pickerPlaceholder: "Pick a caregiver",
     onShift: "on shift",
+    countBadge: "{{count}} profiles",
+  },
+  activeProfile: {
+    actingAs: "Acting as",
+    pick: "Pick a profile",
+    switch: "Switch profile",
+    dropdownLabel: "Acting as",
+    manage: "Manage profiles",
+    addFirst: "Add your first profile",
   },
   scheduleEvents: {
     new: "New event",

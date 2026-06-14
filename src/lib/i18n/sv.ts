@@ -194,6 +194,12 @@ export const sv = {
     deleted: "Pass borttaget",
     errorTime: "Sluttid måste vara efter starttid",
     errorCaregiver: "Välj en vårdgivare",
+    errorProfile: "Välj en vårdprofil",
+    caregiverProfile: "Vårdprofil",
+    noProfiles: "Inga vårdprofiler ännu",
+    addProfilesFirst: "Lägg till vårdprofiler på Vårdteam-sidan för att börja schemalägga pass.",
+    unassigned: "Otilldelade",
+    unassignedHint: "Tidigare pass utan kopplad profil",
     dow: {
       sun: "Sön",
       mon: "Mån",
@@ -446,6 +452,8 @@ export const sv = {
   caregiversPage: {
     subtitle: "Ditt vårdteam och väntande inbjudningar.",
     members: "Vårdteam",
+    accounts: "Vårdgivarkonton",
+    roleOrg: "Organisation",
     invitesTitle: "Väntande inbjudningar",
     noMembers: "Inga medlemmar än.",
     noPending: "Inga väntande inbjudningar — skapa en för att bjuda in en vårdgivare.",
@@ -505,6 +513,15 @@ export const sv = {
     pickerLabel: "Vem gjorde detta?",
     pickerPlaceholder: "Välj en vårdare",
     onShift: "på pass",
+    countBadge: "{{count}} vårdprofiler",
+  },
+  activeProfile: {
+    actingAs: "Agerar som",
+    pick: "Välj profil",
+    switch: "Byt profil",
+    dropdownLabel: "Agerar som",
+    manage: "Hantera profiler",
+    addFirst: "Lägg till din första profil",
   },
   scheduleEvents: {
     new: "Nytt event",

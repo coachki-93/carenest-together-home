@@ -49,6 +49,7 @@ import {
 import { useAppointments, type Appointment } from "@/lib/data/appointments";
 import { useFamilyMembers, useInvites } from "@/lib/data/family";
 import { useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
+import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
@@ -135,6 +136,7 @@ function DashboardPage() {
 
   const logDose = useLogDose();
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
+  const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
@@ -299,7 +301,7 @@ function DashboardPage() {
         scheduled_for: confirmTask.source.dose.scheduled_for.toISOString(),
         status: "given",
         given_by: user?.id ?? null,
-        caregiver_profile_id: suggestedCaregiverId ?? null,
+        caregiver_profile_id: activeCaregiverId ?? suggestedCaregiverId ?? null,
       });
       toast.success(t("dashboard.taskLogged", { title: confirmTask.title }));
     } catch (e) {

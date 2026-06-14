@@ -10,6 +10,7 @@ export interface ShiftOccurrence {
   id: string;
   masterId: string;
   caregiverUserId: string;
+  caregiverProfileId: string | null;
   start: Date;
   end: Date;
   color: string | null;
@@ -108,6 +109,7 @@ export function expandShifts(
           id: s.id,
           masterId: s.id,
           caregiverUserId: s.caregiver_user_id,
+            caregiverProfileId: s.caregiver_profile_id,
           start,
           end,
           color: s.color,
@@ -135,6 +137,7 @@ export function expandShifts(
             id: `${s.id}:${cursor.getTime()}`,
             masterId: s.id,
             caregiverUserId: s.caregiver_user_id,
+            caregiverProfileId: s.caregiver_profile_id,
             start: new Date(cursor),
             end: occEnd,
             color: s.color,
@@ -173,6 +176,7 @@ export function expandShifts(
               id: `${s.id}:${occStart.getTime()}`,
               masterId: s.id,
               caregiverUserId: s.caregiver_user_id,
+            caregiverProfileId: s.caregiver_profile_id,
               start: occStart,
               end: occEnd,
               color: s.color,
