@@ -18,6 +18,12 @@ import {
   CalendarClock,
   Sparkles,
   X,
+  Undo2,
+  ClipboardList,
+  UtensilsCrossed,
+  Moon,
+  Calendar as CalendarIcon,
+  MapPin,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -25,16 +31,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT } from "@/lib/data/vitals";
@@ -44,13 +40,36 @@ import {
   useMedications,
   useMedLogs,
   useLogDose,
+  useDeleteLog,
   type ScheduledDose,
+  type Medication,
+  type MedLog,
 } from "@/lib/data/medications";
-import { useAppointments, type Appointment } from "@/lib/data/appointments";
+import {
+  useAppointments,
+  type ExpandedAppointment,
+  type AppointmentKind,
+} from "@/lib/data/appointments";
+import {
+  useAppointmentCompletions,
+  useLogAppointmentCompletion,
+  useDeleteAppointmentCompletion,
+  type AppointmentCompletion,
+} from "@/lib/data/appointment-completions";
 import { useFamilyMembers, useInvites } from "@/lib/data/family";
-import { useCaregiverProfiles, useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
+import {
+  useCaregiverProfiles,
+  useSuggestedCaregiverProfile,
+  type CaregiverProfile,
+} from "@/lib/data/caregiver-profiles";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
+import {
+  TaskActionDialog,
+  type TaskAction,
+  type TaskActionResult,
+} from "@/components/carenest/TaskActionDialog";
+import { ByProfile } from "@/components/carenest/ByProfile";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
