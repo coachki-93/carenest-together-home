@@ -759,6 +759,8 @@ function AppointmentDialog({
   const [repeat, setRepeat] = useState<RepeatMode>("none");
   const [interval, setInterval] = useState<number>(1);
   const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
+  const [reminderMinutes, setReminderMinutes] = useState<number | null>(null);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -778,10 +780,11 @@ function AppointmentDialog({
       setAllDay(editing.all_day);
       setLocation(editing.location ?? "");
       setNotes(editing.notes ?? "");
-      // recurrence: when editing series, load from master; instance: load too so user sees pattern
       setRepeat((editing.recurrence_freq as RepeatMode | null) ?? "none");
       setInterval(editing.recurrence_interval || 1);
       setWeekdays(editing.recurrence_byweekday ?? []);
+      setTimesOfDay(editing.recurrence_times_of_day ?? []);
+      setReminderMinutes(editing.reminder_minutes ?? null);
     } else {
       setTitle("");
       setKind("appointment");
@@ -794,6 +797,8 @@ function AppointmentDialog({
       setRepeat("none");
       setInterval(1);
       setWeekdays([]);
+      setTimesOfDay([]);
+      setReminderMinutes(null);
     }
   }, [open, editing, defaultDay]);
 
@@ -816,6 +821,18 @@ function AppointmentDialog({
       toast.error(t("scheduleEvents.weekdaysRequired"));
       return null;
     }
+    // Times-of-day only apply to daily/weekly/monthly (not hourly).
+    const allowTimes =
+      showsRepeat && (repeat === "daily" || repeat === "weekly" || repeat === "monthly");
+    const cleanedTimes = allowTimes
+      ? Array.from(
+          new Set(
+            timesOfDay
+              .map((s) => s.trim())
+              .filter((s) => /^\d{1,2}:\d{2}$/.test(s)),
+          ),
+        ).sort()
+      : [];
     return {
       family_id: familyId,
       child_id: childId,
@@ -831,6 +848,8 @@ function AppointmentDialog({
       recurrence_interval: showsRepeat && repeat !== "none" ? Math.max(1, interval) : 1,
       recurrence_byweekday:
         showsRepeat && repeat === "weekly" ? [...weekdays].sort() : null,
+      recurrence_times_of_day: cleanedTimes.length > 0 ? cleanedTimes : null,
+      reminder_minutes: reminderMinutes,
     };
   }
 
