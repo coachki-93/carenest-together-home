@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Logo } from "@/components/carenest/Logo";
 
 export const Route = createFileRoute("/auth/reset-password")({
   head: () => ({ meta: [{ title: "Set new password — CareNest" }] }),
@@ -43,6 +44,9 @@ function ResetPage() {
 
   return (
     <div className="card-soft p-8 space-y-6">
+      <div className="flex justify-center">
+        <Logo size={120} />
+      </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">{t("auth.setNewPassword")}</h1>
         <p className="text-sm text-muted-foreground">{t("auth.setNewPasswordSub")}</p>
