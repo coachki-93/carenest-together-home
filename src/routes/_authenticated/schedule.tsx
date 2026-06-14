@@ -18,6 +18,7 @@ import {
   Calendar as CalendarIcon,
   Trash2,
   Pencil,
+  Repeat,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -68,9 +69,30 @@ import {
   useCreateAppointment,
   useUpdateAppointment,
   useDeleteAppointment,
-  type Appointment,
+  useUpdateAppointmentInstance,
+  useDeleteAppointmentInstance,
+  type ExpandedAppointment,
   type AppointmentKind,
+  type RecurrenceFreq,
 } from "@/lib/data/appointments";
+
+type RepeatMode = "none" | RecurrenceFreq;
+
+type SavePayload = {
+  family_id: string;
+  child_id: string | null;
+  created_by: string;
+  title: string;
+  notes: string | null;
+  location: string | null;
+  kind: AppointmentKind;
+  starts_at: string;
+  ends_at: string | null;
+  all_day: boolean;
+  recurrence_freq: RecurrenceFreq | null;
+  recurrence_interval: number;
+  recurrence_byweekday: number[] | null;
+};
 
 export const Route = createFileRoute("/_authenticated/schedule")({
   head: () => ({ meta: [{ title: "Schedule — CareNest" }] }),
