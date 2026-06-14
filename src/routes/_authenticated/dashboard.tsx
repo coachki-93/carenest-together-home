@@ -231,7 +231,7 @@ function DashboardPage() {
   const logAppt = useLogAppointmentCompletion();
   const deleteApptCompletion = useDeleteAppointmentCompletion();
   const { data: completions = [] } = useAppointmentCompletions(familyId, todayStart, todayEnd);
-  const { data: caregiverProfilesForActions = [] } = useCaregiverProfiles(familyId);
+  const caregiverProfilesForActions = caregiverProfiles;
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
@@ -703,17 +703,17 @@ function DashboardPage() {
                           </span>
                           {overdue && isPending && (
                             <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
-                              {t("medications.overdue")}
+                              {t("schedule.overdue")}
                             </span>
                           )}
                           {isSkipped && (
                             <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground bg-muted rounded-full px-2 py-0.5">
-                              {t("medications.statusSkipped")}
+                              {t("schedule.statusSkipped")}
                             </span>
                           )}
                           {isPostponed && (
                             <span className="text-[10px] font-bold uppercase tracking-wide text-warning-foreground bg-warning/30 rounded-full px-2 py-0.5">
-                              {t("medications.statusPostponed")}
+                              {t("schedule.statusPostponed")}
                             </span>
                           )}
                         </div>
@@ -763,8 +763,8 @@ function DashboardPage() {
                               variant="outline"
                               className="rounded-full font-bold"
                               onClick={() => setPendingAction({ task, action: "skipped" })}
-                              aria-label={t("medications.skip")}
-                              title={t("medications.skip")}
+                              aria-label={t("schedule.skip")}
+                              title={t("schedule.skip")}
                             >
                               <X className="size-4" />
                             </Button>
@@ -773,8 +773,8 @@ function DashboardPage() {
                               variant="outline"
                               className="rounded-full font-bold"
                               onClick={() => setPendingAction({ task, action: "postponed" })}
-                              aria-label={t("medications.postpone")}
-                              title={t("medications.postpone")}
+                              aria-label={t("schedule.postpone")}
+                              title={t("schedule.postpone")}
                             >
                               <CalendarClock className="size-4" />
                             </Button>
@@ -788,7 +788,7 @@ function DashboardPage() {
                           >
                             <Undo2 className="size-4" />
                             <span className="hidden sm:inline ml-1">
-                              {t("medications.undo")}
+                              {t("schedule.undo")}
                             </span>
                           </Button>
                         )}

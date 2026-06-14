@@ -62,12 +62,12 @@ export function TaskActionDialog({
     setProfileId(defaultProfileId);
     setReason("");
     // Default postpone to scheduled + 1 hour, local
-    const t = new Date(scheduledFor.getTime() + 60 * 60 * 1000);
+    const plusOneHour = new Date(scheduledFor.getTime() + 60 * 60 * 1000);
     const pad = (n: number) => String(n).padStart(2, "0");
     setPostponedDate(
-      `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`,
+      `${plusOneHour.getFullYear()}-${pad(plusOneHour.getMonth() + 1)}-${pad(plusOneHour.getDate())}`,
     );
-    setPostponedTime(`${pad(t.getHours())}:${pad(t.getMinutes())}`);
+    setPostponedTime(`${pad(plusOneHour.getHours())}:${pad(plusOneHour.getMinutes())}`);
   }, [open, defaultProfileId, scheduledFor]);
 
   if (!action) return null;
