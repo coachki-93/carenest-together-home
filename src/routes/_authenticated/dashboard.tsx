@@ -48,8 +48,9 @@ import {
 } from "@/lib/data/medications";
 import { useAppointments, type Appointment } from "@/lib/data/appointments";
 import { useFamilyMembers, useInvites } from "@/lib/data/family";
-import { useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
+import { useCaregiverProfiles, useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
