@@ -137,15 +137,20 @@ function DashboardPage() {
     return () => window.clearInterval(id);
   }, []);
 
-  const { currentShift, nextShift } = useMemo(() => {
+  const { currentShifts, nextShifts } = useMemo(() => {
     const now = new Date(nowTick);
     const horizon = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
     const occs = expandShifts(shifts, now, horizon).sort(
       (a, b) => a.start.getTime() - b.start.getTime(),
     );
-    const current = occs.find((o) => o.start <= now && o.end > now) ?? null;
-    const next = occs.find((o) => o.start > now) ?? null;
-    return { currentShift: current, nextShift: next };
+    const current = occs.filter((o) => o.start <= now && o.end > now);
+    const upcoming = occs.filter((o) => o.start > now);
+    // Group "next" by the earliest upcoming start time (everyone starting then).
+    const firstStart = upcoming[0]?.start.getTime() ?? null;
+    const next = firstStart
+      ? upcoming.filter((o) => o.start.getTime() === firstStart)
+      : [];
+    return { currentShifts: current, nextShifts: next };
   }, [shifts, nowTick]);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
@@ -762,7 +767,7 @@ function DashboardPage() {
                 <>
                   <ShiftSlot
                     label={t("dashboard.onShift")}
-                    shift={currentShift}
+                    shifts={currentShifts}
                     emptyLabel={t("dashboard.noOneOnShift")}
                     members={members}
                     profiles={caregiverProfiles}
@@ -776,7 +781,7 @@ function DashboardPage() {
                   <div className="border-t border-border/60" />
                   <ShiftSlot
                     label={t("dashboard.nextShift")}
-                    shift={nextShift}
+                    shifts={nextShifts}
                     emptyLabel={t("dashboard.noUpcomingShift")}
                     members={members}
                     profiles={caregiverProfiles}
@@ -913,7 +918,7 @@ function CareMember({
 
 function ShiftSlot({
   label,
-  shift,
+  shifts,
   emptyLabel,
   members,
   profiles,
@@ -925,7 +930,7 @@ function ShiftSlot({
   accent,
 }: {
   label: string;
-  shift: ShiftOccurrence | null;
+  shifts: ShiftOccurrence[];
   emptyLabel: string;
   members: ReturnType<typeof useFamilyMembers>["data"] extends infer T ? (T extends undefined ? never : T) : never;
   profiles: ReturnType<typeof useCaregiverProfiles>["data"] extends infer T ? (T extends undefined ? never : T) : never;
@@ -955,7 +960,7 @@ function ShiftSlot({
     return d.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" }) + " · ";
   };
 
-  if (!shift) {
+  if (shifts.length === 0) {
     return (
       <div>
         <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
@@ -966,63 +971,66 @@ function ShiftSlot({
     );
   }
 
-  const profile = shift.caregiverProfileId
-    ? profiles.find((p) => p.id === shift.caregiverProfileId) ?? null
-    : null;
-  const member = members.find((m) => m.user_id === shift.caregiverUserId);
-  const orgName = member?.profile?.full_name ?? null;
-
-  const displayName = profile?.name ?? orgName ?? unassignedLabel;
-  const color =
-    profile?.color ?? shift.color ?? member?.profile?.avatar_color ?? member?.display_color ?? "#6C63FF";
-  const subtitle = profile && orgName ? orgName : null;
-  const isYou = !!youUserId && shift.caregiverUserId === youUserId;
-
-  const initials = displayName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((s) => s[0]?.toUpperCase())
-    .join("");
-
-  const timeStr = t("dashboard.shiftTime", {
-    start: fmtTime(shift.start),
-    end: fmtTime(shift.end),
-  });
-  const prefix = fmtDay(shift.start);
-
   return (
     <div>
       <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
         {label}
       </div>
-      <div
-        className={cn(
-          "flex items-center gap-3 rounded-2xl p-3",
-          accent ? "bg-primary-soft/40 border border-primary/20" : "bg-secondary/40",
-        )}
-      >
-        <div
-          className="size-11 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-          style={{ backgroundColor: color }}
-        >
-          {initials || "•"}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="font-bold truncate">{displayName}</span>
-            {isYou && (
-              <span className="text-[10px] font-bold text-primary bg-primary-soft rounded-full px-1.5 py-0.5 shrink-0">
-                {youLabel}
-              </span>
-            )}
-          </div>
-          <div className="text-xs text-muted-foreground truncate">
-            {subtitle ? `${subtitle} · ` : ""}
-            {prefix}
-            {timeStr}
-          </div>
-        </div>
+      <div className="space-y-2">
+        {shifts.map((shift) => {
+          const profile = shift.caregiverProfileId
+            ? profiles.find((p) => p.id === shift.caregiverProfileId) ?? null
+            : null;
+          const member = members.find((m) => m.user_id === shift.caregiverUserId);
+          const orgName = member?.profile?.full_name ?? null;
+          const displayName = profile?.name ?? orgName ?? unassignedLabel;
+          const color =
+            profile?.color ?? shift.color ?? member?.profile?.avatar_color ?? member?.display_color ?? "#6C63FF";
+          const subtitle = profile && orgName ? orgName : null;
+          const isYou = !!youUserId && shift.caregiverUserId === youUserId;
+          const initials = displayName
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((s) => s[0]?.toUpperCase())
+            .join("");
+          const timeStr = t("dashboard.shiftTime", {
+            start: fmtTime(shift.start),
+            end: fmtTime(shift.end),
+          });
+          const prefix = fmtDay(shift.start);
+          return (
+            <div
+              key={shift.id}
+              className={cn(
+                "flex items-center gap-3 rounded-2xl p-3",
+                accent ? "bg-primary-soft/40 border border-primary/20" : "bg-secondary/40",
+              )}
+            >
+              <div
+                className="size-11 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
+                style={{ backgroundColor: color }}
+              >
+                {initials || "•"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-bold truncate">{displayName}</span>
+                  {isYou && (
+                    <span className="text-[10px] font-bold text-primary bg-primary-soft rounded-full px-1.5 py-0.5 shrink-0">
+                      {youLabel}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {subtitle ? `${subtitle} · ` : ""}
+                  {prefix}
+                  {timeStr}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
