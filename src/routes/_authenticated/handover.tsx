@@ -220,9 +220,12 @@ function HandoverPage() {
 
               <div className="mt-4 pt-4 border-t border-border/60 flex items-center gap-2 text-xs text-muted-foreground">
                 <User className="size-3.5" />
-                {h.author_id === profile?.id
-                  ? t("handoverPage.byYou")
-                  : t("handoverPage.byCaregiver")}
+                <ByProfile
+                  familyId={membership?.family_id}
+                  caregiverProfileId={h.caregiver_profile_id}
+                  authorUserId={h.author_id}
+                  viewerUserId={user?.id}
+                />
               </div>
             </li>
           ))}
