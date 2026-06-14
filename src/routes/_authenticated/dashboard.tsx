@@ -725,7 +725,17 @@ function DashboardPage() {
               </Button>
             </div>
             <div className="space-y-3">
-              {members.length === 0 ? (
+              {membersLoading ? (
+                Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <Skeleton className="size-10 rounded-full" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-4 w-32 rounded" />
+                      <Skeleton className="h-3 w-20 rounded" />
+                    </div>
+                  </div>
+                ))
+              ) : members.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t("dashboard.noMembers")}</p>
               ) : (
                 members.map((m) => (
