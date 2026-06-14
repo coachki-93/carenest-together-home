@@ -515,6 +515,11 @@ export const en = {
     onShift: "on shift",
     countBadge: "{{count}} profiles",
   },
+  byProfile: {
+    by: "By",
+    you: "you",
+    unknown: "Caregiver",
+  },
   activeProfile: {
     actingAs: "Acting as",
     pick: "Pick a profile",
