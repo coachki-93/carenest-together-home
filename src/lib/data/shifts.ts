@@ -10,6 +10,7 @@ export interface ShiftOccurrence {
   id: string;
   masterId: string;
   caregiverUserId: string;
+  caregiverProfileId: string | null;
   start: Date;
   end: Date;
   color: string | null;
