@@ -587,7 +587,7 @@ function DashboardPage() {
                     {t("dashboard.upNext")}
                   </div>
                   <div className="text-sm font-bold">
-                    {nextTask.time} · {nextTask.title}
+                    {nextTask.timeLabel} · {nextTask.title}
                   </div>
                 </div>
               )}
