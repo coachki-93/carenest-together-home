@@ -302,7 +302,7 @@ export const en = {
     saved: "Reading logged",
     valueRequired: "Enter a number value",
     noReadings: "No readings yet",
-    noReadingsBody: "Log your first reading to start the trend chart.",
+    noReadingsBody: "Log your first reading and the trend will start building here.",
     trendLast: "Last {{count}} hours",
     range: "Range",
     range24h: "24h",

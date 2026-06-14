@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,18 +118,19 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
-  const { data: child } = useChild();
-  const { data: latestVitals } = useLatestVitals(familyId);
+  const { data: child, isLoading: childLoading } = useChild();
+  const { data: latestVitals, isLoading: vitalsLoading } = useLatestVitals(familyId);
   const { data: fluidsToday } = useVitals(familyId, { types: ["fluids"], sinceHours: 24 });
-  const { data: latestHandover } = useLatestHandover(familyId);
-  const { data: members = [] } = useFamilyMembers(familyId);
+  const { data: latestHandover, isLoading: handoverLoading } = useLatestHandover(familyId);
+  const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
   const { data: invites = [] } = useInvites(familyId);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
   const todayEnd = useMemo(() => endOfDay(new Date()), []);
-  const { data: meds = [] } = useMedications(familyId);
-  const { data: logs = [] } = useMedLogs(familyId, todayStart, todayEnd);
-  const { data: appointments = [] } = useAppointments(familyId, todayStart, todayEnd);
+  const { data: meds = [], isLoading: medsLoading } = useMedications(familyId);
+  const { data: logs = [], isLoading: logsLoading } = useMedLogs(familyId, todayStart, todayEnd);
+  const { data: appointments = [], isLoading: apptsLoading } = useAppointments(familyId, todayStart, todayEnd);
+  const scheduleLoading = !!familyId && (medsLoading || logsLoading || apptsLoading || childLoading);
 
   const logDose = useLogDose();
   const navigate = useNavigate();
@@ -427,7 +429,24 @@ function DashboardPage() {
                 {t("dashboard.viewFull")} <ChevronRight className="size-4" />
               </Button>
             </div>
-            {tasks.length === 0 ? (
+            {scheduleLoading ? (
+              <ul className="space-y-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-3 md:gap-4 rounded-2xl border border-border/60 p-3 md:p-4 bg-card"
+                  >
+                    <Skeleton className="h-4 w-12 rounded" />
+                    <Skeleton className="size-11 rounded-2xl" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-1/2 rounded" />
+                      <Skeleton className="h-3 w-1/3 rounded" />
+                    </div>
+                    <Skeleton className="h-8 w-20 rounded-full" />
+                  </li>
+                ))}
+              </ul>
+            ) : tasks.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-8 text-center">
                 <CalendarClock className="size-8 mx-auto text-muted-foreground mb-2" />
                 <p className="font-bold mb-1">{t("dashboard.emptyTitle")}</p>
@@ -526,7 +545,20 @@ function DashboardPage() {
           {/* Vitals snapshot */}
           <section className="card-soft p-6" data-tour="vitals">
 
-            {(() => {
+            {vitalsLoading ? (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <Skeleton className="h-5 w-32 rounded" />
+                  <Skeleton className="h-4 w-16 rounded" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-24 rounded-2xl" />
+                  ))}
+                </div>
+                <Skeleton className="w-full h-10 mt-4 rounded-full" />
+              </>
+            ) : (() => {
               const hr = latestVitals?.get("heart_rate");
               const spo2 = latestVitals?.get("spo2");
               const temp = latestVitals?.get("temperature");
@@ -609,7 +641,18 @@ function DashboardPage() {
           {/* Handover preview */}
           <section className="card-soft p-6" data-tour="handover">
 
-            {(() => {
+            {handoverLoading ? (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <Skeleton className="h-5 w-32 rounded" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-3/4 mb-2 rounded" />
+                <Skeleton className="h-4 w-2/3 mb-2 rounded" />
+                <Skeleton className="h-4 w-1/2 rounded" />
+                <Skeleton className="w-full h-10 mt-4 rounded-full" />
+              </>
+            ) : (() => {
               const fmt = new Intl.DateTimeFormat(
                 i18n.language === "sv" ? "sv-SE" : "en-US",
                 { weekday: "short", hour: "2-digit", minute: "2-digit" },
@@ -682,7 +725,17 @@ function DashboardPage() {
               </Button>
             </div>
             <div className="space-y-3">
-              {members.length === 0 ? (
+              {membersLoading ? (
+                Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <Skeleton className="size-10 rounded-full" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-4 w-32 rounded" />
+                      <Skeleton className="h-3 w-20 rounded" />
+                    </div>
+                  </div>
+                ))
+              ) : members.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t("dashboard.noMembers")}</p>
               ) : (
                 members.map((m) => (
