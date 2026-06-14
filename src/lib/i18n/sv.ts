@@ -272,8 +272,9 @@ export const sv = {
     viewer: "Läsare",
     resumeTitle: "Slutför installationen av CareNest",
     resumeChild: "Lägg till barnets profil för att komma igång.",
-    resumeMed: "Lägg till första medicinen så schemat fylls.",
-    resumeInvite: "Bjud in en vårdgivare för att dela på vården.",
+    resumeChild: "Lägg till barnets profil för att komma igång.",
+    resumeMed: "Lägg till första medicinen så fylls schemat.",
+    resumeInvite: "Bjud in en vårdgivare så ni kan dela på vården.",
     resumeDismiss: "Dölj",
   },
   vitals: {
