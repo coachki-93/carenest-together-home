@@ -545,7 +545,20 @@ function DashboardPage() {
           {/* Vitals snapshot */}
           <section className="card-soft p-6" data-tour="vitals">
 
-            {(() => {
+            {vitalsLoading ? (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <Skeleton className="h-5 w-32 rounded" />
+                  <Skeleton className="h-4 w-16 rounded" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-24 rounded-2xl" />
+                  ))}
+                </div>
+                <Skeleton className="w-full h-10 mt-4 rounded-full" />
+              </>
+            ) : (() => {
               const hr = latestVitals?.get("heart_rate");
               const spo2 = latestVitals?.get("spo2");
               const temp = latestVitals?.get("temperature");
