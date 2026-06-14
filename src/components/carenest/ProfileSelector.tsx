@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useProfile, useMyMembership } from "@/lib/auth/use-profile";
+import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { supabase } from "@/integrations/supabase/client";
+import { ActiveProfileSwitcher } from "@/components/carenest/ActiveProfileSwitcher";
 
 function initials(name?: string | null) {
   if (!name) return "•";
