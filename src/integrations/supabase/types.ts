@@ -27,6 +27,12 @@ export type Database = {
           kind: Database["public"]["Enums"]["appointment_kind"]
           location: string | null
           notes: string | null
+          recurrence_byweekday: number[] | null
+          recurrence_cancelled: boolean
+          recurrence_freq: string | null
+          recurrence_interval: number
+          recurrence_override_at: string | null
+          recurrence_parent_id: string | null
           starts_at: string
           title: string
           updated_at: string
@@ -43,6 +49,12 @@ export type Database = {
           kind?: Database["public"]["Enums"]["appointment_kind"]
           location?: string | null
           notes?: string | null
+          recurrence_byweekday?: number[] | null
+          recurrence_cancelled?: boolean
+          recurrence_freq?: string | null
+          recurrence_interval?: number
+          recurrence_override_at?: string | null
+          recurrence_parent_id?: string | null
           starts_at: string
           title: string
           updated_at?: string
@@ -59,6 +71,12 @@ export type Database = {
           kind?: Database["public"]["Enums"]["appointment_kind"]
           location?: string | null
           notes?: string | null
+          recurrence_byweekday?: number[] | null
+          recurrence_cancelled?: boolean
+          recurrence_freq?: string | null
+          recurrence_interval?: number
+          recurrence_override_at?: string | null
+          recurrence_parent_id?: string | null
           starts_at?: string
           title?: string
           updated_at?: string
@@ -76,6 +94,13 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_recurrence_parent_id_fkey"
+            columns: ["recurrence_parent_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
             referencedColumns: ["id"]
           },
         ]
