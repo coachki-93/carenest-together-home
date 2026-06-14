@@ -472,6 +472,7 @@ type InstanceOverrideInput = {
     starts_at: string;
     ends_at: string | null;
     all_day: boolean;
+    reminder_minutes: number | null;
   };
 };
 
