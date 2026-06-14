@@ -42,7 +42,10 @@ function AuthLayout() {
           <div aria-hidden="true" className="absolute -bottom-40 -left-20 size-[460px] rounded-full border border-white/10" />
 
           <div className="relative z-10 flex w-full flex-col justify-between p-12 text-white">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider backdrop-blur">
+            <span
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider backdrop-blur"
+              suppressHydrationWarning
+            >
               <Heart className="size-3.5 fill-white" />
               {t("auth.showcaseTag")}
             </span>

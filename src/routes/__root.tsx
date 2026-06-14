@@ -7,15 +7,19 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { createIsomorphicFn } from "@tanstack/react-start";
-import { resolveClientLanguage, setI18nLanguage } from "@/lib/i18n";
-import { type Lang } from "@/lib/i18n/cookie";
+import {
+  resolveClientLanguage,
+  detectClientLanguage,
+  setI18nLanguage,
+} from "@/lib/i18n";
+import { writeLangCookieClient, type Lang } from "@/lib/i18n/cookie";
 import { resolveLanguageServer } from "@/lib/i18n/resolve.server";
 import { useTranslation } from "react-i18next";
 
@@ -82,9 +86,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   // beforeLoad runs on both server and client BEFORE the route renders.
   // We resolve the user's language here so SSR + first client paint match.
+  // Awaiting changeLanguage ensures i18n is ready before any t() calls.
   beforeLoad: async () => {
     const lang: Lang = resolveLanguageIso();
-    setI18nLanguage(lang);
+    await setI18nLanguage(lang);
     return { lang };
   },
   head: () => ({
@@ -130,8 +135,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const { lang } = Route.useRouteContext();
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <HeadContent />
       </head>
@@ -144,8 +150,20 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+  const { queryClient, lang } = Route.useRouteContext();
   const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+    // After hydration, check if the user has a different language
+    // preference in localStorage or navigator that we should honour.
+    const detected = detectClientLanguage();
+    if (detected && detected !== lang) {
+      writeLangCookieClient(detected);
+      void setI18nLanguage(detected);
+    }
+  }, [lang]);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
