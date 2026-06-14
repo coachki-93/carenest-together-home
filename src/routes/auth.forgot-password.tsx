@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Logo } from "@/components/carenest/Logo";
 
 export const Route = createFileRoute("/auth/forgot-password")({
   head: () => ({ meta: [{ title: "Reset password — CareNest" }] }),
@@ -62,6 +63,9 @@ function ForgotPage() {
 
   return (
     <div className="card-soft p-8 space-y-6">
+      <div className="flex justify-center">
+        <Logo size={120} />
+      </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">{t("auth.forgotTitle")}</h1>
         <p className="text-sm text-muted-foreground">{t("auth.forgotSub")}</p>

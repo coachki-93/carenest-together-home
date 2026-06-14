@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { Logo } from "@/components/carenest/Logo";
 
 const searchSchema = z.object({
   invite: z.string().optional(),
@@ -112,6 +113,9 @@ function SignUpPage() {
 
   return (
     <div className="card-soft p-8 space-y-6">
+      <div className="flex justify-center">
+        <Logo size={120} />
+      </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">
           {isCaregiver ? t("auth.signupTitleCaregiver") : t("auth.signupTitleFamily")}
