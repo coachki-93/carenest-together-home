@@ -19,6 +19,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
+import { Route as AuthenticatedShiftsRouteImport } from './routes/_authenticated/shifts'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
@@ -77,6 +78,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
 const AuthenticatedVitalsRoute = AuthenticatedVitalsRouteImport.update({
   id: '/vitals',
   path: '/vitals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedShiftsRoute = AuthenticatedShiftsRouteImport.update({
+  id: '/shifts',
+  path: '/shifts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/medications': typeof AuthenticatedMedicationsRoute
   '/schedule': typeof AuthenticatedScheduleRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/shifts': typeof AuthenticatedShiftsRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/medications': typeof AuthenticatedMedicationsRoute
   '/schedule': typeof AuthenticatedScheduleRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/shifts': typeof AuthenticatedShiftsRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/shifts': typeof AuthenticatedShiftsRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/medications'
     | '/schedule'
     | '/settings'
+    | '/shifts'
     | '/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/medications'
     | '/schedule'
     | '/settings'
+    | '/shifts'
     | '/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/_authenticated/medications'
     | '/_authenticated/schedule'
     | '/_authenticated/settings'
+    | '/_authenticated/shifts'
     | '/_authenticated/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVitalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/shifts': {
+      id: '/_authenticated/shifts'
+      path: '/shifts'
+      fullPath: '/shifts'
+      preLoaderRoute: typeof AuthenticatedShiftsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -427,6 +446,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedShiftsRoute: typeof AuthenticatedShiftsRoute
   AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
   AuthenticatedOnboardingCaregiverRoute: typeof AuthenticatedOnboardingCaregiverRoute
   AuthenticatedOnboardingChildRoute: typeof AuthenticatedOnboardingChildRoute
@@ -441,6 +461,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedShiftsRoute: AuthenticatedShiftsRoute,
   AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
   AuthenticatedOnboardingCaregiverRoute: AuthenticatedOnboardingCaregiverRoute,
   AuthenticatedOnboardingChildRoute: AuthenticatedOnboardingChildRoute,
