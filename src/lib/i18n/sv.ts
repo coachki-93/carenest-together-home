@@ -452,6 +452,8 @@ export const sv = {
   caregiversPage: {
     subtitle: "Ditt vårdteam och väntande inbjudningar.",
     members: "Vårdteam",
+    accounts: "Vårdgivarkonton",
+    roleOrg: "Organisation",
     invitesTitle: "Väntande inbjudningar",
     noMembers: "Inga medlemmar än.",
     noPending: "Inga väntande inbjudningar — skapa en för att bjuda in en vårdgivare.",
