@@ -301,7 +301,7 @@ function DashboardPage() {
         scheduled_for: confirmTask.source.dose.scheduled_for.toISOString(),
         status: "given",
         given_by: user?.id ?? null,
-        caregiver_profile_id: suggestedCaregiverId ?? null,
+        caregiver_profile_id: activeCaregiverId ?? suggestedCaregiverId ?? null,
       });
       toast.success(t("dashboard.taskLogged", { title: confirmTask.title }));
     } catch (e) {
