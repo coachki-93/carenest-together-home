@@ -871,8 +871,19 @@ function AppointmentDialog({
     );
   }
 
-  const showInterval = repeat === "hourly" || repeat === "daily";
+  const showInterval = repeat === "hourly" || repeat === "daily" || repeat === "monthly";
   const showWeekdays = repeat === "weekly";
+  const showTimesOfDay = repeat === "daily" || repeat === "weekly" || repeat === "monthly";
+
+  function addTimeOfDay() {
+    setTimesOfDay((prev) => [...prev, "12:00"]);
+  }
+  function updateTimeOfDay(idx: number, value: string) {
+    setTimesOfDay((prev) => prev.map((t, i) => (i === idx ? value : t)));
+  }
+  function removeTimeOfDay(idx: number) {
+    setTimesOfDay((prev) => prev.filter((_, i) => i !== idx));
+  }
 
   return (
     <>
