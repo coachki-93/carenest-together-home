@@ -95,6 +95,8 @@ type SavePayload = {
   recurrence_freq: RecurrenceFreq | null;
   recurrence_interval: number;
   recurrence_byweekday: number[] | null;
+  recurrence_times_of_day: string[] | null;
+  reminder_minutes: number | null;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
