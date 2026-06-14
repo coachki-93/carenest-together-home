@@ -429,7 +429,24 @@ function DashboardPage() {
                 {t("dashboard.viewFull")} <ChevronRight className="size-4" />
               </Button>
             </div>
-            {tasks.length === 0 ? (
+            {scheduleLoading ? (
+              <ul className="space-y-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-3 md:gap-4 rounded-2xl border border-border/60 p-3 md:p-4 bg-card"
+                  >
+                    <Skeleton className="h-4 w-12 rounded" />
+                    <Skeleton className="size-11 rounded-2xl" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-1/2 rounded" />
+                      <Skeleton className="h-3 w-1/3 rounded" />
+                    </div>
+                    <Skeleton className="h-8 w-20 rounded-full" />
+                  </li>
+                ))}
+              </ul>
+            ) : tasks.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-8 text-center">
                 <CalendarClock className="size-8 mx-auto text-muted-foreground mb-2" />
                 <p className="font-bold mb-1">{t("dashboard.emptyTitle")}</p>
