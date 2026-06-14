@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type AppointmentRow = Database["public"]["Tables"]["appointments"]["Row"];
 
-export type RecurrenceFreq = "hourly" | "daily" | "weekly";
+export type RecurrenceFreq = "hourly" | "daily" | "weekly" | "monthly";
 
 // Extend the generated row with the recurrence columns (typegen runs after
 // migration approval; we type them here so the rest of the app compiles now).
@@ -15,6 +15,8 @@ export type Appointment = AppointmentRow & {
   recurrence_parent_id: string | null;
   recurrence_override_at: string | null;
   recurrence_cancelled: boolean;
+  recurrence_times_of_day: string[] | null;
+  reminder_minutes: number | null;
 };
 
 export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["Insert"] & {
@@ -24,15 +26,26 @@ export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["In
   recurrence_parent_id?: string | null;
   recurrence_override_at?: string | null;
   recurrence_cancelled?: boolean;
+  recurrence_times_of_day?: string[] | null;
+  reminder_minutes?: number | null;
 };
 
 export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Update"] & {
   recurrence_freq?: RecurrenceFreq | null;
   recurrence_interval?: number;
   recurrence_byweekday?: number[] | null;
+  recurrence_times_of_day?: string[] | null;
+  reminder_minutes?: number | null;
 };
 
-export type AppointmentKind = Database["public"]["Enums"]["appointment_kind"];
+// Locally widen the kind union — generated types lag behind the enum migration.
+export type AppointmentKind =
+  | "appointment"
+  | "therapy"
+  | "task"
+  | "other"
+  | "meal"
+  | "sleep";
 
 /**
  * What the UI receives. For non-recurring rows, `master_id` is null and
@@ -51,6 +64,8 @@ export const APPOINTMENT_KINDS: AppointmentKind[] = [
   "appointment",
   "therapy",
   "task",
+  "meal",
+  "sleep",
   "other",
 ];
 
@@ -61,6 +76,50 @@ export const APPOINTMENT_KINDS: AppointmentKind[] = [
 const MS_HOUR = 60 * 60 * 1000;
 const MS_DAY = 24 * MS_HOUR;
 const SAFETY_CAP = 500; // per master, per window
+
+/**
+ * Parse "HH:MM" → [hours, minutes]. Returns null when malformed.
+ */
+function parseHHMM(s: string): [number, number] | null {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(s.trim());
+  if (!m) return null;
+  const hh = Number(m[1]);
+  const mm = Number(m[2]);
+  if (!(hh >= 0 && hh <= 23) || !(mm >= 0 && mm <= 59)) return null;
+  return [hh, mm];
+}
+
+/**
+ * Expand a calendar "anchor day" (year/month/day) into one occurrence per
+ * configured time-of-day (or a single occurrence at the master's start time
+ * when no times-of-day are set).
+ */
+function expandDayWithTimes(
+  master: Appointment,
+  anchorYear: number,
+  anchorMonth: number, // 0-11
+  anchorDay: number,
+  rangeStart: Date,
+  rangeEnd: Date,
+  start: Date,
+  out: Date[],
+) {
+  const times: Array<[number, number]> = [];
+  const list = (master.recurrence_times_of_day ?? [])
+    .map(parseHHMM)
+    .filter((x): x is [number, number] => !!x);
+  if (list.length > 0) {
+    times.push(...list);
+  } else {
+    times.push([start.getHours(), start.getMinutes()]);
+  }
+  for (const [hh, mm] of times) {
+    const occ = new Date(anchorYear, anchorMonth, anchorDay, hh, mm, 0, 0);
+    if (occ >= start && occ >= rangeStart && occ < rangeEnd) {
+      out.push(occ);
+    }
+  }
+}
 
 function expandMaster(
   master: Appointment,
@@ -75,7 +134,6 @@ function expandMaster(
 
   if (master.recurrence_freq === "hourly") {
     const stepMs = interval * MS_HOUR;
-    // jump forward to the first occurrence inside the range
     let t = start.getTime();
     if (t < rangeStart.getTime()) {
       const diff = rangeStart.getTime() - t;
@@ -92,17 +150,30 @@ function expandMaster(
   }
 
   if (master.recurrence_freq === "daily") {
-    const stepMs = interval * MS_DAY;
-    let t = start.getTime();
-    if (t < rangeStart.getTime()) {
-      const diff = rangeStart.getTime() - t;
-      const skips = Math.ceil(diff / stepMs);
-      t = t + skips * stepMs;
-    }
+    // Walk day-by-day so we can emit multiple times-of-day per day.
+    const cursor = new Date(Math.max(start.getTime(), rangeStart.getTime()));
+    cursor.setHours(0, 0, 0, 0);
+    // Align to the daily interval relative to master's start day.
+    const startDay = new Date(start);
+    startDay.setHours(0, 0, 0, 0);
     let n = 0;
-    while (t < rangeEnd.getTime() && n < SAFETY_CAP) {
-      out.push(new Date(t));
-      t += stepMs;
+    while (cursor < rangeEnd && n < SAFETY_CAP) {
+      const diffDays = Math.round(
+        (cursor.getTime() - startDay.getTime()) / MS_DAY,
+      );
+      if (diffDays >= 0 && diffDays % interval === 0) {
+        expandDayWithTimes(
+          master,
+          cursor.getFullYear(),
+          cursor.getMonth(),
+          cursor.getDate(),
+          rangeStart,
+          rangeEnd,
+          start,
+          out,
+        );
+      }
+      cursor.setDate(cursor.getDate() + 1);
       n++;
     }
     return out;
@@ -113,23 +184,70 @@ function expandMaster(
       (w) => w >= 0 && w <= 6,
     );
     if (weekdays.length === 0) return out;
-    // walk day by day from max(start, rangeStart) to rangeEnd, keeping the
-    // local time-of-day equal to master's start.
-    const hours = start.getHours();
-    const minutes = start.getMinutes();
-    const seconds = start.getSeconds();
     const cursor = new Date(Math.max(start.getTime(), rangeStart.getTime()));
     cursor.setHours(0, 0, 0, 0);
     let n = 0;
     while (cursor < rangeEnd && n < SAFETY_CAP * 7) {
       if (weekdays.includes(cursor.getDay())) {
-        const occ = new Date(cursor);
-        occ.setHours(hours, minutes, seconds, 0);
-        if (occ >= start && occ >= rangeStart && occ < rangeEnd) {
-          out.push(occ);
-        }
+        expandDayWithTimes(
+          master,
+          cursor.getFullYear(),
+          cursor.getMonth(),
+          cursor.getDate(),
+          rangeStart,
+          rangeEnd,
+          start,
+          out,
+        );
       }
       cursor.setDate(cursor.getDate() + 1);
+      n++;
+    }
+    return out;
+  }
+
+  if (master.recurrence_freq === "monthly") {
+    // Same day-of-month as the master start. Skip months where that
+    // day doesn't exist (e.g. Feb 30).
+    const dom = start.getDate();
+    // Move to first candidate month at-or-after rangeStart.
+    let y = Math.max(start.getFullYear(), rangeStart.getFullYear());
+    let mo =
+      y === start.getFullYear()
+        ? start.getMonth()
+        : 0;
+    // If rangeStart is later in same year, advance to its month.
+    if (y === rangeStart.getFullYear() && mo < rangeStart.getMonth()) {
+      mo = rangeStart.getMonth();
+    }
+    let n = 0;
+    while (n < SAFETY_CAP) {
+      const daysInMonth = new Date(y, mo + 1, 0).getDate();
+      if (dom <= daysInMonth) {
+        // Honour interval (months) relative to master start.
+        const totalMonths =
+          (y - start.getFullYear()) * 12 + (mo - start.getMonth());
+        if (totalMonths >= 0 && totalMonths % interval === 0) {
+          expandDayWithTimes(
+            master,
+            y,
+            mo,
+            dom,
+            rangeStart,
+            rangeEnd,
+            start,
+            out,
+          );
+        }
+      }
+      // step one month forward
+      mo += 1;
+      if (mo > 11) {
+        mo = 0;
+        y += 1;
+      }
+      const probe = new Date(y, mo, Math.min(dom, 28), 0, 0, 0, 0);
+      if (probe >= rangeEnd) break;
       n++;
     }
     return out;
@@ -354,6 +472,7 @@ type InstanceOverrideInput = {
     starts_at: string;
     ends_at: string | null;
     all_day: boolean;
+    reminder_minutes: number | null;
   };
 };
 

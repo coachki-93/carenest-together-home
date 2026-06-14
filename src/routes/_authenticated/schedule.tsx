@@ -19,6 +19,9 @@ import {
   Trash2,
   Pencil,
   Repeat,
+  Bell,
+  UtensilsCrossed,
+  Moon,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -92,6 +95,8 @@ type SavePayload = {
   recurrence_freq: RecurrenceFreq | null;
   recurrence_interval: number;
   recurrence_byweekday: number[] | null;
+  recurrence_times_of_day: string[] | null;
+  reminder_minutes: number | null;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
@@ -404,6 +409,7 @@ function SchedulePage() {
                   starts_at: values.starts_at,
                   ends_at: values.ends_at,
                   all_day: values.all_day,
+                  reminder_minutes: values.reminder_minutes,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
@@ -423,6 +429,7 @@ function SchedulePage() {
                     // keep clock-time + duration changes for the series
                     starts_at: values.starts_at,
                     ends_at: values.ends_at,
+                    reminder_minutes: values.reminder_minutes,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
@@ -752,6 +759,8 @@ function AppointmentDialog({
   const [repeat, setRepeat] = useState<RepeatMode>("none");
   const [interval, setInterval] = useState<number>(1);
   const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
+  const [reminderMinutes, setReminderMinutes] = useState<number | null>(null);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -771,10 +780,11 @@ function AppointmentDialog({
       setAllDay(editing.all_day);
       setLocation(editing.location ?? "");
       setNotes(editing.notes ?? "");
-      // recurrence: when editing series, load from master; instance: load too so user sees pattern
       setRepeat((editing.recurrence_freq as RepeatMode | null) ?? "none");
       setInterval(editing.recurrence_interval || 1);
       setWeekdays(editing.recurrence_byweekday ?? []);
+      setTimesOfDay(editing.recurrence_times_of_day ?? []);
+      setReminderMinutes(editing.reminder_minutes ?? null);
     } else {
       setTitle("");
       setKind("appointment");
@@ -787,6 +797,8 @@ function AppointmentDialog({
       setRepeat("none");
       setInterval(1);
       setWeekdays([]);
+      setTimesOfDay([]);
+      setReminderMinutes(null);
     }
   }, [open, editing, defaultDay]);
 
@@ -809,6 +821,18 @@ function AppointmentDialog({
       toast.error(t("scheduleEvents.weekdaysRequired"));
       return null;
     }
+    // Times-of-day only apply to daily/weekly/monthly (not hourly).
+    const allowTimes =
+      showsRepeat && (repeat === "daily" || repeat === "weekly" || repeat === "monthly");
+    const cleanedTimes = allowTimes
+      ? Array.from(
+          new Set(
+            timesOfDay
+              .map((s) => s.trim())
+              .filter((s) => /^\d{1,2}:\d{2}$/.test(s)),
+          ),
+        ).sort()
+      : [];
     return {
       family_id: familyId,
       child_id: childId,
@@ -824,6 +848,8 @@ function AppointmentDialog({
       recurrence_interval: showsRepeat && repeat !== "none" ? Math.max(1, interval) : 1,
       recurrence_byweekday:
         showsRepeat && repeat === "weekly" ? [...weekdays].sort() : null,
+      recurrence_times_of_day: cleanedTimes.length > 0 ? cleanedTimes : null,
+      reminder_minutes: reminderMinutes,
     };
   }
 
@@ -845,8 +871,19 @@ function AppointmentDialog({
     );
   }
 
-  const showInterval = repeat === "hourly" || repeat === "daily";
+  const showInterval = repeat === "hourly" || repeat === "daily" || repeat === "monthly";
   const showWeekdays = repeat === "weekly";
+  const showTimesOfDay = repeat === "daily" || repeat === "weekly" || repeat === "monthly";
+
+  function addTimeOfDay() {
+    setTimesOfDay((prev) => [...prev, "12:00"]);
+  }
+  function updateTimeOfDay(idx: number, value: string) {
+    setTimesOfDay((prev) => prev.map((t, i) => (i === idx ? value : t)));
+  }
+  function removeTimeOfDay(idx: number) {
+    setTimesOfDay((prev) => prev.filter((_, i) => i !== idx));
+  }
 
   return (
     <>
@@ -948,6 +985,7 @@ function AppointmentDialog({
                     <SelectItem value="hourly">{t("scheduleEvents.repeat.hourly")}</SelectItem>
                     <SelectItem value="daily">{t("scheduleEvents.repeat.daily")}</SelectItem>
                     <SelectItem value="weekly">{t("scheduleEvents.repeat.weekly")}</SelectItem>
+                    <SelectItem value="monthly">{t("scheduleEvents.repeat.monthly")}</SelectItem>
                   </SelectContent>
                 </Select>
                 {showInterval && (
@@ -958,7 +996,7 @@ function AppointmentDialog({
                     <Input
                       type="number"
                       min={1}
-                      max={repeat === "hourly" ? 23 : 365}
+                      max={repeat === "hourly" ? 23 : repeat === "monthly" ? 24 : 365}
                       value={interval}
                       onChange={(e) =>
                         setInterval(Math.max(1, Number(e.target.value) || 1))
@@ -968,7 +1006,9 @@ function AppointmentDialog({
                     <span className="text-sm text-muted-foreground">
                       {repeat === "hourly"
                         ? t("scheduleEvents.repeat.hoursUnit", { count: interval })
-                        : t("scheduleEvents.repeat.daysUnit", { count: interval })}
+                        : repeat === "monthly"
+                          ? t("scheduleEvents.repeat.monthsUnit", { count: interval })
+                          : t("scheduleEvents.repeat.daysUnit", { count: interval })}
                     </span>
                   </div>
                 )}
@@ -999,6 +1039,48 @@ function AppointmentDialog({
                     </div>
                   </div>
                 )}
+                {showTimesOfDay && (
+                  <div className="space-y-2">
+                    <Label className="text-sm">
+                      {t("scheduleEvents.repeat.timesOfDay")}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {t("scheduleEvents.repeat.timesOfDayHint")}
+                    </p>
+                    <div className="space-y-2">
+                      {timesOfDay.map((tod, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <Input
+                            type="time"
+                            value={tod}
+                            onChange={(e) => updateTimeOfDay(i, e.target.value)}
+                            className="rounded-xl w-32"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full text-muted-foreground hover:text-destructive"
+                            onClick={() => removeTimeOfDay(i)}
+                            aria-label={t("common.remove")}
+                          >
+                            <X className="size-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="rounded-full"
+                        onClick={addTimeOfDay}
+                      >
+                        <Plus className="size-3.5" />
+                        {t("scheduleEvents.repeat.addTime")}
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 {repeat !== "none" && (
                   <p className="text-xs text-muted-foreground">
                     {t("scheduleEvents.repeat.foreverHint")}
@@ -1006,6 +1088,37 @@ function AppointmentDialog({
                 )}
               </div>
             )}
+
+            {/* Reminder */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Bell className="size-4 text-primary" />
+                <Label className="font-semibold">
+                  {t("scheduleEvents.fields.reminder")}
+                </Label>
+              </div>
+              <Select
+                value={reminderMinutes === null ? "none" : String(reminderMinutes)}
+                onValueChange={(v) =>
+                  setReminderMinutes(v === "none" ? null : Number(v))
+                }
+              >
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("scheduleEvents.reminder.none")}</SelectItem>
+                  <SelectItem value="0">{t("scheduleEvents.reminder.atTime")}</SelectItem>
+                  <SelectItem value="5">{t("scheduleEvents.reminder.min5")}</SelectItem>
+                  <SelectItem value="10">{t("scheduleEvents.reminder.min10")}</SelectItem>
+                  <SelectItem value="15">{t("scheduleEvents.reminder.min15")}</SelectItem>
+                  <SelectItem value="30">{t("scheduleEvents.reminder.min30")}</SelectItem>
+                  <SelectItem value="60">{t("scheduleEvents.reminder.hour1")}</SelectItem>
+                  <SelectItem value="120">{t("scheduleEvents.reminder.hour2")}</SelectItem>
+                  <SelectItem value="1440">{t("scheduleEvents.reminder.day1")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             {isInstance && (
               <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">
@@ -1142,6 +1255,10 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
       return <Sparkles className={className} />;
     case "task":
       return <ClipboardList className={className} />;
+    case "meal":
+      return <UtensilsCrossed className={className} />;
+    case "sleep":
+      return <Moon className={className} />;
     default:
       return <CalendarIcon className={className} />;
   }
@@ -1155,6 +1272,10 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
       return { bg: "#FCE7F3", fg: "#BE185D" };
     case "task":
       return { bg: "#DCFCE7", fg: "#15803D" };
+    case "meal":
+      return { bg: "#FFEDD5", fg: "#C2410C" };
+    case "sleep":
+      return { bg: "#E0E7FF", fg: "#4338CA" };
     default:
       return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
