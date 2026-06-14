@@ -179,6 +179,8 @@ function SchedulePage() {
   const createAppt = useCreateAppointment();
   const updateAppt = useUpdateAppointment();
   const deleteAppt = useDeleteAppointment();
+  const updateInstance = useUpdateAppointmentInstance();
+  const deleteInstance = useDeleteAppointmentInstance();
 
   const [confirm, setConfirm] = useState<
     { dose: ScheduledDose; status: "given" | "skipped" } | null
@@ -222,16 +224,31 @@ function SchedulePage() {
     setApptOpen(true);
   }
 
-  async function handleDeleteAppt() {
-    if (!confirmDeleteAppt) return;
+  async function handleDeleteAppt(scope: "this" | "series") {
+    if (!confirmDeleteAppt || !familyId || !user) return;
+    const target = confirmDeleteAppt;
     try {
-      await deleteAppt.mutateAsync(confirmDeleteAppt.id);
+      if (target.is_recurring && target.master_id && scope === "this") {
+        await deleteInstance.mutateAsync({
+          family_id: familyId,
+          child_id: target.child_id,
+          created_by: user.id,
+          master_id: target.master_id,
+          occurrence_start: target.occurrence_start,
+          title: target.title,
+          kind: target.kind,
+        });
+      } else {
+        const id = target.master_id ?? target.id;
+        await deleteAppt.mutateAsync(id);
+      }
       toast.success(t("scheduleEvents.deleted"));
       setConfirmDeleteAppt(null);
     } catch (e) {
       toast.error((e as Error).message);
     }
   }
+
 
   return (
     <DashboardLayout
