@@ -513,6 +513,15 @@ export const en = {
     pickerLabel: "Who did this?",
     pickerPlaceholder: "Pick a caregiver",
     onShift: "on shift",
+    countBadge: "{{count}} profiles",
+  },
+  activeProfile: {
+    actingAs: "Acting as",
+    pick: "Pick a profile",
+    switch: "Switch profile",
+    dropdownLabel: "Acting as",
+    manage: "Manage profiles",
+    addFirst: "Add your first profile",
   },
   scheduleEvents: {
     new: "New event",
