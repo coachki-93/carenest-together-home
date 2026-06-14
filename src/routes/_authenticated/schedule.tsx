@@ -588,6 +588,16 @@ function DoseRow({
         {med.instructions && (
           <p className="text-xs text-muted-foreground truncate mt-0.5">{med.instructions}</p>
         )}
+        {status && dose.log && (
+          <div className="text-xs text-muted-foreground mt-1">
+            <ByProfile
+              familyId={membership?.family_id}
+              caregiverProfileId={dose.log.caregiver_profile_id}
+              authorUserId={dose.log.given_by}
+              viewerUserId={user?.id}
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex gap-2 shrink-0">
