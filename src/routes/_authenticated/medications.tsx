@@ -57,6 +57,7 @@ function MedicationsPage() {
   const { t } = useTranslation();
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
+  const isOwner = membership?.role === "owner";
   const { data: child } = useFamilyChild(familyId);
   const { data: meds, isLoading } = useMedications(familyId);
 
@@ -73,9 +74,11 @@ function MedicationsPage() {
             <Pill className="size-7" />
           </div>
           <p className="text-muted-foreground mb-6">{t("meds.noChildFirst")}</p>
-          <Button asChild>
-            <Link to="/child">{t("meds.goToChild")}</Link>
-          </Button>
+          {isOwner && (
+            <Button asChild>
+              <Link to="/child">{t("meds.goToChild")}</Link>
+            </Button>
+          )}
         </div>
       </DashboardLayout>
     );
@@ -86,7 +89,7 @@ function MedicationsPage() {
       title={t("meds.title")}
       subtitle={child ? t("meds.subtitle", { name: child.name }) : undefined}
       actions={
-        child ? (
+        child && isOwner ? (
           <Button onClick={() => setCreating(true)} className="rounded-full">
             <Plus className="size-4" /> {t("meds.addNew")}
           </Button>
@@ -101,8 +104,10 @@ function MedicationsPage() {
             <Pill className="size-7" />
           </div>
           <h2 className="text-xl font-extrabold mb-2">{t("meds.noMeds")}</h2>
-          <p className="text-muted-foreground mb-6">{t("meds.noMedsBody")}</p>
-          {child && (
+          <p className="text-muted-foreground mb-6">
+            {isOwner ? t("meds.noMedsBody") : t("meds.noMedsBodyCaregiver")}
+          </p>
+          {child && isOwner && (
             <Button onClick={() => setCreating(true)} className="rounded-full">
               <Plus className="size-4" /> {t("meds.addNew")}
             </Button>
@@ -114,12 +119,14 @@ function MedicationsPage() {
             <MedicationCard
               key={m.id}
               med={m}
+              canEdit={isOwner}
               onEdit={() => setEditing(m)}
               onDelete={() => setDeleting(m)}
             />
           ))}
         </div>
       )}
+
 
       {(creating || editing) && child && familyId && (
         <MedicationDialog
@@ -170,10 +177,12 @@ function MedicationsPage() {
 
 function MedicationCard({
   med,
+  canEdit,
   onEdit,
   onDelete,
 }: {
   med: Medication;
+  canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -196,14 +205,16 @@ function MedicationCard({
                 {dose || "—"} · {t(`meds.route${routeKey(med.route)}`)}
               </p>
             </div>
-            <div className="flex gap-1">
-              <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
-                <Pencil className="size-4" />
-              </Button>
-              <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
-            </div>
+            {canEdit && (
+              <div className="flex gap-1">
+                <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
+                  <Pencil className="size-4" />
+                </Button>
+                <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
+                  <Trash2 className="size-4 text-destructive" />
+                </Button>
+              </div>
+            )}
           </div>
           {med.instructions && (
             <p className="text-sm text-muted-foreground mt-2">{med.instructions}</p>

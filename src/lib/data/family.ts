@@ -97,10 +97,12 @@ export function useCreateInvite() {
     mutationFn: async ({
       familyId,
       createdBy,
+      invitedEmail,
       daysValid = 14,
     }: {
       familyId: string;
       createdBy: string;
+      invitedEmail?: string | null;
       daysValid?: number;
     }) => {
       const expires = new Date();
@@ -113,6 +115,7 @@ export function useCreateInvite() {
           code: generateCode(),
           expires_at: expires.toISOString(),
           status: "pending",
+          invited_email: invitedEmail?.trim().toLowerCase() || null,
         })
         .select()
         .single();
