@@ -18,6 +18,7 @@ export const en = {
     google: "Google",
     apple: "Apple",
     addAnother: "Add another",
+    remove: "Remove",
     language: "Language",
     english: "English",
     swedish: "Svenska",
