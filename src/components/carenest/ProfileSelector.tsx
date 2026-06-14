@@ -90,5 +90,6 @@ export function ProfileSelector() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    </div>
   );
 }
