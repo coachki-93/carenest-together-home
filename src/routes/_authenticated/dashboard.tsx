@@ -137,15 +137,20 @@ function DashboardPage() {
     return () => window.clearInterval(id);
   }, []);
 
-  const { currentShift, nextShift } = useMemo(() => {
+  const { currentShifts, nextShifts } = useMemo(() => {
     const now = new Date(nowTick);
     const horizon = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
     const occs = expandShifts(shifts, now, horizon).sort(
       (a, b) => a.start.getTime() - b.start.getTime(),
     );
-    const current = occs.find((o) => o.start <= now && o.end > now) ?? null;
-    const next = occs.find((o) => o.start > now) ?? null;
-    return { currentShift: current, nextShift: next };
+    const current = occs.filter((o) => o.start <= now && o.end > now);
+    const upcoming = occs.filter((o) => o.start > now);
+    // Group "next" by the earliest upcoming start time (everyone starting then).
+    const firstStart = upcoming[0]?.start.getTime() ?? null;
+    const next = firstStart
+      ? upcoming.filter((o) => o.start.getTime() === firstStart)
+      : [];
+    return { currentShifts: current, nextShifts: next };
   }, [shifts, nowTick]);
 
   const todayStart = useMemo(() => startOfDay(new Date()), []);
