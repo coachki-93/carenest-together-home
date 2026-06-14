@@ -693,6 +693,8 @@ function AppointmentRow({
   );
 }
 
+const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+
 function AppointmentDialog({
   open,
   onOpenChange,
@@ -711,18 +713,7 @@ function AppointmentDialog({
   childId: string | null;
   userId: string | null;
   editing: ExpandedAppointment | null;
-  onSave: (values: {
-    family_id: string;
-    child_id: string | null;
-    created_by: string;
-    title: string;
-    notes: string | null;
-    location: string | null;
-    kind: AppointmentKind;
-    starts_at: string;
-    ends_at: string | null;
-    all_day: boolean;
-  }, id?: string) => void | Promise<void>;
+  onSave: (values: SavePayload, scope: "this" | "series") => void | Promise<void>;
   saving: boolean;
 }) {
   const { t } = useTranslation();
@@ -735,6 +726,14 @@ function AppointmentDialog({
   const [allDay, setAllDay] = useState(false);
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
+  const [repeat, setRepeat] = useState<RepeatMode>("none");
+  const [interval, setInterval] = useState<number>(1);
+  const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [scopeOpen, setScopeOpen] = useState(false);
+  const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
+
+  const isInstance = !!editing?.is_recurring;
+  const showsRepeat = !editing || (editing && !editing.is_recurring);
 
   useEffect(() => {
     if (!open) return;
@@ -749,6 +748,10 @@ function AppointmentDialog({
       setAllDay(editing.all_day);
       setLocation(editing.location ?? "");
       setNotes(editing.notes ?? "");
+      // recurrence: when editing series, load from master; instance: load too so user sees pattern
+      setRepeat((editing.recurrence_freq as RepeatMode | null) ?? "none");
+      setInterval(editing.recurrence_interval || 1);
+      setWeekdays(editing.recurrence_byweekday ?? []);
     } else {
       setTitle("");
       setKind("appointment");
@@ -758,155 +761,308 @@ function AppointmentDialog({
       setAllDay(false);
       setLocation("");
       setNotes("");
+      setRepeat("none");
+      setInterval(1);
+      setWeekdays([]);
     }
   }, [open, editing, defaultDay]);
 
-  function handleSubmit() {
-    if (!familyId || !userId) return;
+  function buildValues(): SavePayload | null {
+    if (!familyId || !userId) return null;
     const trimmed = title.trim();
     if (!trimmed) {
       toast.error(t("scheduleEvents.titleRequired"));
-      return;
+      return null;
     }
     const startDt = allDay
       ? toLocalDateTime(date, "00:00")
       : toLocalDateTime(date, time || "00:00");
-    const endDt =
-      !allDay && endTime ? toLocalDateTime(date, endTime) : null;
+    const endDt = !allDay && endTime ? toLocalDateTime(date, endTime) : null;
     if (endDt && endDt <= startDt) {
       toast.error(t("scheduleEvents.endAfterStart"));
+      return null;
+    }
+    if (repeat === "weekly" && weekdays.length === 0 && showsRepeat) {
+      toast.error(t("scheduleEvents.weekdaysRequired"));
+      return null;
+    }
+    return {
+      family_id: familyId,
+      child_id: childId,
+      created_by: userId,
+      title: trimmed,
+      notes: notes.trim() || null,
+      location: location.trim() || null,
+      kind,
+      starts_at: startDt.toISOString(),
+      ends_at: endDt ? endDt.toISOString() : null,
+      all_day: allDay,
+      recurrence_freq: showsRepeat && repeat !== "none" ? repeat : null,
+      recurrence_interval: showsRepeat && repeat !== "none" ? Math.max(1, interval) : 1,
+      recurrence_byweekday:
+        showsRepeat && repeat === "weekly" ? [...weekdays].sort() : null,
+    };
+  }
+
+  function handleSubmit() {
+    const values = buildValues();
+    if (!values) return;
+    if (isInstance) {
+      // Ask scope: this one only, or the whole series
+      setPendingValues(values);
+      setScopeOpen(true);
       return;
     }
-    onSave(
-      {
-        family_id: familyId,
-        child_id: childId,
-        created_by: userId,
-        title: trimmed,
-        notes: notes.trim() || null,
-        location: location.trim() || null,
-        kind,
-        starts_at: startDt.toISOString(),
-        ends_at: endDt ? endDt.toISOString() : null,
-        all_day: allDay,
-      },
-      editing?.id,
+    onSave(values, "series");
+  }
+
+  function toggleWeekday(i: number) {
+    setWeekdays((prev) =>
+      prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i],
     );
   }
 
+  const showInterval = repeat === "hourly" || repeat === "daily";
+  const showWeekdays = repeat === "weekly";
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-2xl max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {editing ? t("scheduleEvents.editTitle") : t("scheduleEvents.newTitle")}
-          </DialogTitle>
-          <DialogDescription>{t("scheduleEvents.newBody")}</DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div>
-            <Label className="font-semibold">{t("scheduleEvents.fields.title")}</Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t("scheduleEvents.placeholders.title")}
-              className="rounded-xl mt-1.5"
-            />
-          </div>
-          <div>
-            <Label className="font-semibold">{t("scheduleEvents.fields.kind")}</Label>
-            <Select value={kind} onValueChange={(v) => setKind(v as AppointmentKind)}>
-              <SelectTrigger className="rounded-xl mt-1.5">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {APPOINTMENT_KINDS.map((k) => (
-                  <SelectItem key={k} value={k}>
-                    {t(`scheduleEvents.kind.${k}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="all-day"
-              checked={allDay}
-              onCheckedChange={(c) => setAllDay(c === true)}
-            />
-            <Label htmlFor="all-day" className="font-semibold">
-              {t("scheduleEvents.allDay")}
-            </Label>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="sm:col-span-1">
-              <Label className="font-semibold">{t("scheduleEvents.fields.date")}</Label>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="rounded-2xl max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editing ? t("scheduleEvents.editTitle") : t("scheduleEvents.newTitle")}
+            </DialogTitle>
+            <DialogDescription>{t("scheduleEvents.newBody")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label className="font-semibold">{t("scheduleEvents.fields.title")}</Label>
               <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={t("scheduleEvents.placeholders.title")}
                 className="rounded-xl mt-1.5"
               />
             </div>
-            {!allDay && (
-              <>
-                <div>
-                  <Label className="font-semibold">{t("scheduleEvents.fields.start")}</Label>
-                  <Input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="rounded-xl mt-1.5"
-                  />
+            <div>
+              <Label className="font-semibold">{t("scheduleEvents.fields.kind")}</Label>
+              <Select value={kind} onValueChange={(v) => setKind(v as AppointmentKind)}>
+                <SelectTrigger className="rounded-xl mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {APPOINTMENT_KINDS.map((k) => (
+                    <SelectItem key={k} value={k}>
+                      {t(`scheduleEvents.kind.${k}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="all-day"
+                checked={allDay}
+                onCheckedChange={(c) => setAllDay(c === true)}
+              />
+              <Label htmlFor="all-day" className="font-semibold">
+                {t("scheduleEvents.allDay")}
+              </Label>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-1">
+                <Label className="font-semibold">{t("scheduleEvents.fields.date")}</Label>
+                <Input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="rounded-xl mt-1.5"
+                />
+              </div>
+              {!allDay && (
+                <>
+                  <div>
+                    <Label className="font-semibold">{t("scheduleEvents.fields.start")}</Label>
+                    <Input
+                      type="time"
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      className="rounded-xl mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label className="font-semibold">{t("scheduleEvents.fields.end")}</Label>
+                    <Input
+                      type="time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className="rounded-xl mt-1.5"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Recurrence */}
+            {showsRepeat && (
+              <div className="rounded-2xl border border-border/60 p-3 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Repeat className="size-4 text-primary" />
+                  <Label className="font-semibold">
+                    {t("scheduleEvents.fields.repeat")}
+                  </Label>
                 </div>
-                <div>
-                  <Label className="font-semibold">{t("scheduleEvents.fields.end")}</Label>
-                  <Input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="rounded-xl mt-1.5"
-                  />
-                </div>
-              </>
+                <Select
+                  value={repeat}
+                  onValueChange={(v) => setRepeat(v as RepeatMode)}
+                >
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("scheduleEvents.repeat.none")}</SelectItem>
+                    <SelectItem value="hourly">{t("scheduleEvents.repeat.hourly")}</SelectItem>
+                    <SelectItem value="daily">{t("scheduleEvents.repeat.daily")}</SelectItem>
+                    <SelectItem value="weekly">{t("scheduleEvents.repeat.weekly")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                {showInterval && (
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm shrink-0">
+                      {t("scheduleEvents.repeat.everyN")}
+                    </Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={repeat === "hourly" ? 23 : 365}
+                      value={interval}
+                      onChange={(e) =>
+                        setInterval(Math.max(1, Number(e.target.value) || 1))
+                      }
+                      className="rounded-xl w-20"
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {repeat === "hourly"
+                        ? t("scheduleEvents.repeat.hoursUnit", { count: interval })
+                        : t("scheduleEvents.repeat.daysUnit", { count: interval })}
+                    </span>
+                  </div>
+                )}
+                {showWeekdays && (
+                  <div>
+                    <Label className="text-sm">
+                      {t("scheduleEvents.repeat.weekdays")}
+                    </Label>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {WEEKDAY_KEYS.map((k, i) => {
+                        const active = weekdays.includes(i);
+                        return (
+                          <button
+                            key={k}
+                            type="button"
+                            onClick={() => toggleWeekday(i)}
+                            className={cn(
+                              "size-9 rounded-full text-xs font-bold border transition-colors",
+                              active
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-background border-border text-foreground hover:bg-muted",
+                            )}
+                          >
+                            {t(`scheduleEvents.repeat.weekdayShort.${k}`)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                {repeat !== "none" && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.repeat.foreverHint")}
+                  </p>
+                )}
+              </div>
             )}
+
+            {isInstance && (
+              <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">
+                {t("scheduleEvents.repeat.instanceHint")}
+              </p>
+            )}
+
+            <div>
+              <Label className="font-semibold">{t("scheduleEvents.fields.location")}</Label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={t("scheduleEvents.placeholders.location")}
+                className="rounded-xl mt-1.5"
+              />
+            </div>
+            <div>
+              <Label className="font-semibold">{t("scheduleEvents.fields.notes")}</Label>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={t("scheduleEvents.placeholders.notes")}
+                rows={3}
+                className="rounded-xl mt-1.5"
+              />
+            </div>
           </div>
-          <div>
-            <Label className="font-semibold">{t("scheduleEvents.fields.location")}</Label>
-            <Input
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder={t("scheduleEvents.placeholders.location")}
-              className="rounded-xl mt-1.5"
-            />
-          </div>
-          <div>
-            <Label className="font-semibold">{t("scheduleEvents.fields.notes")}</Label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder={t("scheduleEvents.placeholders.notes")}
-              rows={3}
-              className="rounded-xl mt-1.5"
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" className="rounded-full" onClick={() => onOpenChange(false)}>
-            {t("common.cancel")}
-          </Button>
-          <Button
-            className="rounded-full font-bold"
-            onClick={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? t("common.saving") : t("scheduleEvents.save")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button variant="ghost" className="rounded-full" onClick={() => onOpenChange(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              className="rounded-full font-bold"
+              onClick={handleSubmit}
+              disabled={saving}
+            >
+              {saving ? t("common.saving") : t("scheduleEvents.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Scope chooser for editing a recurring instance */}
+      <AlertDialog open={scopeOpen} onOpenChange={setScopeOpen}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("scheduleEvents.scopeTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("scheduleEvents.scopeBody")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="rounded-full">
+              {t("common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-full"
+              onClick={() => {
+                if (pendingValues) onSave(pendingValues, "this");
+                setScopeOpen(false);
+              }}
+            >
+              {t("scheduleEvents.scopeThis")}
+            </AlertDialogAction>
+            <AlertDialogAction
+              className="rounded-full"
+              onClick={() => {
+                if (pendingValues) onSave(pendingValues, "series");
+                setScopeOpen(false);
+              }}
+            >
+              {t("scheduleEvents.scopeSeries")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
+
 
 function StatusBadge({ status }: { status?: string }) {
   const { t } = useTranslation();
