@@ -736,53 +736,61 @@ function DashboardPage() {
             })()}
           </section>
 
-          {/* Care team */}
+          {/* On shift now / Next shift */}
           <section className="card-soft p-6" data-tour="care-team">
-
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.onShift")}</h3>
               <Button
                 variant="ghost"
                 size="sm"
                 className="rounded-full text-primary font-semibold"
-                onClick={() => navigate({ to: "/caregivers" })}
+                onClick={() => navigate({ to: "/shifts" })}
               >
                 {t("dashboard.manage")} <ChevronRight className="size-4" />
               </Button>
             </div>
-            <div className="space-y-3">
-              {membersLoading ? (
-                Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="size-10 rounded-full" />
-                    <div className="flex-1 space-y-1.5">
-                      <Skeleton className="h-4 w-32 rounded" />
-                      <Skeleton className="h-3 w-20 rounded" />
-                    </div>
+            <div className="space-y-4">
+              {shiftsLoading ? (
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-10 rounded-full" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-4 w-32 rounded" />
+                    <Skeleton className="h-3 w-20 rounded" />
                   </div>
-                ))
-              ) : members.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("dashboard.noMembers")}</p>
+                </div>
               ) : (
-                members.map((m) => (
-                  <CareMember
-                    key={m.id}
-                    name={m.profile?.full_name ?? "—"}
-                    role={
-                      m.role === "owner"
-                        ? t("dashboard.owner")
-                        : m.role === "caregiver"
-                          ? t("dashboard.caregiver")
-                          : t("dashboard.viewer")
-                    }
-                    color={m.profile?.avatar_color ?? m.display_color ?? "#6C63FF"}
-                    avatarUrl={m.profile?.avatar_url ?? null}
-                    you={m.user_id === user?.id}
+                <>
+                  <ShiftSlot
+                    label={t("dashboard.onShift")}
+                    shift={currentShift}
+                    emptyLabel={t("dashboard.noOneOnShift")}
+                    members={members}
+                    profiles={caregiverProfiles}
+                    youUserId={user?.id}
+                    youLabel={t("dashboard.youLabel")}
+                    unassignedLabel={t("dashboard.shiftUnassigned")}
+                    locale={i18n.language === "sv" ? "sv-SE" : "en-US"}
+                    t={t}
+                    accent
                   />
-                ))
+                  <div className="border-t border-border/60" />
+                  <ShiftSlot
+                    label={t("dashboard.nextShift")}
+                    shift={nextShift}
+                    emptyLabel={t("dashboard.noUpcomingShift")}
+                    members={members}
+                    profiles={caregiverProfiles}
+                    youUserId={user?.id}
+                    youLabel={t("dashboard.youLabel")}
+                    unassignedLabel={t("dashboard.shiftUnassigned")}
+                    locale={i18n.language === "sv" ? "sv-SE" : "en-US"}
+                    t={t}
+                  />
+                </>
               )}
             </div>
           </section>
+
         </div>
       </div>
 
