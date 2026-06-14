@@ -115,6 +115,7 @@ export function useLogDose() {
       scheduled_for: string;
       status: MedLogStatus;
       given_by?: string | null;
+      caregiver_profile_id?: string | null;
       notes?: string | null;
     }) => {
       // Upsert on (medication_id, scheduled_for) unique constraint
