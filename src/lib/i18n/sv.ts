@@ -194,6 +194,12 @@ export const sv = {
     deleted: "Pass borttaget",
     errorTime: "Sluttid måste vara efter starttid",
     errorCaregiver: "Välj en vårdgivare",
+    errorProfile: "Välj en vårdprofil",
+    caregiverProfile: "Vårdprofil",
+    noProfiles: "Inga vårdprofiler ännu",
+    addProfilesFirst: "Lägg till vårdprofiler på Vårdteam-sidan för att börja schemalägga pass.",
+    unassigned: "Otilldelade",
+    unassignedHint: "Tidigare pass utan kopplad profil",
     dow: {
       sun: "Sön",
       mon: "Mån",
