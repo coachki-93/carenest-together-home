@@ -117,8 +117,9 @@ export function useLogDose() {
       given_by?: string | null;
       caregiver_profile_id?: string | null;
       notes?: string | null;
+      reason?: string | null;
+      postponed_to?: string | null;
     }) => {
-      // Upsert on (medication_id, scheduled_for) unique constraint
       const payload = {
         ...input,
         given_at: input.status === "given" ? new Date().toISOString() : null,
