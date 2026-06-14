@@ -513,6 +513,15 @@ export const sv = {
     pickerLabel: "Vem gjorde detta?",
     pickerPlaceholder: "Välj en vårdare",
     onShift: "på pass",
+    countBadge: "{{count}} vårdprofiler",
+  },
+  activeProfile: {
+    actingAs: "Agerar som",
+    pick: "Välj profil",
+    switch: "Byt profil",
+    dropdownLabel: "Agerar som",
+    manage: "Hantera profiler",
+    addFirst: "Lägg till din första profil",
   },
   scheduleEvents: {
     new: "Nytt event",
