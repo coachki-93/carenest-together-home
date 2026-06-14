@@ -231,7 +231,7 @@ function DashboardPage() {
   const logAppt = useLogAppointmentCompletion();
   const deleteApptCompletion = useDeleteAppointmentCompletion();
   const { data: completions = [] } = useAppointmentCompletions(familyId, todayStart, todayEnd);
-  const { data: caregiverProfilesForActions = [] } = useCaregiverProfiles(familyId);
+  const caregiverProfilesForActions = caregiverProfiles;
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
