@@ -767,7 +767,7 @@ function DashboardPage() {
                 <>
                   <ShiftSlot
                     label={t("dashboard.onShift")}
-                    shift={currentShift}
+                    shifts={currentShifts}
                     emptyLabel={t("dashboard.noOneOnShift")}
                     members={members}
                     profiles={caregiverProfiles}
