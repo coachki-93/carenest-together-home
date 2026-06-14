@@ -232,11 +232,11 @@ function CareTeamPage() {
               <UserCircle2 className="size-5 text-primary" />
               <h2 className="text-lg font-extrabold">{t("caregiverProfiles.title")}</h2>
             </div>
-            {!isOwner && (
+            {!isOwner && user?.id && (
               <Button
                 size="sm"
                 className="rounded-full gap-1.5 font-semibold"
-                onClick={() => setCreatingProfile(true)}
+                onClick={() => setCreatingProfileFor(user.id)}
               >
                 <Plus className="size-4" /> {t("caregiverProfiles.add")}
               </Button>
