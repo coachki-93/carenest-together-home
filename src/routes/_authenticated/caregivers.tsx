@@ -177,6 +177,9 @@ function CareTeamPage() {
                   .slice(0, 2)
                   .toUpperCase();
                 const bg = m.display_color || m.profile?.avatar_color || "var(--primary-soft)";
+                const accountProfiles = (profiles ?? []).filter(
+                  (p) => p.account_user_id === m.user_id,
+                );
                 return (
                   <li key={m.id} className="flex items-center gap-3 p-3 rounded-2xl bg-muted/40">
                     <div
@@ -199,7 +202,12 @@ function CareTeamPage() {
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-muted-foreground bg-background px-2 py-0.5 rounded-full">
-                            {t("caregiversPage.roleCaregiver")}
+                            {t("caregiversPage.roleOrg")}
+                          </span>
+                        )}
+                        {!isOwnerRow && (
+                          <span className="text-xs font-semibold text-primary bg-primary-soft px-2 py-0.5 rounded-full">
+                            {t("caregiverProfiles.countBadge", { count: accountProfiles.length })}
                           </span>
                         )}
                       </div>
@@ -207,6 +215,16 @@ function CareTeamPage() {
                         {t("caregiversPage.joined", { date: dateFmt.format(new Date(m.joined_at)) })}
                       </p>
                     </div>
+                    {isOwner && !isOwnerRow && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full gap-1"
+                        onClick={() => setCreatingProfileFor(m.user_id)}
+                      >
+                        <Plus className="size-4" /> {t("caregiverProfiles.add")}
+                      </Button>
+                    )}
                     {isOwner && !isOwnerRow && !isMe && (
                       <Button
                         variant="ghost"
