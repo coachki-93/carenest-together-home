@@ -739,7 +739,7 @@ function StepFooter({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+    <div className="-mx-6 md:-mx-8 -mb-6 md:-mb-8 mt-4 px-6 md:px-8 py-4 md:py-0 md:pt-2 border-t border-border/40 md:border-0 bg-card/95 backdrop-blur md:bg-transparent md:backdrop-blur-0 sticky bottom-0 md:static rounded-b-2xl flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
       <div className="flex items-center gap-2">
         <Button
           type="button"
@@ -764,7 +764,7 @@ function StepFooter({
         type={primaryType ?? "button"}
         onClick={primaryType === "submit" ? undefined : onPrimary}
         disabled={primaryDisabled}
-        className="rounded-full h-12 px-8 text-base font-bold"
+        className="rounded-full h-12 px-8 text-base font-bold w-full sm:w-auto"
       >
         {primaryLoading && <Loader2 className="size-4 animate-spin" />}
         {primaryLabel}
