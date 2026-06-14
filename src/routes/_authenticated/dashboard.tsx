@@ -136,6 +136,7 @@ function DashboardPage() {
 
   const logDose = useLogDose();
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
+  const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
