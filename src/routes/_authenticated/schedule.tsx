@@ -656,6 +656,14 @@ function AppointmentRow({
           >
             {t(`scheduleEvents.kind.${appt.kind}`)}
           </span>
+          {appt.is_recurring && (
+            <span
+              className="text-[10px] font-bold uppercase rounded-full px-2 py-0.5 bg-primary-soft text-primary inline-flex items-center gap-1"
+              title={t("scheduleEvents.repeat.badge")}
+            >
+              <Repeat className="size-3" /> {t("scheduleEvents.repeat.badge")}
+            </span>
+          )}
         </div>
         {appt.location && (
           <p className="text-sm text-muted-foreground truncate flex items-center gap-1.5">
