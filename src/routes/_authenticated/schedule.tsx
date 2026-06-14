@@ -1255,6 +1255,10 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
       return <Sparkles className={className} />;
     case "task":
       return <ClipboardList className={className} />;
+    case "meal":
+      return <UtensilsCrossed className={className} />;
+    case "sleep":
+      return <Moon className={className} />;
     default:
       return <CalendarIcon className={className} />;
   }
@@ -1268,6 +1272,10 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
       return { bg: "#FCE7F3", fg: "#BE185D" };
     case "task":
       return { bg: "#DCFCE7", fg: "#15803D" };
+    case "meal":
+      return { bg: "#FFEDD5", fg: "#C2410C" };
+    case "sleep":
+      return { bg: "#E0E7FF", fg: "#4338CA" };
     default:
       return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
