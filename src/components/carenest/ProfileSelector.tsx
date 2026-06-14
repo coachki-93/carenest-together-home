@@ -27,9 +27,11 @@ function initials(name?: string | null) {
 export function ProfileSelector() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
 
+  const isCaregiverAccount = profile?.account_type === "caregiver";
   const role =
     profile?.account_type === "family"
       ? t("profile.familyRole")
@@ -42,6 +44,10 @@ export function ProfileSelector() {
   }
 
   return (
+    <div className="flex items-center gap-2">
+      {isCaregiverAccount && membership?.family_id && user?.id && (
+        <ActiveProfileSwitcher familyId={membership.family_id} userId={user.id} />
+      )}
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-3 rounded-full pl-1 pr-3 py-1 hover:bg-accent transition-colors cursor-pointer">
