@@ -338,77 +338,151 @@ function DashboardPage() {
     [i18n.language],
   );
 
+  const now = new Date(nowTick);
+
   const tasks: TaskItem[] = useMemo(() => {
     const items: TaskItem[] = [];
     const doses = buildTodaysDoses(meds, logs);
+    const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
     const fmtTime = (d: Date) =>
-      d.toLocaleTimeString(i18n.language === "sv" ? "sv-SE" : "en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 
     for (const d of doses) {
-      const dose = d.medication;
-      const amount = dose.dose_amount ?? "";
-      const unit = dose.dose_unit ?? "";
-      const detail = [amount && unit ? `${amount} ${unit}` : amount || unit, dose.route]
+      const med = d.medication;
+      const amount = med.dose_amount ?? "";
+      const unit = med.dose_unit ?? "";
+      const detail = [amount && unit ? `${amount} ${unit}` : amount || unit, med.route]
         .filter(Boolean)
         .join(" • ");
+      const logStatus = d.log?.status;
+      const status: TaskStatus =
+        logStatus === "given"
+          ? "given"
+          : logStatus === "skipped"
+            ? "skipped"
+            : logStatus === "postponed"
+              ? "postponed"
+              : "pending";
+      const isOverdue = status === "pending" && d.scheduled_for < now;
       items.push({
         id: `dose-${d.key}`,
-        time: d.time,
-        title: dose.name,
+        sortKey: d.scheduled_for.getTime(),
+        timeLabel: fmtTime(d.scheduled_for),
+        title: med.name,
         detail,
-        type: "medication",
-        done: d.log?.status === "given",
+        status,
+        scheduledFor: d.scheduled_for,
+        isOverdue,
+        byUserId: d.log?.given_by ?? null,
+        byProfileId: d.log?.caregiver_profile_id ?? null,
+        reason: d.log?.reason ?? null,
+        postponedTo: d.log?.postponed_to ? new Date(d.log.postponed_to) : null,
         source: { kind: "dose", dose: d },
       });
     }
 
     for (const a of appointments) {
       const at = new Date(a.starts_at);
-      const time = a.all_day ? t("dashboard.allDay") : fmtTime(at);
+      const masterId = a.master_id ?? a.id;
+      const completion =
+        completions.find(
+          (c) =>
+            c.appointment_id === masterId &&
+            new Date(c.occurrence_at).getTime() === new Date(a.occurrence_start).getTime(),
+        ) ?? null;
+      const status: TaskStatus =
+        completion?.status === "done"
+          ? "given"
+          : completion?.status === "skipped"
+            ? "skipped"
+            : completion?.status === "postponed"
+              ? "postponed"
+              : "pending";
+      const isOverdue = status === "pending" && !a.all_day && at < now;
       const detail = [a.location, a.notes].filter(Boolean).join(" • ");
       items.push({
         id: `appt-${a.id}`,
-        time,
+        sortKey: a.all_day ? 0 : at.getTime(),
+        timeLabel: a.all_day ? t("dashboard.allDay") : fmtTime(at),
         title: a.title,
         detail,
-        type: (a.kind as TaskKind) ?? "other",
-        done: false,
-        source: { kind: "appt", appt: a },
+        status,
+        scheduledFor: at,
+        isOverdue,
+        byUserId: completion?.completed_by ?? null,
+        byProfileId: completion?.caregiver_profile_id ?? null,
+        reason: completion?.reason ?? null,
+        postponedTo: completion?.postponed_to ? new Date(completion.postponed_to) : null,
+        source: { kind: "appt", appt: a, completion },
       });
     }
 
-    return items.sort((a, b) => a.time.localeCompare(b.time));
-  }, [meds, logs, appointments, i18n.language, t]);
+    return items.sort((a, b) => a.sortKey - b.sortKey);
+  }, [meds, logs, appointments, completions, i18n.language, t, nowTick]);
 
-  const doneCount = tasks.filter((tk) => tk.done).length;
+  const doneCount = tasks.filter((tk) => tk.status === "given").length;
   const totalCount = tasks.length;
-  const nextTask = tasks.find((tk) => !tk.done);
+  const nextTask = tasks.find((tk) => tk.status === "pending");
 
-  async function confirmDone() {
-    if (!confirmTask || !familyId || !child) return;
-    if (confirmTask.source.kind !== "dose") {
-      setConfirmTask(null);
-      return;
-    }
+  async function handleTaskAction(result: TaskActionResult) {
+    if (!pendingAction || !familyId) return;
+    const { task, action } = pendingAction;
+    const profileId =
+      result.caregiverProfileId ?? suggestedCaregiverId ?? activeCaregiverId ?? null;
     try {
-      await logDose.mutateAsync({
-        family_id: familyId,
-        child_id: child.id,
-        medication_id: confirmTask.source.dose.medication.id,
-        scheduled_for: confirmTask.source.dose.scheduled_for.toISOString(),
-        status: "given",
-        given_by: user?.id ?? null,
-        caregiver_profile_id: activeCaregiverId ?? suggestedCaregiverId ?? null,
-      });
-      toast.success(t("dashboard.taskLogged", { title: confirmTask.title }));
+      if (task.source.kind === "dose") {
+        if (!child) return;
+        const status =
+          action === "done" ? "given" : action === "skipped" ? "skipped" : "postponed";
+        await logDose.mutateAsync({
+          family_id: familyId,
+          child_id: child.id,
+          medication_id: task.source.dose.medication.id,
+          scheduled_for: task.source.dose.scheduled_for.toISOString(),
+          status,
+          given_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          reason: result.reason,
+          postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
+        });
+      } else {
+        const a = task.source.appt;
+        await logAppt.mutateAsync({
+          family_id: familyId,
+          appointment_id: a.master_id ?? a.id,
+          occurrence_at: a.occurrence_start,
+          status: action === "done" ? "done" : action === "skipped" ? "skipped" : "postponed",
+          completed_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          reason: result.reason,
+          postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
+        });
+      }
+      toast.success(
+        action === "done"
+          ? t("taskAction.doneToast")
+          : action === "skipped"
+            ? t("taskAction.skippedToast")
+            : t("taskAction.postponedToast"),
+      );
     } catch (e) {
       toast.error((e as Error).message);
     }
-    setConfirmTask(null);
+    setPendingAction(null);
   }
+
+  async function undoTask(task: TaskItem) {
+    try {
+      if (task.source.kind === "dose") {
+        if (task.source.dose.log) await deleteLog.mutateAsync(task.source.dose.log.id);
+      } else if (task.source.completion) {
+        await deleteApptCompletion.mutateAsync(task.source.completion.id);
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
 
   const childName = child?.name ?? t("dashboard.yourChild");
   const firstName = profile?.full_name?.split(" ")[0] ?? "";
