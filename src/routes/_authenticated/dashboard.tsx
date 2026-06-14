@@ -18,6 +18,12 @@ import {
   CalendarClock,
   Sparkles,
   X,
+  Undo2,
+  ClipboardList,
+  UtensilsCrossed,
+  Moon,
+  Calendar as CalendarIcon,
+  MapPin,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -25,16 +31,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT } from "@/lib/data/vitals";
@@ -44,13 +40,36 @@ import {
   useMedications,
   useMedLogs,
   useLogDose,
+  useDeleteLog,
   type ScheduledDose,
+  type Medication,
+  type MedLog,
 } from "@/lib/data/medications";
-import { useAppointments, type Appointment } from "@/lib/data/appointments";
+import {
+  useAppointments,
+  type ExpandedAppointment,
+  type AppointmentKind,
+} from "@/lib/data/appointments";
+import {
+  useAppointmentCompletions,
+  useLogAppointmentCompletion,
+  useDeleteAppointmentCompletion,
+  type AppointmentCompletion,
+} from "@/lib/data/appointment-completions";
 import { useFamilyMembers, useInvites } from "@/lib/data/family";
-import { useCaregiverProfiles, useSuggestedCaregiverProfile } from "@/lib/data/caregiver-profiles";
+import {
+  useCaregiverProfiles,
+  useSuggestedCaregiverProfile,
+  type CaregiverProfile,
+} from "@/lib/data/caregiver-profiles";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
+import {
+  TaskActionDialog,
+  type TaskAction,
+  type TaskActionResult,
+} from "@/components/carenest/TaskActionDialog";
+import { ByProfile } from "@/components/carenest/ByProfile";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
@@ -66,15 +85,32 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-type TaskKind = "medication" | "appointment" | "therapy" | "task" | "other";
+type TaskStatus = "pending" | "given" | "skipped" | "postponed" | "missed";
+
+type TaskSource =
+  | { kind: "dose"; dose: ScheduledDose }
+  | {
+      kind: "appt";
+      appt: ExpandedAppointment;
+      completion: AppointmentCompletion | null;
+    };
+
 interface TaskItem {
   id: string;
-  time: string;
+  /** Sort key — ISO time of when it's scheduled (or 00:00 if all-day). */
+  sortKey: number;
+  timeLabel: string;
   title: string;
   detail: string;
-  type: TaskKind;
-  done: boolean;
-  source: { kind: "dose"; dose: ScheduledDose } | { kind: "appt"; appt: Appointment };
+  status: TaskStatus;
+  scheduledFor: Date;
+  isOverdue: boolean;
+  /** Author / caregiver attribution when completed. */
+  byUserId: string | null;
+  byProfileId: string | null;
+  reason: string | null;
+  postponedTo: Date | null;
+  source: TaskSource;
 }
 
 function useChild() {
@@ -96,13 +132,43 @@ function useChild() {
   });
 }
 
-const TYPE_STYLES: Record<TaskKind, { icon: typeof Pill; bg: string; fg: string }> = {
-  medication: { icon: Pill, bg: "bg-primary-soft", fg: "text-primary" },
-  appointment: { icon: Stethoscope, bg: "bg-warning/20", fg: "text-warning-foreground" },
-  therapy: { icon: Activity, bg: "bg-success/20", fg: "text-success-foreground" },
-  task: { icon: Briefcase, bg: "bg-lavender-deep/40", fg: "text-accent-foreground" },
-  other: { icon: Calendar, bg: "bg-secondary", fg: "text-foreground" },
-};
+function kindIcon(kind: AppointmentKind | "medication"): typeof Pill {
+  switch (kind) {
+    case "medication":
+      return Pill;
+    case "appointment":
+      return Stethoscope;
+    case "therapy":
+      return Sparkles;
+    case "task":
+      return ClipboardList;
+    case "meal":
+      return UtensilsCrossed;
+    case "sleep":
+      return Moon;
+    default:
+      return CalendarIcon;
+  }
+}
+
+function kindTone(kind: AppointmentKind | "medication"): { bg: string; fg: string } {
+  switch (kind) {
+    case "medication":
+      return { bg: "#EDE9FE", fg: "#6D28D9" };
+    case "appointment":
+      return { bg: "#DBEAFE", fg: "#1D4ED8" };
+    case "therapy":
+      return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "task":
+      return { bg: "#DCFCE7", fg: "#15803D" };
+    case "meal":
+      return { bg: "#FFEDD5", fg: "#C2410C" };
+    case "sleep":
+      return { bg: "#E0E7FF", fg: "#4338CA" };
+    default:
+      return { bg: "#F3E8FF", fg: "#7C3AED" };
+  }
+}
 
 function startOfDay(d: Date) {
   const x = new Date(d);
@@ -161,11 +227,19 @@ function DashboardPage() {
   const scheduleLoading = !!familyId && (medsLoading || logsLoading || apptsLoading || childLoading);
 
   const logDose = useLogDose();
+  const deleteLog = useDeleteLog();
+  const logAppt = useLogAppointmentCompletion();
+  const deleteApptCompletion = useDeleteAppointmentCompletion();
+  const { data: completions = [] } = useAppointmentCompletions(familyId, todayStart, todayEnd);
+  const { data: caregiverProfilesForActions = [] } = useCaregiverProfiles(familyId);
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const [confirmTask, setConfirmTask] = useState<TaskItem | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    task: TaskItem;
+    action: TaskAction;
+  } | null>(null);
   const dismissKey = user?.id ? `carenest.resume.dismissed.${user.id}` : null;
   const [resumeDismissed, setResumeDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined" || !dismissKey) return false;
@@ -264,77 +338,151 @@ function DashboardPage() {
     [i18n.language],
   );
 
+  const now = new Date(nowTick);
+
   const tasks: TaskItem[] = useMemo(() => {
     const items: TaskItem[] = [];
     const doses = buildTodaysDoses(meds, logs);
+    const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
     const fmtTime = (d: Date) =>
-      d.toLocaleTimeString(i18n.language === "sv" ? "sv-SE" : "en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 
     for (const d of doses) {
-      const dose = d.medication;
-      const amount = dose.dose_amount ?? "";
-      const unit = dose.dose_unit ?? "";
-      const detail = [amount && unit ? `${amount} ${unit}` : amount || unit, dose.route]
+      const med = d.medication;
+      const amount = med.dose_amount ?? "";
+      const unit = med.dose_unit ?? "";
+      const detail = [amount && unit ? `${amount} ${unit}` : amount || unit, med.route]
         .filter(Boolean)
         .join(" • ");
+      const logStatus = d.log?.status;
+      const status: TaskStatus =
+        logStatus === "given"
+          ? "given"
+          : logStatus === "skipped"
+            ? "skipped"
+            : logStatus === "postponed"
+              ? "postponed"
+              : "pending";
+      const isOverdue = status === "pending" && d.scheduled_for < now;
       items.push({
         id: `dose-${d.key}`,
-        time: d.time,
-        title: dose.name,
+        sortKey: d.scheduled_for.getTime(),
+        timeLabel: fmtTime(d.scheduled_for),
+        title: med.name,
         detail,
-        type: "medication",
-        done: d.log?.status === "given",
+        status,
+        scheduledFor: d.scheduled_for,
+        isOverdue,
+        byUserId: d.log?.given_by ?? null,
+        byProfileId: d.log?.caregiver_profile_id ?? null,
+        reason: d.log?.reason ?? null,
+        postponedTo: d.log?.postponed_to ? new Date(d.log.postponed_to) : null,
         source: { kind: "dose", dose: d },
       });
     }
 
     for (const a of appointments) {
       const at = new Date(a.starts_at);
-      const time = a.all_day ? t("dashboard.allDay") : fmtTime(at);
+      const masterId = a.master_id ?? a.id;
+      const completion =
+        completions.find(
+          (c) =>
+            c.appointment_id === masterId &&
+            new Date(c.occurrence_at).getTime() === new Date(a.occurrence_start).getTime(),
+        ) ?? null;
+      const status: TaskStatus =
+        completion?.status === "done"
+          ? "given"
+          : completion?.status === "skipped"
+            ? "skipped"
+            : completion?.status === "postponed"
+              ? "postponed"
+              : "pending";
+      const isOverdue = status === "pending" && !a.all_day && at < now;
       const detail = [a.location, a.notes].filter(Boolean).join(" • ");
       items.push({
         id: `appt-${a.id}`,
-        time,
+        sortKey: a.all_day ? 0 : at.getTime(),
+        timeLabel: a.all_day ? t("dashboard.allDay") : fmtTime(at),
         title: a.title,
         detail,
-        type: (a.kind as TaskKind) ?? "other",
-        done: false,
-        source: { kind: "appt", appt: a },
+        status,
+        scheduledFor: at,
+        isOverdue,
+        byUserId: completion?.completed_by ?? null,
+        byProfileId: completion?.caregiver_profile_id ?? null,
+        reason: completion?.reason ?? null,
+        postponedTo: completion?.postponed_to ? new Date(completion.postponed_to) : null,
+        source: { kind: "appt", appt: a, completion },
       });
     }
 
-    return items.sort((a, b) => a.time.localeCompare(b.time));
-  }, [meds, logs, appointments, i18n.language, t]);
+    return items.sort((a, b) => a.sortKey - b.sortKey);
+  }, [meds, logs, appointments, completions, i18n.language, t, nowTick]);
 
-  const doneCount = tasks.filter((tk) => tk.done).length;
+  const doneCount = tasks.filter((tk) => tk.status === "given").length;
   const totalCount = tasks.length;
-  const nextTask = tasks.find((tk) => !tk.done);
+  const nextTask = tasks.find((tk) => tk.status === "pending");
 
-  async function confirmDone() {
-    if (!confirmTask || !familyId || !child) return;
-    if (confirmTask.source.kind !== "dose") {
-      setConfirmTask(null);
-      return;
-    }
+  async function handleTaskAction(result: TaskActionResult) {
+    if (!pendingAction || !familyId) return;
+    const { task, action } = pendingAction;
+    const profileId =
+      result.caregiverProfileId ?? suggestedCaregiverId ?? activeCaregiverId ?? null;
     try {
-      await logDose.mutateAsync({
-        family_id: familyId,
-        child_id: child.id,
-        medication_id: confirmTask.source.dose.medication.id,
-        scheduled_for: confirmTask.source.dose.scheduled_for.toISOString(),
-        status: "given",
-        given_by: user?.id ?? null,
-        caregiver_profile_id: activeCaregiverId ?? suggestedCaregiverId ?? null,
-      });
-      toast.success(t("dashboard.taskLogged", { title: confirmTask.title }));
+      if (task.source.kind === "dose") {
+        if (!child) return;
+        const status =
+          action === "done" ? "given" : action === "skipped" ? "skipped" : "postponed";
+        await logDose.mutateAsync({
+          family_id: familyId,
+          child_id: child.id,
+          medication_id: task.source.dose.medication.id,
+          scheduled_for: task.source.dose.scheduled_for.toISOString(),
+          status,
+          given_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          reason: result.reason,
+          postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
+        });
+      } else {
+        const a = task.source.appt;
+        await logAppt.mutateAsync({
+          family_id: familyId,
+          appointment_id: a.master_id ?? a.id,
+          occurrence_at: a.occurrence_start,
+          status: action === "done" ? "done" : action === "skipped" ? "skipped" : "postponed",
+          completed_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          reason: result.reason,
+          postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
+        });
+      }
+      toast.success(
+        action === "done"
+          ? t("taskAction.doneToast")
+          : action === "skipped"
+            ? t("taskAction.skippedToast")
+            : t("taskAction.postponedToast"),
+      );
     } catch (e) {
       toast.error((e as Error).message);
     }
-    setConfirmTask(null);
+    setPendingAction(null);
   }
+
+  async function undoTask(task: TaskItem) {
+    try {
+      if (task.source.kind === "dose") {
+        if (task.source.dose.log) await deleteLog.mutateAsync(task.source.dose.log.id);
+      } else if (task.source.completion) {
+        await deleteApptCompletion.mutateAsync(task.source.completion.id);
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
 
   const childName = child?.name ?? t("dashboard.yourChild");
   const firstName = profile?.full_name?.split(" ")[0] ?? "";

@@ -14,6 +14,76 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_completions: {
+        Row: {
+          appointment_id: string
+          caregiver_profile_id: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          family_id: string
+          id: string
+          notes: string | null
+          occurrence_at: string
+          postponed_to: string | null
+          reason: string | null
+          status: Database["public"]["Enums"]["appointment_completion_status"]
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          caregiver_profile_id?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          family_id: string
+          id?: string
+          notes?: string | null
+          occurrence_at: string
+          postponed_to?: string | null
+          reason?: string | null
+          status: Database["public"]["Enums"]["appointment_completion_status"]
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          caregiver_profile_id?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          family_id?: string
+          id?: string
+          notes?: string | null
+          occurrence_at?: string
+          postponed_to?: string | null
+          reason?: string | null
+          status?: Database["public"]["Enums"]["appointment_completion_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_completions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_completions_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_completions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           all_day: boolean
@@ -476,6 +546,8 @@ export type Database = {
           id: string
           medication_id: string
           notes: string | null
+          postponed_to: string | null
+          reason: string | null
           scheduled_for: string
           status: Database["public"]["Enums"]["med_log_status"]
           updated_at: string
@@ -490,6 +562,8 @@ export type Database = {
           id?: string
           medication_id: string
           notes?: string | null
+          postponed_to?: string | null
+          reason?: string | null
           scheduled_for: string
           status?: Database["public"]["Enums"]["med_log_status"]
           updated_at?: string
@@ -504,6 +578,8 @@ export type Database = {
           id?: string
           medication_id?: string
           notes?: string | null
+          postponed_to?: string | null
+          reason?: string | null
           scheduled_for?: string
           status?: Database["public"]["Enums"]["med_log_status"]
           updated_at?: string
@@ -733,6 +809,7 @@ export type Database = {
     }
     Enums: {
       account_type: "family" | "caregiver"
+      appointment_completion_status: "done" | "skipped" | "postponed"
       appointment_kind:
         | "appointment"
         | "therapy"
@@ -741,7 +818,7 @@ export type Database = {
         | "meal"
         | "sleep"
       invite_status: "pending" | "accepted" | "revoked"
-      med_log_status: "given" | "skipped" | "missed"
+      med_log_status: "given" | "skipped" | "missed" | "postponed"
       med_route:
         | "oral"
         | "g_tube"
@@ -887,6 +964,7 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["family", "caregiver"],
+      appointment_completion_status: ["done", "skipped", "postponed"],
       appointment_kind: [
         "appointment",
         "therapy",
@@ -896,7 +974,7 @@ export const Constants = {
         "sleep",
       ],
       invite_status: ["pending", "accepted", "revoked"],
-      med_log_status: ["given", "skipped", "missed"],
+      med_log_status: ["given", "skipped", "missed", "postponed"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
       shift_label: ["morning", "afternoon", "night", "custom"],
