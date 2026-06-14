@@ -410,7 +410,22 @@ function SchedulePage() {
             } else {
               // whole series, or non-recurring row
               const id = editing.master_id ?? editing.id;
-              await updateAppt.mutateAsync({ id, patch: values });
+              // When editing an instance with scope=series, the dialog
+              // doesn't show the recurrence editor — strip those fields so
+              // we don't clobber the master's existing pattern.
+              const patch = editing.is_recurring
+                ? {
+                    title: values.title,
+                    notes: values.notes,
+                    location: values.location,
+                    kind: values.kind,
+                    all_day: values.all_day,
+                    // keep clock-time + duration changes for the series
+                    starts_at: values.starts_at,
+                    ends_at: values.ends_at,
+                  }
+                : values;
+              await updateAppt.mutateAsync({ id, patch });
               toast.success(t("scheduleEvents.updated"));
             }
             setApptOpen(false);
