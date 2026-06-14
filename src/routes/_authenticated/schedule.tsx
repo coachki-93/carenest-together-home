@@ -19,6 +19,9 @@ import {
   Trash2,
   Pencil,
   Repeat,
+  Bell,
+  UtensilsCrossed,
+  Moon,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
