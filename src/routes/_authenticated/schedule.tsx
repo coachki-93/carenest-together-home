@@ -133,7 +133,7 @@ function isSameDay(a: Date, b: Date) {
 
 type TimelineItem =
   | { kind: "dose"; key: string; at: Date; dose: ScheduledDose }
-  | { kind: "appt"; key: string; at: Date; appt: Appointment };
+  | { kind: "appt"; key: string; at: Date; appt: ExpandedAppointment };
 
 function SchedulePage() {
   const { t, i18n } = useTranslation();
@@ -184,8 +184,8 @@ function SchedulePage() {
     { dose: ScheduledDose; status: "given" | "skipped" } | null
   >(null);
   const [apptOpen, setApptOpen] = useState(false);
-  const [editing, setEditing] = useState<Appointment | null>(null);
-  const [confirmDeleteAppt, setConfirmDeleteAppt] = useState<Appointment | null>(null);
+  const [editing, setEditing] = useState<ExpandedAppointment | null>(null);
+  const [confirmDeleteAppt, setConfirmDeleteAppt] = useState<ExpandedAppointment | null>(null);
 
   const now = new Date();
   const stats = isToday
@@ -217,7 +217,7 @@ function SchedulePage() {
     setApptOpen(true);
   }
 
-  function openEditAppt(a: Appointment) {
+  function openEditAppt(a: ExpandedAppointment) {
     setEditing(a);
     setApptOpen(true);
   }
@@ -544,7 +544,7 @@ function AppointmentRow({
   onDelete,
   canManage,
 }: {
-  appt: Appointment;
+  appt: ExpandedAppointment;
   onEdit: () => void;
   onDelete: () => void;
   canManage: boolean;
@@ -651,7 +651,7 @@ function AppointmentDialog({
   familyId: string | undefined | null;
   childId: string | null;
   userId: string | null;
-  editing: Appointment | null;
+  editing: ExpandedAppointment | null;
   onSave: (values: {
     family_id: string;
     child_id: string | null;
