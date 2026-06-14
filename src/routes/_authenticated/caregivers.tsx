@@ -158,7 +158,7 @@ function CareTeamPage() {
         <section className="card-soft p-6">
           <div className="flex items-center gap-2 mb-5">
             <Users className="size-5 text-primary" />
-            <h2 className="text-lg font-extrabold">{t("caregiversPage.members")}</h2>
+            <h2 className="text-lg font-extrabold">{t("caregiversPage.accounts")}</h2>
           </div>
           {loadingMembers ? (
             <p className="text-muted-foreground text-sm">{t("common.loading")}</p>
