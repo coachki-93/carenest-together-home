@@ -111,6 +111,65 @@ export type Database = {
           },
         ]
       }
+      caregiver_shifts: {
+        Row: {
+          caregiver_user_id: string
+          category: string | null
+          color: string | null
+          created_at: string
+          created_by: string
+          end_at: string
+          family_id: string
+          id: string
+          recurrence_days_of_week: number[] | null
+          recurrence_freq: string | null
+          recurrence_interval: number | null
+          recurrence_until: string | null
+          start_at: string
+          updated_at: string
+        }
+        Insert: {
+          caregiver_user_id: string
+          category?: string | null
+          color?: string | null
+          created_at?: string
+          created_by: string
+          end_at: string
+          family_id: string
+          id?: string
+          recurrence_days_of_week?: number[] | null
+          recurrence_freq?: string | null
+          recurrence_interval?: number | null
+          recurrence_until?: string | null
+          start_at: string
+          updated_at?: string
+        }
+        Update: {
+          caregiver_user_id?: string
+          category?: string | null
+          color?: string | null
+          created_at?: string
+          created_by?: string
+          end_at?: string
+          family_id?: string
+          id?: string
+          recurrence_days_of_week?: number[] | null
+          recurrence_freq?: string | null
+          recurrence_interval?: number | null
+          recurrence_until?: string | null
+          start_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregiver_shifts_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       children: {
         Row: {
           allergies: string | null

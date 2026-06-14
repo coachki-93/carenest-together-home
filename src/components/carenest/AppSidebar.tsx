@@ -8,6 +8,7 @@ import {
   ClipboardList,
   Baby,
   Users,
+  CalendarDays,
   Settings,
 } from "lucide-react";
 import {
@@ -40,6 +41,7 @@ export function AppSidebar() {
   const family = [
     { title: t("nav.child"), url: "/child", icon: Baby },
     { title: t("nav.caregivers"), url: "/caregivers", icon: Users },
+    { title: t("nav.shifts"), url: "/shifts", icon: CalendarDays },
     { title: t("nav.settings"), url: "/settings", icon: Settings },
   ];
 
