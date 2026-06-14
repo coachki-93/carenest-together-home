@@ -475,7 +475,7 @@ function DashboardPage() {
             ) : (
               <ul className="space-y-2">
                 {tasks.map((task) => {
-                  const style = TYPE_STYLES[task.type];
+                  const style = TYPE_STYLES[task.type] ?? TYPE_STYLES.other;
                   const Icon = style.icon;
                   const isDose = task.source.kind === "dose";
                   return (
