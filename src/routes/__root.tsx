@@ -18,9 +18,8 @@ import {
   resolveClientLanguage,
   detectClientLanguage,
   setI18nLanguage,
-  writeLangCookieClient,
 } from "@/lib/i18n";
-import { type Lang } from "@/lib/i18n/cookie";
+import { writeLangCookieClient, type Lang } from "@/lib/i18n/cookie";
 import { resolveLanguageServer } from "@/lib/i18n/resolve.server";
 import { useTranslation } from "react-i18next";
 
