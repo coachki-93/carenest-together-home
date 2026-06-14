@@ -383,14 +383,35 @@ function SchedulePage() {
         childId={child?.id ?? null}
         userId={user?.id ?? null}
         editing={editing}
-        onSave={async (values, id) => {
+        onSave={async (values, scope) => {
+          if (!familyId || !user) return;
           try {
-            if (id) {
-              await updateAppt.mutateAsync({ id, patch: values });
-              toast.success(t("scheduleEvents.updated"));
-            } else {
+            if (!editing) {
               await createAppt.mutateAsync(values as never);
               toast.success(t("scheduleEvents.created"));
+            } else if (editing.is_recurring && editing.master_id && scope === "this") {
+              await updateInstance.mutateAsync({
+                family_id: familyId,
+                child_id: editing.child_id,
+                created_by: user.id,
+                master_id: editing.master_id,
+                occurrence_start: editing.occurrence_start,
+                patch: {
+                  title: values.title,
+                  notes: values.notes,
+                  location: values.location,
+                  kind: values.kind,
+                  starts_at: values.starts_at,
+                  ends_at: values.ends_at,
+                  all_day: values.all_day,
+                },
+              });
+              toast.success(t("scheduleEvents.updated"));
+            } else {
+              // whole series, or non-recurring row
+              const id = editing.master_id ?? editing.id;
+              await updateAppt.mutateAsync({ id, patch: values });
+              toast.success(t("scheduleEvents.updated"));
             }
             setApptOpen(false);
             setEditing(null);
@@ -398,7 +419,11 @@ function SchedulePage() {
             toast.error((e as Error).message);
           }
         }}
-        saving={createAppt.isPending || updateAppt.isPending}
+        saving={
+          createAppt.isPending ||
+          updateAppt.isPending ||
+          updateInstance.isPending
+        }
       />
 
       <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
@@ -445,22 +470,39 @@ function SchedulePage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("scheduleEvents.confirmDeleteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("scheduleEvents.confirmDeleteBody", {
-                title: confirmDeleteAppt?.title ?? "",
-              })}
+              {confirmDeleteAppt?.is_recurring
+                ? t("scheduleEvents.confirmDeleteSeriesBody", {
+                    title: confirmDeleteAppt?.title ?? "",
+                  })
+                : t("scheduleEvents.confirmDeleteBody", {
+                    title: confirmDeleteAppt?.title ?? "",
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-full">{t("common.cancel")}</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="rounded-full">
+              {t("common.cancel")}
+            </AlertDialogCancel>
+            {confirmDeleteAppt?.is_recurring && (
+              <AlertDialogAction
+                className="rounded-full"
+                onClick={() => handleDeleteAppt("this")}
+              >
+                {t("scheduleEvents.deleteThisOne")}
+              </AlertDialogAction>
+            )}
             <AlertDialogAction
               className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={handleDeleteAppt}
+              onClick={() => handleDeleteAppt("series")}
             >
-              {t("scheduleEvents.delete")}
+              {confirmDeleteAppt?.is_recurring
+                ? t("scheduleEvents.deleteSeries")
+                : t("scheduleEvents.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
     </DashboardLayout>
   );
 }
