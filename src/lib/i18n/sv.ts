@@ -237,6 +237,7 @@ export const sv = {
     nameRequired: "Medicinens namn krävs",
     noMeds: "Inga mediciner ännu",
     noMedsBody: "Lägg till din första medicin för att börja med det dagliga schemat.",
+    noMedsBodyCaregiver: "Familjens ägare har inte lagt till några mediciner ännu.",
     deleteConfirm: "Ta bort denna medicin?",
     deleteBody: "Loggar för tidigare doser finns kvar, men \"{{name}}\" tas bort från schemat.",
     delete: "Ta bort",
