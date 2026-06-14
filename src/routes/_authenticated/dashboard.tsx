@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
