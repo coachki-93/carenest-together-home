@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type AppointmentRow = Database["public"]["Tables"]["appointments"]["Row"];
 
-export type RecurrenceFreq = "hourly" | "daily" | "weekly";
+export type RecurrenceFreq = "hourly" | "daily" | "weekly" | "monthly";
 
 // Extend the generated row with the recurrence columns (typegen runs after
 // migration approval; we type them here so the rest of the app compiles now).
@@ -15,6 +15,8 @@ export type Appointment = AppointmentRow & {
   recurrence_parent_id: string | null;
   recurrence_override_at: string | null;
   recurrence_cancelled: boolean;
+  recurrence_times_of_day: string[] | null;
+  reminder_minutes: number | null;
 };
 
 export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["Insert"] & {
@@ -24,15 +26,26 @@ export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["In
   recurrence_parent_id?: string | null;
   recurrence_override_at?: string | null;
   recurrence_cancelled?: boolean;
+  recurrence_times_of_day?: string[] | null;
+  reminder_minutes?: number | null;
 };
 
 export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Update"] & {
   recurrence_freq?: RecurrenceFreq | null;
   recurrence_interval?: number;
   recurrence_byweekday?: number[] | null;
+  recurrence_times_of_day?: string[] | null;
+  reminder_minutes?: number | null;
 };
 
-export type AppointmentKind = Database["public"]["Enums"]["appointment_kind"];
+// Locally widen the kind union — generated types lag behind the enum migration.
+export type AppointmentKind =
+  | "appointment"
+  | "therapy"
+  | "task"
+  | "other"
+  | "meal"
+  | "sleep";
 
 /**
  * What the UI receives. For non-recurring rows, `master_id` is null and
