@@ -525,7 +525,7 @@ export const sv = {
     next: "Nästa",
     finish: "Klar",
     scheduleTitle: "Dagens schema",
-    scheduleBody: "Mediciner och händelser för idag. Tryck Markera klar för att logga.",
+    scheduleBody: "Mediciner och händelser för idag. Tryck på Markera klar för att logga en dos.",
     vitalsTitle: "Värden",
     vitalsBody: "Senaste värdena. Logga nya här eller på värdesidan.",
     handoverTitle: "Överlämning",
