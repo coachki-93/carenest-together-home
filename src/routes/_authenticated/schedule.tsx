@@ -1006,7 +1006,9 @@ function AppointmentDialog({
                     <span className="text-sm text-muted-foreground">
                       {repeat === "hourly"
                         ? t("scheduleEvents.repeat.hoursUnit", { count: interval })
-                        : t("scheduleEvents.repeat.daysUnit", { count: interval })}
+                        : repeat === "monthly"
+                          ? t("scheduleEvents.repeat.monthsUnit", { count: interval })
+                          : t("scheduleEvents.repeat.daysUnit", { count: interval })}
                     </span>
                   </div>
                 )}
