@@ -148,6 +148,7 @@ export const sv = {
     body: "Hej {{name}} — ditt CareNest-konto är klart.",
     there: "där",
     inviteAccepted: "Inbjudan accepterad",
+    loadFailed: "Vi kunde inte läsa in ditt konto. Logga in igen.",
   },
   nav: {
     care: "Omsorg",

@@ -4,6 +4,7 @@ import { Heart, CalendarDays, ShieldCheck } from "lucide-react";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
   component: AuthLayout,
 });
 
