@@ -178,8 +178,8 @@ function SchedulePage() {
   const { data: appointments = [] } = useAppointments(familyId, day, dayEnd);
   const { data: shifts = [] } = useShifts(familyId);
   const doses = useMemo(
-    () => (isToday ? buildTodaysDoses(meds, logs) : []),
-    [meds, logs, isToday],
+    () => buildTodaysDoses(meds, logs, day),
+    [meds, logs, day],
   );
 
   const [dismissedHandovers, setDismissedHandovers] = useState<Set<string>>(
