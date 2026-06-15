@@ -6,6 +6,7 @@ import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles } fro
 import { resetTour } from "@/lib/onboarding/tour-state";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
+import { EnableNotificationsCard } from "@/components/carenest/EnableNotificationsCard";
 import {
   AvatarColorPicker,
   AVATAR_COLORS,
@@ -244,6 +245,9 @@ function SettingsPage() {
             </button>
           </div>
         </section>
+
+        {/* Notifications */}
+        <EnableNotificationsCard />
 
         {/* Password */}
         <section className="card-soft p-6 md:p-8 space-y-6">
