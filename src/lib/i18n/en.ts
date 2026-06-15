@@ -477,6 +477,18 @@ export const en = {
       meds: "All scheduled meds given",
       notes: "Keep tracking temperature this evening…",
     },
+    prefill: {
+      banner: "Pre-filled from your shift",
+      nothing: "Nothing eventful to flag.",
+      empty: "Nothing eventful to flag.",
+      medSkipped: "skipped",
+      medRefused: "refused",
+      medPostponed: "postponed",
+      medMissed: "missed (no log)",
+      apptMissed: "missed",
+      apptCancelled: "skipped",
+      vitalAbnormal: "Out-of-range reading",
+    },
   },
   childPage: {
     subtitle: "View and update your child's profile.",
