@@ -77,6 +77,8 @@ import {
   TaskActionDialog,
   type TaskAction,
   type TaskActionResult,
+  type VitalSpec,
+  type NotesSpec,
 } from "@/components/carenest/TaskActionDialog";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
