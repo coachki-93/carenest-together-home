@@ -39,6 +39,7 @@ function ChildProfilePage() {
   const { data: membership } = useMyMembership();
   const { data: child, isLoading } = useFamilyChild(membership?.family_id);
   const updateChild = useUpdateChild();
+  const canEdit = membership?.role === "owner";
 
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
