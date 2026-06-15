@@ -9,6 +9,7 @@ import {
   Scale,
   Zap,
   CircleDot,
+  Wind,
   Plus,
   Trash2,
   TrendingDown,
@@ -86,6 +87,7 @@ const TYPE_ICONS: Record<VitalType, typeof Heart> = {
   weight: Scale,
   seizure: Zap,
   fluids: Droplet,
+  breathing: Wind,
   other: CircleDot,
 };
 
@@ -96,6 +98,7 @@ const TYPE_TONES: Record<VitalType, { bg: string; fg: string; stroke: string }> 
   weight: { bg: "bg-lavender-deep/40", fg: "text-accent-foreground", stroke: "var(--lavender-deep)" },
   seizure: { bg: "bg-destructive/15", fg: "text-destructive", stroke: "var(--destructive)" },
   fluids: { bg: "bg-primary-soft", fg: "text-primary", stroke: "var(--primary)" },
+  breathing: { bg: "bg-success/20", fg: "text-success-foreground", stroke: "var(--success)" },
   other: { bg: "bg-muted", fg: "text-muted-foreground", stroke: "var(--muted-foreground)" },
 };
 

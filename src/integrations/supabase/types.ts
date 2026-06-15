@@ -817,6 +817,14 @@ export type Database = {
         | "other"
         | "meal"
         | "sleep"
+        | "temperature"
+        | "heart_rate"
+        | "spo2"
+        | "fluids"
+        | "diaper"
+        | "seizure"
+        | "breathing"
+        | "note"
       invite_status: "pending" | "accepted" | "revoked"
       med_log_status: "given" | "skipped" | "missed" | "postponed"
       med_route:
@@ -836,6 +844,7 @@ export type Database = {
         | "seizure"
         | "fluids"
         | "other"
+        | "breathing"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -972,6 +981,14 @@ export const Constants = {
         "other",
         "meal",
         "sleep",
+        "temperature",
+        "heart_rate",
+        "spo2",
+        "fluids",
+        "diaper",
+        "seizure",
+        "breathing",
+        "note",
       ],
       invite_status: ["pending", "accepted", "revoked"],
       med_log_status: ["given", "skipped", "missed", "postponed"],
@@ -986,6 +1003,7 @@ export const Constants = {
         "seizure",
         "fluids",
         "other",
+        "breathing",
       ],
     },
   },

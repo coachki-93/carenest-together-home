@@ -45,7 +45,15 @@ export type AppointmentKind =
   | "task"
   | "other"
   | "meal"
-  | "sleep";
+  | "sleep"
+  | "temperature"
+  | "heart_rate"
+  | "spo2"
+  | "fluids"
+  | "diaper"
+  | "seizure"
+  | "breathing"
+  | "note";
 
 /**
  * What the UI receives. For non-recurring rows, `master_id` is null and
@@ -66,6 +74,14 @@ export const APPOINTMENT_KINDS: AppointmentKind[] = [
   "task",
   "meal",
   "sleep",
+  "temperature",
+  "heart_rate",
+  "spo2",
+  "fluids",
+  "diaper",
+  "seizure",
+  "breathing",
+  "note",
   "other",
 ];
 

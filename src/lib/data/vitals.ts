@@ -13,6 +13,7 @@ export const VITAL_TYPES: VitalType[] = [
   "weight",
   "seizure",
   "fluids",
+  "breathing",
   "other",
 ];
 
@@ -23,6 +24,7 @@ export const DEFAULT_UNIT: Record<VitalType, string> = {
   weight: "kg",
   seizure: "min",
   fluids: "ml",
+  breathing: "br/min",
   other: "",
 };
 
