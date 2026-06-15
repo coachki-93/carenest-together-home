@@ -243,6 +243,15 @@ function DashboardPage() {
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
+  const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
+    useDismissedHandovers(user?.id);
+  const handoverDue = useHandoverDueItem(
+    shifts,
+    user?.id,
+    todayStart,
+    todayEnd,
+    dismissedHandovers,
+  );
   const search = Route.useSearch();
   const [pendingAction, setPendingAction] = useState<{
     task: TaskItem;
