@@ -474,12 +474,17 @@ function DashboardPage() {
     setPendingAction(null);
   }
 
+  const deleteVital = useDeleteVital();
   async function undoTask(task: TaskItem) {
     try {
       if (task.source.kind === "dose") {
         if (task.source.dose.log) await deleteLog.mutateAsync(task.source.dose.log.id);
-      } else if (task.source.completion) {
-        await deleteApptCompletion.mutateAsync(task.source.completion.id);
+      } else if (task.source.kind === "appt") {
+        if (task.source.completion) {
+          await deleteApptCompletion.mutateAsync(task.source.completion.id);
+        }
+      } else if (task.source.kind === "vital") {
+        await deleteVital.mutateAsync(task.source.vital.id);
       }
     } catch (e) {
       toast.error((e as Error).message);
