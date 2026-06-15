@@ -380,6 +380,11 @@ export const sv = {
     notesPlaceholder: "Valfria detaljer…",
     save: "Spara händelse",
     saved: "{{label}} loggad",
+    when: "När hände det?",
+    now: "Använd nuvarande tid",
+    invalidTime: "Välj en giltig tid.",
+    loggedSection: "Loggade händelser",
+    removeLogged: "Ta bort",
     presets: {
       temperature: "Temperatur",
       heart_rate: "Puls",
