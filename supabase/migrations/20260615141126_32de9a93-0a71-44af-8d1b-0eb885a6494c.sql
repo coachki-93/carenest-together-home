@@ -1,0 +1,9 @@
+ALTER TYPE public.vital_type ADD VALUE IF NOT EXISTS 'breathing';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'temperature';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'heart_rate';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'spo2';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'fluids';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'diaper';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'seizure';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'breathing';
+ALTER TYPE public.appointment_kind ADD VALUE IF NOT EXISTS 'note';
