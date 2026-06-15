@@ -50,6 +50,7 @@ const PRESETS: Preset[] = [
   { key: "temperature", icon: Thermometer, tone: "bg-rose-50 text-rose-600", vitalType: "temperature", needsValue: true },
   { key: "heart_rate", icon: Heart, tone: "bg-pink-50 text-pink-600", vitalType: "heart_rate", needsValue: true },
   { key: "spo2", icon: Wind, tone: "bg-sky-50 text-sky-600", vitalType: "spo2", needsValue: true },
+  { key: "breathing", icon: Activity, tone: "bg-cyan-50 text-cyan-600", vitalType: "breathing", needsValue: true },
   { key: "fluids", icon: Droplet, tone: "bg-blue-50 text-blue-600", vitalType: "fluids", needsValue: true },
   { key: "diaper", icon: Baby, tone: "bg-amber-50 text-amber-700", vitalType: "other", needsValue: false },
   { key: "seizure", icon: Zap, tone: "bg-violet-50 text-violet-600", vitalType: "seizure", needsValue: true },
