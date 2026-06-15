@@ -72,12 +72,14 @@ export function QuickLogDialog({
   const [preset, setPreset] = useState<Preset | null>(null);
   const [value, setValue] = useState("");
   const [notes, setNotes] = useState("");
+  const [loggedAt, setLoggedAt] = useState<string>(() => toLocalInput(new Date()));
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
       setPreset(null);
       setValue("");
       setNotes("");
+      setLoggedAt(toLocalInput(new Date()));
     }
   }, [open]);
 
@@ -94,6 +96,11 @@ export function QuickLogDialog({
       }
       num = n;
     }
+    const when = loggedAt ? new Date(loggedAt) : new Date();
+    if (Number.isNaN(when.getTime())) {
+      toast.error(t("quickLog.invalidTime"));
+      return;
+    }
     const label = t(`quickLog.presets.${preset.key}`);
     const finalNotes = preset.needsValue
       ? notes.trim() || null
@@ -106,6 +113,7 @@ export function QuickLogDialog({
       value: num,
       unit: unit || "",
       notes: finalNotes,
+      logged_at: when.toISOString(),
     });
     toast.success(t("quickLog.saved", { label }));
     onOpenChange(false);
