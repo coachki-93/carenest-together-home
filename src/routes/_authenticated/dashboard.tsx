@@ -421,8 +421,39 @@ function DashboardPage() {
       });
     }
 
+    const todayStartMs = todayStart.getTime();
+    const todayEndMs = todayEnd.getTime();
+    for (const v of vitalsToday) {
+      const at = new Date(v.logged_at);
+      const ms = at.getTime();
+      if (ms < todayStartMs || ms > todayEndMs) continue;
+      const typeLabel = t(`quickLog.presets.${v.vital_type}` as const, {
+        defaultValue: t(`vitals.${v.vital_type}` as const, { defaultValue: v.vital_type }),
+      });
+      const valueStr =
+        v.vital_type === "other" || !v.value
+          ? ""
+          : `${Number(v.value)}${v.unit ? ` ${v.unit}` : ""}`;
+      const detail = [valueStr, v.notes].filter(Boolean).join(" • ");
+      items.push({
+        id: `vital-${v.id}`,
+        sortKey: ms,
+        timeLabel: fmtTime(at),
+        title: typeLabel,
+        detail,
+        status: "given",
+        scheduledFor: at,
+        isOverdue: false,
+        byUserId: v.logged_by ?? null,
+        byProfileId: null,
+        reason: null,
+        postponedTo: null,
+        source: { kind: "vital", vital: v },
+      });
+    }
+
     return items.sort((a, b) => a.sortKey - b.sortKey);
-  }, [meds, logs, appointments, completions, i18n.language, t, nowTick]);
+  }, [meds, logs, appointments, completions, vitalsToday, todayStart, todayEnd, i18n.language, t, nowTick]);
 
   const doneCount = tasks.filter((tk) => tk.status === "given").length;
   const totalCount = tasks.length;
