@@ -176,10 +176,67 @@ function SchedulePage() {
 
   const { data: logs = [] } = useMedLogs(familyId, day, dayEnd);
   const { data: appointments = [] } = useAppointments(familyId, day, dayEnd);
+  const { data: shifts = [] } = useShifts(familyId);
   const doses = useMemo(
     () => (isToday ? buildTodaysDoses(meds, logs) : []),
     [meds, logs, isToday],
   );
+
+  const [dismissedHandovers, setDismissedHandovers] = useState<Set<string>>(
+    () => new Set(),
+  );
+  useEffect(() => {
+    if (typeof window === "undefined" || !user?.id) return;
+    try {
+      const raw = window.localStorage.getItem(
+        `carenest.handover-skipped.${user.id}`,
+      );
+      if (raw) setDismissedHandovers(new Set(JSON.parse(raw) as string[]));
+    } catch {
+      /* ignore */
+    }
+  }, [user?.id]);
+  function dismissHandover(id: string) {
+    setDismissedHandovers((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      if (typeof window !== "undefined" && user?.id) {
+        try {
+          window.localStorage.setItem(
+            `carenest.handover-skipped.${user.id}`,
+            JSON.stringify([...next]),
+          );
+        } catch {
+          /* ignore */
+        }
+      }
+      return next;
+    });
+  }
+
+  const handoverItems = useMemo<TimelineItem[]>(() => {
+    if (!user?.id) return [];
+    const occs = expandShifts(shifts, day, dayEnd);
+    const now = new Date();
+    const items: TimelineItem[] = [];
+    for (const o of occs) {
+      if (o.caregiverUserId !== user.id) continue;
+      const at = new Date(o.end.getTime() - 30 * 60 * 1000);
+      if (at < day || at >= dayEnd) continue;
+      if (o.end <= now) continue; // shift already over
+      const dismissId = `${o.masterId}:${o.start.getTime()}`;
+      if (dismissedHandovers.has(dismissId)) continue;
+      items.push({
+        kind: "handover",
+        key: `handover-${dismissId}`,
+        at,
+        shiftStart: o.start,
+        shiftEnd: o.end,
+        dismissId,
+      });
+    }
+    return items;
+  }, [shifts, day, dayEnd, user?.id, dismissedHandovers]);
 
   const timeline = useMemo<TimelineItem[]>(() => {
     const items: TimelineItem[] = [];
@@ -189,8 +246,9 @@ function SchedulePage() {
     for (const a of appointments) {
       items.push({ kind: "appt", key: a.id, at: new Date(a.starts_at), appt: a });
     }
+    items.push(...handoverItems);
     return items.sort((x, y) => x.at.getTime() - y.at.getTime());
-  }, [doses, appointments]);
+  }, [doses, appointments, handoverItems]);
 
   const logDose = useLogDose();
   const deleteLog = useDeleteLog();
