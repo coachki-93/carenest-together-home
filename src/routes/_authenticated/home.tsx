@@ -56,8 +56,16 @@ function HomeRouter() {
   useEffect(() => {
     if (processingInvite) return;
     if (profile.isLoading || membership.isLoading) return;
+    if (profile.isError || membership.isError) {
+      toast.error(t("home.loadFailed"));
+      navigate({ to: "/auth/login", replace: true });
+      return;
+    }
     const p = profile.data;
-    if (!p) return;
+    if (!p) {
+      navigate({ to: "/onboarding/child" });
+      return;
+    }
     if (p.account_type === "caregiver" && !p.onboarded) {
       navigate({ to: "/onboarding/caregiver" });
       return;
@@ -77,6 +85,9 @@ function HomeRouter() {
     membership.data,
     profile.isLoading,
     membership.isLoading,
+    profile.isError,
+    membership.isError,
+    t,
     navigate,
   ]);
 

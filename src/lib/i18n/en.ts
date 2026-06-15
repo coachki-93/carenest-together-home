@@ -148,6 +148,7 @@ export const en = {
     body: "Hi {{name}} — your CareNest account is ready.",
     there: "there",
     inviteAccepted: "Invite accepted",
+    loadFailed: "We couldn't load your account. Please log in again.",
   },
   nav: {
     care: "Care",
