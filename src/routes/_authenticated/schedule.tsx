@@ -362,23 +362,37 @@ function SchedulePage() {
         </div>
       ) : (
         <ol className="space-y-3">
-          {timeline.map((item) =>
-            item.kind === "dose" ? (
-              <DoseRow
-                key={item.key}
-                dose={item.dose}
-                now={now}
-                onMark={(status) => setConfirm({ dose: item.dose, status })}
-                onUndo={() => {
-                  if (item.dose.log) {
-                    deleteLog.mutate(item.dose.log.id, {
-                      onSuccess: () => toast.success(t("schedule.doseUndone")),
-                      onError: (e) => toast.error((e as Error).message),
-                    });
-                  }
-                }}
-              />
-            ) : (
+          {timeline.map((item) => {
+            if (item.kind === "dose") {
+              return (
+                <DoseRow
+                  key={item.key}
+                  dose={item.dose}
+                  now={now}
+                  onMark={(status) => setConfirm({ dose: item.dose, status })}
+                  onUndo={() => {
+                    if (item.dose.log) {
+                      deleteLog.mutate(item.dose.log.id, {
+                        onSuccess: () => toast.success(t("schedule.doseUndone")),
+                        onError: (e) => toast.error((e as Error).message),
+                      });
+                    }
+                  }}
+                />
+              );
+            }
+            if (item.kind === "handover") {
+              return (
+                <HandoverDueRow
+                  key={item.key}
+                  at={item.at}
+                  shiftStart={item.shiftStart}
+                  shiftEnd={item.shiftEnd}
+                  onDismiss={() => dismissHandover(item.dismissId)}
+                />
+              );
+            }
+            return (
               <AppointmentRow
                 key={item.key}
                 appt={item.appt}
@@ -386,8 +400,8 @@ function SchedulePage() {
                 onDelete={() => setConfirmDeleteAppt(item.appt)}
                 canManage={item.appt.created_by === user?.id || membership?.role === "owner"}
               />
-            ),
-          )}
+            );
+          })}
         </ol>
       )}
 
