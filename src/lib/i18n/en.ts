@@ -478,6 +478,7 @@ export const en = {
     saveError: "Couldn't save the profile",
     emptyTitle: "No child profile yet",
     emptyBody: "Finish onboarding to set up your child's profile.",
+    readOnlyNotice: "You're viewing this profile as a caregiver. Only family owners can make changes.",
   },
   caregiversPage: {
     subtitle: "Your care team and pending invites.",

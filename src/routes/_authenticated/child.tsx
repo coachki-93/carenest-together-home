@@ -39,6 +39,7 @@ function ChildProfilePage() {
   const { data: membership } = useMyMembership();
   const { data: child, isLoading } = useFamilyChild(membership?.family_id);
   const updateChild = useUpdateChild();
+  const canEdit = membership?.role === "owner";
 
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
@@ -116,13 +117,19 @@ function ChildProfilePage() {
   return (
     <DashboardLayout title={t("nav.child")} subtitle={t("childPage.subtitle")}>
       <form onSubmit={handleSubmit} className="card-soft p-8 space-y-8 max-w-3xl mx-auto">
+        {!canEdit && (
+          <div className="rounded-xl bg-muted/60 text-sm text-muted-foreground px-4 py-3">
+            {t("childPage.readOnlyNotice")}
+          </div>
+        )}
+        <fieldset disabled={!canEdit} className="space-y-8 min-w-0 contents">
         <section className="flex flex-col items-center">
           {user && (
             <ImageUpload
               userId={user.id}
               folder="children"
               value={photoPath}
-              onChange={setPhotoPath}
+              onChange={canEdit ? setPhotoPath : () => {}}
               size={120}
             />
           )}
@@ -187,12 +194,15 @@ function ChildProfilePage() {
           )}
         />
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={updateChild.isPending} className="rounded-full h-12 px-8 text-base font-semibold">
-            {updateChild.isPending && <Loader2 className="size-4 animate-spin" />}
-            {updateChild.isPending ? t("common.saving") : t("childPage.save")}
-          </Button>
-        </div>
+        {canEdit && (
+          <div className="flex justify-end">
+            <Button type="submit" disabled={updateChild.isPending} className="rounded-full h-12 px-8 text-base font-semibold">
+              {updateChild.isPending && <Loader2 className="size-4 animate-spin" />}
+              {updateChild.isPending ? t("common.saving") : t("childPage.save")}
+            </Button>
+          </div>
+        )}
+        </fieldset>
       </form>
     </DashboardLayout>
   );
