@@ -159,6 +159,22 @@ function kindIcon(kind: AppointmentKind | "medication"): typeof Pill {
       return UtensilsCrossed;
     case "sleep":
       return Moon;
+    case "temperature":
+      return Thermometer;
+    case "heart_rate":
+      return Heart;
+    case "spo2":
+      return Wind;
+    case "breathing":
+      return Activity;
+    case "fluids":
+      return Droplet;
+    case "diaper":
+      return Baby;
+    case "seizure":
+      return Zap;
+    case "note":
+      return StickyNote;
     default:
       return CalendarIcon;
   }
@@ -178,6 +194,22 @@ function kindTone(kind: AppointmentKind | "medication"): { bg: string; fg: strin
       return { bg: "#FFEDD5", fg: "#C2410C" };
     case "sleep":
       return { bg: "#E0E7FF", fg: "#4338CA" };
+    case "temperature":
+      return { bg: "#FFE4E6", fg: "#BE123C" };
+    case "heart_rate":
+      return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "spo2":
+      return { bg: "#E0F2FE", fg: "#0369A1" };
+    case "breathing":
+      return { bg: "#CFFAFE", fg: "#0E7490" };
+    case "fluids":
+      return { bg: "#DBEAFE", fg: "#1D4ED8" };
+    case "diaper":
+      return { bg: "#FEF3C7", fg: "#B45309" };
+    case "seizure":
+      return { bg: "#EDE9FE", fg: "#6D28D9" };
+    case "note":
+      return { bg: "#F1F5F9", fg: "#334155" };
     default:
       return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
