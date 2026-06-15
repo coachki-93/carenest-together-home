@@ -9,6 +9,7 @@ import {
   Scale,
   Zap,
   CircleDot,
+  Wind,
   Plus,
   Trash2,
   TrendingDown,
