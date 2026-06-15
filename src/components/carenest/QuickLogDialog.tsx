@@ -54,6 +54,11 @@ const PRESETS: Preset[] = [
   { key: "note", icon: StickyNote, tone: "bg-slate-100 text-slate-700", vitalType: "other", needsValue: false },
 ];
 
+function toLocalInput(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function QuickLogDialog({
   open,
   onOpenChange,
