@@ -1043,7 +1043,7 @@ function DashboardPage() {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-extrabold flex items-center gap-2">
                       {t("dashboard.handover")}
-                      {handoverDue && (
+                      {handoverDue && handoverMinutesLeft > 0 && handoverMinutesLeft <= 30 && (
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-destructive bg-destructive/10 rounded-full px-2.5 py-1">
                           <Clock className="size-3" />
                           {t("dashboard.handoverCountdown", { minutes: handoverMinutesLeft })}
