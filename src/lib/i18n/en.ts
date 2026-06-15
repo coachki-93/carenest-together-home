@@ -340,6 +340,7 @@ export const en = {
     lastLogged: "Last logged {{time}}",
     logVitals: "Log new vitals",
     handover: "Handover preview",
+    handoverCountdown: "{{minutes}} min report",
     shiftEndsIn: "Shift ends in {{time}}",
     handoverIntro: "A quick summary of the day so the next caregiver is up to speed.",
     sleep: "Sleep",

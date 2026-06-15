@@ -340,6 +340,7 @@ export const sv = {
     lastLogged: "Senast loggat {{time}}",
     logVitals: "Logga nya värden",
     handover: "Överlämning",
+    handoverCountdown: "{{minutes}} min rapport",
     shiftEndsIn: "Passet slutar om {{time}}",
     handoverIntro: "En snabb sammanfattning så nästa vårdgivare är uppdaterad.",
     sleep: "Sömn",
