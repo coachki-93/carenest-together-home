@@ -199,6 +199,29 @@ export function QuickLogDialog({
 
             <div>
               <Label
+                htmlFor="quick-time"
+                className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+              >
+                {t("quickLog.when")}
+              </Label>
+              <Input
+                id="quick-time"
+                type="datetime-local"
+                value={loggedAt}
+                onChange={(e) => setLoggedAt(e.target.value)}
+                className="rounded-xl h-11 mt-1.5"
+              />
+              <button
+                type="button"
+                onClick={() => setLoggedAt(toLocalInput(new Date()))}
+                className="mt-1.5 text-xs font-semibold text-primary hover:underline"
+              >
+                {t("quickLog.now")}
+              </button>
+            </div>
+
+            <div>
+              <Label
                 htmlFor="quick-notes"
                 className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
               >
