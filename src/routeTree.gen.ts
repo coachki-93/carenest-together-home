@@ -30,6 +30,7 @@ import { Route as AuthenticatedChildRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedCaregiversRouteImport } from './routes/_authenticated/caregivers'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
+import { Route as ApiPublicHooksDispatchTaskNotificationsRouteImport } from './routes/api/public/hooks/dispatch-task-notifications'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -138,6 +139,12 @@ const AuthenticatedOnboardingCaregiverRoute =
     path: '/onboarding/caregiver',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicHooksDispatchTaskNotificationsRoute =
+  ApiPublicHooksDispatchTaskNotificationsRouteImport.update({
+    id: '/api/public/hooks/dispatch-task-notifications',
+    path: '/api/public/hooks/dispatch-task-notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/invite/': typeof InviteIndexRoute
   '/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -182,6 +190,7 @@ export interface FileRoutesByTo {
   '/invite': typeof InviteIndexRoute
   '/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -206,6 +215,7 @@ export interface FileRoutesById {
   '/invite/': typeof InviteIndexRoute
   '/_authenticated/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/_authenticated/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/invite/'
     | '/onboarding/caregiver'
     | '/onboarding/child'
+    | '/api/public/hooks/dispatch-task-notifications'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/onboarding/caregiver'
     | '/onboarding/child'
+    | '/api/public/hooks/dispatch-task-notifications'
   id:
     | '__root__'
     | '/'
@@ -275,6 +287,7 @@ export interface FileRouteTypes {
     | '/invite/'
     | '/_authenticated/onboarding/caregiver'
     | '/_authenticated/onboarding/child'
+    | '/api/public/hooks/dispatch-task-notifications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -283,6 +296,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   InviteCodeRoute: typeof InviteCodeRoute
   InviteIndexRoute: typeof InviteIndexRoute
+  ApiPublicHooksDispatchTaskNotificationsRoute: typeof ApiPublicHooksDispatchTaskNotificationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -434,6 +448,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingCaregiverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/dispatch-task-notifications': {
+      id: '/api/public/hooks/dispatch-task-notifications'
+      path: '/api/public/hooks/dispatch-task-notifications'
+      fullPath: '/api/public/hooks/dispatch-task-notifications'
+      preLoaderRoute: typeof ApiPublicHooksDispatchTaskNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -492,6 +513,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   InviteCodeRoute: InviteCodeRoute,
   InviteIndexRoute: InviteIndexRoute,
+  ApiPublicHooksDispatchTaskNotificationsRoute:
+    ApiPublicHooksDispatchTaskNotificationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
