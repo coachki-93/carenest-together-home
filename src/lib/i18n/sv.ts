@@ -795,4 +795,17 @@ export const sv = {
     tryAgain: "Försök igen",
     goHome: "Till startsidan",
   },
+  push: {
+    title: "Pushnotiser",
+    description: "Få en notis på den här enheten när en uppgift ska göras — så att inget missas, även när appen är stängd.",
+    enable: "Slå på notiser",
+    enabling: "Aktiverar…",
+    disable: "Stäng av notiser",
+    enabledToast: "Notiser är på för den här enheten.",
+    disabledToast: "Notiser avstängda för den här enheten.",
+    enableFailed: "Kunde inte slå på notiser.",
+    unsupported: "Den här enheten eller webbläsaren stöder inte pushnotiser.",
+    denied: "Notiser är blockerade i enhetens inställningar. Öppna Inställningar → Notiser → CareNest för att tillåta.",
+    iosHint: "På iPad/iPhone: lägg först till CareNest på hemskärmen, öppna sedan från ikonen och tryck Slå på.",
+  },
 };
