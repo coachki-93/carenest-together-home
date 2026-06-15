@@ -394,6 +394,7 @@ export const en = {
       temperature: "Temperature",
       heart_rate: "Heart rate",
       spo2: "Oxygen (SpO₂)",
+      breathing: "Breathing rate",
       fluids: "Fluids",
       diaper: "Diaper change",
       seizure: "Seizure",
