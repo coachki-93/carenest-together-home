@@ -1374,6 +1374,22 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
       return <UtensilsCrossed className={className} />;
     case "sleep":
       return <Moon className={className} />;
+    case "temperature":
+      return <Thermometer className={className} />;
+    case "heart_rate":
+      return <Heart className={className} />;
+    case "spo2":
+      return <Wind className={className} />;
+    case "breathing":
+      return <Activity className={className} />;
+    case "fluids":
+      return <Droplet className={className} />;
+    case "diaper":
+      return <Baby className={className} />;
+    case "seizure":
+      return <Zap className={className} />;
+    case "note":
+      return <StickyNote className={className} />;
     default:
       return <CalendarIcon className={className} />;
   }
@@ -1391,6 +1407,22 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
       return { bg: "#FFEDD5", fg: "#C2410C" };
     case "sleep":
       return { bg: "#E0E7FF", fg: "#4338CA" };
+    case "temperature":
+      return { bg: "#FFE4E6", fg: "#BE123C" };
+    case "heart_rate":
+      return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "spo2":
+      return { bg: "#E0F2FE", fg: "#0369A1" };
+    case "breathing":
+      return { bg: "#CFFAFE", fg: "#0E7490" };
+    case "fluids":
+      return { bg: "#DBEAFE", fg: "#1D4ED8" };
+    case "diaper":
+      return { bg: "#FEF3C7", fg: "#B45309" };
+    case "seizure":
+      return { bg: "#EDE9FE", fg: "#6D28D9" };
+    case "note":
+      return { bg: "#F1F5F9", fg: "#334155" };
     default:
       return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
