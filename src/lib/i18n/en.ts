@@ -380,6 +380,11 @@ export const en = {
     notesPlaceholder: "Optional details…",
     save: "Save event",
     saved: "{{label}} logged",
+    when: "When did it happen?",
+    now: "Use current time",
+    invalidTime: "Please pick a valid time.",
+    loggedSection: "Logged events",
+    removeLogged: "Remove",
     presets: {
       temperature: "Temperature",
       heart_rate: "Heart rate",
