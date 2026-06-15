@@ -215,6 +215,59 @@ function kindTone(kind: AppointmentKind | "medication"): { bg: string; fg: strin
   }
 }
 
+function apptKindToVitalType(kind: AppointmentKind): VitalType | null {
+  switch (kind) {
+    case "temperature":
+      return "temperature";
+    case "heart_rate":
+      return "heart_rate";
+    case "spo2":
+      return "spo2";
+    case "breathing":
+      return "breathing";
+    case "fluids":
+      return "fluids";
+    case "seizure":
+      return "seizure";
+    default:
+      return null;
+  }
+}
+
+function buildVitalSpec(
+  kind: AppointmentKind,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): VitalSpec | null {
+  const vt = apptKindToVitalType(kind);
+  if (!vt) return null;
+  return {
+    type: vt,
+    unit: DEFAULT_UNIT[vt] ?? "",
+    label: t(`quickLog.presets.${vt}`, { defaultValue: t(`vitals.${vt}`, { defaultValue: vt }) }),
+  };
+}
+
+function buildNotesSpec(
+  kind: AppointmentKind,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): NotesSpec | null {
+  if (kind === "diaper") {
+    return {
+      label: t("taskAction.diaperNoteLabel"),
+      placeholder: t("taskAction.diaperNotePlaceholder"),
+      required: true,
+      quickOptions: [
+        t("taskAction.diaper.pee"),
+        t("taskAction.diaper.poo"),
+        t("taskAction.diaper.peeAndPoo"),
+        t("taskAction.diaper.little"),
+        t("taskAction.diaper.much"),
+      ],
+    };
+  }
+  return null;
+}
+
 function startOfDay(d: Date) {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
