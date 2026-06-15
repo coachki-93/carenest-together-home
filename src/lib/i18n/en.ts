@@ -795,4 +795,17 @@ export const en = {
     tryAgain: "Try again",
     goHome: "Go home",
   },
+  push: {
+    title: "Push notifications",
+    description: "Get a notification on this device when a task is due — so nothing slips through, even when the app isn't open.",
+    enable: "Enable notifications",
+    enabling: "Enabling…",
+    disable: "Turn off notifications",
+    enabledToast: "Notifications are on for this device.",
+    disabledToast: "Notifications turned off for this device.",
+    enableFailed: "Couldn't enable notifications.",
+    unsupported: "This device or browser doesn't support push notifications.",
+    denied: "Notifications are blocked in your device settings. Open Settings → Notifications → CareNest to allow them.",
+    iosHint: "On iPad/iPhone: add CareNest to your Home Screen first, then open it from the icon and tap Enable.",
+  },
 };
