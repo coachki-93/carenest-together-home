@@ -1015,7 +1015,7 @@ function DashboardPage() {
           <section
             className={cn(
               "p-6",
-              handoverDue
+              handoverDue && handoverMinutesLeft > 0 && handoverMinutesLeft <= 30
                 ? "bg-gradient-to-br from-red-50 to-rose-50 border border-red-200 rounded-[var(--radius-2xl)] shadow-[var(--shadow-card)]"
                 : "card-soft",
             )}
