@@ -650,6 +650,14 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
+          {handoverDue && (
+            <HandoverDueBanner
+              at={handoverDue.at}
+              shiftStart={handoverDue.shiftStart}
+              shiftEnd={handoverDue.shiftEnd}
+              onDismiss={() => dismissHandover(handoverDue.dismissId)}
+            />
+          )}
           <section className="card-soft p-6" data-tour="today-schedule">
 
             <div className="flex items-center justify-between mb-4">
