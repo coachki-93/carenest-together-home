@@ -477,6 +477,18 @@ export const sv = {
       meds: "Alla planerade mediciner gavs",
       notes: "Fortsätt följa temperaturen i kväll…",
     },
+    prefill: {
+      banner: "Förifylld från ditt pass",
+      nothing: "Inget särskilt att flagga.",
+      empty: "Inget särskilt att flagga.",
+      medSkipped: "hoppad över",
+      medRefused: "vägrad",
+      medPostponed: "senarelagd",
+      medMissed: "missad (ingen logg)",
+      apptMissed: "missad",
+      apptCancelled: "hoppad över",
+      vitalAbnormal: "Värde utanför normalområdet",
+    },
   },
   childPage: {
     subtitle: "Visa och uppdatera barnets profil.",
