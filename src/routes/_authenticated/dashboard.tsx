@@ -987,7 +987,7 @@ function DashboardPage() {
                     <VitalTile
                       icon={Thermometer}
                       label={t("vitals.temp")}
-                      value={temp ? fmt(Number(temp.value)) : "—"}
+                      value={temp ? Number(temp.value).toFixed(1) : "—"}
                       unit={temp?.unit ?? DEFAULT_UNIT.temperature}
                       tone={toneFor("temperature", temp ? Number(temp.value) : undefined, "warning")}
                     />
