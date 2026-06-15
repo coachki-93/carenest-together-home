@@ -497,7 +497,7 @@ function DashboardPage() {
         <Button
           size="sm"
           className="rounded-full gap-1.5 font-semibold"
-          onClick={() => navigate({ to: "/schedule" })}
+          onClick={() => setQuickLogOpen(true)}
         >
           <Plus className="size-4" /> {t("dashboard.logEvent")}
         </Button>
