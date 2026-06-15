@@ -1049,6 +1049,13 @@ function DashboardPage() {
         onClose={closeTour}
         onFinish={closeTour}
       />
+      <QuickLogDialog
+        open={quickLogOpen}
+        onOpenChange={setQuickLogOpen}
+        familyId={familyId}
+        childId={child?.id ?? null}
+        loggedBy={user?.id ?? null}
+      />
     </DashboardLayout>
   );
 }
