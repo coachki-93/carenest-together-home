@@ -292,13 +292,42 @@ function HandoverPage() {
         </ul>
       )}
 
-      <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : (setOpen(false), resetForm()))}>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          if (o) {
+            setOpen(true);
+          } else {
+            setOpen(false);
+            resetForm();
+            if (shiftStartIso || shiftEndIso) {
+              navigate({ search: {}, replace: true });
+            }
+          }
+        }}
+      >
         <DialogContent className="rounded-2xl max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t("handoverPage.newTitle")}</DialogTitle>
             <DialogDescription>{t("handoverPage.newBody")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
+            {shiftWindow && (
+              <div className="rounded-xl bg-primary-soft/60 text-sm px-4 py-3 flex items-start gap-2">
+                <Sparkles className="size-4 mt-0.5 text-primary shrink-0" />
+                <div>
+                  <p className="font-semibold">
+                    {t("handoverPage.prefill.banner")}
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-0.5">
+                    {dateFmt.format(shiftWindow.start)} – {dateFmt.format(shiftWindow.end)}
+                    {prefill && !prefill.hasContent
+                      ? ` · ${t("handoverPage.prefill.nothing")}`
+                      : ""}
+                  </p>
+                </div>
+              </div>
+            )}
             <div>
               <Label className="font-semibold">{t("handoverPage.fields.shift")}</Label>
               <Select
