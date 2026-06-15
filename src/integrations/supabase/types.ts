@@ -97,6 +97,7 @@ export type Database = {
           kind: Database["public"]["Enums"]["appointment_kind"]
           location: string | null
           notes: string | null
+          notified_at: string | null
           recurrence_byweekday: number[] | null
           recurrence_cancelled: boolean
           recurrence_freq: string | null
@@ -121,6 +122,7 @@ export type Database = {
           kind?: Database["public"]["Enums"]["appointment_kind"]
           location?: string | null
           notes?: string | null
+          notified_at?: string | null
           recurrence_byweekday?: number[] | null
           recurrence_cancelled?: boolean
           recurrence_freq?: string | null
@@ -145,6 +147,7 @@ export type Database = {
           kind?: Database["public"]["Enums"]["appointment_kind"]
           location?: string | null
           notes?: string | null
+          notified_at?: string | null
           recurrence_byweekday?: number[] | null
           recurrence_cancelled?: boolean
           recurrence_freq?: string | null
@@ -713,6 +716,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          family_id: string
+          id: string
+          last_seen_at: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          family_id: string
+          id?: string
+          last_seen_at?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          family_id?: string
+          id?: string
+          last_seen_at?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vitals: {
         Row: {
