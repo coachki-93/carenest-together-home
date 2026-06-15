@@ -373,6 +373,23 @@ export const sv = {
     resumeInvite: "Bjud in en vårdgivare så ni kan dela på vården.",
     resumeDismiss: "Dölj",
   },
+  quickLog: {
+    title: "Snabblogg",
+    subtitle: "Logga en spontan händelse som sker just nu.",
+    changeType: "Välj en annan händelse",
+    notesPlaceholder: "Valfria detaljer…",
+    save: "Spara händelse",
+    saved: "{{label}} loggad",
+    presets: {
+      temperature: "Temperatur",
+      heart_rate: "Puls",
+      spo2: "Syremättnad (SpO₂)",
+      fluids: "Vätska",
+      diaper: "Blöjbyte",
+      seizure: "Anfall",
+      note: "Annan anteckning",
+    },
+  },
   vitals: {
     title: "Värden & loggar",
     subtitle: "Följ {{name}}s värden och dagligt intag.",

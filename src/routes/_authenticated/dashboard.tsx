@@ -70,6 +70,7 @@ import {
   type TaskActionResult,
 } from "@/components/carenest/TaskActionDialog";
 import { ByProfile } from "@/components/carenest/ByProfile";
+import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
@@ -240,6 +241,7 @@ function DashboardPage() {
     task: TaskItem;
     action: TaskAction;
   } | null>(null);
+  const [quickLogOpen, setQuickLogOpen] = useState(false);
   const dismissKey = user?.id ? `carenest.resume.dismissed.${user.id}` : null;
   const [resumeDismissed, setResumeDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined" || !dismissKey) return false;
@@ -495,7 +497,7 @@ function DashboardPage() {
         <Button
           size="sm"
           className="rounded-full gap-1.5 font-semibold"
-          onClick={() => navigate({ to: "/schedule" })}
+          onClick={() => setQuickLogOpen(true)}
         >
           <Plus className="size-4" /> {t("dashboard.logEvent")}
         </Button>
@@ -1046,6 +1048,13 @@ function DashboardPage() {
         steps={tourSteps}
         onClose={closeTour}
         onFinish={closeTour}
+      />
+      <QuickLogDialog
+        open={quickLogOpen}
+        onOpenChange={setQuickLogOpen}
+        familyId={familyId}
+        childId={child?.id ?? null}
+        loggedBy={user?.id ?? null}
       />
     </DashboardLayout>
   );
