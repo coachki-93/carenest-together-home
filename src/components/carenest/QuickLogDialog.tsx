@@ -4,6 +4,7 @@ import {
   Thermometer,
   Heart,
   Wind,
+  Activity,
   Droplet,
   Baby,
   Zap,
