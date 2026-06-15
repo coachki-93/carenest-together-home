@@ -1,60 +1,66 @@
 ## Goal
+Every appointment/task in CareNest fires a push notification on the caregiver's iPad (and any other device that installed the app to its home screen), with zero setup work for you.
 
-Stop the Today page and Schedule page from stacking finished items inline. Move them into their own collapsible "Previous tasks" section that's hidden by default, with a counter and a toggle button. Pending and overdue items keep their current placement.
+## Provider choice: Web Push (VAPID) — no work for you
+Comparison:
+- **Web Push + VAPID** — I generate the keys, store them as backend secrets, done. No third-party account, no console, no billing. Works on iOS 16.4+ installed PWAs, Android Chrome, desktop. **← Recommended**
+- **Firebase Cloud Messaging** — you'd need to create a Firebase project, generate a server key, paste config. More steps for you. No real benefit here since we already have a backend.
 
-## What counts as "previous"
+Going with **Web Push + VAPID**.
 
-Any task whose status is `given`, `skipped`, or `postponed` (including spontaneous events logged via Quick Log, which already render with `status = "given"`). Pending and overdue items stay in the main list as they are today.
+## Prerequisites (iOS reality check)
+- iPad must run iPadOS 16.4 or newer.
+- The app must be added to the Home Screen (you already did this) and opened from that icon — Safari tabs cannot receive push.
+- The user must tap "Allow" on the permission prompt once, from inside the installed app.
 
-## UI changes
+## What I'll build
 
-**Today's page (`src/routes/_authenticated/dashboard.tsx`)**
+### 1. Make it an installable PWA (manifest only, no offline)
+- `public/manifest.webmanifest` with name, theme color, `display: "standalone"`, icons.
+- App icons (192, 512, maskable, Apple touch icon) generated and dropped in `public/`.
+- `<link rel="manifest">`, `theme-color`, `apple-touch-icon` tags in `__root.tsx` head.
 
-- Split the existing `tasks` array into `activeTasks` (pending/overdue) and `pastTasks` (given/skipped/postponed).
-- Render `activeTasks` exactly as today inside the "Today's schedule" card.
-- Below the active list, render a slim divider + a ghost button:
-  - Label: `t("schedule.showPrevious", { count })` → "Show previous tasks ({{count}})" / "Visa tidigare uppgifter ({{count}})".
-  - Chevron rotates when expanded; second label `t("schedule.hidePrevious")`.
-- When expanded, render `pastTasks` using the same row component already used for the active list (keeps undo + attribution intact).
-- Empty state unchanged. If `pastTasks.length === 0`, the toggle is not rendered.
+### 2. Push service worker
+- `public/push-sw.js` — handles `push` and `notificationclick` events only (not an app-shell cache, safe for Lovable preview).
+- Shows the notification, and on click focuses the app and navigates to `/dashboard` or the specific task.
 
-**Schedule page (`src/routes/_authenticated/schedule.tsx`)**
+### 3. Subscription flow
+- New `usePushSubscription` hook + a "Enable notifications" button in Settings (and a soft prompt on Dashboard for first-time caregivers).
+- Registers the SW, calls `pushManager.subscribe({ applicationServerKey: VAPID_PUBLIC })`, stores the subscription in a new `push_subscriptions` table keyed by `user_id` + `family_id`.
+- Bilingual strings (EN + SV) for the prompt, button, success/error toasts.
 
-- Same split applied per day group in the timeline. Within each day, render active rows first, then a collapsible "Previous tasks ({{n}})" section underneath.
-- For days entirely in the past (every row is done/skipped), default the section to collapsed too, with the same toggle.
+### 4. Database
+Migration adds:
+```
+public.push_subscriptions (
+  id, user_id, family_id, endpoint unique, p256dh, auth,
+  user_agent, created_at, last_seen_at
+)
+```
+With RLS + grants per your rules (users manage their own rows; service_role full access for the sender).
 
-**State**
+### 5. Sending notifications for every task
+Two trigger points so **every** task gets one:
+- **Scheduled trigger** — `pg_cron` runs every minute, calls a `/api/public/hooks/dispatch-task-notifications` server route. Route finds appointments due in the next minute that haven't been notified yet, sends a web-push to every subscription in that family, marks them sent (`notified_at` column added to `appointments`).
+- **Configurable lead time** — defaults to "at start time"; later we can add per-family settings (e.g. 10 min before). Out of scope for v1.
 
-- Local `useState<boolean>` per page (and per day on the schedule). No persistence — it resets on navigation, which keeps the page tidy by default.
-
-**i18n**
-
-Add to both `en.ts` and `sv.ts` under `schedule`:
-- `showPrevious`: "Show previous tasks ({{count}})" / "Visa tidigare uppgifter ({{count}})"
-- `hidePrevious`: "Hide previous tasks" / "Dölj tidigare uppgifter"
-- `previousSection`: "Previous tasks" / "Tidigare uppgifter"
+### 6. Secrets I'll add for you
+- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (a `mailto:` placeholder, you can change later).
+- I'll generate the keys and add them via the secrets tool — you just confirm the prompt.
 
 ## Files touched
+- `public/manifest.webmanifest`, `public/push-sw.js`, `public/icon-*.png`
+- `src/routes/__root.tsx` (head tags)
+- `src/lib/push/` (subscribe hook, server fn to save subscription, helpers)
+- `src/routes/api/public/hooks/dispatch-task-notifications.ts`
+- `src/components/carenest/EnableNotificationsCard.tsx` + integration in Dashboard/Settings
+- `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts`
+- Migration for `push_subscriptions` + `appointments.notified_at`
+- cron schedule (via supabase insert tool, not migration)
 
-- `src/routes/_authenticated/dashboard.tsx` — split task list, add toggle.
-- `src/routes/_authenticated/schedule.tsx` — same split per day group.
-- `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts` — new keys.
+## Out of scope for v1
+- Per-user quiet hours, snooze, custom lead times.
+- Action buttons inside the notification (Done/Postpone) — can add later.
+- Offline app-shell caching.
 
-No DB changes, no new components required (rows are reused).
-
----
-
-## On your second question: notifications on iPad
-
-Short version: **yes, but with limits, and only after the user installs the app to the Home Screen.**
-
-- **iPad / iPhone (Safari)**: Web Push works on iOS/iPadOS 16.4+, but **only** after the user adds the site to the Home Screen ("Add to Home Screen") and opens it from that icon. Notifications won't work in a regular Safari tab — that's an Apple restriction, not something the code can bypass.
-- **Android (Chrome/Edge/Firefox)**: Works in the regular browser tab, no install required.
-- **Desktop (Chrome, Edge, Firefox, Safari)**: Works directly in the browser.
-
-To make this work the app needs:
-1. A small PWA setup (manifest + service worker) so iPads can install it to the Home Screen.
-2. A push provider — either Web Push (VAPID keys, free, more setup) or Firebase Cloud Messaging (easier API, free tier).
-3. A backend job that triggers a push when something happens (e.g. 30 minutes before shift end → handover reminder; missed dose → caregiver ping).
-
-This is a separate piece of work from the task-list cleanup above. If you want it, say the word and I'll plan it out — including which provider fits best and what the install flow looks like for caregivers on iPad.
+Approve and I'll build it.
