@@ -33,7 +33,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT } from "@/lib/data/vitals";
+import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT, useDeleteVital, type Vital } from "@/lib/data/vitals";
 import { useLatestHandover } from "@/lib/data/handovers";
 import {
   buildTodaysDoses,
@@ -94,7 +94,8 @@ type TaskSource =
       kind: "appt";
       appt: ExpandedAppointment;
       completion: AppointmentCompletion | null;
-    };
+    }
+  | { kind: "vital"; vital: Vital };
 
 interface TaskItem {
   id: string;
@@ -191,6 +192,7 @@ function DashboardPage() {
   const { data: child, isLoading: childLoading } = useChild();
   const { data: latestVitals, isLoading: vitalsLoading } = useLatestVitals(familyId);
   const { data: fluidsToday } = useVitals(familyId, { types: ["fluids"], sinceHours: 24 });
+  const { data: vitalsToday = [] } = useVitals(familyId, { sinceHours: 24 });
   const { data: latestHandover, isLoading: handoverLoading } = useLatestHandover(familyId);
   const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
   const { data: invites = [] } = useInvites(familyId);
@@ -419,8 +421,39 @@ function DashboardPage() {
       });
     }
 
+    const todayStartMs = todayStart.getTime();
+    const todayEndMs = todayEnd.getTime();
+    for (const v of vitalsToday) {
+      const at = new Date(v.logged_at);
+      const ms = at.getTime();
+      if (ms < todayStartMs || ms > todayEndMs) continue;
+      const typeLabel = t(`quickLog.presets.${v.vital_type}` as const, {
+        defaultValue: t(`vitals.${v.vital_type}` as const, { defaultValue: v.vital_type }),
+      });
+      const valueStr =
+        v.vital_type === "other" || !v.value
+          ? ""
+          : `${Number(v.value)}${v.unit ? ` ${v.unit}` : ""}`;
+      const detail = [valueStr, v.notes].filter(Boolean).join(" • ");
+      items.push({
+        id: `vital-${v.id}`,
+        sortKey: ms,
+        timeLabel: fmtTime(at),
+        title: typeLabel,
+        detail,
+        status: "given",
+        scheduledFor: at,
+        isOverdue: false,
+        byUserId: v.logged_by ?? null,
+        byProfileId: null,
+        reason: null,
+        postponedTo: null,
+        source: { kind: "vital", vital: v },
+      });
+    }
+
     return items.sort((a, b) => a.sortKey - b.sortKey);
-  }, [meds, logs, appointments, completions, i18n.language, t, nowTick]);
+  }, [meds, logs, appointments, completions, vitalsToday, todayStart, todayEnd, i18n.language, t, nowTick]);
 
   const doneCount = tasks.filter((tk) => tk.status === "given").length;
   const totalCount = tasks.length;
@@ -447,7 +480,7 @@ function DashboardPage() {
           reason: result.reason,
           postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
         });
-      } else {
+      } else if (task.source.kind === "appt") {
         const a = task.source.appt;
         await logAppt.mutateAsync({
           family_id: familyId,
@@ -473,12 +506,17 @@ function DashboardPage() {
     setPendingAction(null);
   }
 
+  const deleteVital = useDeleteVital();
   async function undoTask(task: TaskItem) {
     try {
       if (task.source.kind === "dose") {
         if (task.source.dose.log) await deleteLog.mutateAsync(task.source.dose.log.id);
-      } else if (task.source.completion) {
-        await deleteApptCompletion.mutateAsync(task.source.completion.id);
+      } else if (task.source.kind === "appt") {
+        if (task.source.completion) {
+          await deleteApptCompletion.mutateAsync(task.source.completion.id);
+        }
+      } else if (task.source.kind === "vital") {
+        await deleteVital.mutateAsync(task.source.vital.id);
       }
     } catch (e) {
       toast.error((e as Error).message);
@@ -653,10 +691,17 @@ function DashboardPage() {
             ) : (
               <ul className="space-y-2">
                 {tasks.map((task) => {
-                  const kind: AppointmentKind | "medication" =
-                    task.source.kind === "dose" ? "medication" : task.source.appt.kind;
-                  const tone = kindTone(kind);
-                  const Icon = kindIcon(kind);
+                  const kind: AppointmentKind | "medication" | "vital" =
+                    task.source.kind === "dose"
+                      ? "medication"
+                      : task.source.kind === "vital"
+                        ? "vital"
+                        : task.source.appt.kind;
+                  const tone =
+                    kind === "vital"
+                      ? { bg: "#FEF3C7", fg: "#B45309" }
+                      : kindTone(kind);
+                  const Icon = kind === "vital" ? Activity : kindIcon(kind);
                   const isCompleted = task.status === "given";
                   const isSkipped = task.status === "skipped";
                   const isPostponed = task.status === "postponed";
