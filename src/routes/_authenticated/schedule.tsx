@@ -80,7 +80,11 @@ import {
   type AppointmentKind,
   type RecurrenceFreq,
 } from "@/lib/data/appointments";
-import { useShifts, expandShifts } from "@/lib/data/shifts";
+import { useShifts } from "@/lib/data/shifts";
+import {
+  useHandoverDueItem,
+  useDismissedHandovers,
+} from "@/lib/data/handover-due";
 import { ClipboardCheck } from "lucide-react";
 
 type RepeatMode = "none" | RecurrenceFreq;
