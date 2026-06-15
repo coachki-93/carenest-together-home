@@ -241,6 +241,7 @@ function DashboardPage() {
     task: TaskItem;
     action: TaskAction;
   } | null>(null);
+  const [quickLogOpen, setQuickLogOpen] = useState(false);
   const dismissKey = user?.id ? `carenest.resume.dismissed.${user.id}` : null;
   const [resumeDismissed, setResumeDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined" || !dismissKey) return false;
