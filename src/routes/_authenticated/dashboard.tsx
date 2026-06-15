@@ -275,6 +275,7 @@ function DashboardPage() {
   const logDose = useLogDose();
   const deleteLog = useDeleteLog();
   const logAppt = useLogAppointmentCompletion();
+  const logVital = useLogVital();
   const deleteApptCompletion = useDeleteAppointmentCompletion();
   const { data: completions = [] } = useAppointmentCompletions(familyId, todayStart, todayEnd);
   const caregiverProfilesForActions = caregiverProfiles;
