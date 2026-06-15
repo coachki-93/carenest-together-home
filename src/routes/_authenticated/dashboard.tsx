@@ -552,7 +552,28 @@ function DashboardPage() {
           caregiver_profile_id: profileId,
           reason: result.reason,
           postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
+          notes: result.notes,
         });
+        // Also log a vital when the appt kind maps to one and the caregiver entered a value
+        if (action === "done" && child && result.vitalValue != null) {
+          const vt = apptKindToVitalType(a.kind as AppointmentKind);
+          if (vt) {
+            try {
+              await logVital.mutateAsync({
+                family_id: familyId,
+                child_id: child.id,
+                logged_by: user?.id ?? null,
+                vital_type: vt,
+                value: result.vitalValue,
+                unit: DEFAULT_UNIT[vt] ?? "",
+                notes: result.notes,
+                logged_at: new Date().toISOString(),
+              });
+            } catch (e) {
+              toast.error((e as Error).message);
+            }
+          }
+        }
       }
       toast.success(
         action === "done"
