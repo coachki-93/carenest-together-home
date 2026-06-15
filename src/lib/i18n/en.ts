@@ -373,6 +373,23 @@ export const en = {
     resumeInvite: "Invite a caregiver to share the care load.",
     resumeDismiss: "Dismiss",
   },
+  quickLog: {
+    title: "Quick log",
+    subtitle: "Log a spontaneous event happening right now.",
+    changeType: "Choose a different event",
+    notesPlaceholder: "Optional details…",
+    save: "Save event",
+    saved: "{{label}} logged",
+    presets: {
+      temperature: "Temperature",
+      heart_rate: "Heart rate",
+      spo2: "Oxygen (SpO₂)",
+      fluids: "Fluids",
+      diaper: "Diaper change",
+      seizure: "Seizure",
+      note: "Other note",
+    },
+  },
   vitals: {
     title: "Vitals & logs",
     subtitle: "Track {{name}}'s vitals and daily intake.",
