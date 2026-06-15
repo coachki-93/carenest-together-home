@@ -659,10 +659,17 @@ function DashboardPage() {
             ) : (
               <ul className="space-y-2">
                 {tasks.map((task) => {
-                  const kind: AppointmentKind | "medication" =
-                    task.source.kind === "dose" ? "medication" : task.source.appt.kind;
-                  const tone = kindTone(kind);
-                  const Icon = kindIcon(kind);
+                  const kind: AppointmentKind | "medication" | "vital" =
+                    task.source.kind === "dose"
+                      ? "medication"
+                      : task.source.kind === "vital"
+                        ? "vital"
+                        : task.source.appt.kind;
+                  const tone =
+                    kind === "vital"
+                      ? { bg: "#FEF3C7", fg: "#B45309" }
+                      : kindTone(kind);
+                  const Icon = kind === "vital" ? Activity : kindIcon(kind);
                   const isCompleted = task.status === "given";
                   const isSkipped = task.status === "skipped";
                   const isPostponed = task.status === "postponed";
