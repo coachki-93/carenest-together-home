@@ -394,6 +394,7 @@ export const sv = {
       temperature: "Temperatur",
       heart_rate: "Puls",
       spo2: "Syremättnad (SpO₂)",
+      breathing: "Andningsfrekvens",
       fluids: "Vätska",
       diaper: "Blöjbyte",
       seizure: "Anfall",
