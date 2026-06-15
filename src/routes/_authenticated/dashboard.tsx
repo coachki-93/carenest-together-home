@@ -359,6 +359,13 @@ function DashboardPage() {
 
   const now = new Date(nowTick);
 
+  const handoverMinutesLeft = useMemo(() => {
+    if (!handoverDue) return 0;
+    const ms = handoverDue.shiftEnd.getTime() - nowTick;
+    return Math.max(0, Math.ceil(ms / 60_000));
+  }, [handoverDue, nowTick]);
+
+
   const tasks: TaskItem[] = useMemo(() => {
     const items: TaskItem[] = [];
     const doses = buildTodaysDoses(meds, logs);
