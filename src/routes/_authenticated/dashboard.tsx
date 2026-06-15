@@ -359,6 +359,13 @@ function DashboardPage() {
 
   const now = new Date(nowTick);
 
+  const handoverMinutesLeft = useMemo(() => {
+    if (!handoverDue) return 0;
+    const ms = handoverDue.shiftEnd.getTime() - nowTick;
+    return Math.max(0, Math.ceil(ms / 60_000));
+  }, [handoverDue, nowTick]);
+
+
   const tasks: TaskItem[] = useMemo(() => {
     const items: TaskItem[] = [];
     const doses = buildTodaysDoses(meds, logs);
@@ -1005,7 +1012,15 @@ function DashboardPage() {
           </section>
 
           {/* Handover preview */}
-          <section className="card-soft p-6" data-tour="handover">
+          <section
+            className={cn(
+              "p-6",
+              handoverDue
+                ? "bg-gradient-to-br from-red-50 to-rose-50 border border-red-200 rounded-[var(--radius-2xl)] shadow-[var(--shadow-card)]"
+                : "card-soft",
+            )}
+            data-tour="handover"
+          >
 
             {handoverLoading ? (
               <>
@@ -1026,7 +1041,15 @@ function DashboardPage() {
               return (
                 <>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-extrabold">{t("dashboard.handover")}</h3>
+                    <h3 className="text-lg font-extrabold flex items-center gap-2">
+                      {t("dashboard.handover")}
+                      {handoverDue && (
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-destructive bg-destructive/10 rounded-full px-2.5 py-1">
+                          <Clock className="size-3" />
+                          {t("dashboard.handoverCountdown", { minutes: handoverMinutesLeft })}
+                        </span>
+                      )}
+                    </h3>
                     {latestHandover && (
                       <span className="text-xs font-semibold text-primary bg-primary-soft rounded-full px-2.5 py-1">
                         {fmt.format(new Date(latestHandover.created_at))}
