@@ -7,6 +7,10 @@ import {
   Heart,
   Thermometer,
   Droplet,
+  Wind,
+  Baby,
+  Zap,
+  StickyNote,
   CheckCircle2,
   Clock,
   Plus,
@@ -33,7 +37,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT, useDeleteVital, type Vital } from "@/lib/data/vitals";
+import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT, useDeleteVital, useLogVital, type Vital, type VitalType } from "@/lib/data/vitals";
 import { useLatestHandover } from "@/lib/data/handovers";
 import {
   buildTodaysDoses,
@@ -73,6 +77,8 @@ import {
   TaskActionDialog,
   type TaskAction,
   type TaskActionResult,
+  type VitalSpec,
+  type NotesSpec,
 } from "@/components/carenest/TaskActionDialog";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
@@ -153,6 +159,22 @@ function kindIcon(kind: AppointmentKind | "medication"): typeof Pill {
       return UtensilsCrossed;
     case "sleep":
       return Moon;
+    case "temperature":
+      return Thermometer;
+    case "heart_rate":
+      return Heart;
+    case "spo2":
+      return Wind;
+    case "breathing":
+      return Activity;
+    case "fluids":
+      return Droplet;
+    case "diaper":
+      return Baby;
+    case "seizure":
+      return Zap;
+    case "note":
+      return StickyNote;
     default:
       return CalendarIcon;
   }
@@ -172,9 +194,78 @@ function kindTone(kind: AppointmentKind | "medication"): { bg: string; fg: strin
       return { bg: "#FFEDD5", fg: "#C2410C" };
     case "sleep":
       return { bg: "#E0E7FF", fg: "#4338CA" };
+    case "temperature":
+      return { bg: "#FFE4E6", fg: "#BE123C" };
+    case "heart_rate":
+      return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "spo2":
+      return { bg: "#E0F2FE", fg: "#0369A1" };
+    case "breathing":
+      return { bg: "#CFFAFE", fg: "#0E7490" };
+    case "fluids":
+      return { bg: "#DBEAFE", fg: "#1D4ED8" };
+    case "diaper":
+      return { bg: "#FEF3C7", fg: "#B45309" };
+    case "seizure":
+      return { bg: "#EDE9FE", fg: "#6D28D9" };
+    case "note":
+      return { bg: "#F1F5F9", fg: "#334155" };
     default:
       return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
+}
+
+function apptKindToVitalType(kind: AppointmentKind): VitalType | null {
+  switch (kind) {
+    case "temperature":
+      return "temperature";
+    case "heart_rate":
+      return "heart_rate";
+    case "spo2":
+      return "spo2";
+    case "breathing":
+      return "breathing";
+    case "fluids":
+      return "fluids";
+    case "seizure":
+      return "seizure";
+    default:
+      return null;
+  }
+}
+
+function buildVitalSpec(
+  kind: AppointmentKind,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): VitalSpec | null {
+  const vt = apptKindToVitalType(kind);
+  if (!vt) return null;
+  return {
+    type: vt,
+    unit: DEFAULT_UNIT[vt] ?? "",
+    label: t(`quickLog.presets.${vt}`, { defaultValue: t(`vitals.${vt}`, { defaultValue: vt }) }),
+  };
+}
+
+function buildNotesSpec(
+  kind: AppointmentKind,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): NotesSpec | null {
+  if (kind === "diaper") {
+    return {
+      label: t("taskAction.diaperNoteLabel"),
+      placeholder: t("taskAction.diaperNotePlaceholder"),
+      required: true,
+      quickOptions: [
+        t("taskAction.diaper.pee"),
+        t("taskAction.diaper.poo"),
+        t("taskAction.diaper.peeAndPoo"),
+        t("taskAction.diaper.little"),
+        t("taskAction.diaper.much"),
+      ],
+    };
+  }
+  return null;
 }
 
 function startOfDay(d: Date) {
@@ -237,6 +328,7 @@ function DashboardPage() {
   const logDose = useLogDose();
   const deleteLog = useDeleteLog();
   const logAppt = useLogAppointmentCompletion();
+  const logVital = useLogVital();
   const deleteApptCompletion = useDeleteAppointmentCompletion();
   const { data: completions = [] } = useAppointmentCompletions(familyId, todayStart, todayEnd);
   const caregiverProfilesForActions = caregiverProfiles;
@@ -513,7 +605,28 @@ function DashboardPage() {
           caregiver_profile_id: profileId,
           reason: result.reason,
           postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
+          notes: result.notes,
         });
+        // Also log a vital when the appt kind maps to one and the caregiver entered a value
+        if (action === "done" && child && result.vitalValue != null) {
+          const vt = apptKindToVitalType(a.kind as AppointmentKind);
+          if (vt) {
+            try {
+              await logVital.mutateAsync({
+                family_id: familyId,
+                child_id: child.id,
+                logged_by: user?.id ?? null,
+                vital_type: vt,
+                value: result.vitalValue,
+                unit: DEFAULT_UNIT[vt] ?? "",
+                notes: result.notes,
+                logged_at: new Date().toISOString(),
+              });
+            } catch (e) {
+              toast.error((e as Error).message);
+            }
+          }
+        }
       }
       toast.success(
         action === "done"
@@ -1166,8 +1279,19 @@ function DashboardPage() {
         profiles={caregiverProfilesForActions}
         defaultProfileId={suggestedCaregiverId ?? activeCaregiverId ?? null}
         onConfirm={handleTaskAction}
-        submitting={logDose.isPending || logAppt.isPending}
+        submitting={logDose.isPending || logAppt.isPending || logVital.isPending}
+        vitalSpec={
+          pendingAction?.task.source.kind === "appt"
+            ? buildVitalSpec(pendingAction.task.source.appt.kind as AppointmentKind, t)
+            : null
+        }
+        notesSpec={
+          pendingAction?.task.source.kind === "appt"
+            ? buildNotesSpec(pendingAction.task.source.appt.kind as AppointmentKind, t)
+            : null
+        }
       />
+
 
       <GuidedTour
         open={tourOpen}

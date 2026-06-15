@@ -315,6 +315,15 @@ export const en = {
     doneToast: "Marked as done",
     skippedToast: "Skipped",
     postponedToast: "Postponed",
+    diaperNoteLabel: "What was in the diaper?",
+    diaperNotePlaceholder: "e.g. Pee + a little poo",
+    diaper: {
+      pee: "Pee",
+      poo: "Poo",
+      peeAndPoo: "Pee + poo",
+      little: "Little",
+      much: "Much",
+    },
   },
   profile: {
     familyRole: "Family",

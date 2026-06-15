@@ -315,6 +315,15 @@ export const sv = {
     doneToast: "Markerad som klar",
     skippedToast: "Hoppad",
     postponedToast: "Senarelagd",
+    diaperNoteLabel: "Vad var i blöjan?",
+    diaperNotePlaceholder: "t.ex. Kiss + lite bajs",
+    diaper: {
+      pee: "Kiss",
+      poo: "Bajs",
+      peeAndPoo: "Kiss + bajs",
+      little: "Lite",
+      much: "Mycket",
+    },
   },
   profile: {
     familyRole: "Familj",

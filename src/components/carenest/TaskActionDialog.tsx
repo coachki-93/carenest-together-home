@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { CaregiverProfile } from "@/lib/data/caregiver-profiles";
+import type { VitalType } from "@/lib/data/vitals";
 
 export type TaskAction = "done" | "skipped" | "postponed";
 
@@ -28,6 +29,23 @@ export interface TaskActionResult {
   caregiverProfileId: string | null;
   reason: string | null;
   postponedTo: Date | null;
+  vitalValue: number | null;
+  notes: string | null;
+}
+
+export interface VitalSpec {
+  type: VitalType;
+  unit: string;
+  label: string;
+  step?: string;
+  placeholder?: string;
+}
+
+export interface NotesSpec {
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  quickOptions?: string[];
 }
 
 export function TaskActionDialog({
@@ -40,6 +58,8 @@ export function TaskActionDialog({
   defaultProfileId,
   onConfirm,
   submitting,
+  vitalSpec,
+  notesSpec,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -50,17 +70,23 @@ export function TaskActionDialog({
   defaultProfileId: string | null;
   onConfirm: (result: TaskActionResult) => void | Promise<void>;
   submitting?: boolean;
+  vitalSpec?: VitalSpec | null;
+  notesSpec?: NotesSpec | null;
 }) {
   const { t } = useTranslation();
   const [profileId, setProfileId] = useState<string | null>(defaultProfileId);
   const [reason, setReason] = useState("");
   const [postponedDate, setPostponedDate] = useState("");
   const [postponedTime, setPostponedTime] = useState("");
+  const [vitalValue, setVitalValue] = useState("");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setProfileId(defaultProfileId);
     setReason("");
+    setVitalValue("");
+    setNotes("");
     // Default postpone to scheduled + 1 hour, local
     const plusOneHour = new Date(scheduledFor.getTime() + 60 * 60 * 1000);
     const pad = (n: number) => String(n).padStart(2, "0");
@@ -76,6 +102,8 @@ export function TaskActionDialog({
   const reasonRequired = action === "skipped" || action === "postponed";
   const showProfile = action === "done";
   const showPostpone = action === "postponed";
+  const showVital = action === "done" && !!vitalSpec;
+  const showNotes = action === "done" && !!notesSpec;
 
   const heading =
     action === "done"
@@ -99,10 +127,16 @@ export function TaskActionDialog({
         : t("taskAction.confirmPostpone");
 
   const trimmedReason = reason.trim();
+  const trimmedNotes = notes.trim();
+  const vitalNum = vitalValue.trim() === "" ? NaN : Number(vitalValue);
+  const vitalValid = !showVital || (vitalValue.trim() !== "" && !Number.isNaN(vitalNum));
+  const notesValid = !showNotes || !notesSpec?.required || trimmedNotes.length > 0;
   const canSubmit =
     !submitting &&
     (!reasonRequired || trimmedReason.length > 0) &&
-    (!showPostpone || (!!postponedDate && !!postponedTime));
+    (!showPostpone || (!!postponedDate && !!postponedTime)) &&
+    vitalValid &&
+    notesValid;
 
   async function submit() {
     let postponedTo: Date | null = null;
@@ -116,6 +150,8 @@ export function TaskActionDialog({
       caregiverProfileId: showProfile ? profileId : null,
       reason: trimmedReason ? trimmedReason : null,
       postponedTo,
+      vitalValue: showVital && !Number.isNaN(vitalNum) ? vitalNum : null,
+      notes: showNotes && trimmedNotes ? trimmedNotes : null,
     });
   }
 
@@ -128,6 +164,61 @@ export function TaskActionDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          {showVital && vitalSpec && (
+            <div className="space-y-1.5">
+              <Label>
+                {vitalSpec.label} <span className="text-destructive">*</span>
+              </Label>
+              <div className="grid grid-cols-[1fr_auto] gap-2">
+                <Input
+                  type="number"
+                  inputMode="decimal"
+                  step={vitalSpec.step ?? "0.1"}
+                  className="rounded-xl"
+                  placeholder={vitalSpec.placeholder}
+                  value={vitalValue}
+                  onChange={(e) => setVitalValue(e.target.value)}
+                  autoFocus
+                />
+                <div className="h-9 px-3 rounded-xl border border-input bg-muted/40 flex items-center text-sm font-semibold text-muted-foreground">
+                  {vitalSpec.unit || "—"}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showNotes && notesSpec && (
+            <div className="space-y-1.5">
+              <Label>
+                {notesSpec.label}
+                {notesSpec.required && <span className="text-destructive"> *</span>}
+              </Label>
+              {notesSpec.quickOptions && notesSpec.quickOptions.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {notesSpec.quickOptions.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() =>
+                        setNotes((prev) => (prev ? `${prev} • ${opt}` : opt))
+                      }
+                      className="px-2.5 py-1 rounded-full border border-input text-xs font-semibold hover:bg-accent"
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <Textarea
+                rows={2}
+                className="rounded-xl"
+                placeholder={notesSpec.placeholder}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+          )}
+
           {showProfile && (
             <div className="space-y-1.5">
               <Label>{t("taskAction.completedBy")}</Label>
@@ -200,6 +291,7 @@ export function TaskActionDialog({
             </div>
           )}
         </div>
+
 
         <DialogFooter>
           <Button
