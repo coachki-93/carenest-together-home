@@ -1,45 +1,92 @@
-## The problem
+## Goal
 
-A caregiver account like "Kommunen" isn't a person — it's the organisation that the actual caregivers (vårdprofiler) work under. Right now we show the account holder's name everywhere a "person" appears (Care team list, Shifts row labels, who completed a task). We need to flip that: the account is just a container, and the profiles under it are the human-level identity used across the app.
+When a caregiver's shift is about to end, surface a "Handover due" task in the schedule 30 minutes before `shift.end_at`. Opening it shows the handover form **pre-filled** with everything that happened during that shift window — missed/skipped/postponed meds, missed appointments, abnormal vitals, and still-open tasks. The caregiver reviews, edits, and submits.
 
-## What changes
+## Approach
 
-### 1. Caregivers page (`/caregivers`)
-- Rename the "Members" section to "Caregiver organisations" (and call each row an "account", not a person). Show the account name once, with a small count badge like "3 vårdprofiler".
-- Move the "Vårdprofiler" section to the top and make it the primary list — grouped by the organisation they belong to.
-- Owner gets full management: add / edit / remove profiles for any caregiver account (not just their own).
-- Caregiver account holder still manages only their own profiles.
+Derive the reminder at runtime instead of inserting rows into the DB. For each expanded shift occurrence we already compute in the schedule view, we emit a synthetic "Handover due" entry at `end - 30min`. No new table, no cron, no drift if a shift is edited/deleted.
 
-### 2. Onboarding for a new caregiver account
-- After accepting an invite, the first screen now asks for the **organisation name** (e.g. "Kommunen") and then immediately walks them to "Add your first vårdprofil" (name + color). Skipping the profile step is allowed but a banner reminds them no shifts/logs can be attributed until at least one profile exists.
+The pre-fill is generated on the fly from existing data the moment the dialog opens — querying meds, appointments, vitals for `[shift.start, shift.end]`.
 
-### 3. Shifts (`/shifts`)
-- Rows in the weekly grid become **caregiver profiles**, not member accounts. The profile's color drives the avatar/shift colour.
-- The shift dialog's "Caregiver" selector becomes a **vårdprofil** selector, grouped by organisation.
-- `caregiver_shifts.caregiver_user_id` stays for back-compat but the UI reads/writes `caregiver_profile_id`. Existing rows without a profile are listed under an "Unassigned" row the owner can re-assign.
+## What lands in the schedule
 
-### 4. Schedule, dashboard, handover, med logs
-- Wherever we currently render a caregiver name/avatar from `family_members` + `profiles`, swap to the linked `caregiver_profile` (name + color). Fallback to the organisation name only when no profile is linked (legacy rows).
-- "Who completed" chips on med logs, handovers, and task feed all show profile name + color dot.
+```text
+Mon  ┌───────────────┐
+     │ Morning shift │  07:00 – 14:00
+     │   Anna        │
+     └───────────────┘
+     ⏰ Handover due  13:30   ← new synthetic card, amber/accent
+```
 
-### 5. Sidebar / header
-- The profile chip in the top-right for a caregiver account shows: organisation name as the main label, with "Acting as: {profileName} ▾" underneath — clicking opens a profile switcher so the caregiver picks which vårdprofil they're currently logged actions as. Selection is persisted (localStorage) and used as the default for `caregiver_profile_id` on new med logs / handovers (overriding the time-based suggestion only when the user picks one).
+- Renders only for shifts assigned to the **current user's** caregiver profile (you don't see other caregivers' handover prompts).
+- Only shows when `now < shift.end` (don't nag after the shift is over and a handover already exists for it).
+- Clicking opens the existing handover dialog in `/handover`, pre-filled.
+- A "Skip" affordance dismisses it (stored in localStorage per shift-occurrence id).
 
-## Technical notes
+## What gets pre-filled
 
-- No schema changes needed — `caregiver_profiles`, and the `*_caregiver_profile_id` columns on `caregiver_shifts`, `med_logs`, `handovers` already exist.
-- New helper `useActiveCaregiverProfile()` (returns selected profile from localStorage, falling back to `suggest_caregiver_profile`).
-- RLS update: `caregiver_profiles` insert/update/delete policy needs to also allow `is_family_owner(...)`, not just the owning account, so owners can manage org profiles.
-- Shifts page row data switches from `useFamilyMembers` to `useCaregiverProfiles`; `expandShifts` keeps using `caregiver_user_id` internally for legacy rows but exposes `caregiverProfileId` too.
+For the shift window `[shift.start, shift.end]`:
 
-## Out of scope (for this change)
+- **Meds field** — bulleted list of every `med_log` with status `skipped`, `refused`, or `postponed`, plus any scheduled dose with no log yet (= missed). Each line includes med name, scheduled time, status, and the reason note when present.
+  - Example: `• 12:00 Keppra — postponed to 14:00 (child napping)`
+- **Notes field** — any appointment in the window marked `cancelled` or with no completion row (missed), and any vitals reading flagged out-of-range.
+- **Summary** — left blank for the caregiver to write the human takeaway.
+- Other fields (`sleep`, `mood`, `seizures`, `fluids`) — left blank; pre-fill only what we can derive factually.
 
-- Removing `caregiver_user_id` from `caregiver_shifts` (kept for legacy data).
-- Per-profile login credentials (the org account is still the single login).
-- Reporting/analytics per profile.
+If nothing eventful happened, the meds/notes fields show "Nothing to flag" placeholder text instead of empty.
 
-## Confirm before I build
+## Technical details
 
-Sound right? Two quick decisions I'd like to lock in:
-1. **Owners managing profiles** — should the family owner be able to add/rename/remove vårdprofiler for a caregiver organisation, or only the caregiver account holder?
-2. **Profile switcher placement** — top-right "Acting as" dropdown (my proposal) vs. a one-time picker per session vs. a picker shown only when completing a task. I'd default to top-right because it makes the current identity obvious.
+### New helper: `src/lib/data/handover-prefill.ts`
+
+```ts
+export interface HandoverPrefillInput {
+  familyId: string;
+  childId: string;
+  shiftStart: Date;
+  shiftEnd: Date;
+}
+
+export interface HandoverPrefill {
+  meds: string;   // ready-to-paste multiline text
+  notes: string;
+  hasContent: boolean;
+}
+
+export function useHandoverPrefill(input: HandoverPrefillInput | null): UseQueryResult<HandoverPrefill>
+```
+
+Uses existing `med_logs`, `medications`, `appointments` (+ completions), `vitals` queries scoped to the window. Returns formatted strings.
+
+### Schedule view changes (`src/routes/_authenticated/schedule.tsx`)
+
+- For each expanded `ShiftOccurrence` where `caregiverUserId === currentUser.id` and `end > now`, push a synthetic schedule item `{ kind: 'handover-due', at: end - 30min, shiftStart, shiftEnd }`.
+- Filter out occurrences the user dismissed (localStorage `carenest.handover-skipped.<masterId>:<startMs>`).
+- Render with an amber/accent card distinct from appointments and shifts; clicking calls `navigate({ to: '/handover', search: { shiftStart, shiftEnd } })`.
+
+### Handover route changes (`src/routes/_authenticated/handover.tsx`)
+
+- Add `validateSearch` for optional `shiftStart` / `shiftEnd` ISO strings.
+- When present, auto-open the dialog and seed `form.meds` + `form.notes` from `useHandoverPrefill`. Show a small banner: "Pre-filled from your <morning> shift · <time range>".
+- On submit, the dialog still uses the existing `useCreateHandover` mutation — no schema changes needed.
+
+### i18n
+
+Add keys to both `en.ts` and `sv.ts` under `handoverPage`:
+- `due` ("Handover due")
+- `prefilledBanner`, `prefillEmpty`, `skip`
+- `prefill.medSkipped`, `prefill.medRefused`, `prefill.medPostponed`, `prefill.medMissed`
+- `prefill.apptMissed`, `prefill.vitalAbnormal`
+
+## Out of scope (per your call)
+
+- Push/email notifications at T-30 (skipped).
+- Storing handover-due reminders in the DB (not needed — derived at runtime).
+- Cron jobs.
+
+## Files touched
+
+- new: `src/lib/data/handover-prefill.ts`
+- edit: `src/routes/_authenticated/schedule.tsx` (render synthetic card + dismiss)
+- edit: `src/routes/_authenticated/handover.tsx` (search params + prefill seeding)
+- edit: `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts`

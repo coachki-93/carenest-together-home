@@ -283,6 +283,13 @@ export const en = {
     overdue: "Overdue",
     statusPostponed: "Postponed",
     postpone: "Postpone",
+    handoverDue: {
+      badge: "Due",
+      title: "Handover due soon",
+      body: "Your shift ends at {{end}} — write a quick handover for the next caregiver.",
+      start: "Start handover",
+      skip: "Skip",
+    },
   },
   taskAction: {
     doneTitle: "Mark as done",
@@ -469,6 +476,18 @@ export const en = {
       fluids: "420 ml total",
       meds: "All scheduled meds given",
       notes: "Keep tracking temperature this evening…",
+    },
+    prefill: {
+      banner: "Pre-filled from your shift",
+      nothing: "Nothing eventful to flag.",
+      empty: "Nothing eventful to flag.",
+      medSkipped: "skipped",
+      medRefused: "refused",
+      medPostponed: "postponed",
+      medMissed: "missed (no log)",
+      apptMissed: "missed",
+      apptCancelled: "skipped",
+      vitalAbnormal: "Out-of-range reading",
     },
   },
   childPage: {

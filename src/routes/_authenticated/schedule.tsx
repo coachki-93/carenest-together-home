@@ -80,6 +80,8 @@ import {
   type AppointmentKind,
   type RecurrenceFreq,
 } from "@/lib/data/appointments";
+import { useShifts, expandShifts } from "@/lib/data/shifts";
+import { ClipboardCheck } from "lucide-react";
 
 type RepeatMode = "none" | RecurrenceFreq;
 
@@ -140,7 +142,15 @@ function isSameDay(a: Date, b: Date) {
 
 type TimelineItem =
   | { kind: "dose"; key: string; at: Date; dose: ScheduledDose }
-  | { kind: "appt"; key: string; at: Date; appt: ExpandedAppointment };
+  | { kind: "appt"; key: string; at: Date; appt: ExpandedAppointment }
+  | {
+      kind: "handover";
+      key: string;
+      at: Date;
+      shiftStart: Date;
+      shiftEnd: Date;
+      dismissId: string;
+    };
 
 function SchedulePage() {
   const { t, i18n } = useTranslation();
@@ -166,10 +176,67 @@ function SchedulePage() {
 
   const { data: logs = [] } = useMedLogs(familyId, day, dayEnd);
   const { data: appointments = [] } = useAppointments(familyId, day, dayEnd);
+  const { data: shifts = [] } = useShifts(familyId);
   const doses = useMemo(
     () => (isToday ? buildTodaysDoses(meds, logs) : []),
     [meds, logs, isToday],
   );
+
+  const [dismissedHandovers, setDismissedHandovers] = useState<Set<string>>(
+    () => new Set(),
+  );
+  useEffect(() => {
+    if (typeof window === "undefined" || !user?.id) return;
+    try {
+      const raw = window.localStorage.getItem(
+        `carenest.handover-skipped.${user.id}`,
+      );
+      if (raw) setDismissedHandovers(new Set(JSON.parse(raw) as string[]));
+    } catch {
+      /* ignore */
+    }
+  }, [user?.id]);
+  function dismissHandover(id: string) {
+    setDismissedHandovers((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      if (typeof window !== "undefined" && user?.id) {
+        try {
+          window.localStorage.setItem(
+            `carenest.handover-skipped.${user.id}`,
+            JSON.stringify([...next]),
+          );
+        } catch {
+          /* ignore */
+        }
+      }
+      return next;
+    });
+  }
+
+  const handoverItems = useMemo<TimelineItem[]>(() => {
+    if (!user?.id) return [];
+    const occs = expandShifts(shifts, day, dayEnd);
+    const now = new Date();
+    const items: TimelineItem[] = [];
+    for (const o of occs) {
+      if (o.caregiverUserId !== user.id) continue;
+      const at = new Date(o.end.getTime() - 30 * 60 * 1000);
+      if (at < day || at >= dayEnd) continue;
+      if (o.end <= now) continue; // shift already over
+      const dismissId = `${o.masterId}:${o.start.getTime()}`;
+      if (dismissedHandovers.has(dismissId)) continue;
+      items.push({
+        kind: "handover",
+        key: `handover-${dismissId}`,
+        at,
+        shiftStart: o.start,
+        shiftEnd: o.end,
+        dismissId,
+      });
+    }
+    return items;
+  }, [shifts, day, dayEnd, user?.id, dismissedHandovers]);
 
   const timeline = useMemo<TimelineItem[]>(() => {
     const items: TimelineItem[] = [];
@@ -179,8 +246,9 @@ function SchedulePage() {
     for (const a of appointments) {
       items.push({ kind: "appt", key: a.id, at: new Date(a.starts_at), appt: a });
     }
+    items.push(...handoverItems);
     return items.sort((x, y) => x.at.getTime() - y.at.getTime());
-  }, [doses, appointments]);
+  }, [doses, appointments, handoverItems]);
 
   const logDose = useLogDose();
   const deleteLog = useDeleteLog();
@@ -352,23 +420,37 @@ function SchedulePage() {
         </div>
       ) : (
         <ol className="space-y-3">
-          {timeline.map((item) =>
-            item.kind === "dose" ? (
-              <DoseRow
-                key={item.key}
-                dose={item.dose}
-                now={now}
-                onMark={(status) => setConfirm({ dose: item.dose, status })}
-                onUndo={() => {
-                  if (item.dose.log) {
-                    deleteLog.mutate(item.dose.log.id, {
-                      onSuccess: () => toast.success(t("schedule.doseUndone")),
-                      onError: (e) => toast.error((e as Error).message),
-                    });
-                  }
-                }}
-              />
-            ) : (
+          {timeline.map((item) => {
+            if (item.kind === "dose") {
+              return (
+                <DoseRow
+                  key={item.key}
+                  dose={item.dose}
+                  now={now}
+                  onMark={(status) => setConfirm({ dose: item.dose, status })}
+                  onUndo={() => {
+                    if (item.dose.log) {
+                      deleteLog.mutate(item.dose.log.id, {
+                        onSuccess: () => toast.success(t("schedule.doseUndone")),
+                        onError: (e) => toast.error((e as Error).message),
+                      });
+                    }
+                  }}
+                />
+              );
+            }
+            if (item.kind === "handover") {
+              return (
+                <HandoverDueRow
+                  key={item.key}
+                  at={item.at}
+                  shiftStart={item.shiftStart}
+                  shiftEnd={item.shiftEnd}
+                  onDismiss={() => dismissHandover(item.dismissId)}
+                />
+              );
+            }
+            return (
               <AppointmentRow
                 key={item.key}
                 appt={item.appt}
@@ -376,8 +458,8 @@ function SchedulePage() {
                 onDelete={() => setConfirmDeleteAppt(item.appt)}
                 canManage={item.appt.created_by === user?.id || membership?.role === "owner"}
               />
-            ),
-          )}
+            );
+          })}
         </ol>
       )}
 
@@ -1295,4 +1377,69 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
     default:
       return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
+}
+
+function HandoverDueRow({
+  at,
+  shiftStart,
+  shiftEnd,
+  onDismiss,
+}: {
+  at: Date;
+  shiftStart: Date;
+  shiftEnd: Date;
+  onDismiss: () => void;
+}) {
+  const { t, i18n } = useTranslation();
+  const timeFmt = new Intl.DateTimeFormat(
+    i18n.language === "sv" ? "sv-SE" : "en-US",
+    { hour: "2-digit", minute: "2-digit" },
+  );
+  return (
+    <li className="card-soft p-4 flex items-center gap-4 border-2 border-warning/60 bg-warning/5">
+      <div className="text-center shrink-0 w-16">
+        <div className="text-xl font-extrabold tabular-nums">
+          {timeFmt.format(at)}
+        </div>
+        <div className="text-[10px] font-bold uppercase text-warning-foreground/80 mt-0.5">
+          {t("schedule.handoverDue.badge")}
+        </div>
+      </div>
+      <div className="size-12 rounded-2xl flex items-center justify-center shrink-0 bg-warning/30 text-warning-foreground">
+        <ClipboardCheck className="size-6" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <h3 className="font-extrabold truncate">
+          {t("schedule.handoverDue.title")}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {t("schedule.handoverDue.body", {
+            start: timeFmt.format(shiftStart),
+            end: timeFmt.format(shiftEnd),
+          })}
+        </p>
+      </div>
+      <div className="flex gap-2 shrink-0">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="rounded-full"
+          onClick={onDismiss}
+        >
+          {t("schedule.handoverDue.skip")}
+        </Button>
+        <Button asChild size="sm" className="rounded-full font-semibold">
+          <Link
+            to="/handover"
+            search={{
+              shiftStart: shiftStart.toISOString(),
+              shiftEnd: shiftEnd.toISOString(),
+            }}
+          >
+            {t("schedule.handoverDue.start")}
+          </Link>
+        </Button>
+      </div>
+    </li>
+  );
 }

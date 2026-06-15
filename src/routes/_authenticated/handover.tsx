@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Plus, Trash2, User, Clock } from "lucide-react";
+import { ClipboardList, Plus, Trash2, User, Clock, Sparkles } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,10 +44,18 @@ import {
   type Handover,
   type ShiftLabel,
 } from "@/lib/data/handovers";
+import { useHandoverPrefill } from "@/lib/data/handover-prefill";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
+
+const handoverSearchSchema = z.object({
+  shiftStart: z.string().optional(),
+  shiftEnd: z.string().optional(),
+});
 
 export const Route = createFileRoute("/_authenticated/handover")({
   head: () => ({ meta: [{ title: "Handover — CareNest" }] }),
+  validateSearch: handoverSearchSchema,
   component: HandoverPage,
 });
 
@@ -70,6 +78,46 @@ function HandoverPage() {
   const { data: handovers, isLoading } = useHandovers(membership?.family_id);
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
+  const navigate = Route.useNavigate();
+  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso } = Route.useSearch();
+
+  const shiftWindow = useMemo(() => {
+    if (!shiftStartIso || !shiftEndIso) return null;
+    const s = new Date(shiftStartIso);
+    const e = new Date(shiftEndIso);
+    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return null;
+    return { start: s, end: e };
+  }, [shiftStartIso, shiftEndIso]);
+
+  const prefillLabels = useMemo(
+    () => ({
+      medSkipped: t("handoverPage.prefill.medSkipped"),
+      medRefused: t("handoverPage.prefill.medRefused"),
+      medPostponed: t("handoverPage.prefill.medPostponed"),
+      medMissed: t("handoverPage.prefill.medMissed"),
+      apptMissed: t("handoverPage.prefill.apptMissed"),
+      apptCancelled: t("handoverPage.prefill.apptCancelled"),
+      vitalAbnormal: t("handoverPage.prefill.vitalAbnormal"),
+      empty: t("handoverPage.prefill.empty"),
+    }),
+    [t],
+  );
+  const prefillInput =
+    membership?.family_id && shiftWindow
+      ? {
+          familyId: membership.family_id,
+          shiftStart: shiftWindow.start,
+          shiftEnd: shiftWindow.end,
+        }
+      : null;
+  const { data: prefill } = useHandoverPrefill(prefillInput, prefillLabels);
+
+  function shiftLabelFromDate(d: Date): ShiftLabel {
+    const h = d.getHours();
+    if (h < 12) return "morning";
+    if (h < 18) return "afternoon";
+    return "night";
+  }
 
   const [open, setOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Handover | null>(null);
@@ -83,6 +131,18 @@ function HandoverPage() {
     meds: "",
     notes: "",
   });
+
+  // When arriving with shift query params, open dialog + seed from prefill
+  useEffect(() => {
+    if (!shiftWindow || !prefill) return;
+    setForm((prev) => ({
+      ...prev,
+      shift: shiftLabelFromDate(shiftWindow.start),
+      meds: prev.meds || prefill.meds,
+      notes: prev.notes || prefill.notes,
+    }));
+    setOpen(true);
+  }, [shiftWindow, prefill]);
 
   const dateFmt = useMemo(
     () =>
@@ -128,6 +188,9 @@ function HandoverPage() {
       toast.success(t("handoverPage.saved"));
       setOpen(false);
       resetForm();
+      if (shiftStartIso || shiftEndIso) {
+        navigate({ search: {}, replace: true });
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("handoverPage.saveError"));
     }
@@ -232,13 +295,42 @@ function HandoverPage() {
         </ul>
       )}
 
-      <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : (setOpen(false), resetForm()))}>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          if (o) {
+            setOpen(true);
+          } else {
+            setOpen(false);
+            resetForm();
+            if (shiftStartIso || shiftEndIso) {
+              navigate({ search: {}, replace: true });
+            }
+          }
+        }}
+      >
         <DialogContent className="rounded-2xl max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t("handoverPage.newTitle")}</DialogTitle>
             <DialogDescription>{t("handoverPage.newBody")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
+            {shiftWindow && (
+              <div className="rounded-xl bg-primary-soft/60 text-sm px-4 py-3 flex items-start gap-2">
+                <Sparkles className="size-4 mt-0.5 text-primary shrink-0" />
+                <div>
+                  <p className="font-semibold">
+                    {t("handoverPage.prefill.banner")}
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-0.5">
+                    {dateFmt.format(shiftWindow.start)} – {dateFmt.format(shiftWindow.end)}
+                    {prefill && !prefill.hasContent
+                      ? ` · ${t("handoverPage.prefill.nothing")}`
+                      : ""}
+                  </p>
+                </div>
+              </div>
+            )}
             <div>
               <Label className="font-semibold">{t("handoverPage.fields.shift")}</Label>
               <Select
