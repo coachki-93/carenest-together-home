@@ -94,7 +94,8 @@ type TaskSource =
       kind: "appt";
       appt: ExpandedAppointment;
       completion: AppointmentCompletion | null;
-    };
+    }
+  | { kind: "vital"; vital: Vital };
 
 interface TaskItem {
   id: string;
