@@ -283,6 +283,13 @@ export const sv = {
     overdue: "Försenad",
     statusPostponed: "Senarelagd",
     postpone: "Senarelägg",
+    handoverDue: {
+      badge: "Snart",
+      title: "Överlämning snart",
+      body: "Ditt pass slutar {{end}} — skriv en snabb överlämning till nästa vårdgivare.",
+      start: "Starta överlämning",
+      skip: "Hoppa över",
+    },
   },
   taskAction: {
     doneTitle: "Markera som klar",
