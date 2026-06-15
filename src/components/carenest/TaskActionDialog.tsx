@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { CaregiverProfile } from "@/lib/data/caregiver-profiles";
+import type { VitalType } from "@/lib/data/vitals";
 
 export type TaskAction = "done" | "skipped" | "postponed";
 
@@ -28,6 +29,23 @@ export interface TaskActionResult {
   caregiverProfileId: string | null;
   reason: string | null;
   postponedTo: Date | null;
+  vitalValue: number | null;
+  notes: string | null;
+}
+
+export interface VitalSpec {
+  type: VitalType;
+  unit: string;
+  label: string;
+  step?: string;
+  placeholder?: string;
+}
+
+export interface NotesSpec {
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  quickOptions?: string[];
 }
 
 export function TaskActionDialog({
