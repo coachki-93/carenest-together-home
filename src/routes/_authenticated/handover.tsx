@@ -78,6 +78,46 @@ function HandoverPage() {
   const { data: handovers, isLoading } = useHandovers(membership?.family_id);
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
+  const navigate = Route.useNavigate();
+  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso } = Route.useSearch();
+
+  const shiftWindow = useMemo(() => {
+    if (!shiftStartIso || !shiftEndIso) return null;
+    const s = new Date(shiftStartIso);
+    const e = new Date(shiftEndIso);
+    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return null;
+    return { start: s, end: e };
+  }, [shiftStartIso, shiftEndIso]);
+
+  const prefillLabels = useMemo(
+    () => ({
+      medSkipped: t("handoverPage.prefill.medSkipped"),
+      medRefused: t("handoverPage.prefill.medRefused"),
+      medPostponed: t("handoverPage.prefill.medPostponed"),
+      medMissed: t("handoverPage.prefill.medMissed"),
+      apptMissed: t("handoverPage.prefill.apptMissed"),
+      apptCancelled: t("handoverPage.prefill.apptCancelled"),
+      vitalAbnormal: t("handoverPage.prefill.vitalAbnormal"),
+      empty: t("handoverPage.prefill.empty"),
+    }),
+    [t],
+  );
+  const prefillInput =
+    membership?.family_id && shiftWindow
+      ? {
+          familyId: membership.family_id,
+          shiftStart: shiftWindow.start,
+          shiftEnd: shiftWindow.end,
+        }
+      : null;
+  const { data: prefill } = useHandoverPrefill(prefillInput, prefillLabels);
+
+  function shiftLabelFromDate(d: Date): ShiftLabel {
+    const h = d.getHours();
+    if (h < 12) return "morning";
+    if (h < 18) return "afternoon";
+    return "night";
+  }
 
   const [open, setOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Handover | null>(null);
@@ -91,6 +131,18 @@ function HandoverPage() {
     meds: "",
     notes: "",
   });
+
+  // When arriving with shift query params, open dialog + seed from prefill
+  useEffect(() => {
+    if (!shiftWindow || !prefill) return;
+    setForm((prev) => ({
+      ...prev,
+      shift: shiftLabelFromDate(shiftWindow.start),
+      meds: prev.meds || prefill.meds,
+      notes: prev.notes || prefill.notes,
+    }));
+    setOpen(true);
+  }, [shiftWindow, prefill]);
 
   const dateFmt = useMemo(
     () =>
