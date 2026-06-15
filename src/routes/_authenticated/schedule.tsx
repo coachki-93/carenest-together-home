@@ -22,6 +22,14 @@ import {
   Bell,
   UtensilsCrossed,
   Moon,
+  Thermometer,
+  Heart,
+  Wind,
+  Activity,
+  Droplet,
+  Baby,
+  Zap,
+  StickyNote,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
