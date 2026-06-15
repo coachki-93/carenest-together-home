@@ -188,6 +188,9 @@ function HandoverPage() {
       toast.success(t("handoverPage.saved"));
       setOpen(false);
       resetForm();
+      if (shiftStartIso || shiftEndIso) {
+        navigate({ search: {}, replace: true });
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("handoverPage.saveError"));
     }
