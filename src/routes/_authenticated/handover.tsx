@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Plus, Trash2, User, Clock } from "lucide-react";
+import { ClipboardList, Plus, Trash2, User, Clock, Sparkles } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,10 +44,18 @@ import {
   type Handover,
   type ShiftLabel,
 } from "@/lib/data/handovers";
+import { useHandoverPrefill } from "@/lib/data/handover-prefill";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
+
+const handoverSearchSchema = z.object({
+  shiftStart: z.string().optional(),
+  shiftEnd: z.string().optional(),
+});
 
 export const Route = createFileRoute("/_authenticated/handover")({
   head: () => ({ meta: [{ title: "Handover — CareNest" }] }),
+  validateSearch: handoverSearchSchema,
   component: HandoverPage,
 });
 
