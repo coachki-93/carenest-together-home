@@ -30,6 +30,7 @@ type PresetKey =
   | "temperature"
   | "heart_rate"
   | "spo2"
+  | "breathing"
   | "fluids"
   | "diaper"
   | "seizure"
