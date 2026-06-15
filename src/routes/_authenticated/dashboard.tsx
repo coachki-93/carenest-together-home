@@ -1012,7 +1012,15 @@ function DashboardPage() {
           </section>
 
           {/* Handover preview */}
-          <section className="card-soft p-6" data-tour="handover">
+          <section
+            className={cn(
+              "p-6",
+              handoverDue
+                ? "bg-gradient-to-br from-red-50 to-rose-50 border border-red-200 rounded-[var(--radius-2xl)] shadow-[var(--shadow-card)]"
+                : "card-soft",
+            )}
+            data-tour="handover"
+          >
 
             {handoverLoading ? (
               <>
