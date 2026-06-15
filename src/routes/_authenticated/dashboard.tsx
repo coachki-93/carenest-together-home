@@ -244,6 +244,7 @@ function DashboardPage() {
     action: TaskAction;
   } | null>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
+  const [showPastTasks, setShowPastTasks] = useState(false);
   const dismissKey = user?.id ? `carenest.resume.dismissed.${user.id}` : null;
   const [resumeDismissed, setResumeDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined" || !dismissKey) return false;
@@ -688,163 +689,198 @@ function DashboardPage() {
                   </Button>
                 </div>
               </div>
-            ) : (
-              <ul className="space-y-2">
-                {tasks.map((task) => {
-                  const kind: AppointmentKind | "medication" | "vital" =
-                    task.source.kind === "dose"
-                      ? "medication"
-                      : task.source.kind === "vital"
-                        ? "vital"
-                        : task.source.appt.kind;
-                  const tone =
-                    kind === "vital"
-                      ? { bg: "#FEF3C7", fg: "#B45309" }
-                      : kindTone(kind);
-                  const Icon = kind === "vital" ? Activity : kindIcon(kind);
-                  const isCompleted = task.status === "given";
-                  const isSkipped = task.status === "skipped";
-                  const isPostponed = task.status === "postponed";
-                  const isPending = task.status === "pending";
-                  const overdue = task.isOverdue;
-                  return (
-                    <li
-                      key={task.id}
+            ) : (() => {
+              const activeTasks = tasks.filter((tk) => tk.status === "pending");
+              const pastTasks = tasks.filter((tk) => tk.status !== "pending");
+              const renderRow = (task: TaskItem) => {
+                const kind: AppointmentKind | "medication" | "vital" =
+                  task.source.kind === "dose"
+                    ? "medication"
+                    : task.source.kind === "vital"
+                      ? "vital"
+                      : task.source.appt.kind;
+                const tone =
+                  kind === "vital"
+                    ? { bg: "#FEF3C7", fg: "#B45309" }
+                    : kindTone(kind);
+                const Icon = kind === "vital" ? Activity : kindIcon(kind);
+                const isCompleted = task.status === "given";
+                const isSkipped = task.status === "skipped";
+                const isPostponed = task.status === "postponed";
+                const isPending = task.status === "pending";
+                const overdue = task.isOverdue;
+                return (
+                  <li
+                    key={task.id}
+                    className={cn(
+                      "group flex items-start gap-3 md:gap-4 rounded-2xl border p-3 md:p-4 transition-all",
+                      isCompleted
+                        ? "bg-success/5 border-border/60 opacity-80"
+                        : isSkipped
+                          ? "bg-muted/40 border-border/60"
+                          : isPostponed
+                            ? "bg-warning/10 border-warning/30"
+                            : overdue
+                              ? "bg-destructive/5 border-destructive/40"
+                              : "bg-card border-border/60 hover:shadow-soft",
+                    )}
+                  >
+                    <div
                       className={cn(
-                        "group flex items-start gap-3 md:gap-4 rounded-2xl border p-3 md:p-4 transition-all",
-                        isCompleted
-                          ? "bg-success/5 border-border/60 opacity-80"
-                          : isSkipped
-                            ? "bg-muted/40 border-border/60"
-                            : isPostponed
-                              ? "bg-warning/10 border-warning/30"
-                              : overdue
-                                ? "bg-destructive/5 border-destructive/40"
-                                : "bg-card border-border/60 hover:shadow-soft",
+                        "flex items-center gap-1.5 text-sm font-bold w-14 shrink-0 pt-1",
+                        overdue ? "text-destructive" : "text-muted-foreground",
                       )}
                     >
-                      <div
-                        className={cn(
-                          "flex items-center gap-1.5 text-sm font-bold w-14 shrink-0 pt-1",
-                          overdue ? "text-destructive" : "text-muted-foreground",
-                        )}
-                      >
-                        <Clock className="size-3.5" />
-                        {task.timeLabel}
-                      </div>
-                      <div
-                        className="size-11 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: tone.bg, color: tone.fg }}
-                      >
-                        <Icon className="size-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className={cn(
-                              "font-bold truncate",
-                              isCompleted && "line-through text-muted-foreground",
-                            )}
-                          >
-                            {task.title}
+                      <Clock className="size-3.5" />
+                      {task.timeLabel}
+                    </div>
+                    <div
+                      className="size-11 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: tone.bg, color: tone.fg }}
+                    >
+                      <Icon className="size-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className={cn(
+                            "font-bold truncate",
+                            isCompleted && "line-through text-muted-foreground",
+                          )}
+                        >
+                          {task.title}
+                        </span>
+                        {overdue && isPending && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
+                            {t("schedule.overdue")}
                           </span>
-                          {overdue && isPending && (
-                            <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
-                              {t("schedule.overdue")}
-                            </span>
+                        )}
+                        {isSkipped && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+                            {t("schedule.statusSkipped")}
+                          </span>
+                        )}
+                        {isPostponed && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-warning-foreground bg-warning/30 rounded-full px-2 py-0.5">
+                            {t("schedule.statusPostponed")}
+                          </span>
+                        )}
+                      </div>
+                      {task.detail && (
+                        <div className="text-sm text-muted-foreground truncate">
+                          {task.detail}
+                        </div>
+                      )}
+                      {(isCompleted || isSkipped || isPostponed) && (
+                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                          <ByProfile
+                            familyId={familyId}
+                            caregiverProfileId={task.byProfileId}
+                            authorUserId={task.byUserId}
+                            viewerUserId={user?.id}
+                          />
+                          {task.reason && (
+                            <span className="italic">"{task.reason}"</span>
                           )}
-                          {isSkipped && (
-                            <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground bg-muted rounded-full px-2 py-0.5">
-                              {t("schedule.statusSkipped")}
-                            </span>
-                          )}
-                          {isPostponed && (
-                            <span className="text-[10px] font-bold uppercase tracking-wide text-warning-foreground bg-warning/30 rounded-full px-2 py-0.5">
-                              {t("schedule.statusPostponed")}
+                          {isPostponed && task.postponedTo && (
+                            <span>
+                              →{" "}
+                              {task.postponedTo.toLocaleString(
+                                i18n.language === "sv" ? "sv-SE" : "en-US",
+                                { hour: "2-digit", minute: "2-digit", month: "short", day: "numeric" },
+                              )}
                             </span>
                           )}
                         </div>
-                        {task.detail && (
-                          <div className="text-sm text-muted-foreground truncate">
-                            {task.detail}
-                          </div>
-                        )}
-                        {(isCompleted || isSkipped || isPostponed) && (
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                            <ByProfile
-                              familyId={familyId}
-                              caregiverProfileId={task.byProfileId}
-                              authorUserId={task.byUserId}
-                              viewerUserId={user?.id}
-                            />
-                            {task.reason && (
-                              <span className="italic">"{task.reason}"</span>
-                            )}
-                            {isPostponed && task.postponedTo && (
-                              <span>
-                                →{" "}
-                                {task.postponedTo.toLocaleString(
-                                  i18n.language === "sv" ? "sv-SE" : "en-US",
-                                  { hour: "2-digit", minute: "2-digit", month: "short", day: "numeric" },
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {isPending ? (
-                          <>
-                            <Button
-                              size="sm"
-                              className="rounded-full font-bold"
-                              onClick={() => setPendingAction({ task, action: "done" })}
-                            >
-                              <CheckCircle2 className="size-4" />
-                              <span className="hidden sm:inline ml-1">
-                                {t("dashboard.markDone")}
-                              </span>
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="rounded-full font-bold"
-                              onClick={() => setPendingAction({ task, action: "skipped" })}
-                              aria-label={t("schedule.skip")}
-                              title={t("schedule.skip")}
-                            >
-                              <X className="size-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="rounded-full font-bold"
-                              onClick={() => setPendingAction({ task, action: "postponed" })}
-                              aria-label={t("schedule.postpone")}
-                              title={t("schedule.postpone")}
-                            >
-                              <CalendarClock className="size-4" />
-                            </Button>
-                          </>
-                        ) : (
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {isPending ? (
+                        <>
                           <Button
                             size="sm"
-                            variant="ghost"
-                            className="rounded-full font-semibold text-muted-foreground"
-                            onClick={() => undoTask(task)}
+                            className="rounded-full font-bold"
+                            onClick={() => setPendingAction({ task, action: "done" })}
                           >
-                            <Undo2 className="size-4" />
+                            <CheckCircle2 className="size-4" />
                             <span className="hidden sm:inline ml-1">
-                              {t("schedule.undo")}
+                              {t("dashboard.markDone")}
                             </span>
                           </Button>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-full font-bold"
+                            onClick={() => setPendingAction({ task, action: "skipped" })}
+                            aria-label={t("schedule.skip")}
+                            title={t("schedule.skip")}
+                          >
+                            <X className="size-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-full font-bold"
+                            onClick={() => setPendingAction({ task, action: "postponed" })}
+                            aria-label={t("schedule.postpone")}
+                            title={t("schedule.postpone")}
+                          >
+                            <CalendarClock className="size-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="rounded-full font-semibold text-muted-foreground"
+                          onClick={() => undoTask(task)}
+                        >
+                          <Undo2 className="size-4" />
+                          <span className="hidden sm:inline ml-1">
+                            {t("schedule.undo")}
+                          </span>
+                        </Button>
+                      )}
+                    </div>
+                  </li>
+                );
+              };
+              return (
+                <>
+                  {activeTasks.length > 0 ? (
+                    <ul className="space-y-2">{activeTasks.map(renderRow)}</ul>
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground">
+                      {t("schedule.allCaughtUp")}
+                    </div>
+                  )}
+                  {pastTasks.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-border/50">
+                      <button
+                        type="button"
+                        onClick={() => setShowPastTasks((v) => !v)}
+                        className="w-full flex items-center justify-between gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <span>
+                          {showPastTasks
+                            ? t("schedule.hidePrevious")
+                            : t("schedule.showPrevious", { count: pastTasks.length })}
+                        </span>
+                        <ChevronRight
+                          className={cn(
+                            "size-4 transition-transform",
+                            showPastTasks && "rotate-90",
+                          )}
+                        />
+                      </button>
+                      {showPastTasks && (
+                        <ul className="space-y-2 mt-3">{pastTasks.map(renderRow)}</ul>
+                      )}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </section>
         </div>
 

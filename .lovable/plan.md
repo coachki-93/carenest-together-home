@@ -1,92 +1,60 @@
 ## Goal
 
-When a caregiver's shift is about to end, surface a "Handover due" task in the schedule 30 minutes before `shift.end_at`. Opening it shows the handover form **pre-filled** with everything that happened during that shift window — missed/skipped/postponed meds, missed appointments, abnormal vitals, and still-open tasks. The caregiver reviews, edits, and submits.
+Stop the Today page and Schedule page from stacking finished items inline. Move them into their own collapsible "Previous tasks" section that's hidden by default, with a counter and a toggle button. Pending and overdue items keep their current placement.
 
-## Approach
+## What counts as "previous"
 
-Derive the reminder at runtime instead of inserting rows into the DB. For each expanded shift occurrence we already compute in the schedule view, we emit a synthetic "Handover due" entry at `end - 30min`. No new table, no cron, no drift if a shift is edited/deleted.
+Any task whose status is `given`, `skipped`, or `postponed` (including spontaneous events logged via Quick Log, which already render with `status = "given"`). Pending and overdue items stay in the main list as they are today.
 
-The pre-fill is generated on the fly from existing data the moment the dialog opens — querying meds, appointments, vitals for `[shift.start, shift.end]`.
+## UI changes
 
-## What lands in the schedule
+**Today's page (`src/routes/_authenticated/dashboard.tsx`)**
 
-```text
-Mon  ┌───────────────┐
-     │ Morning shift │  07:00 – 14:00
-     │   Anna        │
-     └───────────────┘
-     ⏰ Handover due  13:30   ← new synthetic card, amber/accent
-```
+- Split the existing `tasks` array into `activeTasks` (pending/overdue) and `pastTasks` (given/skipped/postponed).
+- Render `activeTasks` exactly as today inside the "Today's schedule" card.
+- Below the active list, render a slim divider + a ghost button:
+  - Label: `t("schedule.showPrevious", { count })` → "Show previous tasks ({{count}})" / "Visa tidigare uppgifter ({{count}})".
+  - Chevron rotates when expanded; second label `t("schedule.hidePrevious")`.
+- When expanded, render `pastTasks` using the same row component already used for the active list (keeps undo + attribution intact).
+- Empty state unchanged. If `pastTasks.length === 0`, the toggle is not rendered.
 
-- Renders only for shifts assigned to the **current user's** caregiver profile (you don't see other caregivers' handover prompts).
-- Only shows when `now < shift.end` (don't nag after the shift is over and a handover already exists for it).
-- Clicking opens the existing handover dialog in `/handover`, pre-filled.
-- A "Skip" affordance dismisses it (stored in localStorage per shift-occurrence id).
+**Schedule page (`src/routes/_authenticated/schedule.tsx`)**
 
-## What gets pre-filled
+- Same split applied per day group in the timeline. Within each day, render active rows first, then a collapsible "Previous tasks ({{n}})" section underneath.
+- For days entirely in the past (every row is done/skipped), default the section to collapsed too, with the same toggle.
 
-For the shift window `[shift.start, shift.end]`:
+**State**
 
-- **Meds field** — bulleted list of every `med_log` with status `skipped`, `refused`, or `postponed`, plus any scheduled dose with no log yet (= missed). Each line includes med name, scheduled time, status, and the reason note when present.
-  - Example: `• 12:00 Keppra — postponed to 14:00 (child napping)`
-- **Notes field** — any appointment in the window marked `cancelled` or with no completion row (missed), and any vitals reading flagged out-of-range.
-- **Summary** — left blank for the caregiver to write the human takeaway.
-- Other fields (`sleep`, `mood`, `seizures`, `fluids`) — left blank; pre-fill only what we can derive factually.
+- Local `useState<boolean>` per page (and per day on the schedule). No persistence — it resets on navigation, which keeps the page tidy by default.
 
-If nothing eventful happened, the meds/notes fields show "Nothing to flag" placeholder text instead of empty.
+**i18n**
 
-## Technical details
-
-### New helper: `src/lib/data/handover-prefill.ts`
-
-```ts
-export interface HandoverPrefillInput {
-  familyId: string;
-  childId: string;
-  shiftStart: Date;
-  shiftEnd: Date;
-}
-
-export interface HandoverPrefill {
-  meds: string;   // ready-to-paste multiline text
-  notes: string;
-  hasContent: boolean;
-}
-
-export function useHandoverPrefill(input: HandoverPrefillInput | null): UseQueryResult<HandoverPrefill>
-```
-
-Uses existing `med_logs`, `medications`, `appointments` (+ completions), `vitals` queries scoped to the window. Returns formatted strings.
-
-### Schedule view changes (`src/routes/_authenticated/schedule.tsx`)
-
-- For each expanded `ShiftOccurrence` where `caregiverUserId === currentUser.id` and `end > now`, push a synthetic schedule item `{ kind: 'handover-due', at: end - 30min, shiftStart, shiftEnd }`.
-- Filter out occurrences the user dismissed (localStorage `carenest.handover-skipped.<masterId>:<startMs>`).
-- Render with an amber/accent card distinct from appointments and shifts; clicking calls `navigate({ to: '/handover', search: { shiftStart, shiftEnd } })`.
-
-### Handover route changes (`src/routes/_authenticated/handover.tsx`)
-
-- Add `validateSearch` for optional `shiftStart` / `shiftEnd` ISO strings.
-- When present, auto-open the dialog and seed `form.meds` + `form.notes` from `useHandoverPrefill`. Show a small banner: "Pre-filled from your <morning> shift · <time range>".
-- On submit, the dialog still uses the existing `useCreateHandover` mutation — no schema changes needed.
-
-### i18n
-
-Add keys to both `en.ts` and `sv.ts` under `handoverPage`:
-- `due` ("Handover due")
-- `prefilledBanner`, `prefillEmpty`, `skip`
-- `prefill.medSkipped`, `prefill.medRefused`, `prefill.medPostponed`, `prefill.medMissed`
-- `prefill.apptMissed`, `prefill.vitalAbnormal`
-
-## Out of scope (per your call)
-
-- Push/email notifications at T-30 (skipped).
-- Storing handover-due reminders in the DB (not needed — derived at runtime).
-- Cron jobs.
+Add to both `en.ts` and `sv.ts` under `schedule`:
+- `showPrevious`: "Show previous tasks ({{count}})" / "Visa tidigare uppgifter ({{count}})"
+- `hidePrevious`: "Hide previous tasks" / "Dölj tidigare uppgifter"
+- `previousSection`: "Previous tasks" / "Tidigare uppgifter"
 
 ## Files touched
 
-- new: `src/lib/data/handover-prefill.ts`
-- edit: `src/routes/_authenticated/schedule.tsx` (render synthetic card + dismiss)
-- edit: `src/routes/_authenticated/handover.tsx` (search params + prefill seeding)
-- edit: `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts`
+- `src/routes/_authenticated/dashboard.tsx` — split task list, add toggle.
+- `src/routes/_authenticated/schedule.tsx` — same split per day group.
+- `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts` — new keys.
+
+No DB changes, no new components required (rows are reused).
+
+---
+
+## On your second question: notifications on iPad
+
+Short version: **yes, but with limits, and only after the user installs the app to the Home Screen.**
+
+- **iPad / iPhone (Safari)**: Web Push works on iOS/iPadOS 16.4+, but **only** after the user adds the site to the Home Screen ("Add to Home Screen") and opens it from that icon. Notifications won't work in a regular Safari tab — that's an Apple restriction, not something the code can bypass.
+- **Android (Chrome/Edge/Firefox)**: Works in the regular browser tab, no install required.
+- **Desktop (Chrome, Edge, Firefox, Safari)**: Works directly in the browser.
+
+To make this work the app needs:
+1. A small PWA setup (manifest + service worker) so iPads can install it to the Home Screen.
+2. A push provider — either Web Push (VAPID keys, free, more setup) or Firebase Cloud Messaging (easier API, free tier).
+3. A backend job that triggers a push when something happens (e.g. 30 minutes before shift end → handover reminder; missed dose → caregiver ping).
+
+This is a separate piece of work from the task-list cleanup above. If you want it, say the word and I'll plan it out — including which provider fits best and what the install flow looks like for caregivers on iPad.
