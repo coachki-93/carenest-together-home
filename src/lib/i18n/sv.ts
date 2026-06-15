@@ -478,6 +478,7 @@ export const sv = {
     saveError: "Kunde inte spara profilen",
     emptyTitle: "Ingen barnprofil än",
     emptyBody: "Slutför introduktionen för att skapa barnets profil.",
+    readOnlyNotice: "Du visar profilen som vårdgivare. Endast familjens ägare kan göra ändringar.",
   },
   caregiversPage: {
     subtitle: "Ditt vårdteam och väntande inbjudningar.",
