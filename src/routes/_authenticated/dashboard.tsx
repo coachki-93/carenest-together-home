@@ -1279,8 +1279,19 @@ function DashboardPage() {
         profiles={caregiverProfilesForActions}
         defaultProfileId={suggestedCaregiverId ?? activeCaregiverId ?? null}
         onConfirm={handleTaskAction}
-        submitting={logDose.isPending || logAppt.isPending}
+        submitting={logDose.isPending || logAppt.isPending || logVital.isPending}
+        vitalSpec={
+          pendingAction?.task.source.kind === "appt"
+            ? buildVitalSpec(pendingAction.task.source.appt.kind as AppointmentKind, t)
+            : null
+        }
+        notesSpec={
+          pendingAction?.task.source.kind === "appt"
+            ? buildNotesSpec(pendingAction.task.source.appt.kind as AppointmentKind, t)
+            : null
+        }
       />
+
 
       <GuidedTour
         open={tourOpen}
