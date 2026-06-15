@@ -418,50 +418,87 @@ function SchedulePage() {
             </Button>
           </div>
         </div>
-      ) : (
-        <ol className="space-y-3">
-          {timeline.map((item) => {
-            if (item.kind === "dose") {
-              return (
-                <DoseRow
-                  key={item.key}
-                  dose={item.dose}
-                  now={now}
-                  onMark={(status) => setConfirm({ dose: item.dose, status })}
-                  onUndo={() => {
-                    if (item.dose.log) {
-                      deleteLog.mutate(item.dose.log.id, {
-                        onSuccess: () => toast.success(t("schedule.doseUndone")),
-                        onError: (e) => toast.error((e as Error).message),
-                      });
-                    }
-                  }}
-                />
-              );
-            }
-            if (item.kind === "handover") {
-              return (
-                <HandoverDueRow
-                  key={item.key}
-                  at={item.at}
-                  shiftStart={item.shiftStart}
-                  shiftEnd={item.shiftEnd}
-                  onDismiss={() => dismissHandover(item.dismissId)}
-                />
-              );
-            }
+      ) : (() => {
+        const renderItem = (item: TimelineItem) => {
+          if (item.kind === "dose") {
             return (
-              <AppointmentRow
+              <DoseRow
                 key={item.key}
-                appt={item.appt}
-                onEdit={() => openEditAppt(item.appt)}
-                onDelete={() => setConfirmDeleteAppt(item.appt)}
-                canManage={item.appt.created_by === user?.id || membership?.role === "owner"}
+                dose={item.dose}
+                now={now}
+                onMark={(status) => setConfirm({ dose: item.dose, status })}
+                onUndo={() => {
+                  if (item.dose.log) {
+                    deleteLog.mutate(item.dose.log.id, {
+                      onSuccess: () => toast.success(t("schedule.doseUndone")),
+                      onError: (e) => toast.error((e as Error).message),
+                    });
+                  }
+                }}
               />
             );
-          })}
-        </ol>
-      )}
+          }
+          if (item.kind === "handover") {
+            return (
+              <HandoverDueRow
+                key={item.key}
+                at={item.at}
+                shiftStart={item.shiftStart}
+                shiftEnd={item.shiftEnd}
+                onDismiss={() => dismissHandover(item.dismissId)}
+              />
+            );
+          }
+          return (
+            <AppointmentRow
+              key={item.key}
+              appt={item.appt}
+              onEdit={() => openEditAppt(item.appt)}
+              onDelete={() => setConfirmDeleteAppt(item.appt)}
+              canManage={item.appt.created_by === user?.id || membership?.role === "owner"}
+            />
+          );
+        };
+        const isPast = (item: TimelineItem) =>
+          item.kind === "dose" && !!item.dose.log?.status;
+        const activeItems = timeline.filter((it) => !isPast(it));
+        const pastItems = timeline.filter(isPast);
+        return (
+          <>
+            {activeItems.length > 0 ? (
+              <ol className="space-y-3">{activeItems.map(renderItem)}</ol>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground">
+                {t("schedule.allCaughtUp")}
+              </div>
+            )}
+            {pastItems.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <button
+                  type="button"
+                  onClick={() => setShowPastItems((v) => !v)}
+                  className="w-full flex items-center justify-between gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <span>
+                    {showPastItems
+                      ? t("schedule.hidePrevious")
+                      : t("schedule.showPrevious", { count: pastItems.length })}
+                  </span>
+                  <ChevronRight
+                    className={cn(
+                      "size-4 transition-transform",
+                      showPastItems && "rotate-90",
+                    )}
+                  />
+                </button>
+                {showPastItems && (
+                  <ol className="space-y-3 mt-3">{pastItems.map(renderItem)}</ol>
+                )}
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       <AppointmentDialog
         open={apptOpen}
