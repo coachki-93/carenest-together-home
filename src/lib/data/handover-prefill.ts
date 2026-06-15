@@ -197,9 +197,10 @@ export function useHandoverPrefill(
         const key = `${a.id}|${start.toISOString()}`;
         const c = completionByKey.get(key);
         const time = fmtTime(start);
-        if (c?.status === "cancelled") {
+        if (c?.status === "skipped" || c?.status === "postponed") {
+          const label = c.status === "skipped" ? labels.apptCancelled : labels.apptMissed;
           noteLines.push(
-            `• ${time} ${a.title} — ${labels.apptCancelled}${c.reason ? ` (${c.reason})` : ""}`,
+            `• ${time} ${a.title} — ${label}${c.reason ? ` (${c.reason})` : ""}`,
           );
         } else if (!c && start < new Date()) {
           noteLines.push(`• ${time} ${a.title} — ${labels.apptMissed}`);
