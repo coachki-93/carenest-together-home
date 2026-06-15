@@ -80,6 +80,8 @@ import {
   type AppointmentKind,
   type RecurrenceFreq,
 } from "@/lib/data/appointments";
+import { useShifts, expandShifts } from "@/lib/data/shifts";
+import { ClipboardCheck } from "lucide-react";
 
 type RepeatMode = "none" | RecurrenceFreq;
 
@@ -140,7 +142,15 @@ function isSameDay(a: Date, b: Date) {
 
 type TimelineItem =
   | { kind: "dose"; key: string; at: Date; dose: ScheduledDose }
-  | { kind: "appt"; key: string; at: Date; appt: ExpandedAppointment };
+  | { kind: "appt"; key: string; at: Date; appt: ExpandedAppointment }
+  | {
+      kind: "handover";
+      key: string;
+      at: Date;
+      shiftStart: Date;
+      shiftEnd: Date;
+      dismissId: string;
+    };
 
 function SchedulePage() {
   const { t, i18n } = useTranslation();
