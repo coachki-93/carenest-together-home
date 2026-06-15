@@ -448,7 +448,7 @@ function DashboardPage() {
           reason: result.reason,
           postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
         });
-      } else {
+      } else if (task.source.kind === "appt") {
         const a = task.source.appt;
         await logAppt.mutateAsync({
           family_id: familyId,
