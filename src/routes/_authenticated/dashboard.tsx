@@ -65,6 +65,11 @@ import {
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
 import {
+  useHandoverDueItem,
+  useDismissedHandovers,
+} from "@/lib/data/handover-due";
+import { ClipboardCheck } from "lucide-react";
+import {
   TaskActionDialog,
   type TaskAction,
   type TaskActionResult,
@@ -238,6 +243,15 @@ function DashboardPage() {
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
   const navigate = useNavigate();
+  const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
+    useDismissedHandovers(user?.id);
+  const handoverDue = useHandoverDueItem(
+    shifts,
+    user?.id,
+    todayStart,
+    todayEnd,
+    dismissedHandovers,
+  );
   const search = Route.useSearch();
   const [pendingAction, setPendingAction] = useState<{
     task: TaskItem;
@@ -636,6 +650,14 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
+          {handoverDue && (
+            <HandoverDueBanner
+              at={handoverDue.at}
+              shiftStart={handoverDue.shiftStart}
+              shiftEnd={handoverDue.shiftEnd}
+              onDismiss={() => dismissHandover(handoverDue.dismissId)}
+            />
+          )}
           <section className="card-soft p-6" data-tour="today-schedule">
 
             <div className="flex items-center justify-between mb-4">
@@ -1180,6 +1202,71 @@ function HandoverItem({ label, value }: { label: string; value: string }) {
       <span className="text-muted-foreground font-semibold shrink-0">{label}</span>
       <span className="text-right font-medium">{value}</span>
     </li>
+  );
+}
+
+function HandoverDueBanner({
+  at,
+  shiftStart,
+  shiftEnd,
+  onDismiss,
+}: {
+  at: Date;
+  shiftStart: Date;
+  shiftEnd: Date;
+  onDismiss: () => void;
+}) {
+  const { t, i18n } = useTranslation();
+  const timeFmt = new Intl.DateTimeFormat(
+    i18n.language === "sv" ? "sv-SE" : "en-US",
+    { hour: "2-digit", minute: "2-digit" },
+  );
+  return (
+    <div className="card-soft p-4 mb-4 flex items-center gap-4 border-2 border-warning/60 bg-warning/5">
+      <div className="text-center shrink-0 w-16">
+        <div className="text-xl font-extrabold tabular-nums">
+          {timeFmt.format(at)}
+        </div>
+        <div className="text-[10px] font-bold uppercase text-warning-foreground/80 mt-0.5">
+          {t("schedule.handoverDue.badge")}
+        </div>
+      </div>
+      <div className="size-12 rounded-2xl flex items-center justify-center shrink-0 bg-warning/30 text-warning-foreground">
+        <ClipboardCheck className="size-6" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <h3 className="font-extrabold truncate">
+          {t("schedule.handoverDue.title")}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {t("schedule.handoverDue.body", {
+            start: timeFmt.format(shiftStart),
+            end: timeFmt.format(shiftEnd),
+          })}
+        </p>
+      </div>
+      <div className="flex gap-2 shrink-0">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="rounded-full"
+          onClick={onDismiss}
+        >
+          {t("schedule.handoverDue.skip")}
+        </Button>
+        <Button asChild size="sm" className="rounded-full font-semibold">
+          <Link
+            to="/handover"
+            search={{
+              shiftStart: shiftStart.toISOString(),
+              shiftEnd: shiftEnd.toISOString(),
+            }}
+          >
+            {t("schedule.handoverDue.start")}
+          </Link>
+        </Button>
+      </div>
+    </div>
   );
 }
 
