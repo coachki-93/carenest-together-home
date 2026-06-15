@@ -37,7 +37,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT, useDeleteVital, type Vital } from "@/lib/data/vitals";
+import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT, useDeleteVital, useLogVital, type Vital, type VitalType } from "@/lib/data/vitals";
 import { useLatestHandover } from "@/lib/data/handovers";
 import {
   buildTodaysDoses,
