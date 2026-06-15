@@ -264,6 +264,7 @@ function SchedulePage() {
   const [apptOpen, setApptOpen] = useState(false);
   const [editing, setEditing] = useState<ExpandedAppointment | null>(null);
   const [confirmDeleteAppt, setConfirmDeleteAppt] = useState<ExpandedAppointment | null>(null);
+  const [showPastItems, setShowPastItems] = useState(false);
 
   const now = new Date();
   const stats = isToday
