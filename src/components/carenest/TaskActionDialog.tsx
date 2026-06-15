@@ -58,6 +58,8 @@ export function TaskActionDialog({
   defaultProfileId,
   onConfirm,
   submitting,
+  vitalSpec,
+  notesSpec,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -68,17 +70,23 @@ export function TaskActionDialog({
   defaultProfileId: string | null;
   onConfirm: (result: TaskActionResult) => void | Promise<void>;
   submitting?: boolean;
+  vitalSpec?: VitalSpec | null;
+  notesSpec?: NotesSpec | null;
 }) {
   const { t } = useTranslation();
   const [profileId, setProfileId] = useState<string | null>(defaultProfileId);
   const [reason, setReason] = useState("");
   const [postponedDate, setPostponedDate] = useState("");
   const [postponedTime, setPostponedTime] = useState("");
+  const [vitalValue, setVitalValue] = useState("");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setProfileId(defaultProfileId);
     setReason("");
+    setVitalValue("");
+    setNotes("");
     // Default postpone to scheduled + 1 hour, local
     const plusOneHour = new Date(scheduledFor.getTime() + 60 * 60 * 1000);
     const pad = (n: number) => String(n).padStart(2, "0");
