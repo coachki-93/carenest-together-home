@@ -283,6 +283,13 @@ export const en = {
     overdue: "Overdue",
     statusPostponed: "Postponed",
     postpone: "Postpone",
+    handoverDue: {
+      badge: "Due",
+      title: "Handover due soon",
+      body: "Your shift ends at {{end}} — write a quick handover for the next caregiver.",
+      start: "Start handover",
+      skip: "Skip",
+    },
   },
   taskAction: {
     doneTitle: "Mark as done",
