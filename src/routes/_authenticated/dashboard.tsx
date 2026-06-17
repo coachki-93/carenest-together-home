@@ -1316,6 +1316,96 @@ function DashboardPage() {
   );
 }
 
+function OxygenBar({
+  familyId,
+  activeOxygen,
+  isLoading,
+  now,
+}: {
+  familyId: string | undefined;
+  activeOxygen: OxygenTank | null | undefined;
+  isLoading: boolean;
+  now: Date;
+}) {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  if (!familyId) return null;
+
+  const remainingInfo = activeOxygen ? computeRemaining(activeOxygen, now) : null;
+  const status = remainingInfo?.status ?? "ok";
+  const percent = remainingInfo ? Math.round(remainingInfo.percentRemaining) : 0;
+
+  const statusBar: Record<NonNullable<typeof status>, string> = {
+    ok: "bg-primary",
+    low: "bg-warning",
+    critical: "bg-destructive",
+    empty: "bg-muted",
+  };
+
+  const dateFmt = new Intl.DateTimeFormat(
+    i18n.language === "sv" ? "sv-SE" : "en-US",
+    { weekday: "short", hour: "2-digit", minute: "2-digit" },
+  );
+
+  return (
+    <section className="card-soft p-4">
+      {isLoading ? (
+        <div className="flex items-center gap-3">
+          <Skeleton className="size-10 rounded-xl" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-4 w-24 rounded" />
+            <Skeleton className="h-3 w-40 rounded" />
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => navigate({ to: "/oxygen" })}
+          className="w-full text-left group"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center shrink-0">
+                <Wind className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-extrabold truncate">{t("dashboard.oxygenTitle")}</div>
+                {activeOxygen && remainingInfo ? (
+                  <div className="text-xs text-muted-foreground font-medium truncate">
+                    {formatFlow(activeOxygen.flow_lpm)} · {formatDuration(remainingInfo.remainingMinutes)}{" "}
+                    {t("dashboard.oxygenRemaining")}
+                  </div>
+                ) : (
+                  <div className="text-xs text-muted-foreground font-medium">
+                    {t("dashboard.oxygenEmpty")}
+                  </div>
+                )}
+              </div>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground shrink-0 group-hover:text-foreground transition-colors" />
+          </div>
+          {activeOxygen && remainingInfo && (
+            <div className="mt-3">
+              <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full transition-all duration-500", statusBar[status])}
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+              <div className="mt-1.5 flex justify-between text-xs text-muted-foreground font-medium">
+                <span>{t("oxygen.percentLeft", { percent })}</span>
+                <span>
+                  {t("oxygen.estimatedEmpty")}: {remainingInfo.remainingMinutes > 0 ? dateFmt.format(remainingInfo.emptyAt) : "—"}
+                </span>
+              </div>
+            </div>
+          )}
+        </button>
+      )}
+    </section>
+  );
+}
+
 function VitalTile({
   icon: Icon,
   label,
