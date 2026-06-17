@@ -684,6 +684,53 @@ export type Database = {
           },
         ]
       }
+      oxygen_tanks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          family_id: string
+          flow_lpm: number
+          id: string
+          notes: string | null
+          replaced_at: string | null
+          started_at: string
+          tank_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          family_id: string
+          flow_lpm: number
+          id?: string
+          notes?: string | null
+          replaced_at?: string | null
+          started_at?: string
+          tank_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          family_id?: string
+          flow_lpm?: number
+          id?: string
+          notes?: string | null
+          replaced_at?: string | null
+          started_at?: string
+          tank_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oxygen_tanks_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
