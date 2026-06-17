@@ -473,3 +473,37 @@ function ChangeFlowDialog({
     </Dialog>
   );
 }
+
+function ChangeFlowPreview({ tank, newFlow }: { tank: OxygenTank; newFlow: number }) {
+  const { t } = useTranslation();
+  const info = computeRemaining(tank);
+  const newTotal = durationMinutes(tank.tank_type as TankType, newFlow);
+  if (!info || newTotal == null) return null;
+  const pct = info.percentRemaining / 100;
+  const newRemaining = Math.min(newTotal, Math.max(0, pct * newTotal));
+  const newEmptyAt = new Date(Date.now() + newRemaining * 60000);
+  const percentLabel = Math.round(info.percentRemaining);
+
+  return (
+    <div className="rounded-xl border bg-muted/40 p-4 space-y-3 text-sm">
+      <p className="font-semibold">{t("oxygen.changeFlowPreviewTitle")}</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <p className="text-xs text-muted-foreground">{t("oxygen.changeFlowCurrent")}</p>
+          <p className="font-semibold tabular-nums">{formatFlow(Number(tank.flow_lpm))}</p>
+          <p className="text-muted-foreground tabular-nums">{formatDuration(info.remainingMinutes)} · {percentLabel}%</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">{t("oxygen.changeFlowAfter")}</p>
+          <p className="font-semibold tabular-nums">{formatFlow(newFlow)}</p>
+          <p className="text-muted-foreground tabular-nums">{formatDuration(newRemaining)} · {percentLabel}%</p>
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">{t("oxygen.changeFlowCarried", { percent: percentLabel })}</p>
+      <p className="text-xs">
+        <span className="text-muted-foreground">{t("oxygen.changeFlowNewEmpty")}: </span>
+        <span className="font-semibold tabular-nums">{format(newEmptyAt, "MMM d, HH:mm")}</span>
+      </p>
+    </div>
+  );
+}
