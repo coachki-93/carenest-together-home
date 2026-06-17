@@ -157,7 +157,9 @@ export const sv = {
     schedule: "Schema",
     medications: "Mediciner",
     vitals: "Mätvärden",
+    oxygen: "Syrgas",
     handover: "Överlämning",
+
     child: "Barnets profil",
     caregivers: "Vårdteam",
     shifts: "Pass",

@@ -157,7 +157,9 @@ export const en = {
     schedule: "Schedule",
     medications: "Medications",
     vitals: "Vitals",
+    oxygen: "Oxygen",
     handover: "Handover",
+
     child: "Child profile",
     caregivers: "Care team",
     shifts: "Shifts",

@@ -10,7 +10,9 @@ import {
   Users,
   CalendarDays,
   Settings,
+  Wind,
 } from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
@@ -36,8 +38,10 @@ export function AppSidebar() {
     { title: t("nav.schedule"), url: "/schedule", icon: CalendarClock },
     { title: t("nav.medications"), url: "/medications", icon: Pill },
     { title: t("nav.vitals"), url: "/vitals", icon: Activity },
+    { title: t("nav.oxygen"), url: "/oxygen", icon: Wind },
     { title: t("nav.handover"), url: "/handover", icon: ClipboardList },
   ];
+
   const family = [
     { title: t("nav.child"), url: "/child", icon: Baby },
     { title: t("nav.caregivers"), url: "/caregivers", icon: Users },
