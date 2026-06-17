@@ -22,6 +22,7 @@ import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedShiftsRouteImport } from './routes/_authenticated/shifts'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
+import { Route as AuthenticatedOxygenRouteImport } from './routes/_authenticated/oxygen'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
@@ -96,6 +97,11 @@ const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
   path: '/schedule',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOxygenRoute = AuthenticatedOxygenRouteImport.update({
+  id: '/oxygen',
+  path: '/oxygen',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMedicationsRoute =
   AuthenticatedMedicationsRouteImport.update({
     id: '/medications',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/medications': typeof AuthenticatedMedicationsRoute
+  '/oxygen': typeof AuthenticatedOxygenRoute
   '/schedule': typeof AuthenticatedScheduleRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shifts': typeof AuthenticatedShiftsRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/medications': typeof AuthenticatedMedicationsRoute
+  '/oxygen': typeof AuthenticatedOxygenRoute
   '/schedule': typeof AuthenticatedScheduleRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shifts': typeof AuthenticatedShiftsRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
+  '/_authenticated/oxygen': typeof AuthenticatedOxygenRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shifts': typeof AuthenticatedShiftsRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/handover'
     | '/home'
     | '/medications'
+    | '/oxygen'
     | '/schedule'
     | '/settings'
     | '/shifts'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/handover'
     | '/home'
     | '/medications'
+    | '/oxygen'
     | '/schedule'
     | '/settings'
     | '/shifts'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/_authenticated/handover'
     | '/_authenticated/home'
     | '/_authenticated/medications'
+    | '/_authenticated/oxygen'
     | '/_authenticated/schedule'
     | '/_authenticated/settings'
     | '/_authenticated/shifts'
@@ -392,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScheduleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/oxygen': {
+      id: '/_authenticated/oxygen'
+      path: '/oxygen'
+      fullPath: '/oxygen'
+      preLoaderRoute: typeof AuthenticatedOxygenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/medications': {
       id: '/_authenticated/medications'
       path: '/medications'
@@ -465,6 +484,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
+  AuthenticatedOxygenRoute: typeof AuthenticatedOxygenRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedShiftsRoute: typeof AuthenticatedShiftsRoute
@@ -480,6 +500,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
+  AuthenticatedOxygenRoute: AuthenticatedOxygenRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedShiftsRoute: AuthenticatedShiftsRoute,
