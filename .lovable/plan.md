@@ -1,66 +1,72 @@
 ## Goal
-Every appointment/task in CareNest fires a push notification on the caregiver's iPad (and any other device that installed the app to its home screen), with zero setup work for you.
+Add a new **Oxygen** page where caregivers track the current oxygen tank (LIV Mini 2 L med lågflödesväljare) and see how long it will last at the chosen flow rate, with a live countdown to "empty".
 
-## Provider choice: Web Push (VAPID) — no work for you
-Comparison:
-- **Web Push + VAPID** — I generate the keys, store them as backend secrets, done. No third-party account, no console, no billing. Works on iOS 16.4+ installed PWAs, Android Chrome, desktop. **← Recommended**
-- **Firebase Cloud Messaging** — you'd need to create a Firebase project, generate a server key, paste config. More steps for you. No real benefit here since we already have a backend.
+## How I suggest tackling it
 
-Going with **Web Push + VAPID**.
+### 1. Hard-code the duration table (no DB needed for the lookup)
+The minutes-per-flow values from the bottle's spec sheet don't change — they're a property of the equipment, not user data. I'll store them as a constant in `src/lib/oxygen/tanks.ts`:
 
-## Prerequisites (iOS reality check)
-- iPad must run iPadOS 16.4 or newer.
-- The app must be added to the Home Screen (you already did this) and opened from that icon — Safari tabs cannot receive push.
-- The user must tap "Allow" on the permission prompt once, from inside the installed app.
-
-## What I'll build
-
-### 1. Make it an installable PWA (manifest only, no offline)
-- `public/manifest.webmanifest` with name, theme color, `display: "standalone"`, icons.
-- App icons (192, 512, maskable, Apple touch icon) generated and dropped in `public/`.
-- `<link rel="manifest">`, `theme-color`, `apple-touch-icon` tags in `__root.tsx` head.
-
-### 2. Push service worker
-- `public/push-sw.js` — handles `push` and `notificationclick` events only (not an app-shell cache, safe for Lovable preview).
-- Shows the notification, and on click focuses the app and navigates to `/dashboard` or the specific task.
-
-### 3. Subscription flow
-- New `usePushSubscription` hook + a "Enable notifications" button in Settings (and a soft prompt on Dashboard for first-time caregivers).
-- Registers the SW, calls `pushManager.subscribe({ applicationServerKey: VAPID_PUBLIC })`, stores the subscription in a new `push_subscriptions` table keyed by `user_id` + `family_id`.
-- Bilingual strings (EN + SV) for the prompt, button, success/error toasts.
-
-### 4. Database
-Migration adds:
+```ts
+// LIV Mini 2 L med lågflödesväljare
+{ flow: 0.01, minutes: 27*1440 }, // 27 d
+{ flow: 0.02, minutes: 13*1440 + 12*60 }, // 13 d 12 h
+{ flow: 0.03, minutes: 9*1440 },
+...
+{ flow: 0.20, minutes: 22*60 },
 ```
-public.push_subscriptions (
-  id, user_id, family_id, endpoint unique, p256dh, auth,
-  user_agent, created_at, last_seen_at
-)
+
+Structured so adding more tank types later (e.g. LIV Mini 1.1 L) is just another entry in a `TANKS` record.
+
+### 2. One DB table: `oxygen_tanks`
+Tracks the currently-mounted tank per family:
 ```
-With RLS + grants per your rules (users manage their own rows; service_role full access for the sender).
+id, family_id, tank_type ('liv_mini_2l'), flow_lpm numeric,
+started_at timestamptz, replaced_at timestamptz null, notes,
+created_at, created_by
+```
+RLS: family members read/insert/update their own family's rows. Standard grants.
 
-### 5. Sending notifications for every task
-Two trigger points so **every** task gets one:
-- **Scheduled trigger** — `pg_cron` runs every minute, calls a `/api/public/hooks/dispatch-task-notifications` server route. Route finds appointments due in the next minute that haven't been notified yet, sends a web-push to every subscription in that family, marks them sent (`notified_at` column added to `appointments`).
-- **Configurable lead time** — defaults to "at start time"; later we can add per-family settings (e.g. 10 min before). Out of scope for v1.
+Only one "active" tank per family at a time (active = `replaced_at is null`). Replacing the tank inserts a new row and stamps the old one's `replaced_at`.
 
-### 6. Secrets I'll add for you
-- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (a `mailto:` placeholder, you can change later).
-- I'll generate the keys and add them via the secrets tool — you just confirm the prompt.
+### 3. The Oxygen page (`/oxygen`)
+Layout:
+- **Top card — Current tank**
+  - Big remaining-time readout ("4 d 6 h left") computed live from `started_at + duration(flow) − now`.
+  - Progress bar (% used).
+  - Estimated empty date/time.
+  - "Low" warning color when < 12 h left, "critical" when < 2 h.
+  - Shows current flow setting and tank type.
+- **Actions**
+  - **Change flow rate** — dropdown of the 13 supported settings (0.01–0.30 l/min). Saving updates `flow_lpm` and recomputes — but since changing flow mid-tank invalidates a simple `started_at + duration` calc, see note below.
+  - **Replace tank** — closes the current tank, opens a new one with `started_at = now` and the last flow.
+- **History** — collapsible list of past tanks (started, replaced, flow used).
+- Empty state when no tank logged yet → "Start tracking" button.
+
+### 4. Flow-changes mid-tank (the one tricky bit)
+A flow change resets the simple formula. Two options:
+- **A. Simple (recommended for v1):** treat each flow change as "replace tank, carry over estimated remaining". When the user changes flow, we compute current % remaining at the old flow, close the old row, open a new row with `started_at` back-dated so the remaining time at the new flow matches.
+- **B. Exact:** add an `oxygen_flow_changes` child table logging every flow segment, sum consumption across segments. More accurate but more schema and UI.
+
+I'd go with **A** for v1 — one table, accurate enough, easy to reason about.
+
+### 5. Bilingual (EN + SV)
+All strings go through `t()` with new keys under `oxygen.*` in both `src/lib/i18n/en.ts` and `src/lib/i18n/sv.ts` (Oxygen, Current tank, Flow rate, Replace tank, Time remaining, Estimated empty, Low, Critical, History, etc.).
+
+### 6. Nav + page header
+- Add an "Oxygen" entry to `AppSidebar` (with a `Wind` or `Droplet` icon).
+- Include `<LanguageToggle />` in the page header per project rules.
 
 ## Files touched
-- `public/manifest.webmanifest`, `public/push-sw.js`, `public/icon-*.png`
-- `src/routes/__root.tsx` (head tags)
-- `src/lib/push/` (subscribe hook, server fn to save subscription, helpers)
-- `src/routes/api/public/hooks/dispatch-task-notifications.ts`
-- `src/components/carenest/EnableNotificationsCard.tsx` + integration in Dashboard/Settings
-- `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts`
-- Migration for `push_subscriptions` + `appointments.notified_at`
-- cron schedule (via supabase insert tool, not migration)
+- New: `src/routes/_authenticated/oxygen.tsx`
+- New: `src/lib/oxygen/tanks.ts` (duration table + helpers: `durationMinutes(flow)`, `remainingMinutes(tank, now)`, `formatDuration(min)`)
+- New: `src/lib/data/oxygen.ts` (React Query hooks: `useActiveOxygenTank`, `useOxygenHistory`, `useStartTank`, `useChangeFlow`, `useReplaceTank`)
+- New migration: `oxygen_tanks` table + RLS + grants
+- Edited: `src/components/carenest/AppSidebar.tsx` (nav entry)
+- Edited: `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts`
 
 ## Out of scope for v1
-- Per-user quiet hours, snooze, custom lead times.
-- Action buttons inside the notification (Done/Postpone) — can add later.
-- Offline app-shell caching.
+- Push notification when tank is about to run out (easy follow-up using the existing push pipeline).
+- Multiple tank types / second bottle in reserve.
+- Per-segment exact accounting (option B above).
 
-Approve and I'll build it.
+Approve and I'll build it. Want me to also wire up a **push notification when < 6 h remaining** in this same pass, or save that for a follow-up?
