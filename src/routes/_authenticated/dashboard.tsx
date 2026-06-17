@@ -292,6 +292,7 @@ function DashboardPage() {
   const { data: fluidsToday } = useVitals(familyId, { types: ["fluids"], sinceHours: 24 });
   const { data: vitalsToday = [] } = useVitals(familyId, { sinceHours: 24 });
   const { data: latestHandover, isLoading: handoverLoading } = useLatestHandover(familyId);
+  const { data: activeOxygen } = useActiveOxygenTank(familyId);
   const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
   const { data: invites = [] } = useInvites(familyId);
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
