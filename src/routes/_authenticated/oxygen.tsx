@@ -458,6 +458,7 @@ function ChangeFlowDialog({
             <Label className="text-sm font-semibold">{t("oxygen.flow")}</Label>
             <FlowSelect value={flow} onChange={setFlow} />
           </div>
+          <ChangeFlowPreview tank={tank} newFlow={flow} />
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full">
