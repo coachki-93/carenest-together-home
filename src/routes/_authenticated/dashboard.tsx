@@ -39,7 +39,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLatestVitals, useVitals, vitalStatus, DEFAULT_UNIT, useDeleteVital, useLogVital, type Vital, type VitalType } from "@/lib/data/vitals";
 import { useLatestHandover } from "@/lib/data/handovers";
-import { useActiveOxygenTank } from "@/lib/data/oxygen";
+import { useActiveOxygenTank, type OxygenTank } from "@/lib/data/oxygen";
 import { computeRemaining, formatDuration, formatFlow } from "@/lib/oxygen/tanks";
 import {
   buildTodaysDoses,
