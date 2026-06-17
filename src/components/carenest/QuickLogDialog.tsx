@@ -8,6 +8,7 @@ import {
   Droplet,
   Baby,
   Zap,
+  Frown,
   StickyNote,
   type LucideIcon,
 } from "lucide-react";
