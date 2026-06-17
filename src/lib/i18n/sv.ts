@@ -407,6 +407,7 @@ export const sv = {
       fluids: "Vätska",
       diaper: "Blöjbyte",
       seizure: "Anfall",
+      vomit: "Kräkning",
       note: "Annan anteckning",
     },
   },

@@ -36,6 +36,7 @@ type PresetKey =
   | "fluids"
   | "diaper"
   | "seizure"
+  | "vomit"
   | "note";
 
 type Preset = {
@@ -55,6 +56,7 @@ const PRESETS: Preset[] = [
   { key: "fluids", icon: Droplet, tone: "bg-blue-50 text-blue-600", vitalType: "fluids", needsValue: true },
   { key: "diaper", icon: Baby, tone: "bg-amber-50 text-amber-700", vitalType: "other", needsValue: false },
   { key: "seizure", icon: Zap, tone: "bg-violet-50 text-violet-600", vitalType: "seizure", needsValue: true },
+  { key: "vomit", icon: Frown, tone: "bg-emerald-50 text-emerald-600", vitalType: "other", needsValue: false },
   { key: "note", icon: StickyNote, tone: "bg-slate-100 text-slate-700", vitalType: "other", needsValue: false },
 ];
 

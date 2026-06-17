@@ -407,6 +407,7 @@ export const en = {
       fluids: "Fluids",
       diaper: "Diaper change",
       seizure: "Seizure",
+      vomit: "Vomit",
       note: "Other note",
     },
   },
