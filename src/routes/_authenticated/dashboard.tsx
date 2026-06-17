@@ -1128,7 +1128,7 @@ function DashboardPage() {
           </section>
 
           {/* Oxygen bar */}
-          <OxygenBar familyId={familyId} activeOxygen={activeOxygen} now={now} />
+          <OxygenBar familyId={familyId} activeOxygen={activeOxygen} isLoading={oxygenLoading} now={now} />
 
           {/* Handover preview */}
           <section
