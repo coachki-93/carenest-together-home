@@ -28,6 +28,7 @@ import {
   Moon,
   Calendar as CalendarIcon,
   MapPin,
+  Frown,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -233,6 +234,50 @@ function apptKindToVitalType(kind: AppointmentKind): VitalType | null {
       return "seizure";
     default:
       return null;
+  }
+}
+
+function vitalIconAndTone(
+  vital: Vital,
+): { icon: typeof Activity; tone: { bg: string; fg: string } } {
+  switch (vital.vital_type) {
+    case "temperature":
+      return { icon: Thermometer, tone: { bg: "#FFE4E6", fg: "#BE123C" } };
+    case "heart_rate":
+      return { icon: Heart, tone: { bg: "#FCE7F3", fg: "#BE185D" } };
+    case "spo2":
+      return { icon: Wind, tone: { bg: "#E0F2FE", fg: "#0369A1" } };
+    case "breathing":
+      return { icon: Activity, tone: { bg: "#CFFAFE", fg: "#0E7490" } };
+    case "fluids":
+      return { icon: Droplet, tone: { bg: "#DBEAFE", fg: "#1D4ED8" } };
+    case "seizure":
+      return { icon: Zap, tone: { bg: "#EDE9FE", fg: "#6D28D9" } };
+    case "other": {
+      const notes = (vital.notes ?? "").toLowerCase();
+      const detail = [vital.notes, vital.value].filter(Boolean).join(" ").toLowerCase();
+      if (
+        notes.includes("blöj") ||
+        notes.includes("diaper") ||
+        detail.includes("blöj") ||
+        detail.includes("diaper")
+      ) {
+        return { icon: Baby, tone: { bg: "#FEF3C7", fg: "#B45309" } };
+      }
+      if (
+        notes.includes("kräk") ||
+        notes.includes("vomit") ||
+        notes.includes("spyt") ||
+        detail.includes("kräk") ||
+        detail.includes("vomit") ||
+        detail.includes("spyt")
+      ) {
+        return { icon: Frown, tone: { bg: "#FFEDD5", fg: "#C2410C" } };
+      }
+      return { icon: Activity, tone: { bg: "#FEF3C7", fg: "#B45309" } };
+    }
+    default:
+      return { icon: Activity, tone: { bg: "#FEF3C7", fg: "#B45309" } };
   }
 }
 
@@ -848,11 +893,12 @@ function DashboardPage() {
                     : task.source.kind === "vital"
                       ? "vital"
                       : task.source.appt.kind;
-                const tone =
-                  kind === "vital"
-                    ? { bg: "#FEF3C7", fg: "#B45309" }
-                    : kindTone(kind);
-                const Icon = kind === "vital" ? Activity : kindIcon(kind);
+                const vitalInfo =
+                  task.source.kind === "vital"
+                    ? vitalIconAndTone(task.source.vital)
+                    : null;
+                const tone = vitalInfo?.tone ?? kindTone(kind as AppointmentKind | "medication");
+                const Icon = vitalInfo?.icon ?? kindIcon(kind as AppointmentKind | "medication");
                 const isCompleted = task.status === "given";
                 const isSkipped = task.status === "skipped";
                 const isPostponed = task.status === "postponed";
