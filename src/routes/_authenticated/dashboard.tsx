@@ -229,6 +229,7 @@ function apptKindToVitalType(kind: AppointmentKind): VitalType | null {
     case "breathing":
       return "breathing";
     case "fluids":
+    case "meal":
       return "fluids";
     case "seizure":
       return "seizure";
