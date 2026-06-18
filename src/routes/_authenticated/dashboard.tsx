@@ -927,7 +927,12 @@ function DashboardPage() {
                       )}
                     >
                       <Clock className="size-3.5" />
-                      {task.timeLabel}
+                      {isPostponed && task.postponedTo
+                        ? task.postponedTo.toLocaleTimeString(
+                            i18n.language === "sv" ? "sv-SE" : "en-US",
+                            { hour: "2-digit", minute: "2-digit" },
+                          )
+                        : task.timeLabel}
                     </div>
                     <div
                       className="size-11 rounded-2xl flex items-center justify-center shrink-0"
