@@ -516,6 +516,7 @@ function SchedulePage() {
                   ends_at: values.ends_at,
                   all_day: values.all_day,
                   reminder_minutes: values.reminder_minutes,
+                  amount_ml: values.amount_ml,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
