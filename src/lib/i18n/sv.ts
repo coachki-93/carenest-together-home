@@ -289,6 +289,7 @@ export const sv = {
     overdue: "Försenad",
     statusPostponed: "Senarelagd",
     postpone: "Senarelägg",
+    was: "var",
     handoverDue: {
       badge: "Snart",
       title: "Överlämning snart",
