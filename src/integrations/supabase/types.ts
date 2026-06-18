@@ -87,6 +87,7 @@ export type Database = {
       appointments: {
         Row: {
           all_day: boolean
+          amount_ml: number | null
           child_id: string | null
           color: string | null
           created_at: string
@@ -112,6 +113,7 @@ export type Database = {
         }
         Insert: {
           all_day?: boolean
+          amount_ml?: number | null
           child_id?: string | null
           color?: string | null
           created_at?: string
@@ -137,6 +139,7 @@ export type Database = {
         }
         Update: {
           all_day?: boolean
+          amount_ml?: number | null
           child_id?: string | null
           color?: string | null
           created_at?: string
