@@ -568,7 +568,8 @@ function DashboardPage() {
               ? "postponed"
               : "pending";
       const isOverdue = status === "pending" && !a.all_day && at < now;
-      const detail = [a.location, a.notes].filter(Boolean).join(" • ");
+      const amountStr = a.amount_ml != null ? `${a.amount_ml} ml` : null;
+      const detail = [amountStr, a.location, a.notes].filter(Boolean).join(" • ");
       items.push({
         id: `appt-${a.id}`,
         sortKey: a.all_day ? 0 : at.getTime(),
