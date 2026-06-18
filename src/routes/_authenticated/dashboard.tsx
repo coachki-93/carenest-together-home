@@ -984,11 +984,8 @@ function DashboardPage() {
                           )}
                           {isPostponed && task.postponedTo && (
                             <span>
-                              →{" "}
-                              {task.postponedTo.toLocaleString(
-                                i18n.language === "sv" ? "sv-SE" : "en-US",
-                                { hour: "2-digit", minute: "2-digit", month: "short", day: "numeric" },
-                              )}
+                              {t("schedule.was")}{" "}
+                              {task.timeLabel}
                             </span>
                           )}
                         </div>
