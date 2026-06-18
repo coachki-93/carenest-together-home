@@ -971,6 +971,9 @@ function AppointmentDialog({
         showsRepeat && repeat === "weekly" ? [...weekdays].sort() : null,
       recurrence_times_of_day: cleanedTimes.length > 0 ? cleanedTimes : null,
       reminder_minutes: reminderMinutes,
+      amount_ml: kind === "meal" && amountMl.trim() !== "" && !Number.isNaN(Number(amountMl))
+        ? Number(amountMl)
+        : null,
     };
   }
 
