@@ -28,6 +28,7 @@ import {
   Moon,
   Calendar as CalendarIcon,
   MapPin,
+  Frown,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
