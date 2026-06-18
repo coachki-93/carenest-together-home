@@ -440,7 +440,9 @@ function SchedulePage() {
           );
         };
         const isPast = (item: TimelineItem) =>
-          item.kind === "dose" && !!item.dose.log?.status;
+          item.kind === "dose" &&
+          !!item.dose.log?.status &&
+          item.dose.log.status !== "postponed";
         const activeItems = timeline.filter((it) => !isPast(it));
         const pastItems = timeline.filter(isPast);
         return (
