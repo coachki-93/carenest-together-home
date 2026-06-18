@@ -893,11 +893,12 @@ function DashboardPage() {
                     : task.source.kind === "vital"
                       ? "vital"
                       : task.source.appt.kind;
-                const tone =
+                const vitalInfo =
                   kind === "vital"
-                    ? { bg: "#FEF3C7", fg: "#B45309" }
-                    : kindTone(kind);
-                const Icon = kind === "vital" ? Activity : kindIcon(kind);
+                    ? vitalIconAndTone(task.source.vital)
+                    : null;
+                const tone = vitalInfo?.tone ?? kindTone(kind as AppointmentKind | "medication");
+                const Icon = vitalInfo?.icon ?? kindIcon(kind as AppointmentKind | "medication");
                 const isCompleted = task.status === "given";
                 const isSkipped = task.status === "skipped";
                 const isPostponed = task.status === "postponed";
