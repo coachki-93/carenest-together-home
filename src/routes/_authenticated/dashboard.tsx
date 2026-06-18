@@ -944,7 +944,7 @@ function DashboardPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      {isPending ? (
+                      {isPending || isPostponed ? (
                         <>
                           <Button
                             size="sm"
@@ -976,6 +976,18 @@ function DashboardPage() {
                           >
                             <CalendarClock className="size-4" />
                           </Button>
+                          {isPostponed && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="rounded-full font-semibold text-muted-foreground"
+                              onClick={() => undoTask(task)}
+                              aria-label={t("schedule.undo")}
+                              title={t("schedule.undo")}
+                            >
+                              <Undo2 className="size-4" />
+                            </Button>
+                          )}
                         </>
                       ) : (
                         <Button
