@@ -285,6 +285,7 @@ function vitalIconAndTone(
 function buildVitalSpec(
   kind: AppointmentKind,
   t: (k: string, o?: Record<string, unknown>) => string,
+  defaultValue?: number | null,
 ): VitalSpec | null {
   const vt = apptKindToVitalType(kind);
   if (!vt) return null;
@@ -292,6 +293,7 @@ function buildVitalSpec(
     type: vt,
     unit: DEFAULT_UNIT[vt] ?? "",
     label: t(`quickLog.presets.${vt}`, { defaultValue: t(`vitals.${vt}`, { defaultValue: vt }) }),
+    defaultValue: defaultValue ?? null,
   };
 }
 
