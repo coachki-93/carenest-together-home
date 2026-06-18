@@ -894,7 +894,7 @@ function DashboardPage() {
                       ? "vital"
                       : task.source.appt.kind;
                 const vitalInfo =
-                  kind === "vital"
+                  task.source.kind === "vital"
                     ? vitalIconAndTone(task.source.vital)
                     : null;
                 const tone = vitalInfo?.tone ?? kindTone(kind as AppointmentKind | "medication");
