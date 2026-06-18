@@ -904,6 +904,7 @@ function AppointmentDialog({
       setWeekdays(editing.recurrence_byweekday ?? []);
       setTimesOfDay(editing.recurrence_times_of_day ?? []);
       setReminderMinutes(editing.reminder_minutes ?? null);
+      setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
     } else {
       setTitle("");
       setKind("appointment");
@@ -918,6 +919,7 @@ function AppointmentDialog({
       setWeekdays([]);
       setTimesOfDay([]);
       setReminderMinutes(null);
+      setAmountMl("");
     }
   }, [open, editing, defaultDay]);
 
