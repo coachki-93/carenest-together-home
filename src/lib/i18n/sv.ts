@@ -650,11 +650,13 @@ export const sv = {
       notes: "Anteckningar",
       repeat: "Upprepa",
       reminder: "Påminnelse",
+      amountMl: "Mängd (ml)",
     },
     placeholders: {
       title: "t.ex. Återbesök hos neurolog",
       location: "Klinik, rum eller adress",
       notes: "Något som vårdteamet bör veta.",
+      amountMl: "t.ex. 150",
     },
     kind: {
       appointment: "Besök",
