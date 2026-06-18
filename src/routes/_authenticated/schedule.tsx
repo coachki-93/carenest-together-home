@@ -879,6 +879,7 @@ function AppointmentDialog({
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
   const [reminderMinutes, setReminderMinutes] = useState<number | null>(null);
+  const [amountMl, setAmountMl] = useState<string>("");
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
