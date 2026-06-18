@@ -39,6 +39,7 @@ export interface VitalSpec {
   label: string;
   step?: string;
   placeholder?: string;
+  defaultValue?: number | null;
 }
 
 export interface NotesSpec {
