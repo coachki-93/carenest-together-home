@@ -835,8 +835,12 @@ function DashboardPage() {
                 </div>
               </div>
             ) : (() => {
-              const activeTasks = tasks.filter((tk) => tk.status === "pending");
-              const pastTasks = tasks.filter((tk) => tk.status !== "pending");
+              const activeTasks = tasks.filter(
+                (tk) => tk.status === "pending" || tk.status === "postponed",
+              );
+              const pastTasks = tasks.filter(
+                (tk) => tk.status !== "pending" && tk.status !== "postponed",
+              );
               const renderRow = (task: TaskItem) => {
                 const kind: AppointmentKind | "medication" | "vital" =
                   task.source.kind === "dose"
