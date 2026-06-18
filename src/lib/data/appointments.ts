@@ -17,6 +17,7 @@ export type Appointment = AppointmentRow & {
   recurrence_cancelled: boolean;
   recurrence_times_of_day: string[] | null;
   reminder_minutes: number | null;
+  amount_ml: number | null;
 };
 
 export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["Insert"] & {
@@ -28,6 +29,7 @@ export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["In
   recurrence_cancelled?: boolean;
   recurrence_times_of_day?: string[] | null;
   reminder_minutes?: number | null;
+  amount_ml?: number | null;
 };
 
 export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Update"] & {
@@ -36,6 +38,7 @@ export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Up
   recurrence_byweekday?: number[] | null;
   recurrence_times_of_day?: string[] | null;
   reminder_minutes?: number | null;
+  amount_ml?: number | null;
 };
 
 // Locally widen the kind union — generated types lag behind the enum migration.
@@ -304,6 +307,7 @@ function instanceFromMaster(
     location: src.location,
     kind: src.kind,
     all_day: src.all_day,
+    amount_ml: src.amount_ml ?? master.amount_ml ?? null,
     // pin times to this occurrence (or override's explicit times if given)
     starts_at: override?.starts_at ?? startIso,
     ends_at: override?.ends_at ?? endIso,
@@ -489,6 +493,7 @@ type InstanceOverrideInput = {
     ends_at: string | null;
     all_day: boolean;
     reminder_minutes: number | null;
+    amount_ml: number | null;
   };
 };
 

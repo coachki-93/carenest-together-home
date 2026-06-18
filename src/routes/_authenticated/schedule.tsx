@@ -113,6 +113,7 @@ type SavePayload = {
   recurrence_byweekday: number[] | null;
   recurrence_times_of_day: string[] | null;
   reminder_minutes: number | null;
+  amount_ml: number | null;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
@@ -515,6 +516,7 @@ function SchedulePage() {
                   ends_at: values.ends_at,
                   all_day: values.all_day,
                   reminder_minutes: values.reminder_minutes,
+                  amount_ml: values.amount_ml,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
@@ -878,6 +880,7 @@ function AppointmentDialog({
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
   const [reminderMinutes, setReminderMinutes] = useState<number | null>(null);
+  const [amountMl, setAmountMl] = useState<string>("");
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -902,6 +905,7 @@ function AppointmentDialog({
       setWeekdays(editing.recurrence_byweekday ?? []);
       setTimesOfDay(editing.recurrence_times_of_day ?? []);
       setReminderMinutes(editing.reminder_minutes ?? null);
+      setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
     } else {
       setTitle("");
       setKind("appointment");
@@ -916,6 +920,7 @@ function AppointmentDialog({
       setWeekdays([]);
       setTimesOfDay([]);
       setReminderMinutes(null);
+      setAmountMl("");
     }
   }, [open, editing, defaultDay]);
 
@@ -967,6 +972,9 @@ function AppointmentDialog({
         showsRepeat && repeat === "weekly" ? [...weekdays].sort() : null,
       recurrence_times_of_day: cleanedTimes.length > 0 ? cleanedTimes : null,
       reminder_minutes: reminderMinutes,
+      amount_ml: kind === "meal" && amountMl.trim() !== "" && !Number.isNaN(Number(amountMl))
+        ? Number(amountMl)
+        : null,
     };
   }
 
@@ -1037,6 +1045,26 @@ function AppointmentDialog({
                 </SelectContent>
               </Select>
             </div>
+            {kind === "meal" && (
+              <div>
+                <Label className="font-semibold">{t("scheduleEvents.fields.amountMl")}</Label>
+                <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="1"
+                    value={amountMl}
+                    onChange={(e) => setAmountMl(e.target.value)}
+                    placeholder={t("scheduleEvents.placeholders.amountMl")}
+                    className="rounded-xl"
+                  />
+                  <div className="h-9 px-3 rounded-xl border border-input bg-muted/40 flex items-center text-sm font-semibold text-muted-foreground">
+                    ml
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Checkbox
                 id="all-day"

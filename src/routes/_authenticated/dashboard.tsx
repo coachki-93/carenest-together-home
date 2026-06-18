@@ -229,6 +229,7 @@ function apptKindToVitalType(kind: AppointmentKind): VitalType | null {
     case "breathing":
       return "breathing";
     case "fluids":
+    case "meal":
       return "fluids";
     case "seizure":
       return "seizure";
@@ -284,6 +285,7 @@ function vitalIconAndTone(
 function buildVitalSpec(
   kind: AppointmentKind,
   t: (k: string, o?: Record<string, unknown>) => string,
+  defaultValue?: number | null,
 ): VitalSpec | null {
   const vt = apptKindToVitalType(kind);
   if (!vt) return null;
@@ -291,6 +293,7 @@ function buildVitalSpec(
     type: vt,
     unit: DEFAULT_UNIT[vt] ?? "",
     label: t(`quickLog.presets.${vt}`, { defaultValue: t(`vitals.${vt}`, { defaultValue: vt }) }),
+    defaultValue: defaultValue ?? null,
   };
 }
 
@@ -565,7 +568,8 @@ function DashboardPage() {
               ? "postponed"
               : "pending";
       const isOverdue = status === "pending" && !a.all_day && at < now;
-      const detail = [a.location, a.notes].filter(Boolean).join(" • ");
+      const amountStr = a.amount_ml != null ? `${a.amount_ml} ml` : null;
+      const detail = [amountStr, a.location, a.notes].filter(Boolean).join(" • ");
       items.push({
         id: `appt-${a.id}`,
         sortKey: a.all_day ? 0 : at.getTime(),
@@ -1352,7 +1356,11 @@ function DashboardPage() {
         submitting={logDose.isPending || logAppt.isPending || logVital.isPending}
         vitalSpec={
           pendingAction?.task.source.kind === "appt"
-            ? buildVitalSpec(pendingAction.task.source.appt.kind as AppointmentKind, t)
+            ? buildVitalSpec(
+                pendingAction.task.source.appt.kind as AppointmentKind,
+                t,
+                pendingAction.task.source.appt.amount_ml,
+              )
             : null
         }
         notesSpec={

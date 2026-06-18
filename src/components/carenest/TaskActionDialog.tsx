@@ -39,6 +39,7 @@ export interface VitalSpec {
   label: string;
   step?: string;
   placeholder?: string;
+  defaultValue?: number | null;
 }
 
 export interface NotesSpec {
@@ -85,7 +86,7 @@ export function TaskActionDialog({
     if (!open) return;
     setProfileId(defaultProfileId);
     setReason("");
-    setVitalValue("");
+    setVitalValue(vitalSpec?.defaultValue != null ? String(vitalSpec.defaultValue) : "");
     setNotes("");
     // Default postpone to scheduled + 1 hour, local
     const plusOneHour = new Date(scheduledFor.getTime() + 60 * 60 * 1000);
@@ -94,7 +95,7 @@ export function TaskActionDialog({
       `${plusOneHour.getFullYear()}-${pad(plusOneHour.getMonth() + 1)}-${pad(plusOneHour.getDate())}`,
     );
     setPostponedTime(`${pad(plusOneHour.getHours())}:${pad(plusOneHour.getMinutes())}`);
-  }, [open, defaultProfileId, scheduledFor]);
+  }, [open, defaultProfileId, scheduledFor, vitalSpec?.defaultValue]);
 
   if (!action) return null;
   const act: TaskAction = action;
