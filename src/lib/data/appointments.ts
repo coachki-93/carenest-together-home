@@ -307,6 +307,7 @@ function instanceFromMaster(
     location: src.location,
     kind: src.kind,
     all_day: src.all_day,
+    amount_ml: src.amount_ml ?? master.amount_ml ?? null,
     // pin times to this occurrence (or override's explicit times if given)
     starts_at: override?.starts_at ?? startIso,
     ends_at: override?.ends_at ?? endIso,
