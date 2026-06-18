@@ -289,6 +289,7 @@ export const en = {
     overdue: "Overdue",
     statusPostponed: "Postponed",
     postpone: "Postpone",
+    was: "was",
     handoverDue: {
       badge: "Due",
       title: "Handover due soon",
