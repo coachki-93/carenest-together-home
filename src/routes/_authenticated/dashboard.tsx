@@ -1355,7 +1355,11 @@ function DashboardPage() {
         submitting={logDose.isPending || logAppt.isPending || logVital.isPending}
         vitalSpec={
           pendingAction?.task.source.kind === "appt"
-            ? buildVitalSpec(pendingAction.task.source.appt.kind as AppointmentKind, t)
+            ? buildVitalSpec(
+                pendingAction.task.source.appt.kind as AppointmentKind,
+                t,
+                pendingAction.task.source.appt.amount_ml,
+              )
             : null
         }
         notesSpec={
