@@ -1045,6 +1045,26 @@ function AppointmentDialog({
                 </SelectContent>
               </Select>
             </div>
+            {kind === "meal" && (
+              <div>
+                <Label className="font-semibold">{t("scheduleEvents.fields.amountMl")}</Label>
+                <div className="grid grid-cols-[1fr_auto] gap-2 mt-1.5">
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="1"
+                    value={amountMl}
+                    onChange={(e) => setAmountMl(e.target.value)}
+                    placeholder={t("scheduleEvents.placeholders.amountMl")}
+                    className="rounded-xl"
+                  />
+                  <div className="h-9 px-3 rounded-xl border border-input bg-muted/40 flex items-center text-sm font-semibold text-muted-foreground">
+                    ml
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Checkbox
                 id="all-day"
