@@ -113,6 +113,7 @@ type SavePayload = {
   recurrence_byweekday: number[] | null;
   recurrence_times_of_day: string[] | null;
   reminder_minutes: number | null;
+  amount_ml: number | null;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
