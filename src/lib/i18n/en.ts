@@ -650,11 +650,13 @@ export const en = {
       notes: "Notes",
       repeat: "Repeat",
       reminder: "Reminder",
+      amountMl: "Amount (ml)",
     },
     placeholders: {
       title: "e.g. Neurologist follow-up",
       location: "Clinic, room or address",
       notes: "Anything the care team should know.",
+      amountMl: "e.g. 150",
     },
     kind: {
       appointment: "Appointment",
