@@ -11,6 +11,9 @@ import {
   AlertTriangle,
   CalendarClock,
   History,
+  Truck,
+  PackageCheck,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
@@ -42,13 +45,21 @@ import {
   useDeleteInventoryItem,
   useAdjustInventory,
   useInventoryHistory,
+  useRecentInventoryActivity,
+  useMarkOrdered,
+  useClearOrder,
+  useReceiveStock,
   isLowStock,
+  isOnOrder,
   expiryStatus,
   summarizeStock,
   UNIT_GROUPS,
   type InventoryItem,
   type UnitKind,
 } from "@/lib/data/inventory";
+import { useFamilyMembers } from "@/lib/data/family";
+import { useCarePlaceCheckHistory } from "@/lib/data/care-place-checks";
+import { narrateAdjustments } from "@/lib/data/inventory-narrate";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/inventory")({
