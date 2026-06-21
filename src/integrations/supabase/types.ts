@@ -331,6 +331,7 @@ export type Database = {
           created_by: string
           family_id: string
           id: string
+          inventory_item_id: string | null
           item_type: Database["public"]["Enums"]["care_place_item_type"]
           label: string
           min_count: number | null
@@ -343,6 +344,7 @@ export type Database = {
           created_by: string
           family_id: string
           id?: string
+          inventory_item_id?: string | null
           item_type?: Database["public"]["Enums"]["care_place_item_type"]
           label: string
           min_count?: number | null
@@ -355,6 +357,7 @@ export type Database = {
           created_by?: string
           family_id?: string
           id?: string
+          inventory_item_id?: string | null
           item_type?: Database["public"]["Enums"]["care_place_item_type"]
           label?: string
           min_count?: number | null
@@ -367,6 +370,13 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_place_checklist_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
             referencedColumns: ["id"]
           },
         ]
@@ -605,6 +615,7 @@ export type Database = {
           family_id: string
           id: string
           joined_at: string
+          material_responsible: boolean
           role: Database["public"]["Enums"]["member_role"]
           user_id: string
         }
@@ -613,6 +624,7 @@ export type Database = {
           family_id: string
           id?: string
           joined_at?: string
+          material_responsible?: boolean
           role?: Database["public"]["Enums"]["member_role"]
           user_id: string
         }
@@ -621,6 +633,7 @@ export type Database = {
           family_id?: string
           id?: string
           joined_at?: string
+          material_responsible?: boolean
           role?: Database["public"]["Enums"]["member_role"]
           user_id?: string
         }
@@ -709,6 +722,117 @@ export type Database = {
           },
           {
             foreignKeyName: "handovers_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_adjustments: {
+        Row: {
+          created_at: string
+          delta: number
+          family_id: string
+          id: string
+          inventory_item_id: string
+          note: string | null
+          performed_by: string
+          reason: Database["public"]["Enums"]["inventory_adjustment_reason"]
+          source_check_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          family_id: string
+          id?: string
+          inventory_item_id: string
+          note?: string | null
+          performed_by: string
+          reason: Database["public"]["Enums"]["inventory_adjustment_reason"]
+          source_check_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          family_id?: string
+          id?: string
+          inventory_item_id?: string
+          note?: string | null
+          performed_by?: string
+          reason?: Database["public"]["Enums"]["inventory_adjustment_reason"]
+          source_check_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_adjustments_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_adjustments_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_adjustments_source_check_id_fkey"
+            columns: ["source_check_id"]
+            isOneToOne: false
+            referencedRelation: "care_place_checks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          expiry_date: string | null
+          family_id: string
+          id: string
+          low_stock_threshold: number | null
+          name: string
+          notes: string | null
+          quantity: number
+          unit: Database["public"]["Enums"]["unit_kind"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          expiry_date?: string | null
+          family_id: string
+          id?: string
+          low_stock_threshold?: number | null
+          name: string
+          notes?: string | null
+          quantity?: number
+          unit: Database["public"]["Enums"]["unit_kind"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          expiry_date?: string | null
+          family_id?: string
+          id?: string
+          low_stock_threshold?: number | null
+          name?: string
+          notes?: string | null
+          quantity?: number
+          unit?: Database["public"]["Enums"]["unit_kind"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
@@ -1110,6 +1234,10 @@ export type Database = {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
+      is_material_manager: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
       lookup_invite: {
         Args: { _code: string }
         Returns: {
@@ -1148,6 +1276,12 @@ export type Database = {
         | "breathing"
         | "note"
       care_place_item_type: "yesno" | "count"
+      inventory_adjustment_reason:
+        | "manual_set"
+        | "manual_add"
+        | "manual_remove"
+        | "care_place_check"
+        | "expiry_writeoff"
       invite_status: "pending" | "accepted" | "revoked"
       med_log_status: "given" | "skipped" | "missed" | "postponed"
       med_route:
@@ -1159,6 +1293,7 @@ export type Database = {
         | "other"
       member_role: "owner" | "caregiver"
       shift_label: "morning" | "afternoon" | "night" | "custom"
+      unit_kind: "pcs" | "box" | "pack" | "ml" | "l" | "g" | "kg"
       vital_type:
         | "heart_rate"
         | "spo2"
@@ -1314,11 +1449,19 @@ export const Constants = {
         "note",
       ],
       care_place_item_type: ["yesno", "count"],
+      inventory_adjustment_reason: [
+        "manual_set",
+        "manual_add",
+        "manual_remove",
+        "care_place_check",
+        "expiry_writeoff",
+      ],
       invite_status: ["pending", "accepted", "revoked"],
       med_log_status: ["given", "skipped", "missed", "postponed"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
       shift_label: ["morning", "afternoon", "night", "custom"],
+      unit_kind: ["pcs", "box", "pack", "ml", "l", "g", "kg"],
       vital_type: [
         "heart_rate",
         "spo2",
