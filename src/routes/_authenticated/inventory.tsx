@@ -233,6 +233,7 @@ function InventoryPage() {
           </ul>
         )}
 
+        {familyId && <ShoppingListCard familyId={familyId} />}
         {familyId && <RecentActivityCard familyId={familyId} />}
       </div>
 
