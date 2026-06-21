@@ -160,6 +160,10 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             <DialogDescription>
               {t("carePlace.dialogSubtitle", { slot: slotLabel })}
             </DialogDescription>
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800 w-fit">
+              <Timer className="size-3.5" />
+              {t("carePlace.completeWithin", { time: formatMMSS(secondsLeft) })}
+            </div>
           </DialogHeader>
 
           {activeItems.length === 0 ? (
