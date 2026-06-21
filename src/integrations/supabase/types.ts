@@ -289,6 +289,7 @@ export type Database = {
           created_at: string
           created_by: string
           family_id: string
+          grace_minutes: number
           id: string
           label: string | null
           time_of_day: string
@@ -299,6 +300,7 @@ export type Database = {
           created_at?: string
           created_by: string
           family_id: string
+          grace_minutes?: number
           id?: string
           label?: string | null
           time_of_day: string
@@ -309,6 +311,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           family_id?: string
+          grace_minutes?: number
           id?: string
           label?: string | null
           time_of_day?: string
@@ -329,6 +332,7 @@ export type Database = {
           active: boolean
           created_at: string
           created_by: string
+          decrement_amount: number
           family_id: string
           id: string
           inventory_item_id: string | null
@@ -336,12 +340,14 @@ export type Database = {
           label: string
           min_count: number | null
           position: number
+          severity: Database["public"]["Enums"]["care_place_severity"]
           updated_at: string
         }
         Insert: {
           active?: boolean
           created_at?: string
           created_by: string
+          decrement_amount?: number
           family_id: string
           id?: string
           inventory_item_id?: string | null
@@ -349,12 +355,14 @@ export type Database = {
           label: string
           min_count?: number | null
           position?: number
+          severity?: Database["public"]["Enums"]["care_place_severity"]
           updated_at?: string
         }
         Update: {
           active?: boolean
           created_at?: string
           created_by?: string
+          decrement_amount?: number
           family_id?: string
           id?: string
           inventory_item_id?: string | null
@@ -362,6 +370,7 @@ export type Database = {
           label?: string
           min_count?: number | null
           position?: number
+          severity?: Database["public"]["Enums"]["care_place_severity"]
           updated_at?: string
         }
         Relationships: [
@@ -418,6 +427,51 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      care_place_missed_checks: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          notified_at: string | null
+          scheduled_date: string
+          scheduled_time: string
+          time_id: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          notified_at?: string | null
+          scheduled_date: string
+          scheduled_time: string
+          time_id: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          notified_at?: string | null
+          scheduled_date?: string
+          scheduled_time?: string
+          time_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_place_missed_checks_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_place_missed_checks_time_id_fkey"
+            columns: ["time_id"]
+            isOneToOne: false
+            referencedRelation: "care_place_check_times"
             referencedColumns: ["id"]
           },
         ]
@@ -792,12 +846,15 @@ export type Database = {
           active: boolean
           created_at: string
           created_by: string
+          expected_at: string | null
           expiry_date: string | null
           family_id: string
           id: string
           low_stock_threshold: number | null
           name: string
           notes: string | null
+          ordered_at: string | null
+          ordered_by: string | null
           quantity: number
           unit: Database["public"]["Enums"]["unit_kind"]
           updated_at: string
@@ -806,12 +863,15 @@ export type Database = {
           active?: boolean
           created_at?: string
           created_by: string
+          expected_at?: string | null
           expiry_date?: string | null
           family_id: string
           id?: string
           low_stock_threshold?: number | null
           name: string
           notes?: string | null
+          ordered_at?: string | null
+          ordered_by?: string | null
           quantity?: number
           unit: Database["public"]["Enums"]["unit_kind"]
           updated_at?: string
@@ -820,12 +880,15 @@ export type Database = {
           active?: boolean
           created_at?: string
           created_by?: string
+          expected_at?: string | null
           expiry_date?: string | null
           family_id?: string
           id?: string
           low_stock_threshold?: number | null
           name?: string
           notes?: string | null
+          ordered_at?: string | null
+          ordered_by?: string | null
           quantity?: number
           unit?: Database["public"]["Enums"]["unit_kind"]
           updated_at?: string
@@ -1276,12 +1339,14 @@ export type Database = {
         | "breathing"
         | "note"
       care_place_item_type: "yesno" | "count"
+      care_place_severity: "routine" | "critical"
       inventory_adjustment_reason:
         | "manual_set"
         | "manual_add"
         | "manual_remove"
         | "care_place_check"
         | "expiry_writeoff"
+        | "received"
       invite_status: "pending" | "accepted" | "revoked"
       med_log_status: "given" | "skipped" | "missed" | "postponed"
       med_route:
@@ -1449,12 +1514,14 @@ export const Constants = {
         "note",
       ],
       care_place_item_type: ["yesno", "count"],
+      care_place_severity: ["routine", "critical"],
       inventory_adjustment_reason: [
         "manual_set",
         "manual_add",
         "manual_remove",
         "care_place_check",
         "expiry_writeoff",
+        "received",
       ],
       invite_status: ["pending", "accepted", "revoked"],
       med_log_status: ["given", "skipped", "missed", "postponed"],

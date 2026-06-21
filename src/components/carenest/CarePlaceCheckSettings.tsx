@@ -46,8 +46,11 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
   const [newType, setNewType] = useState<CarePlaceItemType>("yesno");
   const [newMin, setNewMin] = useState("");
   const [newInventoryId, setNewInventoryId] = useState<string>("none");
+  const [newSeverity, setNewSeverity] = useState<"routine" | "critical">("routine");
+  const [newDecrement, setNewDecrement] = useState("1");
   const [newTime, setNewTime] = useState("07:00");
   const [newTimeLabel, setNewTimeLabel] = useState("");
+  const [newGrace, setNewGrace] = useState("30");
 
   async function addItem() {
     if (!familyId || !userId || !newLabel.trim()) return;
@@ -65,10 +68,14 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
             : null,
         position: items.length,
         active: true,
+        severity: newSeverity,
+        decrement_amount: Math.max(1, Number(newDecrement) || 1),
       });
       setNewLabel("");
       setNewMin("");
       setNewInventoryId("none");
+      setNewSeverity("routine");
+      setNewDecrement("1");
       toast.success(t("carePlace.itemAdded"));
     } catch (e) {
       toast.error((e as Error).message);
@@ -84,8 +91,10 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         time_of_day: `${newTime}:00`,
         label: newTimeLabel.trim() || null,
         active: true,
+        grace_minutes: Math.max(0, Math.min(720, Number(newGrace) || 30)),
       });
       setNewTimeLabel("");
+      setNewGrace("30");
       toast.success(t("carePlace.timeAdded"));
     } catch (e) {
       toast.error((e as Error).message);
@@ -129,7 +138,14 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 className="flex items-center gap-2 rounded-xl border p-3"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{it.label}</div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium truncate">{it.label}</span>
+                    {it.severity === "critical" && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-600 text-white">
+                        {t("carePlace.criticalBadge")}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {it.item_type === "yesno"
                       ? t("carePlace.typeYesNo")
@@ -140,10 +156,10 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                       <> · {t("carePlace.linkedTo")} {linked.name}</>
                     )}
                   </div>
-                  {isOwner && it.item_type === "count" && (
-                    <div className="mt-2">
+                  {isOwner && (
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <Select
-                        value={it.inventory_item_id ?? "none"}
+                        value={it.severity}
                         onValueChange={(v) =>
                           upsertItem.mutate({
                             id: it.id,
@@ -154,24 +170,54 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                             min_count: it.min_count,
                             position: it.position,
                             active: it.active,
-                            inventory_item_id: v === "none" ? null : v,
+                            inventory_item_id: it.inventory_item_id,
+                            severity: v as "routine" | "critical",
+                            decrement_amount: it.decrement_amount,
                           })
                         }
                       >
                         <SelectTrigger className="h-8 text-xs">
-                          <SelectValue placeholder={t("carePlace.linkInventory")} />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
-                          {inventory
-                            .filter((iv) => iv.active)
-                            .map((iv) => (
-                              <SelectItem key={iv.id} value={iv.id}>
-                                {iv.name}
-                              </SelectItem>
-                            ))}
+                          <SelectItem value="routine">{t("carePlace.severityRoutine")}</SelectItem>
+                          <SelectItem value="critical">{t("carePlace.severityCritical")}</SelectItem>
                         </SelectContent>
                       </Select>
+                      {it.item_type === "count" && (
+                        <Select
+                          value={it.inventory_item_id ?? "none"}
+                          onValueChange={(v) =>
+                            upsertItem.mutate({
+                              id: it.id,
+                              family_id: it.family_id,
+                              created_by: it.created_by,
+                              label: it.label,
+                              item_type: it.item_type,
+                              min_count: it.min_count,
+                              position: it.position,
+                              active: it.active,
+                              inventory_item_id: v === "none" ? null : v,
+                              severity: it.severity,
+                              decrement_amount: it.decrement_amount,
+                            })
+                          }
+                        >
+                          <SelectTrigger className="h-8 text-xs">
+                            <SelectValue placeholder={t("carePlace.linkInventory")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
+                            {inventory
+                              .filter((iv) => iv.active)
+                              .map((iv) => (
+                                <SelectItem key={iv.id} value={iv.id}>
+                                  {iv.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
                   )}
                 </div>
@@ -190,6 +236,8 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                           position: it.position,
                           active: !!v,
                           inventory_item_id: it.inventory_item_id,
+                          severity: it.severity,
+                          decrement_amount: it.decrement_amount,
                         })
                       }
                     />
@@ -263,6 +311,38 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 </div>
               </>
             )}
+            <div className="grid sm:grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs">{t("carePlace.severityLabel")}</Label>
+                <Select
+                  value={newSeverity}
+                  onValueChange={(v) => setNewSeverity(v as "routine" | "critical")}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="routine">{t("carePlace.severityRoutine")}</SelectItem>
+                    <SelectItem value="critical">{t("carePlace.severityCritical")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {newType === "count" && newInventoryId !== "none" && (
+                <div className="space-y-1">
+                  <Label className="text-xs">{t("carePlace.decrementLabel")}</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={newDecrement}
+                    onChange={(e) => setNewDecrement(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              {t("carePlace.severityHint")}
+            </p>
             <Button
               type="button"
               onClick={addItem}
@@ -300,9 +380,31 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 {tm.label && (
                   <div className="text-xs text-muted-foreground">{tm.label}</div>
                 )}
+                <div className="text-[11px] text-muted-foreground mt-0.5">
+                  {t("carePlace.graceShort", { n: tm.grace_minutes ?? 30 })}
+                </div>
               </div>
               {isOwner && (
                 <>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={720}
+                    className="h-8 w-16 text-xs"
+                    value={tm.grace_minutes ?? 30}
+                    onChange={(e) =>
+                      upsertTime.mutate({
+                        id: tm.id,
+                        family_id: tm.family_id,
+                        created_by: tm.created_by,
+                        time_of_day: tm.time_of_day,
+                        label: tm.label,
+                        active: tm.active,
+                        grace_minutes: Math.max(0, Math.min(720, Number(e.target.value) || 0)),
+                      })
+                    }
+                    aria-label={t("carePlace.graceLabel")}
+                  />
                   <Switch
                     checked={tm.active}
                     onCheckedChange={(v) =>
@@ -313,6 +415,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                         time_of_day: tm.time_of_day,
                         label: tm.label,
                         active: !!v,
+                        grace_minutes: tm.grace_minutes,
                       })
                     }
                   />
@@ -331,7 +434,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         </div>
         {isOwner && (
           <div className="rounded-xl border-dashed border-2 p-3 space-y-2">
-            <div className="grid sm:grid-cols-[120px_1fr] gap-2">
+            <div className="grid sm:grid-cols-[120px_1fr_120px] gap-2">
               <Input
                 type="time"
                 value={newTime}
@@ -342,7 +445,19 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 value={newTimeLabel}
                 onChange={(e) => setNewTimeLabel(e.target.value)}
               />
+              <Input
+                type="number"
+                min={0}
+                max={720}
+                value={newGrace}
+                onChange={(e) => setNewGrace(e.target.value)}
+                placeholder={t("carePlace.graceLabel")}
+                aria-label={t("carePlace.graceLabel")}
+              />
             </div>
+            <p className="text-[11px] text-muted-foreground">
+              {t("carePlace.graceHint")}
+            </p>
             <Button
               type="button"
               onClick={addTime}

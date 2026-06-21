@@ -209,6 +209,10 @@ export function isLowStock(item: InventoryItem): boolean {
   return Number(item.quantity) <= Number(item.low_stock_threshold);
 }
 
+export function isOnOrder(item: InventoryItem): boolean {
+  return !!item.ordered_at;
+}
+
 export function expiryStatus(
   item: InventoryItem,
   now = new Date(),
@@ -228,7 +232,8 @@ export function summarizeStock(items: InventoryItem[]): LowStockSummary {
   const now = new Date();
   for (const it of items) {
     if (!it.active) continue;
-    if (isLowStock(it)) low++;
+    // Items on order don't count toward the red "low" badge — they're acknowledged.
+    if (isLowStock(it) && !isOnOrder(it)) low++;
     const e = expiryStatus(it, now);
     if (e === "soon") soon++;
     if (e === "expired") expired++;
@@ -239,4 +244,79 @@ export function summarizeStock(items: InventoryItem[]): LowStockSummary {
 export function useLowStockSummary(familyId: string | undefined | null) {
   const { data: items = [] } = useInventoryItems(familyId);
   return summarizeStock(items);
+}
+
+export interface MarkOrderedInput {
+  itemId: string;
+  userId: string;
+  expectedAt?: string | null; // YYYY-MM-DD
+}
+
+export function useMarkOrdered() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: MarkOrderedInput) => {
+      const { error } = await supabase
+        .from("inventory_items")
+        .update({
+          ordered_at: new Date().toISOString(),
+          ordered_by: input.userId,
+          expected_at: input.expectedAt ?? null,
+        })
+        .eq("id", input.itemId);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["inventory-items"] }),
+  });
+}
+
+export function useClearOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (itemId: string) => {
+      const { error } = await supabase
+        .from("inventory_items")
+        .update({ ordered_at: null, ordered_by: null, expected_at: null })
+        .eq("id", itemId);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["inventory-items"] }),
+  });
+}
+
+export interface ReceiveStockInput {
+  itemId: string;
+  familyId: string;
+  performedBy: string;
+  quantity: number;
+  note?: string | null;
+}
+
+export function useReceiveStock() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: ReceiveStockInput) => {
+      if (input.quantity <= 0) throw new Error("Quantity must be greater than 0");
+      await adjustInventory({
+        itemId: input.itemId,
+        familyId: input.familyId,
+        performedBy: input.performedBy,
+        delta: input.quantity,
+        reason: "received",
+        note: input.note ?? null,
+      });
+      // Clear the on-order flags now that stock has arrived.
+      const { error } = await supabase
+        .from("inventory_items")
+        .update({ ordered_at: null, ordered_by: null, expected_at: null })
+        .eq("id", input.itemId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["inventory-items"] });
+      qc.invalidateQueries({ queryKey: ["inventory-item"] });
+      qc.invalidateQueries({ queryKey: ["inventory-history"] });
+      qc.invalidateQueries({ queryKey: ["inventory-activity"] });
+    },
+  });
 }
