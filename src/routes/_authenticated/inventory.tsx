@@ -266,18 +266,26 @@ function InventoryRow({
   item,
   canManage,
   userId,
+  familyId,
+  nextSlot,
+  queuedAdhoc,
   onEdit,
   onHistory,
 }: {
   item: InventoryItem;
   canManage: boolean;
   userId: string | null;
+  familyId: string | null;
+  nextSlot: ReturnType<typeof nextUpcomingSlot>;
+  queuedAdhoc: AdhocItem | null;
   onEdit: () => void;
   onHistory: () => void;
 }) {
   const { t } = useTranslation();
   const adjust = useAdjustInventory();
   const del = useDeleteInventoryItem();
+  const addAdhoc = useAddAdhocItem();
+  const removeAdhoc = useDeleteAdhocItem();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const low = isLowStock(item);
