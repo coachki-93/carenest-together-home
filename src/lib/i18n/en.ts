@@ -915,6 +915,12 @@ export const en = {
     itemAdded: "Item added",
     timeAdded: "Time added",
     completeWithin: "Complete within {{time}}",
+    yes: "Yes",
+    no: "No",
+    available: "Available?",
+    quantity: "Quantity",
+    pickAnswer: "Please answer all items before submitting.",
+    enterQuantity: "Enter a quantity for all available items.",
   },
 };
 
