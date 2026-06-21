@@ -14,6 +14,7 @@ import {
   Truck,
   PackageCheck,
   X,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
@@ -58,7 +59,14 @@ import {
   type UnitKind,
 } from "@/lib/data/inventory";
 import { useFamilyMembers } from "@/lib/data/family";
-import { useCarePlaceCheckHistory } from "@/lib/data/care-place-checks";
+import { useCarePlaceCheckHistory, useCarePlaceTimes } from "@/lib/data/care-place-checks";
+import {
+  useOpenAdhocItems,
+  useAddAdhocItem,
+  useDeleteAdhocItem,
+  nextUpcomingSlot,
+  type AdhocItem,
+} from "@/lib/data/adhoc-items";
 import { narrateAdjustments } from "@/lib/data/inventory-narrate";
 import { cn } from "@/lib/utils";
 
@@ -78,6 +86,22 @@ function InventoryPage() {
   const isMaterialManager = isOwner || !!membership?.material_responsible;
 
   const { data: items = [], isLoading } = useInventoryItems(familyId);
+  const { data: carePlaceTimes = [] } = useCarePlaceTimes(familyId);
+  const { data: openAdhocs = [] } = useOpenAdhocItems(familyId);
+  const nextSlot = useMemo(() => nextUpcomingSlot(carePlaceTimes, new Date()), [carePlaceTimes]);
+  const adhocByItem = useMemo(() => {
+    const map = new Map<string, AdhocItem>();
+    if (!nextSlot) return map;
+    for (const a of openAdhocs) {
+      if (
+        a.for_slot_date === nextSlot.date &&
+        a.for_slot_time.slice(0, 5) === nextSlot.time.slice(0, 5)
+      ) {
+        map.set(a.inventory_item_id, a);
+      }
+    }
+    return map;
+  }, [openAdhocs, nextSlot]);
 
   const [filter, setFilter] = useState<FilterMode>("all");
   const [editing, setEditing] = useState<InventoryItem | null>(null);
@@ -199,6 +223,9 @@ function InventoryPage() {
                 item={it}
                 canManage={isMaterialManager}
                 userId={user?.id ?? null}
+                familyId={familyId ?? null}
+                nextSlot={nextSlot}
+                queuedAdhoc={adhocByItem.get(it.id) ?? null}
                 onEdit={() => setEditing(it)}
                 onHistory={() => setHistoryFor(it)}
               />
@@ -240,18 +267,26 @@ function InventoryRow({
   item,
   canManage,
   userId,
+  familyId,
+  nextSlot,
+  queuedAdhoc,
   onEdit,
   onHistory,
 }: {
   item: InventoryItem;
   canManage: boolean;
   userId: string | null;
+  familyId: string | null;
+  nextSlot: ReturnType<typeof nextUpcomingSlot>;
+  queuedAdhoc: AdhocItem | null;
   onEdit: () => void;
   onHistory: () => void;
 }) {
   const { t } = useTranslation();
   const adjust = useAdjustInventory();
   const del = useDeleteInventoryItem();
+  const addAdhoc = useAddAdhocItem();
+  const removeAdhoc = useDeleteAdhocItem();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const low = isLowStock(item);
@@ -302,6 +337,12 @@ function InventoryRow({
           {exp === "expired" && (
             <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-200 text-red-800">
               {t("inventory.expired")}
+            </span>
+          )}
+          {queuedAdhoc && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+              <Zap className="size-3" />
+              {t("inventory.queuedForSlot", { time: queuedAdhoc.for_slot_time.slice(0, 5) })}
             </span>
           )}
         </div>
@@ -357,6 +398,54 @@ function InventoryRow({
               >
                 <Truck className="size-3.5" />
                 {t("inventory.markOrdered")}
+              </Button>
+            )}
+            {low && nextSlot && familyId && userId && !queuedAdhoc && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full gap-1 text-amber-800 border-amber-300 hover:bg-amber-50"
+                disabled={addAdhoc.isPending}
+                onClick={async () => {
+                  try {
+                    await addAdhoc.mutateAsync({
+                      familyId,
+                      inventoryItemId: item.id,
+                      label: item.name,
+                      forSlotDate: nextSlot.date,
+                      forSlotTime: nextSlot.time,
+                      createdBy: userId,
+                    });
+                    toast.success(
+                      t("inventory.addedToNextRound", {
+                        time: nextSlot.time.slice(0, 5),
+                      }),
+                    );
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  }
+                }}
+              >
+                <Zap className="size-3.5" />
+                {t("inventory.addToNextRound")}
+              </Button>
+            )}
+            {queuedAdhoc && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full gap-1 text-muted-foreground"
+                disabled={removeAdhoc.isPending}
+                onClick={async () => {
+                  try {
+                    await removeAdhoc.mutateAsync(queuedAdhoc.id);
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  }
+                }}
+              >
+                <X className="size-3.5" />
+                {t("inventory.cancelQueued")}
               </Button>
             )}
             <Button

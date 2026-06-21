@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, ShieldAlert, Loader2, Timer } from "lucide-react";
+import { AlertTriangle, ShieldAlert, Loader2, Timer, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,12 @@ import {
   type CarePlaceItem,
   type CarePlaceTime,
 } from "@/lib/data/care-place-checks";
+import {
+  useOpenAdhocItems,
+  useResolveAdhocItem,
+  type AdhocItem,
+} from "@/lib/data/adhoc-items";
+import { useInventoryItems, isLowStock, type InventoryItem } from "@/lib/data/inventory";
 
 interface Props {
   familyId: string | undefined | null;
@@ -49,7 +55,16 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: items = [] } = useCarePlaceItems(familyId);
   const { data: times = [] } = useCarePlaceTimes(familyId);
   const { data: todaysChecks = [] } = useTodayCarePlaceChecks(familyId);
+  const { data: inventory = [] } = useInventoryItems(familyId);
+  const { data: openAdhocs = [] } = useOpenAdhocItems(familyId);
   const submit = useSubmitCarePlaceCheck();
+  const resolveAdhoc = useResolveAdhocItem();
+
+  const inventoryById = useMemo(() => {
+    const map = new Map<string, InventoryItem>();
+    for (const it of inventory) map.set(it.id, it);
+    return map;
+  }, [inventory]);
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -67,21 +82,36 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
 
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState<Record<string, AnswerState>>({});
+  const [adhocAnswers, setAdhocAnswers] = useState<Record<string, boolean | null>>({});
   const [notes, setNotes] = useState("");
 
   if (!familyId || !userId || !currentSlot) return null;
 
   const activeItems = items.filter((i) => i.active);
 
+  const slotDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const slotAdhocs = openAdhocs.filter(
+    (a) =>
+      a.for_slot_date === slotDate &&
+      a.for_slot_time.slice(0, 5) === currentSlot.time_of_day.slice(0, 5),
+  );
+
   function startCheck() {
     const initial: Record<string, AnswerState> = {};
     for (const it of activeItems) {
-      initial[it.id] =
-        it.item_type === "yesno"
-          ? { yesno: null }
-          : { available: null, count: "" };
+      // 2A: pre-select "No" / "Not available" when the linked inventory item is already below threshold.
+      const linked = it.inventory_item_id ? inventoryById.get(it.inventory_item_id) : undefined;
+      const alreadyLow = linked ? isLowStock(linked) : false;
+      if (it.item_type === "yesno") {
+        initial[it.id] = { yesno: alreadyLow ? false : null };
+      } else {
+        initial[it.id] = { available: alreadyLow ? false : null, count: "" };
+      }
     }
     setAnswers(initial);
+    const adhocInit: Record<string, boolean | null> = {};
+    for (const a of slotAdhocs) adhocInit[a.id] = null;
+    setAdhocAnswers(adhocInit);
     setNotes("");
     setOpen(true);
   }
@@ -94,6 +124,11 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
       } else {
         if (a.available !== true && a.available !== false) return t("carePlace.pickAnswer");
         if (a.available === true && (a.count === "" || a.count == null)) return t("carePlace.enterQuantity");
+      }
+    }
+    for (const a of slotAdhocs) {
+      if (adhocAnswers[a.id] !== true && adhocAnswers[a.id] !== false) {
+        return t("carePlace.pickAnswer");
       }
     }
     return null;
@@ -109,7 +144,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
     try {
       const today = new Date();
       const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-      await submit.mutateAsync({
+      const check = await submit.mutateAsync({
         family_id: familyId!,
         performed_by: userId!,
         scheduled_time: currentSlot.time_of_day,
@@ -124,6 +159,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
               item_type_snapshot: it.item_type,
               yesno_value: a.yesno === true,
               count_value: null,
+              inventory_item_id: it.inventory_item_id ?? null,
               severity: it.severity,
               decrement_amount: it.decrement_amount,
             };
@@ -141,12 +177,23 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
           };
         }),
       });
+
+      // Resolve ad-hoc items tied to this slot (best-effort).
+      for (const a of slotAdhocs) {
+        try {
+          await resolveAdhoc.mutateAsync({ id: a.id, checkId: check.id });
+        } catch (e) {
+          console.error("Adhoc resolve failed", e);
+        }
+      }
+
       toast.success(t("carePlace.submitted"));
       setOpen(false);
     } catch (e) {
       toast.error((e as Error).message);
     }
   }
+
 
   const slotLabel = currentSlot.label
     ? `${currentSlot.label} · ${currentSlot.time_of_day.slice(0, 5)}`
@@ -201,7 +248,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             </div>
           </DialogHeader>
 
-          {activeItems.length === 0 ? (
+          {activeItems.length === 0 && slotAdhocs.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
               {t("carePlace.empty")}
             </p>
@@ -211,9 +258,25 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
                 <ItemRow
                   key={it.id}
                   item={it}
+                  linkedInventory={
+                    it.inventory_item_id
+                      ? inventoryById.get(it.inventory_item_id) ?? null
+                      : null
+                  }
                   state={answers[it.id] ?? {}}
                   onChange={(s) =>
                     setAnswers((prev) => ({ ...prev, [it.id]: s }))
+                  }
+                />
+              ))}
+              {slotAdhocs.map((a) => (
+                <AdhocRow
+                  key={a.id}
+                  adhoc={a}
+                  linkedInventory={inventoryById.get(a.inventory_item_id) ?? null}
+                  value={adhocAnswers[a.id] ?? null}
+                  onChange={(v) =>
+                    setAdhocAnswers((prev) => ({ ...prev, [a.id]: v }))
                   }
                 />
               ))}
@@ -230,6 +293,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
               </div>
             </div>
           )}
+
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
@@ -288,12 +352,31 @@ function YesNoButtons({
   );
 }
 
+function ShortageStrip({ item }: { item: InventoryItem }) {
+  const { t } = useTranslation();
+  const unitLabel = t(`inventory.units.${item.unit}`);
+  return (
+    <div className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-xs text-amber-900 flex items-center gap-1.5">
+      <AlertTriangle className="size-3.5 shrink-0" />
+      <span>
+        {t("carePlace.alreadyLow", {
+          qty: item.quantity,
+          unit: unitLabel,
+          min: item.low_stock_threshold,
+        })}
+      </span>
+    </div>
+  );
+}
+
 function ItemRow({
   item,
+  linkedInventory,
   state,
   onChange,
 }: {
   item: CarePlaceItem;
+  linkedInventory: InventoryItem | null;
   state: AnswerState;
   onChange: (s: AnswerState) => void;
 }) {
@@ -302,6 +385,8 @@ function ItemRow({
   const containerCls = critical
     ? "rounded-xl border-2 border-red-400 bg-red-50/40 p-3 space-y-2"
     : "rounded-xl border p-3 space-y-2";
+
+  const alreadyLow = linkedInventory ? isLowStock(linkedInventory) : false;
 
   const labelRow = (
     <div className="flex items-center gap-2">
@@ -319,6 +404,7 @@ function ItemRow({
     return (
       <div className={containerCls}>
         {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
         <YesNoButtons
           value={state.yesno ?? null}
           onChange={(v) => onChange({ ...state, yesno: v })}
@@ -338,6 +424,7 @@ function ItemRow({
     <div className={containerCls}>
       <div className="space-y-2">
         {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
         <p className="text-xs text-muted-foreground">{t("carePlace.available")}</p>
         <YesNoButtons
           value={state.available ?? null}
@@ -379,3 +466,35 @@ function ItemRow({
     </div>
   );
 }
+
+function AdhocRow({
+  adhoc,
+  linkedInventory,
+  value,
+  onChange,
+}: {
+  adhoc: AdhocItem;
+  linkedInventory: InventoryItem | null;
+  value: boolean | null;
+  onChange: (v: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-xl border-2 border-amber-400 bg-amber-50/50 p-3 space-y-2">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-600 text-white text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5">
+          <Zap className="size-3" />
+          {t("carePlace.adhocBadge")}
+        </span>
+        <Label className="font-medium">
+          {t("carePlace.adhocQuestion", { name: adhoc.label })}
+        </Label>
+      </div>
+      {linkedInventory && isLowStock(linkedInventory) && (
+        <ShortageStrip item={linkedInventory} />
+      )}
+      <YesNoButtons value={value} onChange={onChange} />
+    </div>
+  );
+}
+

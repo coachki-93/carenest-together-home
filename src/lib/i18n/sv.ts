@@ -941,6 +941,9 @@ export const sv = {
     missedTitle: "Missad vårdplatskontroll",
     missedSub_one: "{{count}} schemalagd kontroll missades idag.",
     missedSub_other: "{{count}} schemalagda kontroller missades idag.",
+    alreadyLow: "Redan lågt: {{qty}} {{unit}} kvar (gräns {{min}}).",
+    adhocBadge: "Akut tillagd",
+    adhocQuestion: "{{name}} — finns det nu?",
   },
   inventory: {
     title: "Förråd",
@@ -1008,6 +1011,10 @@ export const sv = {
     receiveNote: "Notis (valfritt)",
     receiveNotePlaceholder: "Beställningsnummer, leverantör, etc.",
     recentActivity: "Senaste händelser",
+    addToNextRound: "Lägg till nästa runda",
+    addedToNextRound: "Tillagt — verifieras vid {{time}}.",
+    queuedForSlot: "Kö · {{time}}",
+    cancelQueued: "Ångra",
     narrate: {
       someone: "Någon",
       system: "Systemet",

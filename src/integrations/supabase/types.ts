@@ -225,6 +225,67 @@ export type Database = {
           },
         ]
       }
+      care_place_adhoc_items: {
+        Row: {
+          created_at: string
+          created_by: string
+          family_id: string
+          for_slot_date: string
+          for_slot_time: string
+          id: string
+          inventory_item_id: string
+          label: string
+          resolved_at: string | null
+          resolved_check_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          family_id: string
+          for_slot_date: string
+          for_slot_time: string
+          id?: string
+          inventory_item_id: string
+          label: string
+          resolved_at?: string | null
+          resolved_check_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          for_slot_date?: string
+          for_slot_time?: string
+          id?: string
+          inventory_item_id?: string
+          label?: string
+          resolved_at?: string | null
+          resolved_check_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_place_adhoc_items_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_place_adhoc_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_place_adhoc_items_resolved_check_id_fkey"
+            columns: ["resolved_check_id"]
+            isOneToOne: false
+            referencedRelation: "care_place_checks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       care_place_check_answers: {
         Row: {
           check_id: string
