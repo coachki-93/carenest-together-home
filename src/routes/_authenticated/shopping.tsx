@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ShoppingCart } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { ShoppingListCard } from "@/components/carenest/ShoppingListCard";
@@ -16,19 +15,12 @@ function ShoppingPage() {
   const familyId = membership?.family_id;
 
   return (
-    <DashboardLayout>
-      <div className="space-y-4 max-w-3xl mx-auto">
-        <header className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-2">
-              <ShoppingCart className="size-6" />
-              {t("shopping.title")}
-            </h1>
-            <p className="text-sm text-muted-foreground">{t("shopping.subtitle")}</p>
-          </div>
-          <LanguageToggle />
-        </header>
-
+    <DashboardLayout
+      title={t("shopping.title")}
+      subtitle={t("shopping.subtitle")}
+      actions={<LanguageToggle />}
+    >
+      <div className="space-y-4 max-w-3xl">
         {familyId ? (
           <ShoppingListCard familyId={familyId} showEmpty />
         ) : (
