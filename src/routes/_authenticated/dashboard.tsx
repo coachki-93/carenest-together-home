@@ -87,6 +87,7 @@ import { ByProfile } from "@/components/carenest/ByProfile";
 import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
+import { useTodayMissedChecks } from "@/lib/data/missed-checks";
 import { useLowStockSummary } from "@/lib/data/inventory";
 import { Boxes } from "lucide-react";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
@@ -346,6 +347,7 @@ function DashboardPage() {
   const { data: activeOxygen, isLoading: oxygenLoading } = useActiveOxygenTank(familyId);
   const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
   const lowStock = useLowStockSummary(familyId);
+  const { data: missedChecks = [] } = useTodayMissedChecks(familyId);
   const { data: invites = [] } = useInvites(familyId);
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
@@ -826,6 +828,23 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
+          {missedChecks.length > 0 && (
+            <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4 flex items-start gap-3">
+              <div className="size-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center flex-none">
+                <ClipboardCheck className="size-5" />
+              </div>
+              <div className="flex-1 text-sm text-red-900">
+                <div className="font-bold">{t("carePlace.missedTitle")}</div>
+                <div className="text-xs mt-0.5">
+                  {missedChecks
+                    .map((m) => m.scheduled_time.slice(0, 5))
+                    .join(", ")}
+                  {" — "}
+                  {t("carePlace.missedSub", { count: missedChecks.length })}
+                </div>
+              </div>
+            </div>
+          )}
           <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
           {(lowStock.lowCount > 0 ||
             lowStock.expiringCount > 0 ||
