@@ -103,13 +103,19 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   function startCheck() {
     const initial: Record<string, AnswerState> = {};
     for (const it of activeItems) {
-      // 2A: pre-select "No" / "Not available" when the linked inventory item is already below threshold.
       const linked = it.inventory_item_id ? inventoryById.get(it.inventory_item_id) : undefined;
       const alreadyLow = linked ? isLowStock(linked) : false;
       if (it.item_type === "yesno") {
         initial[it.id] = { yesno: alreadyLow ? false : null };
-      } else {
+      } else if (it.item_type === "count") {
         initial[it.id] = { available: alreadyLow ? false : null, count: "" };
+      } else if (it.item_type === "days_left") {
+        const seeded = linked?.days_left_estimate != null ? String(linked.days_left_estimate) : "";
+        initial[it.id] = { days: seeded };
+      } else if (it.item_type === "quantity_estimate") {
+        initial[it.id] = { estimate: alreadyLow ? "lite" : null };
+      } else {
+        initial[it.id] = {};
       }
     }
     setAnswers(initial);
@@ -125,9 +131,14 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
       const a = answers[it.id] ?? {};
       if (it.item_type === "yesno") {
         if (a.yesno !== true && a.yesno !== false) return t("carePlace.pickAnswer");
-      } else {
+      } else if (it.item_type === "count") {
         if (a.available !== true && a.available !== false) return t("carePlace.pickAnswer");
         if (a.available === true && (a.count === "" || a.count == null)) return t("carePlace.enterQuantity");
+      } else if (it.item_type === "days_left") {
+        if (a.days === "" || a.days == null) return t("carePlace.enterDays");
+        if (!Number.isFinite(Number(a.days)) || Number(a.days) < 0) return t("carePlace.enterDays");
+      } else if (it.item_type === "quantity_estimate") {
+        if (!a.estimate) return t("carePlace.pickAnswer");
       }
     }
     for (const a of slotAdhocs) {
