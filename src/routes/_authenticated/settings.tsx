@@ -250,6 +250,15 @@ function SettingsPage() {
         {/* Notifications */}
         <EnableNotificationsCard />
 
+        {/* Care place control */}
+        <CarePlaceCheckSettings
+          familyId={membership.data?.family_id}
+          userId={user?.id}
+          isOwner={membership.data?.role === "owner"}
+        />
+
+
+
         {/* Password */}
         <section className="card-soft p-6 md:p-8 space-y-6">
           <header className="flex items-center gap-3">
