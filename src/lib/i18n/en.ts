@@ -941,6 +941,9 @@ export const en = {
     missedTitle: "Missed care place control",
     missedSub_one: "{{count}} scheduled check was missed today.",
     missedSub_other: "{{count}} scheduled checks were missed today.",
+    alreadyLow: "Already low: {{qty}} {{unit}} left (min {{min}}).",
+    adhocBadge: "Added urgently",
+    adhocQuestion: "{{name}} — is it stocked now?",
   },
   inventory: {
     title: "Inventory",
