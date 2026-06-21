@@ -37,10 +37,14 @@ interface Props {
   userId: string | undefined | null;
 }
 
+type QuantityEstimate = "mycket" | "lite" | "slut";
+
 interface AnswerState {
   yesno?: boolean | null;
   available?: boolean | null;
   count?: string;
+  days?: string;
+  estimate?: QuantityEstimate | null;
 }
 
 function formatMMSS(seconds: number) {
