@@ -46,8 +46,11 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
   const [newType, setNewType] = useState<CarePlaceItemType>("yesno");
   const [newMin, setNewMin] = useState("");
   const [newInventoryId, setNewInventoryId] = useState<string>("none");
+  const [newSeverity, setNewSeverity] = useState<"routine" | "critical">("routine");
+  const [newDecrement, setNewDecrement] = useState("1");
   const [newTime, setNewTime] = useState("07:00");
   const [newTimeLabel, setNewTimeLabel] = useState("");
+  const [newGrace, setNewGrace] = useState("30");
 
   async function addItem() {
     if (!familyId || !userId || !newLabel.trim()) return;
@@ -65,10 +68,14 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
             : null,
         position: items.length,
         active: true,
+        severity: newSeverity,
+        decrement_amount: Math.max(1, Number(newDecrement) || 1),
       });
       setNewLabel("");
       setNewMin("");
       setNewInventoryId("none");
+      setNewSeverity("routine");
+      setNewDecrement("1");
       toast.success(t("carePlace.itemAdded"));
     } catch (e) {
       toast.error((e as Error).message);
@@ -84,8 +91,10 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         time_of_day: `${newTime}:00`,
         label: newTimeLabel.trim() || null,
         active: true,
+        grace_minutes: Math.max(0, Math.min(720, Number(newGrace) || 30)),
       });
       setNewTimeLabel("");
+      setNewGrace("30");
       toast.success(t("carePlace.timeAdded"));
     } catch (e) {
       toast.error((e as Error).message);
