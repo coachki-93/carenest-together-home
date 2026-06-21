@@ -352,12 +352,31 @@ function YesNoButtons({
   );
 }
 
+function ShortageStrip({ item }: { item: InventoryItem }) {
+  const { t } = useTranslation();
+  const unitLabel = t(`inventory.units.${item.unit}`);
+  return (
+    <div className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-xs text-amber-900 flex items-center gap-1.5">
+      <AlertTriangle className="size-3.5 shrink-0" />
+      <span>
+        {t("carePlace.alreadyLow", {
+          qty: item.quantity,
+          unit: unitLabel,
+          min: item.low_stock_threshold,
+        })}
+      </span>
+    </div>
+  );
+}
+
 function ItemRow({
   item,
+  linkedInventory,
   state,
   onChange,
 }: {
   item: CarePlaceItem;
+  linkedInventory: InventoryItem | null;
   state: AnswerState;
   onChange: (s: AnswerState) => void;
 }) {
@@ -366,6 +385,8 @@ function ItemRow({
   const containerCls = critical
     ? "rounded-xl border-2 border-red-400 bg-red-50/40 p-3 space-y-2"
     : "rounded-xl border p-3 space-y-2";
+
+  const alreadyLow = linkedInventory ? isLowStock(linkedInventory) : false;
 
   const labelRow = (
     <div className="flex items-center gap-2">
@@ -383,6 +404,7 @@ function ItemRow({
     return (
       <div className={containerCls}>
         {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
         <YesNoButtons
           value={state.yesno ?? null}
           onChange={(v) => onChange({ ...state, yesno: v })}
@@ -402,6 +424,7 @@ function ItemRow({
     <div className={containerCls}>
       <div className="space-y-2">
         {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
         <p className="text-xs text-muted-foreground">{t("carePlace.available")}</p>
         <YesNoButtons
           value={state.available ?? null}
@@ -443,3 +466,35 @@ function ItemRow({
     </div>
   );
 }
+
+function AdhocRow({
+  adhoc,
+  linkedInventory,
+  value,
+  onChange,
+}: {
+  adhoc: AdhocItem;
+  linkedInventory: InventoryItem | null;
+  value: boolean | null;
+  onChange: (v: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-xl border-2 border-amber-400 bg-amber-50/50 p-3 space-y-2">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-600 text-white text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5">
+          <Zap className="size-3" />
+          {t("carePlace.adhocBadge")}
+        </span>
+        <Label className="font-medium">
+          {t("carePlace.adhocQuestion", { name: adhoc.label })}
+        </Label>
+      </div>
+      {linkedInventory && isLowStock(linkedInventory) && (
+        <ShortageStrip item={linkedInventory} />
+      )}
+      <YesNoButtons value={value} onChange={onChange} />
+    </div>
+  );
+}
+
