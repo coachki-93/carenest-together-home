@@ -941,6 +941,9 @@ export const sv = {
     missedTitle: "Missad vårdplatskontroll",
     missedSub_one: "{{count}} schemalagd kontroll missades idag.",
     missedSub_other: "{{count}} schemalagda kontroller missades idag.",
+    alreadyLow: "Redan lågt: {{qty}} {{unit}} kvar (gräns {{min}}).",
+    adhocBadge: "Akut tillagd",
+    adhocQuestion: "{{name}} — finns det nu?",
   },
   inventory: {
     title: "Förråd",
