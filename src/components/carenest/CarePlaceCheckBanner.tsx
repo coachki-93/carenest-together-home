@@ -131,6 +131,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             item_type_snapshot: it.item_type,
             yesno_value: available,
             count_value: available ? Number(a.count) : 0,
+            inventory_item_id: it.inventory_item_id ?? null,
           };
         }),
       });

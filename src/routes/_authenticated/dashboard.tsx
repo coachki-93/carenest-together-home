@@ -87,6 +87,8 @@ import { ByProfile } from "@/components/carenest/ByProfile";
 import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
+import { useLowStockSummary } from "@/lib/data/inventory";
+import { Boxes } from "lucide-react";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
@@ -343,6 +345,7 @@ function DashboardPage() {
   const { data: latestHandover, isLoading: handoverLoading } = useLatestHandover(familyId);
   const { data: activeOxygen, isLoading: oxygenLoading } = useActiveOxygenTank(familyId);
   const { data: members = [], isLoading: membersLoading } = useFamilyMembers(familyId);
+  const lowStock = useLowStockSummary(familyId);
   const { data: invites = [] } = useInvites(familyId);
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
@@ -824,6 +827,34 @@ function DashboardPage() {
 
           {/* Today's schedule */}
           <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
+          {(lowStock.lowCount > 0 ||
+            lowStock.expiringCount > 0 ||
+            lowStock.expiredCount > 0) && (
+            <Link
+              to="/inventory"
+              className="flex items-center gap-3 rounded-2xl border-2 border-amber-300 bg-amber-50 px-4 py-3 hover:bg-amber-100 transition-colors"
+            >
+              <div className="size-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-none">
+                <Boxes className="size-5" />
+              </div>
+              <div className="flex-1 text-sm text-amber-900">
+                <div className="font-bold">{t("inventory.alertTitle")}</div>
+                <div className="text-xs">
+                  {[
+                    lowStock.lowCount > 0 &&
+                      t("inventory.lowCount", { count: lowStock.lowCount }),
+                    lowStock.expiringCount > 0 &&
+                      t("inventory.expiringCount", { count: lowStock.expiringCount }),
+                    lowStock.expiredCount > 0 &&
+                      t("inventory.expiredCount", { count: lowStock.expiredCount }),
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </div>
+              </div>
+              <ChevronRight className="size-5 text-amber-700" />
+            </Link>
+          )}
           {handoverDue && (
             <HandoverDueBanner
               at={handoverDue.at}

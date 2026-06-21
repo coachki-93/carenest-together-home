@@ -23,6 +23,7 @@ import {
   useCarePlaceCheckHistory,
   type CarePlaceItemType,
 } from "@/lib/data/care-place-checks";
+import { useInventoryItems } from "@/lib/data/inventory";
 
 interface Props {
   familyId: string | undefined | null;
@@ -35,6 +36,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
   const { data: items = [] } = useCarePlaceItems(familyId);
   const { data: times = [] } = useCarePlaceTimes(familyId);
   const { data: history = [] } = useCarePlaceCheckHistory(familyId, 30);
+  const { data: inventory = [] } = useInventoryItems(familyId);
   const upsertItem = useUpsertCarePlaceItem();
   const deleteItem = useDeleteCarePlaceItem();
   const upsertTime = useUpsertCarePlaceTime();
@@ -43,6 +45,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
   const [newLabel, setNewLabel] = useState("");
   const [newType, setNewType] = useState<CarePlaceItemType>("yesno");
   const [newMin, setNewMin] = useState("");
+  const [newInventoryId, setNewInventoryId] = useState<string>("none");
   const [newTime, setNewTime] = useState("07:00");
   const [newTimeLabel, setNewTimeLabel] = useState("");
 
@@ -56,11 +59,16 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         item_type: newType,
         min_count:
           newType === "count" && newMin !== "" ? Number(newMin) : null,
+        inventory_item_id:
+          newType === "count" && newInventoryId !== "none"
+            ? newInventoryId
+            : null,
         position: items.length,
         active: true,
       });
       setNewLabel("");
       setNewMin("");
+      setNewInventoryId("none");
       toast.success(t("carePlace.itemAdded"));
     } catch (e) {
       toast.error((e as Error).message);
@@ -113,50 +121,91 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
               {t("carePlace.noItems")}
             </p>
           )}
-          {items.map((it) => (
-            <div
-              key={it.id}
-              className="flex items-center gap-2 rounded-xl border p-3"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="font-medium truncate">{it.label}</div>
-                <div className="text-xs text-muted-foreground">
-                  {it.item_type === "yesno"
-                    ? t("carePlace.typeYesNo")
-                    : it.item_type === "count" && it.min_count != null
-                      ? t("carePlace.typeCountMin", { n: it.min_count })
-                      : t("carePlace.typeCount")}
+          {items.map((it) => {
+            const linked = inventory.find((iv) => iv.id === it.inventory_item_id);
+            return (
+              <div
+                key={it.id}
+                className="flex items-center gap-2 rounded-xl border p-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate">{it.label}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {it.item_type === "yesno"
+                      ? t("carePlace.typeYesNo")
+                      : it.item_type === "count" && it.min_count != null
+                        ? t("carePlace.typeCountMin", { n: it.min_count })
+                        : t("carePlace.typeCount")}
+                    {it.item_type === "count" && linked && (
+                      <> · {t("carePlace.linkedTo")} {linked.name}</>
+                    )}
+                  </div>
+                  {isOwner && it.item_type === "count" && (
+                    <div className="mt-2">
+                      <Select
+                        value={it.inventory_item_id ?? "none"}
+                        onValueChange={(v) =>
+                          upsertItem.mutate({
+                            id: it.id,
+                            family_id: it.family_id,
+                            created_by: it.created_by,
+                            label: it.label,
+                            item_type: it.item_type,
+                            min_count: it.min_count,
+                            position: it.position,
+                            active: it.active,
+                            inventory_item_id: v === "none" ? null : v,
+                          })
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder={t("carePlace.linkInventory")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
+                          {inventory
+                            .filter((iv) => iv.active)
+                            .map((iv) => (
+                              <SelectItem key={iv.id} value={iv.id}>
+                                {iv.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
+                {isOwner && (
+                  <>
+                    <Switch
+                      checked={it.active}
+                      onCheckedChange={(v) =>
+                        upsertItem.mutate({
+                          id: it.id,
+                          family_id: it.family_id,
+                          created_by: it.created_by,
+                          label: it.label,
+                          item_type: it.item_type,
+                          min_count: it.min_count,
+                          position: it.position,
+                          active: !!v,
+                          inventory_item_id: it.inventory_item_id,
+                        })
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteItem.mutate(it.id)}
+                    >
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </>
+                )}
               </div>
-              {isOwner && (
-                <>
-                  <Switch
-                    checked={it.active}
-                    onCheckedChange={(v) =>
-                      upsertItem.mutate({
-                        id: it.id,
-                        family_id: it.family_id,
-                        created_by: it.created_by,
-                        label: it.label,
-                        item_type: it.item_type,
-                        min_count: it.min_count,
-                        position: it.position,
-                        active: !!v,
-                      })
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteItem.mutate(it.id)}
-                  >
-                    <Trash2 className="size-4 text-destructive" />
-                  </Button>
-                </>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
         {isOwner && (
           <div className="rounded-xl border-dashed border-2 p-3 space-y-2">
@@ -180,16 +229,39 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
               </Select>
             </div>
             {newType === "count" && (
-              <div className="flex items-center gap-2">
-                <Label className="text-xs">{t("carePlace.minCountLabel")}</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  className="w-24"
-                  value={newMin}
-                  onChange={(e) => setNewMin(e.target.value)}
-                />
-              </div>
+              <>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs">{t("carePlace.minCountLabel")}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    className="w-24"
+                    value={newMin}
+                    onChange={(e) => setNewMin(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">{t("carePlace.linkInventory")}</Label>
+                  <Select value={newInventoryId} onValueChange={setNewInventoryId}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
+                      {inventory
+                        .filter((iv) => iv.active)
+                        .map((iv) => (
+                          <SelectItem key={iv.id} value={iv.id}>
+                            {iv.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[11px] text-muted-foreground">
+                    {t("carePlace.linkHint")}
+                  </p>
+                </div>
+              </>
             )}
             <Button
               type="button"

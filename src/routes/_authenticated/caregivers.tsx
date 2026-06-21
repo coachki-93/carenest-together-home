@@ -22,6 +22,7 @@ import { AvatarColorPicker, AVATAR_COLORS, initials } from "@/components/carenes
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +48,7 @@ import {
   useInvites,
   useRemoveMember,
   useRevokeInvite,
+  useSetMaterialResponsible,
   type Invite,
   type MemberWithProfile,
 } from "@/lib/data/family";
@@ -78,6 +80,7 @@ function CareTeamPage() {
 
   const revokeInvite = useRevokeInvite();
   const removeMember = useRemoveMember();
+  const setMaterial = useSetMaterialResponsible();
 
   const [creatingInvite, setCreatingInvite] = useState(false);
   const [sentInvite, setSentInvite] = useState<Invite | null>(null);
@@ -214,6 +217,29 @@ function CareTeamPage() {
                       <p className="text-xs text-muted-foreground">
                         {t("caregiversPage.joined", { date: dateFmt.format(new Date(m.joined_at)) })}
                       </p>
+                      {!isOwnerRow && (isOwner || m.material_responsible) && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <Switch
+                            id={`mat-${m.id}`}
+                            checked={!!m.material_responsible}
+                            disabled={!isOwner || setMaterial.isPending}
+                            onCheckedChange={(v) =>
+                              setMaterial.mutate({ id: m.id, value: !!v })
+                            }
+                          />
+                          <label
+                            htmlFor={`mat-${m.id}`}
+                            className="text-xs font-semibold text-muted-foreground"
+                          >
+                            {t("inventory.materialResponsible")}
+                          </label>
+                          {isOwner && (
+                            <span className="text-[11px] text-muted-foreground">
+                              · {t("inventory.materialResponsibleHint")}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {isOwner && !isOwnerRow && (
                       <Button
