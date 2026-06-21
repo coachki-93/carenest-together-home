@@ -159,6 +159,7 @@ export const en = {
     vitals: "Vitals",
     oxygen: "Oxygen",
     handover: "Handover",
+    instructions: "Instructions",
 
     child: "Child profile",
     caregivers: "Care team",
@@ -856,6 +857,24 @@ export const en = {
     saveError: "Couldn't save.",
     flowFromTo: "Flow {{from}} → {{to}} l/min",
     duration: "Lasts {{duration}} at full",
+  },
+  instructions: {
+    title: "Instructions",
+    subtitle: "How to perform different care tasks.",
+    add: "Add instruction",
+    addTitle: "New instruction",
+    editTitle: "Edit instruction",
+    dialogDesc: "Document a care task so anyone on the team can follow it.",
+    fieldTitle: "Title",
+    fieldBody: "Instructions",
+    titlePlaceholder: "e.g. Diaper change",
+    bodyPlaceholder: "Step-by-step instructions…",
+    empty: "No instructions yet. Add one so your team knows how to perform care tasks.",
+    noBody: "No details yet.",
+    saved: "Instruction saved",
+    deleted: "Instruction deleted",
+    deleteTitle: "Delete instruction?",
+    deleteDesc: "\"{{title}}\" will be permanently removed.",
   },
 };
 

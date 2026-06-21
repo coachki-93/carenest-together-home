@@ -187,6 +187,44 @@ export type Database = {
           },
         ]
       }
+      care_instructions: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          family_id: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          created_by: string
+          family_id: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_instructions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       caregiver_profiles: {
         Row: {
           account_user_id: string

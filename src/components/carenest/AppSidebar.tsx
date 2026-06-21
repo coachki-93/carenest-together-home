@@ -11,6 +11,7 @@ import {
   CalendarDays,
   Settings,
   Wind,
+  BookOpen,
 } from "lucide-react";
 
 import {
@@ -40,6 +41,7 @@ export function AppSidebar() {
     { title: t("nav.vitals"), url: "/vitals", icon: Activity },
     { title: t("nav.oxygen"), url: "/oxygen", icon: Wind },
     { title: t("nav.handover"), url: "/handover", icon: ClipboardList },
+    { title: t("nav.instructions"), url: "/instructions", icon: BookOpen },
   ];
 
   const family = [
