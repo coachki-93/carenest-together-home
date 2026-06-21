@@ -400,6 +400,54 @@ function InventoryRow({
                 {t("inventory.markOrdered")}
               </Button>
             )}
+            {low && nextSlot && familyId && userId && !queuedAdhoc && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full gap-1 text-amber-800 border-amber-300 hover:bg-amber-50"
+                disabled={addAdhoc.isPending}
+                onClick={async () => {
+                  try {
+                    await addAdhoc.mutateAsync({
+                      familyId,
+                      inventoryItemId: item.id,
+                      label: item.name,
+                      forSlotDate: nextSlot.date,
+                      forSlotTime: nextSlot.time,
+                      createdBy: userId,
+                    });
+                    toast.success(
+                      t("inventory.addedToNextRound", {
+                        time: nextSlot.time.slice(0, 5),
+                      }),
+                    );
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  }
+                }}
+              >
+                <Zap className="size-3.5" />
+                {t("inventory.addToNextRound")}
+              </Button>
+            )}
+            {queuedAdhoc && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full gap-1 text-muted-foreground"
+                disabled={removeAdhoc.isPending}
+                onClick={async () => {
+                  try {
+                    await removeAdhoc.mutateAsync(queuedAdhoc.id);
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  }
+                }}
+              >
+                <X className="size-3.5" />
+                {t("inventory.cancelQueued")}
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
