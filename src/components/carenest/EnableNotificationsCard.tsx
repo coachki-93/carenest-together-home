@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Bell, BellOff, BellRing } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { usePushSubscription } from "@/lib/push/use-push-subscription";
 import { useMyMembership } from "@/lib/auth/use-profile";

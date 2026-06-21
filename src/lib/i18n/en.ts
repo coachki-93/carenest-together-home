@@ -805,6 +805,15 @@ export const en = {
     body: "That page may have moved. Let's get you home.",
     goHome: "Go home",
   },
+  notify: {
+    close: "Close",
+    expand: "Show more",
+    collapse: "Show less",
+    countdown: "This message will close in {{seconds}}s.",
+    paused: "Paused.",
+    stop: "Click to stop.",
+    resume: "Click to resume.",
+  },
   error: {
     title: "Something didn't load",
     body: "Take a breath — try again or head home.",

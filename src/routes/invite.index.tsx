@@ -6,7 +6,7 @@ import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/invite/")({
   head: () => ({ meta: [{ title: "Join with invite — CareNest" }] }),

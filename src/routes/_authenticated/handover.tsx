@@ -32,7 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { useMyMembership, useProfile, useSession } from "@/lib/auth/use-profile";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 import { ByProfile } from "@/components/carenest/ByProfile";

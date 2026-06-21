@@ -58,7 +58,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { useMyMembership } from "@/lib/auth/use-profile";
 import { useFamilyChild } from "@/lib/data/medications";
 import {
