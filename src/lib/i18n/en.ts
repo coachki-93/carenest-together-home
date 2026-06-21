@@ -1046,6 +1046,7 @@ export const en = {
       used: "{{who}} used {{n}} — \"{{item}}\" {{range}}.",
       set: "{{who}} set the quantity — \"{{item}}\" {{range}}.",
       expired: "{{who}} wrote off expired stock — \"{{item}}\" {{range}}.",
+      daysLeft: "{{who}} updated days-left for \"{{item}}\" — {{note}}.",
       generic: "{{who}} updated \"{{item}}\" {{range}}.",
     },
   },
