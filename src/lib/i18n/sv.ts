@@ -805,6 +805,15 @@ export const sv = {
     body: "Sidan kan ha flyttats. Vi tar dig hem.",
     goHome: "Till startsidan",
   },
+  notify: {
+    close: "Stäng",
+    expand: "Visa mer",
+    collapse: "Visa mindre",
+    countdown: "Meddelandet stängs om {{seconds}} s.",
+    paused: "Pausad.",
+    stop: "Klicka för att stoppa.",
+    resume: "Klicka för att fortsätta.",
+  },
   error: {
     title: "Något kunde inte laddas",
     body: "Andas — försök igen eller gå hem.",
