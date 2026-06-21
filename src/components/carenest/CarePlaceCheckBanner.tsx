@@ -134,6 +134,10 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             <p className="text-sm text-red-800 mt-0.5">
               {t("carePlace.bannerSubtitle", { slot: slotLabel })}
             </p>
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800">
+              <Timer className="size-3.5" />
+              {t("carePlace.completeWithin", { time: formatMMSS(secondsLeft) })}
+            </div>
             {pending.length > 1 && (
               <p className="text-xs text-red-700 mt-1">
                 {t("carePlace.missedExtra", { count: pending.length - 1 })}
