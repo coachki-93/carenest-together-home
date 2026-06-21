@@ -1011,6 +1011,10 @@ export const en = {
     receiveNote: "Note (optional)",
     receiveNotePlaceholder: "Order number, supplier, etc.",
     recentActivity: "Recent activity",
+    addToNextRound: "Add to next round",
+    addedToNextRound: "Added — caregiver will verify at {{time}}.",
+    queuedForSlot: "Queued · {{time}}",
+    cancelQueued: "Cancel",
     narrate: {
       someone: "Someone",
       system: "The system",
