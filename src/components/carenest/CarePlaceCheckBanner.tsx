@@ -32,7 +32,8 @@ interface Props {
 }
 
 interface AnswerState {
-  yesno?: boolean;
+  yesno?: boolean | null;
+  available?: boolean | null;
   count?: string;
 }
 
@@ -76,15 +77,35 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
     const initial: Record<string, AnswerState> = {};
     for (const it of activeItems) {
       initial[it.id] =
-        it.item_type === "yesno" ? { yesno: false } : { count: "" };
+        it.item_type === "yesno"
+          ? { yesno: null }
+          : { available: null, count: "" };
     }
     setAnswers(initial);
     setNotes("");
     setOpen(true);
   }
 
+  function validate(): string | null {
+    for (const it of activeItems) {
+      const a = answers[it.id] ?? {};
+      if (it.item_type === "yesno") {
+        if (a.yesno !== true && a.yesno !== false) return t("carePlace.pickAnswer");
+      } else {
+        if (a.available !== true && a.available !== false) return t("carePlace.pickAnswer");
+        if (a.available === true && (a.count === "" || a.count == null)) return t("carePlace.enterQuantity");
+      }
+    }
+    return null;
+  }
+
   async function handleSubmit() {
     if (!currentSlot) return;
+    const err = validate();
+    if (err) {
+      toast.error(err);
+      return;
+    }
     try {
       await submit.mutateAsync({
         family_id: familyId!,
@@ -94,15 +115,22 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
         notes: notes.trim() || null,
         answers: activeItems.map((it) => {
           const a = answers[it.id] ?? {};
+          if (it.item_type === "yesno") {
+            return {
+              item_id: it.id,
+              item_label_snapshot: it.label,
+              item_type_snapshot: it.item_type,
+              yesno_value: a.yesno === true,
+              count_value: null,
+            };
+          }
+          const available = a.available === true;
           return {
             item_id: it.id,
             item_label_snapshot: it.label,
             item_type_snapshot: it.item_type,
-            yesno_value: it.item_type === "yesno" ? !!a.yesno : null,
-            count_value:
-              it.item_type === "count" && a.count !== ""
-                ? Number(a.count)
-                : null,
+            yesno_value: available,
+            count_value: available ? Number(a.count) : 0,
           };
         }),
       });
@@ -215,6 +243,44 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   );
 }
 
+function YesNoButtons({
+  value,
+  onChange,
+}: {
+  value: boolean | null | undefined;
+  onChange: (v: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  const base =
+    "flex-1 rounded-lg border px-3 py-2 text-sm font-semibold transition";
+  return (
+    <div className="flex gap-2">
+      <button
+        type="button"
+        onClick={() => onChange(true)}
+        className={`${base} ${
+          value === true
+            ? "border-green-600 bg-green-600 text-white"
+            : "border-input bg-background hover:bg-muted"
+        }`}
+      >
+        {t("carePlace.yes")}
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange(false)}
+        className={`${base} ${
+          value === false
+            ? "border-red-600 bg-red-600 text-white"
+            : "border-input bg-background hover:bg-muted"
+        }`}
+      >
+        {t("carePlace.no")}
+      </button>
+    </div>
+  );
+}
+
 function ItemRow({
   item,
   state,
@@ -225,48 +291,67 @@ function ItemRow({
   onChange: (s: AnswerState) => void;
 }) {
   const { t } = useTranslation();
+
+  if (item.item_type === "yesno") {
+    return (
+      <div className="rounded-xl border p-3 space-y-2">
+        <Label className="font-medium">{item.label}</Label>
+        <YesNoButtons
+          value={state.yesno ?? null}
+          onChange={(v) => onChange({ ...state, yesno: v })}
+        />
+      </div>
+    );
+  }
+
   const below =
-    item.item_type === "count" &&
     item.min_count != null &&
+    state.available === true &&
     state.count !== "" &&
     state.count != null &&
     Number(state.count) < item.min_count;
 
-  if (item.item_type === "yesno") {
-    return (
-      <label className="flex items-center justify-between gap-3 rounded-xl border p-3 cursor-pointer hover:bg-muted/30">
-        <span className="font-medium">{item.label}</span>
-        <Checkbox
-          checked={!!state.yesno}
-          onCheckedChange={(v) => onChange({ yesno: !!v })}
-        />
-      </label>
-    );
-  }
-
   return (
-    <div className="rounded-xl border p-3 space-y-2">
-      <div className="flex items-center justify-between gap-3">
+    <div className="rounded-xl border p-3 space-y-3">
+      <div className="space-y-2">
         <Label className="font-medium">{item.label}</Label>
-        <Input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          value={state.count ?? ""}
-          onChange={(e) => onChange({ count: e.target.value })}
-          className="w-24 text-right"
+        <p className="text-xs text-muted-foreground">{t("carePlace.available")}</p>
+        <YesNoButtons
+          value={state.available ?? null}
+          onChange={(v) =>
+            onChange({
+              ...state,
+              available: v,
+              count: v ? state.count ?? "" : "",
+            })
+          }
         />
       </div>
-      {item.min_count != null && (
-        <p className="text-xs text-muted-foreground">
-          {t("carePlace.minHint", { n: item.min_count })}
-        </p>
-      )}
-      {below && (
-        <p className="text-xs text-red-700 flex items-center gap-1">
-          <AlertTriangle className="size-3" />
-          {t("carePlace.belowMin", { n: item.min_count })}
-        </p>
+      {state.available === true && (
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-3">
+            <Label className="text-sm">{t("carePlace.quantity")}</Label>
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              value={state.count ?? ""}
+              onChange={(e) => onChange({ ...state, count: e.target.value })}
+              className="w-24 text-right"
+            />
+          </div>
+          {item.min_count != null && (
+            <p className="text-xs text-muted-foreground">
+              {t("carePlace.minHint", { n: item.min_count })}
+            </p>
+          )}
+          {below && (
+            <p className="text-xs text-red-700 flex items-center gap-1">
+              <AlertTriangle className="size-3" />
+              {t("carePlace.belowMin", { n: item.min_count })}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
