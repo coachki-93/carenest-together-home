@@ -138,7 +138,14 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 className="flex items-center gap-2 rounded-xl border p-3"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{it.label}</div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium truncate">{it.label}</span>
+                    {it.severity === "critical" && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-red-600 text-white">
+                        {t("carePlace.criticalBadge")}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {it.item_type === "yesno"
                       ? t("carePlace.typeYesNo")
@@ -149,10 +156,10 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                       <> · {t("carePlace.linkedTo")} {linked.name}</>
                     )}
                   </div>
-                  {isOwner && it.item_type === "count" && (
-                    <div className="mt-2">
+                  {isOwner && (
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <Select
-                        value={it.inventory_item_id ?? "none"}
+                        value={it.severity}
                         onValueChange={(v) =>
                           upsertItem.mutate({
                             id: it.id,
@@ -163,24 +170,54 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                             min_count: it.min_count,
                             position: it.position,
                             active: it.active,
-                            inventory_item_id: v === "none" ? null : v,
+                            inventory_item_id: it.inventory_item_id,
+                            severity: v as "routine" | "critical",
+                            decrement_amount: it.decrement_amount,
                           })
                         }
                       >
                         <SelectTrigger className="h-8 text-xs">
-                          <SelectValue placeholder={t("carePlace.linkInventory")} />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
-                          {inventory
-                            .filter((iv) => iv.active)
-                            .map((iv) => (
-                              <SelectItem key={iv.id} value={iv.id}>
-                                {iv.name}
-                              </SelectItem>
-                            ))}
+                          <SelectItem value="routine">{t("carePlace.severityRoutine")}</SelectItem>
+                          <SelectItem value="critical">{t("carePlace.severityCritical")}</SelectItem>
                         </SelectContent>
                       </Select>
+                      {it.item_type === "count" && (
+                        <Select
+                          value={it.inventory_item_id ?? "none"}
+                          onValueChange={(v) =>
+                            upsertItem.mutate({
+                              id: it.id,
+                              family_id: it.family_id,
+                              created_by: it.created_by,
+                              label: it.label,
+                              item_type: it.item_type,
+                              min_count: it.min_count,
+                              position: it.position,
+                              active: it.active,
+                              inventory_item_id: v === "none" ? null : v,
+                              severity: it.severity,
+                              decrement_amount: it.decrement_amount,
+                            })
+                          }
+                        >
+                          <SelectTrigger className="h-8 text-xs">
+                            <SelectValue placeholder={t("carePlace.linkInventory")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
+                            {inventory
+                              .filter((iv) => iv.active)
+                              .map((iv) => (
+                                <SelectItem key={iv.id} value={iv.id}>
+                                  {iv.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
                   )}
                 </div>
@@ -199,6 +236,8 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                           position: it.position,
                           active: !!v,
                           inventory_item_id: it.inventory_item_id,
+                          severity: it.severity,
+                          decrement_amount: it.decrement_amount,
                         })
                       }
                     />
