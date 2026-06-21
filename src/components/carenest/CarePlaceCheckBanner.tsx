@@ -107,11 +107,13 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
       return;
     }
     try {
+      const today = new Date();
+      const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
       await submit.mutateAsync({
         family_id: familyId!,
         performed_by: userId!,
         scheduled_time: currentSlot.time_of_day,
-        scheduled_date: new Date().toISOString().slice(0, 10),
+        scheduled_date: localDate,
         notes: notes.trim() || null,
         answers: activeItems.map((it) => {
           const a = answers[it.id] ?? {};
