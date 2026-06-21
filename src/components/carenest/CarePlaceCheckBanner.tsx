@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, ShieldAlert, Loader2 } from "lucide-react";
+import { AlertTriangle, ShieldAlert, Loader2, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ import {
   useTodayCarePlaceChecks,
   useSubmitCarePlaceCheck,
   pendingSlots,
+  slotSecondsRemaining,
   type CarePlaceItem,
   type CarePlaceTime,
 } from "@/lib/data/care-place-checks";
@@ -35,6 +36,13 @@ interface AnswerState {
   count?: string;
 }
 
+function formatMMSS(seconds: number) {
+  const s = Math.max(0, seconds);
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+}
+
 export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { t } = useTranslation();
   const { data: items = [] } = useCarePlaceItems(familyId);
@@ -42,11 +50,19 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: todaysChecks = [] } = useTodayCarePlaceChecks(familyId);
   const submit = useSubmitCarePlaceCheck();
 
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   const pending = useMemo(
-    () => pendingSlots(times, todaysChecks, new Date()),
-    [times, todaysChecks],
+    () => pendingSlots(times, todaysChecks, now),
+    [times, todaysChecks, now],
   );
   const currentSlot: CarePlaceTime | undefined = pending[pending.length - 1];
+  const secondsLeft = currentSlot ? slotSecondsRemaining(currentSlot, now) : 0;
+
 
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState<Record<string, AnswerState>>({});
