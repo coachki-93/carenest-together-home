@@ -444,6 +444,49 @@ function ItemRow({
     );
   }
 
+  if (item.item_type === "days_left") {
+    const daysNum = state.days != null && state.days !== "" ? Number(state.days) : null;
+    const lowDays = daysNum != null && daysNum <= 2;
+    return (
+      <div className={containerCls}>
+        {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
+        <div className="flex items-center justify-between gap-3">
+          <Label className="text-sm">{t("carePlace.daysLeftLabel")}</Label>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            value={state.days ?? ""}
+            onChange={(e) => onChange({ ...state, days: e.target.value })}
+            className="w-24 text-right"
+            placeholder="0"
+          />
+        </div>
+        {lowDays && (
+          <p className="text-xs text-red-700 flex items-center gap-1">
+            <AlertTriangle className="size-3" />
+            {t("carePlace.daysLeftLow", { n: daysNum })}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (item.item_type === "quantity_estimate") {
+    return (
+      <div className={containerCls}>
+        {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
+        <EstimateButtons
+          value={state.estimate ?? null}
+          onChange={(v) => onChange({ ...state, estimate: v })}
+        />
+      </div>
+    );
+  }
+
+  // count
   const below =
     item.min_count != null &&
     state.available === true &&
@@ -494,6 +537,37 @@ function ItemRow({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function EstimateButtons({
+  value,
+  onChange,
+}: {
+  value: QuantityEstimate | null;
+  onChange: (v: QuantityEstimate) => void;
+}) {
+  const { t } = useTranslation();
+  const opts: { key: QuantityEstimate; label: string; cls: string }[] = [
+    { key: "mycket", label: t("carePlace.estMycket"), cls: "border-green-600 bg-green-600 text-white" },
+    { key: "lite", label: t("carePlace.estLite"), cls: "border-amber-500 bg-amber-500 text-white" },
+    { key: "slut", label: t("carePlace.estSlut"), cls: "border-red-600 bg-red-600 text-white" },
+  ];
+  return (
+    <div className="flex gap-2">
+      {opts.map((o) => (
+        <button
+          key={o.key}
+          type="button"
+          onClick={() => onChange(o.key)}
+          className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+            value === o.key ? o.cls : "border-input bg-background hover:bg-muted"
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   );
 }
