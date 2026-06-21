@@ -822,6 +822,7 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
+          <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
           {handoverDue && (
             <HandoverDueBanner
               at={handoverDue.at}
@@ -830,6 +831,7 @@ function DashboardPage() {
               onDismiss={() => dismissHandover(handoverDue.dismissId)}
             />
           )}
+
           <section className="card-soft p-6" data-tour="today-schedule">
 
             <div className="flex items-center justify-between mb-4">
