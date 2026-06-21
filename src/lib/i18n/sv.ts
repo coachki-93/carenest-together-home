@@ -19,6 +19,8 @@ export const sv = {
     apple: "Apple",
     addAnother: "Lägg till en till",
     remove: "Ta bort",
+    edit: "Redigera",
+    close: "Stäng",
     language: "Språk",
     english: "English",
     swedish: "Svenska",
