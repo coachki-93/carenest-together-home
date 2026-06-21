@@ -1046,6 +1046,7 @@ export const sv = {
       used: "{{who}} förbrukade {{n}} — \"{{item}}\" {{range}}.",
       set: "{{who}} satte antalet — \"{{item}}\" {{range}}.",
       expired: "{{who}} skrev av utgånget — \"{{item}}\" {{range}}.",
+      daysLeft: "{{who}} uppdaterade dagar-kvar för \"{{item}}\" — {{note}}.",
       generic: "{{who}} uppdaterade \"{{item}}\" {{range}}.",
     },
   },
