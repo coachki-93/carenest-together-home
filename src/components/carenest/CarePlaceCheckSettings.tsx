@@ -23,6 +23,7 @@ import {
   useCarePlaceCheckHistory,
   type CarePlaceItemType,
 } from "@/lib/data/care-place-checks";
+import { useInventoryItems } from "@/lib/data/inventory";
 
 interface Props {
   familyId: string | undefined | null;
@@ -35,6 +36,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
   const { data: items = [] } = useCarePlaceItems(familyId);
   const { data: times = [] } = useCarePlaceTimes(familyId);
   const { data: history = [] } = useCarePlaceCheckHistory(familyId, 30);
+  const { data: inventory = [] } = useInventoryItems(familyId);
   const upsertItem = useUpsertCarePlaceItem();
   const deleteItem = useDeleteCarePlaceItem();
   const upsertTime = useUpsertCarePlaceTime();
@@ -43,6 +45,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
   const [newLabel, setNewLabel] = useState("");
   const [newType, setNewType] = useState<CarePlaceItemType>("yesno");
   const [newMin, setNewMin] = useState("");
+  const [newInventoryId, setNewInventoryId] = useState<string>("none");
   const [newTime, setNewTime] = useState("07:00");
   const [newTimeLabel, setNewTimeLabel] = useState("");
 
@@ -56,11 +59,16 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         item_type: newType,
         min_count:
           newType === "count" && newMin !== "" ? Number(newMin) : null,
+        inventory_item_id:
+          newType === "count" && newInventoryId !== "none"
+            ? newInventoryId
+            : null,
         position: items.length,
         active: true,
       });
       setNewLabel("");
       setNewMin("");
+      setNewInventoryId("none");
       toast.success(t("carePlace.itemAdded"));
     } catch (e) {
       toast.error((e as Error).message);
