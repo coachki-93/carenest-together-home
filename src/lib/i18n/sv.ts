@@ -159,6 +159,7 @@ export const sv = {
     vitals: "Mätvärden",
     oxygen: "Syrgas",
     handover: "Överlämning",
+    instructions: "Instruktioner",
 
     child: "Barnets profil",
     caregivers: "Vårdteam",
