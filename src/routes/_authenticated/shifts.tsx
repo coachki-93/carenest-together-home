@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Plus, Trash2, CalendarClock } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { initials } from "@/components/carenest/AvatarColorPicker";
 import { Button } from "@/components/ui/button";

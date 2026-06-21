@@ -14,7 +14,7 @@ import {
   UserCircle2,
   Pencil,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { z } from "zod";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { StorageImage } from "@/components/carenest/StorageImage";

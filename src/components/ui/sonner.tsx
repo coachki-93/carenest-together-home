@@ -1,23 +1,7 @@
-import { Toaster as Sonner } from "sonner";
+// Backwards-compat shim: the app's custom NotifyContainer replaces sonner.
+// Existing imports of `Toaster` from "@/components/ui/sonner" keep working.
+import { NotifyContainer } from "@/lib/notify";
 
-type ToasterProps = React.ComponentProps<typeof Sonner>;
-
-const Toaster = ({ ...props }: ToasterProps) => {
-  return (
-    <Sonner
-      className="toaster group"
-      toastOptions={{
-        classNames: {
-          toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-        },
-      }}
-      {...props}
-    />
-  );
-};
+const Toaster = (_props: Record<string, unknown>) => <NotifyContainer />;
 
 export { Toaster };

@@ -12,7 +12,7 @@ import { AvatarColorPicker, AVATAR_COLORS, initials } from "@/components/carenes
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/_authenticated/onboarding/caregiver")({
   head: () => ({ meta: [{ title: "Set up your caregiver profile — CareNest" }] }),

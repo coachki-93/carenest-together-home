@@ -8,7 +8,7 @@ import { useSession } from "@/lib/auth/use-profile";
 import { Logo } from "@/components/carenest/Logo";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/invite/$code")({
   head: () => ({ meta: [{ title: "Join family — CareNest" }] }),

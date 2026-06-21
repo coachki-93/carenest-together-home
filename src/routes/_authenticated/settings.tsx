@@ -20,7 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession, useProfile, useMyMembership } from "@/lib/auth/use-profile";
 import { I18N_STORAGE_KEY } from "@/lib/i18n";
 import { writeLangCookieClient, type Lang } from "@/lib/i18n/cookie";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — CareNest" }] }),
