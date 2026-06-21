@@ -967,7 +967,37 @@ function InventoryDialog({
               rows={2}
             />
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>{t("inventory.location")}</Label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={t("inventory.locationPlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("inventory.supplier")}</Label>
+              <Input
+                value={supplier}
+                onChange={(e) => setSupplier(e.target.value)}
+                placeholder={t("inventory.supplierPlaceholder")}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>{t("inventory.supplierUrl")}</Label>
+            <Input
+              type="url"
+              value={supplierUrl}
+              onChange={(e) => setSupplierUrl(e.target.value)}
+              placeholder="https://…"
+            />
+          </div>
         </div>
+
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
