@@ -58,7 +58,14 @@ import {
   type UnitKind,
 } from "@/lib/data/inventory";
 import { useFamilyMembers } from "@/lib/data/family";
-import { useCarePlaceCheckHistory } from "@/lib/data/care-place-checks";
+import { useCarePlaceCheckHistory, useCarePlaceTimes } from "@/lib/data/care-place-checks";
+import {
+  useOpenAdhocItems,
+  useAddAdhocItem,
+  useDeleteAdhocItem,
+  nextUpcomingSlot,
+  type AdhocItem,
+} from "@/lib/data/adhoc-items";
 import { narrateAdjustments } from "@/lib/data/inventory-narrate";
 import { cn } from "@/lib/utils";
 
