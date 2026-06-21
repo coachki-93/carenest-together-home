@@ -217,7 +217,10 @@ export function NotifyContainer() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
-    return store.subscribe(setItems);
+    const unsub = store.subscribe(setItems);
+    return () => {
+      unsub();
+    };
   }, []);
   const handleDismiss = useCallback((id: string) => store.dismiss(id), []);
   const ctx = useMemo(() => store, []);
