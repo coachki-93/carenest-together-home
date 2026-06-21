@@ -222,6 +222,9 @@ function InventoryPage() {
                 item={it}
                 canManage={isMaterialManager}
                 userId={user?.id ?? null}
+                familyId={familyId ?? null}
+                nextSlot={nextSlot}
+                queuedAdhoc={adhocByItem.get(it.id) ?? null}
                 onEdit={() => setEditing(it)}
                 onHistory={() => setHistoryFor(it)}
               />
