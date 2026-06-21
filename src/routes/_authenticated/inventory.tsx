@@ -466,6 +466,17 @@ function InventoryRow({
               <PackageCheck className="size-3.5" />
               {t("inventory.markReceived")}
             </Button>
+            {item.supplier_url && (
+              <a
+                href={item.supplier_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold text-blue-700 border-blue-300 hover:bg-blue-50"
+              >
+                <Truck className="size-3.5" />
+                {t("inventory.reorder")}
+              </a>
+            )}
           </>
         )}
         <Button
