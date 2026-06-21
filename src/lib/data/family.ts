@@ -150,3 +150,20 @@ export function useRemoveMember() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["family-members"] }),
   });
 }
+
+export function useSetMaterialResponsible() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, value }: { id: string; value: boolean }) => {
+      const { error } = await supabase
+        .from("family_members")
+        .update({ material_responsible: value })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["family-members"] });
+      qc.invalidateQueries({ queryKey: ["my-membership"] });
+    },
+  });
+}
