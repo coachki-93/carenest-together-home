@@ -1001,6 +1001,7 @@ export const sv = {
       expiry_writeoff: "Utgånget",
       opening: "Startsaldo",
       received: "Mottaget",
+      days_left_update: "Dagar-kvar uppdaterad",
     },
     chip: { low: "{{count}} artikel lågt", lowOther: "{{count}} artiklar lågt" },
     ordered: "Beställd",
