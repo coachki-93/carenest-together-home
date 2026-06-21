@@ -225,6 +225,193 @@ export type Database = {
           },
         ]
       }
+      care_place_check_answers: {
+        Row: {
+          check_id: string
+          count_value: number | null
+          created_at: string
+          family_id: string
+          id: string
+          item_id: string | null
+          item_label_snapshot: string
+          item_type_snapshot: Database["public"]["Enums"]["care_place_item_type"]
+          yesno_value: boolean | null
+        }
+        Insert: {
+          check_id: string
+          count_value?: number | null
+          created_at?: string
+          family_id: string
+          id?: string
+          item_id?: string | null
+          item_label_snapshot: string
+          item_type_snapshot: Database["public"]["Enums"]["care_place_item_type"]
+          yesno_value?: boolean | null
+        }
+        Update: {
+          check_id?: string
+          count_value?: number | null
+          created_at?: string
+          family_id?: string
+          id?: string
+          item_id?: string | null
+          item_label_snapshot?: string
+          item_type_snapshot?: Database["public"]["Enums"]["care_place_item_type"]
+          yesno_value?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_place_check_answers_check_id_fkey"
+            columns: ["check_id"]
+            isOneToOne: false
+            referencedRelation: "care_place_checks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_place_check_answers_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_place_check_answers_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "care_place_checklist_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      care_place_check_times: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          family_id: string
+          id: string
+          label: string | null
+          time_of_day: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          family_id: string
+          id?: string
+          label?: string | null
+          time_of_day: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          id?: string
+          label?: string | null
+          time_of_day?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_place_check_times_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      care_place_checklist_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          family_id: string
+          id: string
+          item_type: Database["public"]["Enums"]["care_place_item_type"]
+          label: string
+          min_count: number | null
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          family_id: string
+          id?: string
+          item_type?: Database["public"]["Enums"]["care_place_item_type"]
+          label: string
+          min_count?: number | null
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          id?: string
+          item_type?: Database["public"]["Enums"]["care_place_item_type"]
+          label?: string
+          min_count?: number | null
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_place_checklist_items_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      care_place_checks: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          notes: string | null
+          performed_at: string
+          performed_by: string
+          scheduled_date: string
+          scheduled_time: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          notes?: string | null
+          performed_at?: string
+          performed_by: string
+          scheduled_date: string
+          scheduled_time: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          notes?: string | null
+          performed_at?: string
+          performed_by?: string
+          scheduled_date?: string
+          scheduled_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_place_checks_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       caregiver_profiles: {
         Row: {
           account_user_id: string
@@ -960,6 +1147,7 @@ export type Database = {
         | "seizure"
         | "breathing"
         | "note"
+      care_place_item_type: "yesno" | "count"
       invite_status: "pending" | "accepted" | "revoked"
       med_log_status: "given" | "skipped" | "missed" | "postponed"
       med_route:
@@ -1125,6 +1313,7 @@ export const Constants = {
         "breathing",
         "note",
       ],
+      care_place_item_type: ["yesno", "count"],
       invite_status: ["pending", "accepted", "revoked"],
       med_log_status: ["given", "skipped", "missed", "postponed"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
