@@ -914,6 +914,7 @@ export const sv = {
     itemsLabel: "punkter",
     itemAdded: "Punkt tillagd",
     timeAdded: "Tid tillagd",
+    completeWithin: "Slutför inom {{time}}",
   },
 };
 
