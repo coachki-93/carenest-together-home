@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { adjustInventory } from "./inventory";
 
 export type CarePlaceItem =
   Database["public"]["Tables"]["care_place_checklist_items"]["Row"];
@@ -139,6 +140,8 @@ export interface SubmitCheckInput {
     item_type_snapshot: CarePlaceItemType;
     yesno_value?: boolean | null;
     count_value?: number | null;
+    /** Linked inventory item to decrement when yesno_value === false. */
+    inventory_item_id?: string | null;
   }[];
 }
 
@@ -174,11 +177,35 @@ export function useSubmitCarePlaceCheck() {
           );
         if (aerr) throw aerr;
       }
+
+      // Auto-decrement linked inventory items when the caregiver answered "Nej".
+      const decrements = input.answers.filter(
+        (a) => a.inventory_item_id && a.yesno_value === false,
+      );
+      for (const a of decrements) {
+        try {
+          await adjustInventory({
+            itemId: a.inventory_item_id!,
+            familyId: input.family_id,
+            performedBy: input.performed_by,
+            delta: -1,
+            reason: "care_place_check",
+            note: a.item_label_snapshot,
+            sourceCheckId: check.id,
+          });
+        } catch (e) {
+          // Non-fatal: don't undo the check if a single decrement fails.
+          console.error("Inventory decrement failed", e);
+        }
+      }
       return check as CarePlaceCheck;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["care-place-checks-today"] });
       qc.invalidateQueries({ queryKey: ["care-place-check-history"] });
+      qc.invalidateQueries({ queryKey: ["inventory-items"] });
+      qc.invalidateQueries({ queryKey: ["inventory-history"] });
+      qc.invalidateQueries({ queryKey: ["inventory-activity"] });
     },
   });
 }
