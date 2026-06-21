@@ -13,6 +13,7 @@ import {
   Wind,
   BookOpen,
   Boxes,
+  ShoppingCart,
 } from "lucide-react";
 
 import {
@@ -44,6 +45,7 @@ export function AppSidebar() {
     { title: t("nav.handover"), url: "/handover", icon: ClipboardList },
     { title: t("nav.instructions"), url: "/instructions", icon: BookOpen },
     { title: t("nav.inventory"), url: "/inventory", icon: Boxes },
+    { title: t("nav.shopping"), url: "/shopping", icon: ShoppingCart },
   ];
 
   const family = [
