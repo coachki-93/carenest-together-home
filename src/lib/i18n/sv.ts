@@ -163,6 +163,8 @@ export const sv = {
     handover: "Överlämning",
     instructions: "Instruktioner",
     inventory: "Förråd",
+    shopping: "Inköpslista",
+
 
 
     child: "Barnets profil",
@@ -952,6 +954,8 @@ export const sv = {
     estMycket: "Mycket",
     estLite: "Lite",
     estSlut: "Slut",
+    daysLeftThresholdLabel: "Kritisk vid (dagar)",
+    daysLeftThresholdHint: "Skicka kritisk notis när svaret för dagar kvar når denna nivå eller lägre.",
   },
   inventory: {
     title: "Förråd",
