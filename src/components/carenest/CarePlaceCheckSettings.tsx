@@ -191,7 +191,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                           <SelectItem value="critical">{t("carePlace.severityCritical")}</SelectItem>
                         </SelectContent>
                       </Select>
-                      {it.item_type === "count" && (
+                      {it.item_type !== "yesno" && (
                         <Select
                           value={it.inventory_item_id ?? "none"}
                           onValueChange={(v) =>
