@@ -175,6 +175,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             severity: it.severity,
             decrement_amount: it.decrement_amount,
             min_count_snapshot: it.min_count,
+            days_left_threshold_snapshot: it.days_left_threshold ?? 2,
           };
           if (it.item_type === "yesno") {
             return {

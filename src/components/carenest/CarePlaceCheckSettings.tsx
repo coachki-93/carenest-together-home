@@ -48,6 +48,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
   const [newInventoryId, setNewInventoryId] = useState<string>("none");
   const [newSeverity, setNewSeverity] = useState<"routine" | "critical">("routine");
   const [newDecrement, setNewDecrement] = useState("1");
+  const [newThreshold, setNewThreshold] = useState("2");
   const [newTime, setNewTime] = useState("07:00");
   const [newTimeLabel, setNewTimeLabel] = useState("");
   const [newGrace, setNewGrace] = useState("30");
@@ -70,12 +71,17 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         active: true,
         severity: newSeverity,
         decrement_amount: Math.max(1, Number(newDecrement) || 1),
+        days_left_threshold:
+          newType === "days_left"
+            ? Math.max(1, Number(newThreshold) || 2)
+            : 2,
       });
       setNewLabel("");
       setNewMin("");
       setNewInventoryId("none");
       setNewSeverity("routine");
       setNewDecrement("1");
+      setNewThreshold("2");
       toast.success(t("carePlace.itemAdded"));
     } catch (e) {
       toast.error((e as Error).message);
@@ -346,6 +352,21 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                     onChange={(e) => setNewDecrement(e.target.value)}
                     className="h-9"
                   />
+                </div>
+              )}
+              {newType === "days_left" && (
+                <div className="space-y-1">
+                  <Label className="text-xs">{t("carePlace.daysLeftThresholdLabel")}</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={newThreshold}
+                    onChange={(e) => setNewThreshold(e.target.value)}
+                    className="h-9"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    {t("carePlace.daysLeftThresholdHint")}
+                  </p>
                 </div>
               )}
             </div>

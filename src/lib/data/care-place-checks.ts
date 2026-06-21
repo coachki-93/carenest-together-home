@@ -154,6 +154,8 @@ export interface SubmitCheckInput {
     decrement_amount?: number | null;
     /** Severity of the question — drives critical push notifications. */
     severity?: "routine" | "critical";
+    /** Days-left threshold snapshot — answers ≤ this trigger a critical push. */
+    days_left_threshold_snapshot?: number | null;
   }[];
 }
 
@@ -270,13 +272,16 @@ export function useSubmitCarePlaceCheck() {
         }
       }
 
-      // Critical push: classic "No", "Slut", or days_left ≤ 2.
+      // Critical push: classic "No", "Slut", or days_left ≤ per-question threshold.
       const criticalNos = input.answers
         .filter((a) => {
           if (a.severity !== "critical") return false;
           if (a.yesno_value === false) return true;
           if (a.estimate_value === "slut") return true;
-          if (a.item_type_snapshot === "days_left" && Number(a.count_value ?? 99) <= 2) return true;
+          if (a.item_type_snapshot === "days_left") {
+            const threshold = Number(a.days_left_threshold_snapshot ?? 2);
+            if (Number(a.count_value ?? 99) <= threshold) return true;
+          }
           return false;
         })
         .map((a) => a.item_label_snapshot);
