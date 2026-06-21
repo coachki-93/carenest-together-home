@@ -1011,6 +1011,10 @@ export const sv = {
     receiveNote: "Notis (valfritt)",
     receiveNotePlaceholder: "Beställningsnummer, leverantör, etc.",
     recentActivity: "Senaste händelser",
+    addToNextRound: "Lägg till nästa runda",
+    addedToNextRound: "Tillagt — verifieras vid {{time}}.",
+    queuedForSlot: "Kö · {{time}}",
+    cancelQueued: "Ångra",
     narrate: {
       someone: "Någon",
       system: "Systemet",
