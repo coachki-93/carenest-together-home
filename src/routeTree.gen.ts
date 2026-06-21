@@ -19,6 +19,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
+import { Route as AuthenticatedShoppingRouteImport } from './routes/_authenticated/shopping'
 import { Route as AuthenticatedShiftsRouteImport } from './routes/_authenticated/shifts'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
@@ -83,6 +84,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
 const AuthenticatedVitalsRoute = AuthenticatedVitalsRouteImport.update({
   id: '/vitals',
   path: '/vitals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedShoppingRoute = AuthenticatedShoppingRouteImport.update({
+  id: '/shopping',
+  path: '/shopping',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedShiftsRoute = AuthenticatedShiftsRouteImport.update({
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/schedule': typeof AuthenticatedScheduleRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shifts': typeof AuthenticatedShiftsRoute
+  '/shopping': typeof AuthenticatedShoppingRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/schedule': typeof AuthenticatedScheduleRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/shifts': typeof AuthenticatedShiftsRoute
+  '/shopping': typeof AuthenticatedShoppingRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shifts': typeof AuthenticatedShiftsRoute
+  '/_authenticated/shopping': typeof AuthenticatedShoppingRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/settings'
     | '/shifts'
+    | '/shopping'
     | '/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/settings'
     | '/shifts'
+    | '/shopping'
     | '/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/_authenticated/schedule'
     | '/_authenticated/settings'
     | '/_authenticated/shifts'
+    | '/_authenticated/shopping'
     | '/_authenticated/vitals'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -420,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/vitals'
       fullPath: '/vitals'
       preLoaderRoute: typeof AuthenticatedVitalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/shopping': {
+      id: '/_authenticated/shopping'
+      path: '/shopping'
+      fullPath: '/shopping'
+      preLoaderRoute: typeof AuthenticatedShoppingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/shifts': {
@@ -550,6 +569,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedShiftsRoute: typeof AuthenticatedShiftsRoute
+  AuthenticatedShoppingRoute: typeof AuthenticatedShoppingRoute
   AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
   AuthenticatedOnboardingCaregiverRoute: typeof AuthenticatedOnboardingCaregiverRoute
   AuthenticatedOnboardingChildRoute: typeof AuthenticatedOnboardingChildRoute
@@ -568,6 +588,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedShiftsRoute: AuthenticatedShiftsRoute,
+  AuthenticatedShoppingRoute: AuthenticatedShoppingRoute,
   AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
   AuthenticatedOnboardingCaregiverRoute: AuthenticatedOnboardingCaregiverRoute,
   AuthenticatedOnboardingChildRoute: AuthenticatedOnboardingChildRoute,
