@@ -167,28 +167,44 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
         notes: notes.trim() || null,
         answers: activeItems.map((it) => {
           const a = answers[it.id] ?? {};
-          if (it.item_type === "yesno") {
-            return {
-              item_id: it.id,
-              item_label_snapshot: it.label,
-              item_type_snapshot: it.item_type,
-              yesno_value: a.yesno === true,
-              count_value: null,
-              inventory_item_id: it.inventory_item_id ?? null,
-              severity: it.severity,
-              decrement_amount: it.decrement_amount,
-            };
-          }
-          const available = a.available === true;
-          return {
+          const base = {
             item_id: it.id,
             item_label_snapshot: it.label,
             item_type_snapshot: it.item_type,
-            yesno_value: available,
-            count_value: available ? Number(a.count) : 0,
             inventory_item_id: it.inventory_item_id ?? null,
             severity: it.severity,
             decrement_amount: it.decrement_amount,
+            min_count_snapshot: it.min_count,
+          };
+          if (it.item_type === "yesno") {
+            return {
+              ...base,
+              yesno_value: a.yesno === true,
+              count_value: null,
+            };
+          }
+          if (it.item_type === "count") {
+            const available = a.available === true;
+            return {
+              ...base,
+              yesno_value: available,
+              count_value: available ? Number(a.count) : 0,
+            };
+          }
+          if (it.item_type === "days_left") {
+            return {
+              ...base,
+              yesno_value: null,
+              count_value: Number(a.days),
+            };
+          }
+          // quantity_estimate
+          const estimate = a.estimate ?? null;
+          return {
+            ...base,
+            yesno_value: estimate === "mycket" ? true : estimate ? false : null,
+            count_value: estimate === "mycket" ? 2 : estimate === "lite" ? 1 : 0,
+            estimate_value: estimate,
           };
         }),
       });
