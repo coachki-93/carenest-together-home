@@ -86,6 +86,7 @@ import {
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
+import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
@@ -822,6 +823,7 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
+          <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
           {handoverDue && (
             <HandoverDueBanner
               at={handoverDue.at}
@@ -830,6 +832,7 @@ function DashboardPage() {
               onDismiss={() => dismissHandover(handoverDue.dismissId)}
             />
           )}
+
           <section className="card-soft p-6" data-tour="today-schedule">
 
             <div className="flex items-center justify-between mb-4">

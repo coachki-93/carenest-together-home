@@ -7,6 +7,7 @@ import { resetTour } from "@/lib/onboarding/tour-state";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
 import { EnableNotificationsCard } from "@/components/carenest/EnableNotificationsCard";
+import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSettings";
 import {
   AvatarColorPicker,
   AVATAR_COLORS,
@@ -248,6 +249,15 @@ function SettingsPage() {
 
         {/* Notifications */}
         <EnableNotificationsCard />
+
+        {/* Care place control */}
+        <CarePlaceCheckSettings
+          familyId={membership.data?.family_id}
+          userId={user?.id}
+          isOwner={membership.data?.role === "owner"}
+        />
+
+
 
         {/* Password */}
         <section className="card-soft p-6 md:p-8 space-y-6">
