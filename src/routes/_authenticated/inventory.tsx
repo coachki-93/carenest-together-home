@@ -833,6 +833,9 @@ function InventoryDialog({
           expiry_date: expiry || null,
           notes: notes.trim() || null,
           active: item.active,
+          location: location.trim() || null,
+          supplier: supplier.trim() || null,
+          supplier_url: supplierUrl.trim() || null,
         });
         if (q !== Number(item.quantity)) {
           await adjust.mutateAsync({
@@ -860,6 +863,9 @@ function InventoryDialog({
                 expiry_date: expiry || null,
                 notes: notes.trim() || null,
                 active: true,
+                location: location.trim() || null,
+                supplier: supplier.trim() || null,
+                supplier_url: supplierUrl.trim() || null,
               })
               .select()
               .single(),
