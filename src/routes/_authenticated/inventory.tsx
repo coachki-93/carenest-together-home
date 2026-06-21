@@ -349,10 +349,15 @@ function InventoryRow({
         <div className="text-2xl font-extrabold mt-0.5">
           {formatQty(item.quantity, item.unit, unitLabel)}
         </div>
-        <div className="text-xs text-muted-foreground space-x-2">
+        <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
           {item.low_stock_threshold != null && (
             <span>
               {t("inventory.minLabel")}: {item.low_stock_threshold} {unitLabel}
+            </span>
+          )}
+          {item.days_left_estimate != null && (
+            <span className="text-amber-700 font-medium">
+              {t("inventory.daysLeftEst", { n: item.days_left_estimate })}
             </span>
           )}
           {item.expiry_date && (
@@ -361,6 +366,10 @@ function InventoryRow({
               {item.expiry_date}
             </span>
           )}
+          {item.location && (
+            <span>{t("inventory.locationLabel")}: {item.location}</span>
+          )}
+          {item.supplier && <span>{item.supplier}</span>}
         </div>
         {item.notes && (
           <p className="text-xs text-muted-foreground italic mt-1">{item.notes}</p>
