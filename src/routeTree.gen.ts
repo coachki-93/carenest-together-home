@@ -24,6 +24,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
 import { Route as AuthenticatedOxygenRouteImport } from './routes/_authenticated/oxygen'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
+import { Route as AuthenticatedInstructionsRouteImport } from './routes/_authenticated/instructions'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -108,6 +109,12 @@ const AuthenticatedMedicationsRoute =
     path: '/medications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInstructionsRoute =
+  AuthenticatedInstructionsRouteImport.update({
+    id: '/instructions',
+    path: '/instructions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -160,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/instructions': typeof AuthenticatedInstructionsRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/oxygen': typeof AuthenticatedOxygenRoute
   '/schedule': typeof AuthenticatedScheduleRoute
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/instructions': typeof AuthenticatedInstructionsRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/oxygen': typeof AuthenticatedOxygenRoute
   '/schedule': typeof AuthenticatedScheduleRoute
@@ -210,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/instructions': typeof AuthenticatedInstructionsRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/oxygen': typeof AuthenticatedOxygenRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/handover'
     | '/home'
+    | '/instructions'
     | '/medications'
     | '/oxygen'
     | '/schedule'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/handover'
     | '/home'
+    | '/instructions'
     | '/medications'
     | '/oxygen'
     | '/schedule'
@@ -285,6 +297,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/handover'
     | '/_authenticated/home'
+    | '/_authenticated/instructions'
     | '/_authenticated/medications'
     | '/_authenticated/oxygen'
     | '/_authenticated/schedule'
@@ -418,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMedicationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/instructions': {
+      id: '/_authenticated/instructions'
+      path: '/instructions'
+      fullPath: '/instructions'
+      preLoaderRoute: typeof AuthenticatedInstructionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -483,6 +503,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedInstructionsRoute: typeof AuthenticatedInstructionsRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedOxygenRoute: typeof AuthenticatedOxygenRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
@@ -499,6 +520,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedInstructionsRoute: AuthenticatedInstructionsRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedOxygenRoute: AuthenticatedOxygenRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
@@ -540,13 +562,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
