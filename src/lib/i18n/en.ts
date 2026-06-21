@@ -914,6 +914,7 @@ export const en = {
     itemsLabel: "items",
     itemAdded: "Item added",
     timeAdded: "Time added",
+    completeWithin: "Complete within {{time}}",
   },
 };
 

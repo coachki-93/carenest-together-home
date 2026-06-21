@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, ShieldAlert, Loader2 } from "lucide-react";
+import { AlertTriangle, ShieldAlert, Loader2, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ import {
   useTodayCarePlaceChecks,
   useSubmitCarePlaceCheck,
   pendingSlots,
+  slotSecondsRemaining,
   type CarePlaceItem,
   type CarePlaceTime,
 } from "@/lib/data/care-place-checks";
@@ -35,6 +36,13 @@ interface AnswerState {
   count?: string;
 }
 
+function formatMMSS(seconds: number) {
+  const s = Math.max(0, seconds);
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+}
+
 export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { t } = useTranslation();
   const { data: items = [] } = useCarePlaceItems(familyId);
@@ -42,11 +50,19 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: todaysChecks = [] } = useTodayCarePlaceChecks(familyId);
   const submit = useSubmitCarePlaceCheck();
 
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   const pending = useMemo(
-    () => pendingSlots(times, todaysChecks, new Date()),
-    [times, todaysChecks],
+    () => pendingSlots(times, todaysChecks, now),
+    [times, todaysChecks, now],
   );
   const currentSlot: CarePlaceTime | undefined = pending[pending.length - 1];
+  const secondsLeft = currentSlot ? slotSecondsRemaining(currentSlot, now) : 0;
+
 
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState<Record<string, AnswerState>>({});
@@ -118,6 +134,10 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             <p className="text-sm text-red-800 mt-0.5">
               {t("carePlace.bannerSubtitle", { slot: slotLabel })}
             </p>
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800">
+              <Timer className="size-3.5" />
+              {t("carePlace.completeWithin", { time: formatMMSS(secondsLeft) })}
+            </div>
             {pending.length > 1 && (
               <p className="text-xs text-red-700 mt-1">
                 {t("carePlace.missedExtra", { count: pending.length - 1 })}
@@ -140,6 +160,10 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             <DialogDescription>
               {t("carePlace.dialogSubtitle", { slot: slotLabel })}
             </DialogDescription>
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800 w-fit">
+              <Timer className="size-3.5" />
+              {t("carePlace.completeWithin", { time: formatMMSS(secondsLeft) })}
+            </div>
           </DialogHeader>
 
           {activeItems.length === 0 ? (
