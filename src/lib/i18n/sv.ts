@@ -915,6 +915,12 @@ export const sv = {
     itemAdded: "Punkt tillagd",
     timeAdded: "Tid tillagd",
     completeWithin: "Slutför inom {{time}}",
+    yes: "Ja",
+    no: "Nej",
+    available: "Finns tillgängligt?",
+    quantity: "Antal",
+    pickAnswer: "Svara på alla punkter innan du skickar.",
+    enterQuantity: "Ange antal för alla tillgängliga punkter.",
   },
 };
 
