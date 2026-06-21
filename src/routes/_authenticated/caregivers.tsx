@@ -47,6 +47,7 @@ import {
   useInvites,
   useRemoveMember,
   useRevokeInvite,
+  useSetMaterialResponsible,
   type Invite,
   type MemberWithProfile,
 } from "@/lib/data/family";
@@ -78,6 +79,7 @@ function CareTeamPage() {
 
   const revokeInvite = useRevokeInvite();
   const removeMember = useRemoveMember();
+  const setMaterial = useSetMaterialResponsible();
 
   const [creatingInvite, setCreatingInvite] = useState(false);
   const [sentInvite, setSentInvite] = useState<Invite | null>(null);
