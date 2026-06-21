@@ -162,6 +162,8 @@ export const sv = {
     oxygen: "Syrgas",
     handover: "Överlämning",
     instructions: "Instruktioner",
+    inventory: "Förråd",
+
 
     child: "Barnets profil",
     caregivers: "Vårdteam",
