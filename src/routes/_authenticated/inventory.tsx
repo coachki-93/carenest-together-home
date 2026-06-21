@@ -14,6 +14,7 @@ import {
   Truck,
   PackageCheck,
   X,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
