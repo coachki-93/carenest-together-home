@@ -85,6 +85,22 @@ function InventoryPage() {
   const isMaterialManager = isOwner || !!membership?.material_responsible;
 
   const { data: items = [], isLoading } = useInventoryItems(familyId);
+  const { data: carePlaceTimes = [] } = useCarePlaceTimes(familyId);
+  const { data: openAdhocs = [] } = useOpenAdhocItems(familyId);
+  const nextSlot = useMemo(() => nextUpcomingSlot(carePlaceTimes, new Date()), [carePlaceTimes]);
+  const adhocByItem = useMemo(() => {
+    const map = new Map<string, AdhocItem>();
+    if (!nextSlot) return map;
+    for (const a of openAdhocs) {
+      if (
+        a.for_slot_date === nextSlot.date &&
+        a.for_slot_time.slice(0, 5) === nextSlot.time.slice(0, 5)
+      ) {
+        map.set(a.inventory_item_id, a);
+      }
+    }
+    return map;
+  }, [openAdhocs, nextSlot]);
 
   const [filter, setFilter] = useState<FilterMode>("all");
   const [editing, setEditing] = useState<InventoryItem | null>(null);
