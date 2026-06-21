@@ -37,10 +37,14 @@ interface Props {
   userId: string | undefined | null;
 }
 
+type QuantityEstimate = "mycket" | "lite" | "slut";
+
 interface AnswerState {
   yesno?: boolean | null;
   available?: boolean | null;
   count?: string;
+  days?: string;
+  estimate?: QuantityEstimate | null;
 }
 
 function formatMMSS(seconds: number) {
@@ -99,13 +103,19 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   function startCheck() {
     const initial: Record<string, AnswerState> = {};
     for (const it of activeItems) {
-      // 2A: pre-select "No" / "Not available" when the linked inventory item is already below threshold.
       const linked = it.inventory_item_id ? inventoryById.get(it.inventory_item_id) : undefined;
       const alreadyLow = linked ? isLowStock(linked) : false;
       if (it.item_type === "yesno") {
         initial[it.id] = { yesno: alreadyLow ? false : null };
-      } else {
+      } else if (it.item_type === "count") {
         initial[it.id] = { available: alreadyLow ? false : null, count: "" };
+      } else if (it.item_type === "days_left") {
+        const seeded = linked?.days_left_estimate != null ? String(linked.days_left_estimate) : "";
+        initial[it.id] = { days: seeded };
+      } else if (it.item_type === "quantity_estimate") {
+        initial[it.id] = { estimate: alreadyLow ? "lite" : null };
+      } else {
+        initial[it.id] = {};
       }
     }
     setAnswers(initial);
@@ -121,9 +131,14 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
       const a = answers[it.id] ?? {};
       if (it.item_type === "yesno") {
         if (a.yesno !== true && a.yesno !== false) return t("carePlace.pickAnswer");
-      } else {
+      } else if (it.item_type === "count") {
         if (a.available !== true && a.available !== false) return t("carePlace.pickAnswer");
         if (a.available === true && (a.count === "" || a.count == null)) return t("carePlace.enterQuantity");
+      } else if (it.item_type === "days_left") {
+        if (a.days === "" || a.days == null) return t("carePlace.enterDays");
+        if (!Number.isFinite(Number(a.days)) || Number(a.days) < 0) return t("carePlace.enterDays");
+      } else if (it.item_type === "quantity_estimate") {
+        if (!a.estimate) return t("carePlace.pickAnswer");
       }
     }
     for (const a of slotAdhocs) {
@@ -152,28 +167,44 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
         notes: notes.trim() || null,
         answers: activeItems.map((it) => {
           const a = answers[it.id] ?? {};
-          if (it.item_type === "yesno") {
-            return {
-              item_id: it.id,
-              item_label_snapshot: it.label,
-              item_type_snapshot: it.item_type,
-              yesno_value: a.yesno === true,
-              count_value: null,
-              inventory_item_id: it.inventory_item_id ?? null,
-              severity: it.severity,
-              decrement_amount: it.decrement_amount,
-            };
-          }
-          const available = a.available === true;
-          return {
+          const base = {
             item_id: it.id,
             item_label_snapshot: it.label,
             item_type_snapshot: it.item_type,
-            yesno_value: available,
-            count_value: available ? Number(a.count) : 0,
             inventory_item_id: it.inventory_item_id ?? null,
             severity: it.severity,
             decrement_amount: it.decrement_amount,
+            min_count_snapshot: it.min_count,
+          };
+          if (it.item_type === "yesno") {
+            return {
+              ...base,
+              yesno_value: a.yesno === true,
+              count_value: null,
+            };
+          }
+          if (it.item_type === "count") {
+            const available = a.available === true;
+            return {
+              ...base,
+              yesno_value: available,
+              count_value: available ? Number(a.count) : 0,
+            };
+          }
+          if (it.item_type === "days_left") {
+            return {
+              ...base,
+              yesno_value: null,
+              count_value: Number(a.days),
+            };
+          }
+          // quantity_estimate
+          const estimate = a.estimate ?? null;
+          return {
+            ...base,
+            yesno_value: estimate === "mycket" ? true : estimate ? false : null,
+            count_value: estimate === "mycket" ? 2 : estimate === "lite" ? 1 : 0,
+            estimate_value: estimate,
           };
         }),
       });
@@ -413,6 +444,49 @@ function ItemRow({
     );
   }
 
+  if (item.item_type === "days_left") {
+    const daysNum = state.days != null && state.days !== "" ? Number(state.days) : null;
+    const lowDays = daysNum != null && daysNum <= 2;
+    return (
+      <div className={containerCls}>
+        {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
+        <div className="flex items-center justify-between gap-3">
+          <Label className="text-sm">{t("carePlace.daysLeftLabel")}</Label>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            value={state.days ?? ""}
+            onChange={(e) => onChange({ ...state, days: e.target.value })}
+            className="w-24 text-right"
+            placeholder="0"
+          />
+        </div>
+        {lowDays && (
+          <p className="text-xs text-red-700 flex items-center gap-1">
+            <AlertTriangle className="size-3" />
+            {t("carePlace.daysLeftLow", { n: daysNum })}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (item.item_type === "quantity_estimate") {
+    return (
+      <div className={containerCls}>
+        {labelRow}
+        {alreadyLow && linkedInventory && <ShortageStrip item={linkedInventory} />}
+        <EstimateButtons
+          value={state.estimate ?? null}
+          onChange={(v) => onChange({ ...state, estimate: v })}
+        />
+      </div>
+    );
+  }
+
+  // count
   const below =
     item.min_count != null &&
     state.available === true &&
@@ -463,6 +537,37 @@ function ItemRow({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function EstimateButtons({
+  value,
+  onChange,
+}: {
+  value: QuantityEstimate | null;
+  onChange: (v: QuantityEstimate) => void;
+}) {
+  const { t } = useTranslation();
+  const opts: { key: QuantityEstimate; label: string; cls: string }[] = [
+    { key: "mycket", label: t("carePlace.estMycket"), cls: "border-green-600 bg-green-600 text-white" },
+    { key: "lite", label: t("carePlace.estLite"), cls: "border-amber-500 bg-amber-500 text-white" },
+    { key: "slut", label: t("carePlace.estSlut"), cls: "border-red-600 bg-red-600 text-white" },
+  ];
+  return (
+    <div className="flex gap-2">
+      {opts.map((o) => (
+        <button
+          key={o.key}
+          type="button"
+          onClick={() => onChange(o.key)}
+          className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+            value === o.key ? o.cls : "border-input bg-background hover:bg-muted"
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   );
 }

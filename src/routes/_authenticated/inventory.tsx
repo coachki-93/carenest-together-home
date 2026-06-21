@@ -233,6 +233,7 @@ function InventoryPage() {
           </ul>
         )}
 
+        {familyId && <ShoppingListCard familyId={familyId} />}
         {familyId && <RecentActivityCard familyId={familyId} />}
       </div>
 
@@ -349,10 +350,15 @@ function InventoryRow({
         <div className="text-2xl font-extrabold mt-0.5">
           {formatQty(item.quantity, item.unit, unitLabel)}
         </div>
-        <div className="text-xs text-muted-foreground space-x-2">
+        <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5">
           {item.low_stock_threshold != null && (
             <span>
               {t("inventory.minLabel")}: {item.low_stock_threshold} {unitLabel}
+            </span>
+          )}
+          {item.days_left_estimate != null && (
+            <span className="text-amber-700 font-medium">
+              {t("inventory.daysLeftEst", { n: item.days_left_estimate })}
             </span>
           )}
           {item.expiry_date && (
@@ -361,6 +367,10 @@ function InventoryRow({
               {item.expiry_date}
             </span>
           )}
+          {item.location && (
+            <span>{t("inventory.locationLabel")}: {item.location}</span>
+          )}
+          {item.supplier && <span>{item.supplier}</span>}
         </div>
         {item.notes && (
           <p className="text-xs text-muted-foreground italic mt-1">{item.notes}</p>
@@ -457,6 +467,17 @@ function InventoryRow({
               <PackageCheck className="size-3.5" />
               {t("inventory.markReceived")}
             </Button>
+            {item.supplier_url && (
+              <a
+                href={item.supplier_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold text-blue-700 border-blue-300 hover:bg-blue-50"
+              >
+                <Truck className="size-3.5" />
+                {t("inventory.reorder")}
+              </a>
+            )}
           </>
         )}
         <Button
@@ -699,6 +720,99 @@ function ReceiveStockDialog({
   );
 }
 
+function ShoppingListCard({ familyId }: { familyId: string }) {
+  const { t } = useTranslation();
+  const { data: items = [] } = useInventoryItems(familyId);
+
+  const { toOrder, onOrder } = useMemo(() => {
+    const to: InventoryItem[] = [];
+    const oo: InventoryItem[] = [];
+    for (const it of items) {
+      if (!it.active) continue;
+      if (isOnOrder(it)) {
+        oo.push(it);
+      } else if (isLowStock(it)) {
+        to.push(it);
+      }
+    }
+    return { toOrder: to, onOrder: oo };
+  }, [items]);
+
+  if (toOrder.length === 0 && onOrder.length === 0) return null;
+
+  return (
+    <section className="card-soft p-4 space-y-3">
+      <h3 className="font-semibold text-sm flex items-center gap-2">
+        <Truck className="size-4" />
+        {t("inventory.shoppingList")}
+      </h3>
+
+      {toOrder.length > 0 && (
+        <div className="space-y-1.5">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-red-700">
+            {t("inventory.toOrder")}
+          </div>
+          <ul className="space-y-1">
+            {toOrder.map((it) => {
+              const unitLabel = t(`inventory.units.${it.unit}`);
+              return (
+                <li
+                  key={it.id}
+                  className="flex items-center justify-between gap-2 text-sm rounded-md border bg-red-50/60 px-2.5 py-1.5"
+                >
+                  <span className="min-w-0">
+                    <span className="font-semibold">{it.name}</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      {formatQty(it.quantity, it.unit, unitLabel)}
+                      {it.low_stock_threshold != null && (
+                        <> / {it.low_stock_threshold} {unitLabel}</>
+                      )}
+                      {it.supplier && <> · {it.supplier}</>}
+                    </span>
+                  </span>
+                  {it.supplier_url && (
+                    <a
+                      href={it.supplier_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold text-blue-700 hover:underline shrink-0"
+                    >
+                      {t("inventory.reorder")}
+                    </a>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {onOrder.length > 0 && (
+        <div className="space-y-1.5">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-blue-700">
+            {t("inventory.onOrder")}
+          </div>
+          <ul className="space-y-1">
+            {onOrder.map((it) => (
+              <li
+                key={it.id}
+                className="flex items-center justify-between gap-2 text-sm rounded-md border bg-blue-50/60 px-2.5 py-1.5"
+              >
+                <span className="font-semibold">{it.name}</span>
+                <span className="text-xs text-blue-800">
+                  {it.expected_at
+                    ? t("inventory.orderedExpected", { date: it.expected_at })
+                    : t("inventory.ordered")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function RecentActivityCard({ familyId }: { familyId: string }) {
   const { t } = useTranslation();
   const { data: activity = [] } = useRecentInventoryActivity(familyId, 10);
@@ -798,6 +912,9 @@ function InventoryDialog({
   );
   const [expiry, setExpiry] = useState(item?.expiry_date ?? "");
   const [notes, setNotes] = useState(item?.notes ?? "");
+  const [location, setLocation] = useState(item?.location ?? "");
+  const [supplier, setSupplier] = useState(item?.supplier ?? "");
+  const [supplierUrl, setSupplierUrl] = useState(item?.supplier_url ?? "");
 
   const editing = !!item;
   const saving = upsert.isPending || adjust.isPending;
@@ -830,6 +947,9 @@ function InventoryDialog({
           expiry_date: expiry || null,
           notes: notes.trim() || null,
           active: item.active,
+          location: location.trim() || null,
+          supplier: supplier.trim() || null,
+          supplier_url: supplierUrl.trim() || null,
         });
         if (q !== Number(item.quantity)) {
           await adjust.mutateAsync({
@@ -857,6 +977,9 @@ function InventoryDialog({
                 expiry_date: expiry || null,
                 notes: notes.trim() || null,
                 active: true,
+                location: location.trim() || null,
+                supplier: supplier.trim() || null,
+                supplier_url: supplierUrl.trim() || null,
               })
               .select()
               .single(),
@@ -958,7 +1081,37 @@ function InventoryDialog({
               rows={2}
             />
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>{t("inventory.location")}</Label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={t("inventory.locationPlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("inventory.supplier")}</Label>
+              <Input
+                value={supplier}
+                onChange={(e) => setSupplier(e.target.value)}
+                placeholder={t("inventory.supplierPlaceholder")}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>{t("inventory.supplierUrl")}</Label>
+            <Input
+              type="url"
+              value={supplierUrl}
+              onChange={(e) => setSupplierUrl(e.target.value)}
+              placeholder="https://…"
+            />
+          </div>
         </div>
+
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>

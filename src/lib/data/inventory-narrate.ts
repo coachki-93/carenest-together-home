@@ -85,6 +85,8 @@ function buildSentence(args: {
       return t("inventory.narrate.set", { who, item, range });
     case "expiry_writeoff":
       return t("inventory.narrate.expired", { who, item, range });
+    case "days_left_update":
+      return t("inventory.narrate.daysLeft", { who, item, note: args.note ?? "" });
     default:
       return t("inventory.narrate.generic", { who, item, range });
   }

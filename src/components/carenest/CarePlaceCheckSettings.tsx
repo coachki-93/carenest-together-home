@@ -63,7 +63,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         min_count:
           newType === "count" && newMin !== "" ? Number(newMin) : null,
         inventory_item_id:
-          newType === "count" && newInventoryId !== "none"
+          newType !== "yesno" && newInventoryId !== "none"
             ? newInventoryId
             : null,
         position: items.length,
@@ -149,12 +149,19 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                   <div className="text-xs text-muted-foreground">
                     {it.item_type === "yesno"
                       ? t("carePlace.typeYesNo")
-                      : it.item_type === "count" && it.min_count != null
-                        ? t("carePlace.typeCountMin", { n: it.min_count })
-                        : t("carePlace.typeCount")}
-                    {it.item_type === "count" && linked && (
-                      <> · {t("carePlace.linkedTo")} {linked.name}</>
-                    )}
+                      : it.item_type === "count"
+                        ? (it.min_count != null
+                            ? t("carePlace.typeCountMin", { n: it.min_count })
+                            : t("carePlace.typeCount"))
+                        : it.item_type === "days_left"
+                          ? t("carePlace.typeDaysLeft")
+                          : t("carePlace.typeQuantityEstimate")}
+                    {(it.item_type === "count" ||
+                      it.item_type === "days_left" ||
+                      it.item_type === "quantity_estimate") &&
+                      linked && (
+                        <> · {t("carePlace.linkedTo")} {linked.name}</>
+                      )}
                   </div>
                   {isOwner && (
                     <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -184,7 +191,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                           <SelectItem value="critical">{t("carePlace.severityCritical")}</SelectItem>
                         </SelectContent>
                       </Select>
-                      {it.item_type === "count" && (
+                      {it.item_type !== "yesno" && (
                         <Select
                           value={it.inventory_item_id ?? "none"}
                           onValueChange={(v) =>
@@ -273,43 +280,45 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 <SelectContent>
                   <SelectItem value="yesno">{t("carePlace.typeYesNo")}</SelectItem>
                   <SelectItem value="count">{t("carePlace.typeCount")}</SelectItem>
+                  <SelectItem value="days_left">{t("carePlace.typeDaysLeft")}</SelectItem>
+                  <SelectItem value="quantity_estimate">{t("carePlace.typeQuantityEstimate")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             {newType === "count" && (
-              <>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs">{t("carePlace.minCountLabel")}</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    className="w-24"
-                    value={newMin}
-                    onChange={(e) => setNewMin(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">{t("carePlace.linkInventory")}</Label>
-                  <Select value={newInventoryId} onValueChange={setNewInventoryId}>
-                    <SelectTrigger className="h-9">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
-                      {inventory
-                        .filter((iv) => iv.active)
-                        .map((iv) => (
-                          <SelectItem key={iv.id} value={iv.id}>
-                            {iv.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[11px] text-muted-foreground">
-                    {t("carePlace.linkHint")}
-                  </p>
-                </div>
-              </>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs">{t("carePlace.minCountLabel")}</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  className="w-24"
+                  value={newMin}
+                  onChange={(e) => setNewMin(e.target.value)}
+                />
+              </div>
+            )}
+            {newType !== "yesno" && (
+              <div className="space-y-1">
+                <Label className="text-xs">{t("carePlace.linkInventory")}</Label>
+                <Select value={newInventoryId} onValueChange={setNewInventoryId}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
+                    {inventory
+                      .filter((iv) => iv.active)
+                      .map((iv) => (
+                        <SelectItem key={iv.id} value={iv.id}>
+                          {iv.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground">
+                  {t("carePlace.linkHint")}
+                </p>
+              </div>
             )}
             <div className="grid sm:grid-cols-2 gap-2">
               <div className="space-y-1">
@@ -327,7 +336,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                   </SelectContent>
                 </Select>
               </div>
-              {newType === "count" && newInventoryId !== "none" && (
+              {newType !== "yesno" && newType !== "days_left" && newInventoryId !== "none" && (
                 <div className="space-y-1">
                   <Label className="text-xs">{t("carePlace.decrementLabel")}</Label>
                   <Input

@@ -907,16 +907,21 @@ export type Database = {
           active: boolean
           created_at: string
           created_by: string
+          days_left_estimate: number | null
+          days_left_updated_at: string | null
           expected_at: string | null
           expiry_date: string | null
           family_id: string
           id: string
+          location: string | null
           low_stock_threshold: number | null
           name: string
           notes: string | null
           ordered_at: string | null
           ordered_by: string | null
           quantity: number
+          supplier: string | null
+          supplier_url: string | null
           unit: Database["public"]["Enums"]["unit_kind"]
           updated_at: string
         }
@@ -924,16 +929,21 @@ export type Database = {
           active?: boolean
           created_at?: string
           created_by: string
+          days_left_estimate?: number | null
+          days_left_updated_at?: string | null
           expected_at?: string | null
           expiry_date?: string | null
           family_id: string
           id?: string
+          location?: string | null
           low_stock_threshold?: number | null
           name: string
           notes?: string | null
           ordered_at?: string | null
           ordered_by?: string | null
           quantity?: number
+          supplier?: string | null
+          supplier_url?: string | null
           unit: Database["public"]["Enums"]["unit_kind"]
           updated_at?: string
         }
@@ -941,16 +951,21 @@ export type Database = {
           active?: boolean
           created_at?: string
           created_by?: string
+          days_left_estimate?: number | null
+          days_left_updated_at?: string | null
           expected_at?: string | null
           expiry_date?: string | null
           family_id?: string
           id?: string
+          location?: string | null
           low_stock_threshold?: number | null
           name?: string
           notes?: string | null
           ordered_at?: string | null
           ordered_by?: string | null
           quantity?: number
+          supplier?: string | null
+          supplier_url?: string | null
           unit?: Database["public"]["Enums"]["unit_kind"]
           updated_at?: string
         }
@@ -1399,7 +1414,11 @@ export type Database = {
         | "seizure"
         | "breathing"
         | "note"
-      care_place_item_type: "yesno" | "count"
+      care_place_item_type:
+        | "yesno"
+        | "count"
+        | "days_left"
+        | "quantity_estimate"
       care_place_severity: "routine" | "critical"
       inventory_adjustment_reason:
         | "manual_set"
@@ -1408,6 +1427,7 @@ export type Database = {
         | "care_place_check"
         | "expiry_writeoff"
         | "received"
+        | "days_left_update"
       invite_status: "pending" | "accepted" | "revoked"
       med_log_status: "given" | "skipped" | "missed" | "postponed"
       med_route:
@@ -1574,7 +1594,12 @@ export const Constants = {
         "breathing",
         "note",
       ],
-      care_place_item_type: ["yesno", "count"],
+      care_place_item_type: [
+        "yesno",
+        "count",
+        "days_left",
+        "quantity_estimate",
+      ],
       care_place_severity: ["routine", "critical"],
       inventory_adjustment_reason: [
         "manual_set",
@@ -1583,6 +1608,7 @@ export const Constants = {
         "care_place_check",
         "expiry_writeoff",
         "received",
+        "days_left_update",
       ],
       invite_status: ["pending", "accepted", "revoked"],
       med_log_status: ["given", "skipped", "missed", "postponed"],
