@@ -338,6 +338,12 @@ function InventoryRow({
               {t("inventory.expired")}
             </span>
           )}
+          {queuedAdhoc && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+              <Zap className="size-3" />
+              {t("inventory.queuedForSlot", { time: queuedAdhoc.for_slot_time.slice(0, 5) })}
+            </span>
+          )}
         </div>
         <div className="text-2xl font-extrabold mt-0.5">
           {formatQty(item.quantity, item.unit, unitLabel)}
