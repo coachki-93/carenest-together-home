@@ -24,6 +24,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
 import { Route as AuthenticatedOxygenRouteImport } from './routes/_authenticated/oxygen'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
+import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedInstructionsRouteImport } from './routes/_authenticated/instructions'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
@@ -109,6 +110,11 @@ const AuthenticatedMedicationsRoute =
     path: '/medications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInstructionsRoute =
   AuthenticatedInstructionsRouteImport.update({
     id: '/instructions',
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/oxygen': typeof AuthenticatedOxygenRoute
   '/schedule': typeof AuthenticatedScheduleRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/oxygen': typeof AuthenticatedOxygenRoute
   '/schedule': typeof AuthenticatedScheduleRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/instructions': typeof AuthenticatedInstructionsRoute
+  '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/oxygen': typeof AuthenticatedOxygenRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/handover'
     | '/home'
     | '/instructions'
+    | '/inventory'
     | '/medications'
     | '/oxygen'
     | '/schedule'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/handover'
     | '/home'
     | '/instructions'
+    | '/inventory'
     | '/medications'
     | '/oxygen'
     | '/schedule'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/_authenticated/handover'
     | '/_authenticated/home'
     | '/_authenticated/instructions'
+    | '/_authenticated/inventory'
     | '/_authenticated/medications'
     | '/_authenticated/oxygen'
     | '/_authenticated/schedule'
@@ -431,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMedicationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inventory': {
+      id: '/_authenticated/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/instructions': {
       id: '/_authenticated/instructions'
       path: '/instructions'
@@ -504,6 +523,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInstructionsRoute: typeof AuthenticatedInstructionsRoute
+  AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedOxygenRoute: typeof AuthenticatedOxygenRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
@@ -521,6 +541,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInstructionsRoute: AuthenticatedInstructionsRoute,
+  AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedOxygenRoute: AuthenticatedOxygenRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
