@@ -798,6 +798,9 @@ function InventoryDialog({
   );
   const [expiry, setExpiry] = useState(item?.expiry_date ?? "");
   const [notes, setNotes] = useState(item?.notes ?? "");
+  const [location, setLocation] = useState(item?.location ?? "");
+  const [supplier, setSupplier] = useState(item?.supplier ?? "");
+  const [supplierUrl, setSupplierUrl] = useState(item?.supplier_url ?? "");
 
   const editing = !!item;
   const saving = upsert.isPending || adjust.isPending;
