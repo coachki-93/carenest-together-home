@@ -380,9 +380,31 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 {tm.label && (
                   <div className="text-xs text-muted-foreground">{tm.label}</div>
                 )}
+                <div className="text-[11px] text-muted-foreground mt-0.5">
+                  {t("carePlace.graceShort", { n: tm.grace_minutes ?? 30 })}
+                </div>
               </div>
               {isOwner && (
                 <>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={720}
+                    className="h-8 w-16 text-xs"
+                    value={tm.grace_minutes ?? 30}
+                    onChange={(e) =>
+                      upsertTime.mutate({
+                        id: tm.id,
+                        family_id: tm.family_id,
+                        created_by: tm.created_by,
+                        time_of_day: tm.time_of_day,
+                        label: tm.label,
+                        active: tm.active,
+                        grace_minutes: Math.max(0, Math.min(720, Number(e.target.value) || 0)),
+                      })
+                    }
+                    aria-label={t("carePlace.graceLabel")}
+                  />
                   <Switch
                     checked={tm.active}
                     onCheckedChange={(v) =>
@@ -393,6 +415,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                         time_of_day: tm.time_of_day,
                         label: tm.label,
                         active: !!v,
+                        grace_minutes: tm.grace_minutes,
                       })
                     }
                   />
@@ -411,7 +434,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         </div>
         {isOwner && (
           <div className="rounded-xl border-dashed border-2 p-3 space-y-2">
-            <div className="grid sm:grid-cols-[120px_1fr] gap-2">
+            <div className="grid sm:grid-cols-[120px_1fr_120px] gap-2">
               <Input
                 type="time"
                 value={newTime}
@@ -422,7 +445,19 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 value={newTimeLabel}
                 onChange={(e) => setNewTimeLabel(e.target.value)}
               />
+              <Input
+                type="number"
+                min={0}
+                max={720}
+                value={newGrace}
+                onChange={(e) => setNewGrace(e.target.value)}
+                placeholder={t("carePlace.graceLabel")}
+                aria-label={t("carePlace.graceLabel")}
+              />
             </div>
+            <p className="text-[11px] text-muted-foreground">
+              {t("carePlace.graceHint")}
+            </p>
             <Button
               type="button"
               onClick={addTime}
