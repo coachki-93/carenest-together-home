@@ -858,5 +858,23 @@ export const sv = {
     flowFromTo: "Flöde {{from}} → {{to}} l/min",
     duration: "Räcker {{duration}} vid full tub",
   },
+  instructions: {
+    title: "Instruktioner",
+    subtitle: "Så här utförs olika vårdmoment.",
+    add: "Lägg till instruktion",
+    addTitle: "Ny instruktion",
+    editTitle: "Redigera instruktion",
+    dialogDesc: "Beskriv ett vårdmoment så alla i teamet kan följa det.",
+    fieldTitle: "Titel",
+    fieldBody: "Instruktioner",
+    titlePlaceholder: "t.ex. Blöjbyte",
+    bodyPlaceholder: "Steg-för-steg-instruktioner…",
+    empty: "Inga instruktioner ännu. Lägg till en så ditt team vet hur vårdmoment ska utföras.",
+    noBody: "Inga detaljer ännu.",
+    saved: "Instruktion sparad",
+    deleted: "Instruktion borttagen",
+    deleteTitle: "Ta bort instruktion?",
+    deleteDesc: "\"{{title}}\" tas bort permanent.",
+  },
 };
 
