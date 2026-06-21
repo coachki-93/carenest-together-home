@@ -82,21 +82,36 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
 
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState<Record<string, AnswerState>>({});
+  const [adhocAnswers, setAdhocAnswers] = useState<Record<string, boolean | null>>({});
   const [notes, setNotes] = useState("");
 
   if (!familyId || !userId || !currentSlot) return null;
 
   const activeItems = items.filter((i) => i.active);
 
+  const slotDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const slotAdhocs = openAdhocs.filter(
+    (a) =>
+      a.for_slot_date === slotDate &&
+      a.for_slot_time.slice(0, 5) === currentSlot.time_of_day.slice(0, 5),
+  );
+
   function startCheck() {
     const initial: Record<string, AnswerState> = {};
     for (const it of activeItems) {
-      initial[it.id] =
-        it.item_type === "yesno"
-          ? { yesno: null }
-          : { available: null, count: "" };
+      // 2A: pre-select "No" / "Not available" when the linked inventory item is already below threshold.
+      const linked = it.inventory_item_id ? inventoryById.get(it.inventory_item_id) : undefined;
+      const alreadyLow = linked ? isLowStock(linked) : false;
+      if (it.item_type === "yesno") {
+        initial[it.id] = { yesno: alreadyLow ? false : null };
+      } else {
+        initial[it.id] = { available: alreadyLow ? false : null, count: "" };
+      }
     }
     setAnswers(initial);
+    const adhocInit: Record<string, boolean | null> = {};
+    for (const a of slotAdhocs) adhocInit[a.id] = null;
+    setAdhocAnswers(adhocInit);
     setNotes("");
     setOpen(true);
   }
@@ -109,6 +124,11 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
       } else {
         if (a.available !== true && a.available !== false) return t("carePlace.pickAnswer");
         if (a.available === true && (a.count === "" || a.count == null)) return t("carePlace.enterQuantity");
+      }
+    }
+    for (const a of slotAdhocs) {
+      if (adhocAnswers[a.id] !== true && adhocAnswers[a.id] !== false) {
+        return t("carePlace.pickAnswer");
       }
     }
     return null;
@@ -124,7 +144,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
     try {
       const today = new Date();
       const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-      await submit.mutateAsync({
+      const check = await submit.mutateAsync({
         family_id: familyId!,
         performed_by: userId!,
         scheduled_time: currentSlot.time_of_day,
@@ -139,6 +159,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
               item_type_snapshot: it.item_type,
               yesno_value: a.yesno === true,
               count_value: null,
+              inventory_item_id: it.inventory_item_id ?? null,
               severity: it.severity,
               decrement_amount: it.decrement_amount,
             };
@@ -156,12 +177,23 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
           };
         }),
       });
+
+      // Resolve ad-hoc items tied to this slot (best-effort).
+      for (const a of slotAdhocs) {
+        try {
+          await resolveAdhoc.mutateAsync({ id: a.id, checkId: check.id });
+        } catch (e) {
+          console.error("Adhoc resolve failed", e);
+        }
+      }
+
       toast.success(t("carePlace.submitted"));
       setOpen(false);
     } catch (e) {
       toast.error((e as Error).message);
     }
   }
+
 
   const slotLabel = currentSlot.label
     ? `${currentSlot.label} · ${currentSlot.time_of_day.slice(0, 5)}`
