@@ -1053,6 +1053,12 @@ export const en = {
       daysLeft: "{{who}} updated days-left for \"{{item}}\" — {{note}}.",
       generic: "{{who}} updated \"{{item}}\" {{range}}.",
     },
+    shoppingEmpty: "Nothing to order right now — every supply is above its low-stock threshold.",
+  },
+  shopping: {
+    title: "Shopping list",
+    subtitle: "Supplies to order and items already on the way.",
+    noFamily: "Join or create a family to see its shopping list.",
   },
 };
 

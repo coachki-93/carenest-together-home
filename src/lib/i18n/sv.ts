@@ -1053,6 +1053,12 @@ export const sv = {
       daysLeft: "{{who}} uppdaterade dagar-kvar för \"{{item}}\" — {{note}}.",
       generic: "{{who}} uppdaterade \"{{item}}\" {{range}}.",
     },
+    shoppingEmpty: "Inget att beställa just nu — allt ligger över lägstanivån.",
+  },
+  shopping: {
+    title: "Inköpslista",
+    subtitle: "Förråd att beställa och saker som redan är på väg.",
+    noFamily: "Gå med i eller skapa en familj för att se inköpslistan.",
   },
 };
 
