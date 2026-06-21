@@ -86,6 +86,7 @@ import {
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
+import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
