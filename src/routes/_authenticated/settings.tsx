@@ -7,6 +7,7 @@ import { resetTour } from "@/lib/onboarding/tour-state";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
 import { EnableNotificationsCard } from "@/components/carenest/EnableNotificationsCard";
+import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSettings";
 import {
   AvatarColorPicker,
   AVATAR_COLORS,
