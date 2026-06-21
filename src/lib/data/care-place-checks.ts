@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { adjustInventory } from "./inventory";
+import { notifyCriticalNo } from "./care-place-notify.functions";
 
 export type CarePlaceItem =
   Database["public"]["Tables"]["care_place_checklist_items"]["Row"];
@@ -142,11 +144,16 @@ export interface SubmitCheckInput {
     count_value?: number | null;
     /** Linked inventory item to decrement when yesno_value === false. */
     inventory_item_id?: string | null;
+    /** Amount to decrement from inventory on a "No". Defaults to 1. */
+    decrement_amount?: number | null;
+    /** Severity of the question — drives critical-no push notifications. */
+    severity?: "routine" | "critical";
   }[];
 }
 
 export function useSubmitCarePlaceCheck() {
   const qc = useQueryClient();
+  const notifyCritical = useServerFn(notifyCriticalNo);
   return useMutation({
     mutationFn: async (input: SubmitCheckInput) => {
       const { data: check, error } = await supabase
@@ -184,11 +191,12 @@ export function useSubmitCarePlaceCheck() {
       );
       for (const a of decrements) {
         try {
+          const amount = Math.max(1, Number(a.decrement_amount ?? 1));
           await adjustInventory({
             itemId: a.inventory_item_id!,
             familyId: input.family_id,
             performedBy: input.performed_by,
-            delta: -1,
+            delta: -amount,
             reason: "care_place_check",
             note: a.item_label_snapshot,
             sourceCheckId: check.id,
@@ -196,6 +204,24 @@ export function useSubmitCarePlaceCheck() {
         } catch (e) {
           // Non-fatal: don't undo the check if a single decrement fails.
           console.error("Inventory decrement failed", e);
+        }
+      }
+
+      // Fire-and-forget push for critical "No" answers.
+      const criticalNos = input.answers
+        .filter((a) => a.severity === "critical" && a.yesno_value === false)
+        .map((a) => a.item_label_snapshot);
+      if (criticalNos.length > 0) {
+        try {
+          await notifyCritical({
+            data: {
+              family_id: input.family_id,
+              scheduled_time: input.scheduled_time,
+              items: criticalNos,
+            },
+          });
+        } catch (e) {
+          console.error("Critical-no push failed", e);
         }
       }
       return check as CarePlaceCheck;
