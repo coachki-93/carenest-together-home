@@ -248,7 +248,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             </div>
           </DialogHeader>
 
-          {activeItems.length === 0 ? (
+          {activeItems.length === 0 && slotAdhocs.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
               {t("carePlace.empty")}
             </p>
@@ -258,9 +258,25 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
                 <ItemRow
                   key={it.id}
                   item={it}
+                  linkedInventory={
+                    it.inventory_item_id
+                      ? inventoryById.get(it.inventory_item_id) ?? null
+                      : null
+                  }
                   state={answers[it.id] ?? {}}
                   onChange={(s) =>
                     setAnswers((prev) => ({ ...prev, [it.id]: s }))
+                  }
+                />
+              ))}
+              {slotAdhocs.map((a) => (
+                <AdhocRow
+                  key={a.id}
+                  adhoc={a}
+                  linkedInventory={inventoryById.get(a.inventory_item_id) ?? null}
+                  value={adhocAnswers[a.id] ?? null}
+                  onChange={(v) =>
+                    setAdhocAnswers((prev) => ({ ...prev, [a.id]: v }))
                   }
                 />
               ))}
@@ -277,6 +293,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
               </div>
             </div>
           )}
+
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
