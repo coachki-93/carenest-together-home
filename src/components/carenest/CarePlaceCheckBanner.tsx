@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, ShieldAlert, Loader2, Timer } from "lucide-react";
+import { AlertTriangle, ShieldAlert, Loader2, Timer, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,12 @@ import {
   type CarePlaceItem,
   type CarePlaceTime,
 } from "@/lib/data/care-place-checks";
+import {
+  useOpenAdhocItems,
+  useResolveAdhocItem,
+  type AdhocItem,
+} from "@/lib/data/adhoc-items";
+import { useInventoryItems, isLowStock, type InventoryItem } from "@/lib/data/inventory";
 
 interface Props {
   familyId: string | undefined | null;
@@ -49,7 +55,16 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: items = [] } = useCarePlaceItems(familyId);
   const { data: times = [] } = useCarePlaceTimes(familyId);
   const { data: todaysChecks = [] } = useTodayCarePlaceChecks(familyId);
+  const { data: inventory = [] } = useInventoryItems(familyId);
+  const { data: openAdhocs = [] } = useOpenAdhocItems(familyId);
   const submit = useSubmitCarePlaceCheck();
+  const resolveAdhoc = useResolveAdhocItem();
+
+  const inventoryById = useMemo(() => {
+    const map = new Map<string, InventoryItem>();
+    for (const it of inventory) map.set(it.id, it);
+    return map;
+  }, [inventory]);
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
