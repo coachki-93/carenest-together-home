@@ -19,6 +19,8 @@ export const en = {
     apple: "Apple",
     addAnother: "Add another",
     remove: "Remove",
+    edit: "Edit",
+    close: "Close",
     language: "Language",
     english: "English",
     swedish: "Svenska",
