@@ -228,7 +228,7 @@ export function NotifyContainer() {
   return createPortal(
     <NotifyCtx.Provider value={ctx}>
       <div
-        className="pointer-events-none fixed inset-x-0 top-3 z-[100] flex flex-col items-center gap-2 px-3 sm:items-end sm:right-4 sm:left-auto sm:top-4 sm:max-w-sm"
+        className="pointer-events-none fixed left-1/2 top-4 z-[100] flex w-full max-w-sm -translate-x-1/2 flex-col items-center gap-2 px-3"
         aria-live="polite"
       >
         {items.map((item) => (
