@@ -124,6 +124,8 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
               item_type_snapshot: it.item_type,
               yesno_value: a.yesno === true,
               count_value: null,
+              severity: it.severity,
+              decrement_amount: it.decrement_amount,
             };
           }
           const available = a.available === true;
@@ -134,6 +136,8 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             yesno_value: available,
             count_value: available ? Number(a.count) : 0,
             inventory_item_id: it.inventory_item_id ?? null,
+            severity: it.severity,
+            decrement_amount: it.decrement_amount,
           };
         }),
       });
@@ -294,11 +298,27 @@ function ItemRow({
   onChange: (s: AnswerState) => void;
 }) {
   const { t } = useTranslation();
+  const critical = item.severity === "critical";
+  const containerCls = critical
+    ? "rounded-xl border-2 border-red-400 bg-red-50/40 p-3 space-y-2"
+    : "rounded-xl border p-3 space-y-2";
+
+  const labelRow = (
+    <div className="flex items-center gap-2">
+      {critical && (
+        <span className="inline-flex items-center gap-1 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5">
+          <AlertTriangle className="size-3" />
+          {t("carePlace.criticalBadge")}
+        </span>
+      )}
+      <Label className="font-medium">{item.label}</Label>
+    </div>
+  );
 
   if (item.item_type === "yesno") {
     return (
-      <div className="rounded-xl border p-3 space-y-2">
-        <Label className="font-medium">{item.label}</Label>
+      <div className={containerCls}>
+        {labelRow}
         <YesNoButtons
           value={state.yesno ?? null}
           onChange={(v) => onChange({ ...state, yesno: v })}
@@ -315,9 +335,9 @@ function ItemRow({
     Number(state.count) < item.min_count;
 
   return (
-    <div className="rounded-xl border p-3 space-y-3">
+    <div className={containerCls}>
       <div className="space-y-2">
-        <Label className="font-medium">{item.label}</Label>
+        {labelRow}
         <p className="text-xs text-muted-foreground">{t("carePlace.available")}</p>
         <YesNoButtons
           value={state.available ?? null}
