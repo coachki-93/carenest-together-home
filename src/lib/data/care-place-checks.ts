@@ -130,6 +130,8 @@ export function slotSecondsRemaining(slot: CarePlaceTime, now: Date): number {
   return Math.floor((end.getTime() - now.getTime()) / 1000);
 }
 
+export type QuantityEstimate = "mycket" | "lite" | "slut";
+
 export interface SubmitCheckInput {
   family_id: string;
   performed_by: string;
@@ -142,11 +144,15 @@ export interface SubmitCheckInput {
     item_type_snapshot: CarePlaceItemType;
     yesno_value?: boolean | null;
     count_value?: number | null;
-    /** Linked inventory item to decrement when yesno_value === false. */
+    /** For quantity_estimate questions. */
+    estimate_value?: QuantityEstimate | null;
+    /** Min count for count questions (drives smarter decrement). */
+    min_count_snapshot?: number | null;
+    /** Linked inventory item to act on. */
     inventory_item_id?: string | null;
-    /** Amount to decrement from inventory on a "No". Defaults to 1. */
+    /** Amount to decrement on usage. Defaults to 1. */
     decrement_amount?: number | null;
-    /** Severity of the question — drives critical-no push notifications. */
+    /** Severity of the question — drives critical push notifications. */
     severity?: "routine" | "critical";
   }[];
 }
@@ -185,31 +191,94 @@ export function useSubmitCarePlaceCheck() {
         if (aerr) throw aerr;
       }
 
-      // Auto-decrement linked inventory items when the caregiver answered "Nej".
-      const decrements = input.answers.filter(
-        (a) => a.inventory_item_id && a.yesno_value === false,
-      );
-      for (const a of decrements) {
+      // Side-effects on linked inventory.
+      for (const a of input.answers) {
+        if (!a.inventory_item_id) continue;
         try {
-          const amount = Math.max(1, Number(a.decrement_amount ?? 1));
-          await adjustInventory({
-            itemId: a.inventory_item_id!,
-            familyId: input.family_id,
-            performedBy: input.performed_by,
-            delta: -amount,
-            reason: "care_place_check",
-            note: a.item_label_snapshot,
-            sourceCheckId: check.id,
-          });
+          if (a.item_type_snapshot === "yesno" && a.yesno_value === false) {
+            const amount = Math.max(1, Number(a.decrement_amount ?? 1));
+            await adjustInventory({
+              itemId: a.inventory_item_id,
+              familyId: input.family_id,
+              performedBy: input.performed_by,
+              delta: -amount,
+              reason: "care_place_check",
+              note: a.item_label_snapshot,
+              sourceCheckId: check.id,
+            });
+          } else if (a.item_type_snapshot === "count" && a.yesno_value === false) {
+            // 3B: smarter decrement = max(decrement_amount, min_count - reported_count).
+            const baseDec = Math.max(1, Number(a.decrement_amount ?? 1));
+            const reported = Number(a.count_value ?? 0);
+            const min = Number(a.min_count_snapshot ?? 0);
+            const gap = min > reported ? min - reported : 0;
+            const amount = Math.max(baseDec, gap);
+            await adjustInventory({
+              itemId: a.inventory_item_id,
+              familyId: input.family_id,
+              performedBy: input.performed_by,
+              delta: -amount,
+              reason: "care_place_check",
+              note: a.item_label_snapshot,
+              sourceCheckId: check.id,
+            });
+          } else if (a.item_type_snapshot === "days_left" && a.count_value != null) {
+            // Update the days-left estimate on the linked item, write an audit row.
+            await supabase
+              .from("inventory_items")
+              .update({
+                days_left_estimate: Number(a.count_value),
+                days_left_updated_at: new Date().toISOString(),
+              })
+              .eq("id", a.inventory_item_id);
+            await supabase.from("inventory_adjustments").insert({
+              family_id: input.family_id,
+              inventory_item_id: a.inventory_item_id,
+              delta: 0,
+              reason: "days_left_update",
+              note: `${a.item_label_snapshot}: ~${a.count_value}d`,
+              performed_by: input.performed_by,
+              source_check_id: check.id,
+            });
+          } else if (a.item_type_snapshot === "quantity_estimate" && a.estimate_value) {
+            if (a.estimate_value === "lite") {
+              const amount = Math.max(1, Number(a.decrement_amount ?? 1));
+              await adjustInventory({
+                itemId: a.inventory_item_id,
+                familyId: input.family_id,
+                performedBy: input.performed_by,
+                delta: -amount,
+                reason: "care_place_check",
+                note: `${a.item_label_snapshot} (lite)`,
+                sourceCheckId: check.id,
+              });
+            } else if (a.estimate_value === "slut") {
+              // Drain to zero — adjustInventory clamps at 0 and logs the real delta.
+              await adjustInventory({
+                itemId: a.inventory_item_id,
+                familyId: input.family_id,
+                performedBy: input.performed_by,
+                delta: -1_000_000,
+                reason: "care_place_check",
+                note: `${a.item_label_snapshot} (slut)`,
+                sourceCheckId: check.id,
+              });
+            }
+          }
         } catch (e) {
-          // Non-fatal: don't undo the check if a single decrement fails.
-          console.error("Inventory decrement failed", e);
+          console.error("Inventory side-effect failed", e);
         }
       }
 
-      // Fire-and-forget push for critical "No" answers.
+      // Critical push: classic "No", "Slut", or days_left ≤ 2.
       const criticalNos = input.answers
-        .filter((a) => a.severity === "critical" && a.yesno_value === false)
+        .filter((a) => {
+          if (a.severity !== "critical") return false;
+          if (a.yesno_value === false) return true;
+          if (a.estimate_value === "slut") return true;
+          if (a.item_type_snapshot === "days_left" && Number(a.count_value ?? 99) <= 2) return true;
+          return false;
+        })
         .map((a) => a.item_label_snapshot);
       if (criticalNos.length > 0) {
         try {
