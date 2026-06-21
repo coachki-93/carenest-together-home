@@ -63,7 +63,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
         min_count:
           newType === "count" && newMin !== "" ? Number(newMin) : null,
         inventory_item_id:
-          newType === "count" && newInventoryId !== "none"
+          newType !== "yesno" && newInventoryId !== "none"
             ? newInventoryId
             : null,
         position: items.length,
