@@ -205,6 +205,8 @@ function InventoryPage() {
             ))}
           </ul>
         )}
+
+        {familyId && <RecentActivityCard familyId={familyId} />}
       </div>
 
       {(creating || editing) && familyId && user?.id && (
