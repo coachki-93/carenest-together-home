@@ -311,6 +311,38 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 </div>
               </>
             )}
+            <div className="grid sm:grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs">{t("carePlace.severityLabel")}</Label>
+                <Select
+                  value={newSeverity}
+                  onValueChange={(v) => setNewSeverity(v as "routine" | "critical")}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="routine">{t("carePlace.severityRoutine")}</SelectItem>
+                    <SelectItem value="critical">{t("carePlace.severityCritical")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {newType === "count" && newInventoryId !== "none" && (
+                <div className="space-y-1">
+                  <Label className="text-xs">{t("carePlace.decrementLabel")}</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={newDecrement}
+                    onChange={(e) => setNewDecrement(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              {t("carePlace.severityHint")}
+            </p>
             <Button
               type="button"
               onClick={addItem}
