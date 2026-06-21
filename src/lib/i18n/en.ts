@@ -1001,6 +1001,7 @@ export const en = {
       expiry_writeoff: "Expired",
       opening: "Opening stock",
       received: "Received",
+      days_left_update: "Days-left estimate updated",
     },
     chip: { low: "{{count}} supply low", lowOther: "{{count}} supplies low" },
     ordered: "Ordered",
