@@ -393,6 +393,7 @@ export type Database = {
           active: boolean
           created_at: string
           created_by: string
+          days_left_threshold: number
           decrement_amount: number
           family_id: string
           id: string
@@ -408,6 +409,7 @@ export type Database = {
           active?: boolean
           created_at?: string
           created_by: string
+          days_left_threshold?: number
           decrement_amount?: number
           family_id: string
           id?: string
@@ -423,6 +425,7 @@ export type Database = {
           active?: boolean
           created_at?: string
           created_by?: string
+          days_left_threshold?: number
           decrement_amount?: number
           family_id?: string
           id?: string
