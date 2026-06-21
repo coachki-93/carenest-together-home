@@ -894,7 +894,24 @@ function HistoryDialog({
 }) {
   const { t } = useTranslation();
   const { data: history = [], isLoading } = useInventoryHistory(item.id, 100);
+  const { data: members = [] } = useFamilyMembers(item.family_id);
+  const { data: checks = [] } = useCarePlaceCheckHistory(item.family_id, 200);
   const unitLabel = t(`inventory.units.${item.unit}`);
+
+  const narrated = useMemo(() => {
+    const memberNames = new Map<string, string>();
+    for (const m of members) {
+      memberNames.set(m.user_id, m.profile?.full_name?.trim() || t("inventory.narrate.someone"));
+    }
+    const checkSlots = new Map<string, string>();
+    for (const c of checks) checkSlots.set(c.id, c.scheduled_time.slice(0, 5));
+    return narrateAdjustments(history, Number(item.quantity), {
+      memberNames,
+      checkSlots,
+      t,
+      itemMeta: { name: item.name, unit: item.unit },
+    });
+  }, [history, members, checks, item, t]);
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -905,13 +922,13 @@ function HistoryDialog({
         </DialogHeader>
         {isLoading ? (
           <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
-        ) : history.length === 0 ? (
+        ) : narrated.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
             {t("inventory.noHistory")}
           </p>
         ) : (
           <ul className="space-y-2">
-            {history.map((h) => {
+            {narrated.map((h) => {
               const positive = Number(h.delta) >= 0;
               return (
                 <li
@@ -922,14 +939,7 @@ function HistoryDialog({
                     <div className="text-xs text-muted-foreground">
                       {new Date(h.created_at).toLocaleString()}
                     </div>
-                    <div className="text-sm font-medium">
-                      {t(`inventory.reason.${h.reason}`)}
-                    </div>
-                    {h.note && (
-                      <div className="text-xs text-muted-foreground italic">
-                        {h.note}
-                      </div>
-                    )}
+                    <div className="text-sm">{h.narration}</div>
                   </div>
                   <div
                     className={cn(
