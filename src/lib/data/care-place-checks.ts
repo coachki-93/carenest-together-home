@@ -94,13 +94,15 @@ export function useCarePlaceCheckHistory(
   });
 }
 
-/** Returns time strings (HH:MM) for slots today that have already started and are not yet completed. */
+export const CARE_PLACE_WINDOW_MIN = 30;
+
+/** Returns active slots for today whose window [slotTime, slotTime+30min] contains `now` and that are not yet completed. */
 export function pendingSlots(
   times: CarePlaceTime[],
   todaysChecks: CarePlaceCheck[],
   now: Date,
 ): CarePlaceTime[] {
-  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
   const done = new Set(
     todaysChecks.map((c) => c.scheduled_time.slice(0, 5)), // "HH:MM"
   );
@@ -109,11 +111,20 @@ export function pendingSlots(
     .filter((t) => {
       const [h, m] = t.time_of_day.split(":").map(Number);
       const slotMin = h * 60 + m;
-      if (slotMin > nowMin) return false;
+      if (nowMin < slotMin) return false;
+      if (nowMin > slotMin + CARE_PLACE_WINDOW_MIN) return false;
       const key = t.time_of_day.slice(0, 5);
       return !done.has(key);
     })
     .sort((a, b) => a.time_of_day.localeCompare(b.time_of_day));
+}
+
+/** Seconds remaining in the 30-minute window for a slot. Negative if past. */
+export function slotSecondsRemaining(slot: CarePlaceTime, now: Date): number {
+  const [h, m] = slot.time_of_day.split(":").map(Number);
+  const end = new Date(now);
+  end.setHours(h, m + CARE_PLACE_WINDOW_MIN, 0, 0);
+  return Math.floor((end.getTime() - now.getTime()) / 1000);
 }
 
 export interface SubmitCheckInput {
