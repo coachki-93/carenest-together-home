@@ -875,6 +875,9 @@ export const en = {
     deleted: "Instruction deleted",
     deleteTitle: "Delete instruction?",
     deleteDesc: "\"{{title}}\" will be permanently removed.",
+    editorHint: "Use headings, lists, checklists and images to make steps clear and easy to follow.",
+    linkPrompt: "Enter URL (leave empty to remove link)",
+    imageTooLarge: "Image is too large (max 1.5 MB). Please pick a smaller one.",
   },
 };
 

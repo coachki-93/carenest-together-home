@@ -875,6 +875,9 @@ export const sv = {
     deleted: "Instruktion borttagen",
     deleteTitle: "Ta bort instruktion?",
     deleteDesc: "\"{{title}}\" tas bort permanent.",
+    editorHint: "Använd rubriker, listor, checklistor och bilder för att göra stegen tydliga och lätta att följa.",
+    linkPrompt: "Ange URL (lämna tomt för att ta bort länken)",
+    imageTooLarge: "Bilden är för stor (max 1,5 MB). Välj en mindre.",
   },
 };
 

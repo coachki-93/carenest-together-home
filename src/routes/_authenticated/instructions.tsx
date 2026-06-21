@@ -9,7 +9,8 @@ import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/carenest/RichTextEditor";
+
 import {
   Dialog,
   DialogContent,
@@ -157,9 +158,15 @@ function InstructionsPage() {
                   </Button>
                 </div>
               </header>
-              <p className="text-sm whitespace-pre-wrap text-muted-foreground">
-                {ins.body || t("instructions.noBody")}
-              </p>
+              {ins.body ? (
+                <div
+                  className="rte-content text-sm"
+                  dangerouslySetInnerHTML={{ __html: ins.body }}
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground">{t("instructions.noBody")}</p>
+              )}
+
             </article>
           ))}
         </div>
@@ -219,7 +226,7 @@ function InstructionDialog({
   const key = instruction?.id ?? "new";
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>
             {instruction ? t("instructions.editTitle") : t("instructions.addTitle")}
@@ -246,14 +253,13 @@ function InstructionDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="ins-body">{t("instructions.fieldBody")}</Label>
-            <Textarea
-              id="ins-body"
-              defaultValue={instruction?.body ?? ""}
-              onChange={(e) => setBody(e.target.value)}
+            <Label>{t("instructions.fieldBody")}</Label>
+            <RichTextEditor
+              value={body}
+              onChange={setBody}
               placeholder={t("instructions.bodyPlaceholder")}
-              rows={8}
             />
+            <p className="text-xs text-muted-foreground">{t("instructions.editorHint")}</p>
           </div>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
@@ -268,3 +274,4 @@ function InstructionDialog({
     </Dialog>
   );
 }
+

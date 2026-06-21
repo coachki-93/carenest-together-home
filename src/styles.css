@@ -194,3 +194,53 @@
   box-shadow: var(--shadow-card);
   border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
 }
+
+/* Rich-text content (TipTap editor + rendered instructions) */
+.rte-content :where(h1) { font-size: 1.6rem; font-weight: 700; margin: 0.6em 0 0.3em; line-height: 1.2; }
+.rte-content :where(h2) { font-size: 1.3rem; font-weight: 700; margin: 0.6em 0 0.3em; line-height: 1.25; }
+.rte-content :where(h3) { font-size: 1.1rem; font-weight: 600; margin: 0.6em 0 0.25em; line-height: 1.3; }
+.rte-content :where(p) { margin: 0.4em 0; line-height: 1.6; }
+.rte-content :where(ul) { list-style: disc; padding-left: 1.4em; margin: 0.4em 0; }
+.rte-content :where(ol) { list-style: decimal; padding-left: 1.4em; margin: 0.4em 0; }
+.rte-content :where(li) { margin: 0.2em 0; }
+.rte-content :where(li > p) { margin: 0; }
+.rte-content :where(blockquote) {
+  border-left: 3px solid var(--primary);
+  padding: 0.2em 0 0.2em 0.9em;
+  margin: 0.6em 0;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+.rte-content :where(code) {
+  background: color-mix(in oklab, var(--muted) 80%, transparent);
+  padding: 0.1em 0.35em;
+  border-radius: 0.3em;
+  font-size: 0.9em;
+}
+.rte-content :where(pre) {
+  background: color-mix(in oklab, var(--muted) 80%, transparent);
+  padding: 0.7em 0.9em;
+  border-radius: 0.6em;
+  overflow-x: auto;
+  margin: 0.6em 0;
+}
+.rte-content :where(pre code) { background: transparent; padding: 0; }
+.rte-content :where(hr) { border: 0; border-top: 1px solid var(--border); margin: 1em 0; }
+.rte-content :where(a) { color: var(--primary); text-decoration: underline; }
+.rte-content :where(img) { max-width: 100%; height: auto; border-radius: 0.6em; margin: 0.6em 0; }
+.rte-content :where(strong) { font-weight: 700; }
+.rte-content :where(em) { font-style: italic; }
+
+.rte-content ul[data-type="taskList"] { list-style: none; padding-left: 0.2em; }
+.rte-content ul[data-type="taskList"] li { display: flex; gap: 0.5em; align-items: flex-start; }
+.rte-content ul[data-type="taskList"] li > label { margin-top: 0.25em; }
+.rte-content ul[data-type="taskList"] li > div { flex: 1; }
+
+.rte-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+}
+
