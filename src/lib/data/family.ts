@@ -167,3 +167,36 @@ export function useSetMaterialResponsible() {
     },
   });
 }
+
+export function useFamily(familyId: string | undefined | null) {
+  return useQuery({
+    queryKey: ["family", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("families")
+        .select("id, name, owner_id, at_hospital_since")
+        .eq("id", familyId!)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useSetHospitalMode() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ familyId, on }: { familyId: string; on: boolean }) => {
+      const { data, error } = await supabase.rpc("set_family_hospital_mode", {
+        _family_id: familyId,
+        _on: on,
+      });
+      if (error) throw error;
+      return data as string | null;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+    },
+  });
+}
