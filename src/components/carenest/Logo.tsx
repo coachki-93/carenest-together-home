@@ -14,7 +14,7 @@ interface LogoProps {
 
 /** CareNest brand mark (CDN-hosted artwork). */
 export function Logo({ size = 40, withWordmark = false, className }: LogoProps) {
-  const height = withWordmark ? Math.round(size * 1.25) : size;
+  const height = withWordmark ? Math.round(size * 1.3) : size;
   return (
     <div className={cn("flex items-center", className)}>
       <img
