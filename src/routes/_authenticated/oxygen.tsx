@@ -185,10 +185,8 @@ function CurrentTankCard({
       {info ? (
         <>
           {info.paused && (
-            <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-3 md:p-4 flex items-center gap-3 text-red-900">
-              <div className="size-9 rounded-xl bg-red-100 text-red-700 flex items-center justify-center shrink-0">
-                <Hospital className="size-5" />
-              </div>
+            <div className="card-soft p-3 flex items-center gap-3 border border-red-200 bg-red-50/60 text-red-900">
+              <Hospital className="size-5 shrink-0" />
               <p className="text-sm font-medium">{t("oxygen.pausedHospital")}</p>
             </div>
           )}
