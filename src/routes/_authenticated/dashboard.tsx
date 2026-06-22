@@ -1770,15 +1770,13 @@ function OxygenBar({
   const isPaused = remainingInfo?.paused ?? false;
 
   return (
-    <div className="space-y-3">
+    <section className={cn("card-soft p-4", isPaused && "border border-red-200 bg-red-50/60 text-red-900")}>
       {isPaused && (
-        <div className="card-soft p-3 flex items-center gap-3 border border-red-200 bg-red-50/60 text-red-900">
+        <div className="flex items-center gap-3 mb-3">
           <Hospital className="size-5 shrink-0" />
           <p className="text-sm font-medium">{t("oxygen.pausedHospital")}</p>
         </div>
       )}
-    <section className="card-soft p-4">
-
       {isLoading ? (
         <div className="flex items-center gap-3">
           <Skeleton className="size-10 rounded-xl" />
@@ -1795,13 +1793,13 @@ function OxygenBar({
         >
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center shrink-0">
+              <div className={cn("size-10 rounded-xl flex items-center justify-center shrink-0", isPaused ? "bg-red-100 text-red-700" : "bg-primary-soft text-primary")}>
                 <Wind className="size-5" />
               </div>
               <div className="min-w-0">
                 <div className="text-sm font-extrabold truncate">{t("dashboard.oxygenTitle")}</div>
                 {activeOxygen && remainingInfo ? (
-                  <div className="text-xs text-muted-foreground font-medium truncate">
+                  <div className={cn("text-xs font-medium truncate", isPaused ? "text-red-900/80" : "text-muted-foreground")}>
                     {formatFlow(activeOxygen.flow_lpm)} · {formatDuration(remainingInfo.remainingMinutes)}{" "}
                     {t("dashboard.oxygenRemaining")}
                   </div>
@@ -1812,17 +1810,17 @@ function OxygenBar({
                 )}
               </div>
             </div>
-            <ChevronRight className="size-4 text-muted-foreground shrink-0 group-hover:text-foreground transition-colors" />
+            <ChevronRight className={cn("size-4 shrink-0 transition-colors", isPaused ? "text-red-700" : "text-muted-foreground group-hover:text-foreground")} />
           </div>
           {activeOxygen && remainingInfo && (
             <div className="mt-3">
-              <div className="h-2 rounded-full bg-secondary overflow-hidden">
+              <div className={cn("h-2 rounded-full overflow-hidden", isPaused ? "bg-red-100" : "bg-secondary")}>
                 <div
                   className={cn("h-full rounded-full transition-all duration-500", statusBar[status])}
                   style={{ width: `${percent}%` }}
                 />
               </div>
-              <div className="mt-1.5 flex justify-between text-xs text-muted-foreground font-medium">
+              <div className={cn("mt-1.5 flex justify-between text-xs font-medium", isPaused ? "text-red-900/80" : "text-muted-foreground")}>
                 <span>{t("oxygen.percentLeft", { percent })}</span>
                 <span>
                   {t("oxygen.estimatedEmpty")}: {remainingInfo.remainingMinutes > 0 ? dateFmt.format(remainingInfo.emptyAt) : "—"}
@@ -1833,8 +1831,8 @@ function OxygenBar({
         </button>
       )}
     </section>
-    </div>
   );
+
 
 }
 
