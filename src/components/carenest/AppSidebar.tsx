@@ -117,6 +117,11 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {!collapsed && (
+        <SidebarFooter className="px-3 py-3 safe-pb">
+          <LanguageToggle />
+        </SidebarFooter>
+      )}
     </Sidebar>
   );
 }
