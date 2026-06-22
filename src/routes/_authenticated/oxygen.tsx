@@ -140,10 +140,13 @@ function statusClass(status: string) {
       return "bg-destructive/10 text-destructive";
     case "low":
       return "bg-amber-100 text-amber-700";
+    case "paused":
+      return "bg-muted text-muted-foreground";
     default:
       return "bg-emerald-100 text-emerald-700";
   }
 }
+
 
 function CurrentTankCard({
   tank,
