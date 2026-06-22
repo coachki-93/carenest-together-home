@@ -832,6 +832,8 @@ export const en = {
     unsupported: "This device or browser doesn't support push notifications.",
     denied: "Notifications are blocked in your device settings. Open Settings → Notifications → CareNest to allow them.",
     iosHint: "On iPad/iPhone: add CareNest to your Home Screen first, then open it from the icon and tap Enable.",
+    diagnostics: "Notification diagnostics",
+    iosNotStandalone: "You're in Safari, not the installed app. Tap the Share icon → Add to Home Screen, then open CareNest from the new icon.",
   },
   oxygen: {
     title: "Oxygen",
