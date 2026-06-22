@@ -21,6 +21,7 @@ export type Appointment = AppointmentRow & {
   late_after_minutes: number;
   missed_after_minutes: number;
   allow_ongoing: boolean;
+  timer_minutes: number | null;
 };
 
 export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["Insert"] & {
@@ -36,6 +37,7 @@ export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["In
   late_after_minutes?: number;
   missed_after_minutes?: number;
   allow_ongoing?: boolean;
+  timer_minutes?: number | null;
 };
 
 export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Update"] & {
@@ -48,6 +50,7 @@ export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Up
   late_after_minutes?: number;
   missed_after_minutes?: number;
   allow_ongoing?: boolean;
+  timer_minutes?: number | null;
 };
 
 // Locally widen the kind union — generated types lag behind the enum migration.
