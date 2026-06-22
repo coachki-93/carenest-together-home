@@ -65,6 +65,7 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         const stale: string[] = [];
 
         for (const tm of times) {
+          if (hospitalFamilyIds.has(tm.family_id)) continue;
           const [h, m] = tm.time_of_day.split(":").map(Number);
           const slotMin = h * 60 + m;
           const closedAt = slotMin + CARE_PLACE_WINDOW_MIN + (tm.grace_minutes ?? 30);
