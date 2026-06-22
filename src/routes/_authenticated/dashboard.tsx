@@ -1086,9 +1086,10 @@ function DashboardPage() {
                 const isCompleted = task.status === "given";
                 const isSkipped = task.status === "skipped";
                 const isPostponed = task.status === "postponed";
+                const isOngoing = task.status === "ongoing";
                 const isPending = task.status === "pending";
                 const liveState = getTaskState({
-                  status: task.status === "missed" ? "pending" : task.status,
+                  status: task.status === "missed" ? "pending" : (task.status as "pending" | "ongoing" | "given" | "skipped" | "postponed"),
                   scheduledFor: task.scheduledFor,
                   lateAfterMinutes: task.lateAfterMinutes,
                   missedAfterMinutes: task.missedAfterMinutes,
@@ -1097,7 +1098,6 @@ function DashboardPage() {
                 });
                 const isLate = liveState === "late";
                 const isMissed = liveState === "missed";
-                const overdue = isLate || isMissed;
                 return (
                   <li
                     key={task.id}
@@ -1107,13 +1107,15 @@ function DashboardPage() {
                         ? "bg-success/5 border-border/60 opacity-80"
                         : isSkipped
                           ? "bg-muted/40 border-border/60"
-                          : isPostponed
-                            ? "bg-warning/10 border-warning/30"
-                            : isMissed
-                              ? "bg-destructive/5 border-destructive/40"
-                              : isLate
-                                ? "bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-700/50"
-                                : "bg-card border-border/60 hover:shadow-soft",
+                          : isOngoing
+                            ? "bg-primary-soft/40 border-primary/40"
+                            : isPostponed
+                              ? "bg-warning/10 border-warning/30"
+                              : isMissed
+                                ? "bg-destructive/5 border-destructive/40"
+                                : isLate
+                                  ? "bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-700/50"
+                                  : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
                     <div className="flex items-start gap-2 sm:gap-4 min-w-0 flex-1">
