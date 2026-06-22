@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { LanguageToggle } from "./LanguageToggle";
 import { ProfileSelector } from "./ProfileSelector";
+import { HospitalToggle } from "./HospitalToggle";
 
 interface DashboardLayoutProps {
   title: string;
@@ -32,6 +33,7 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
               </div>
               <div className="flex items-center gap-1 md:gap-2 shrink-0">
                 {actions}
+                <HospitalToggle />
                 <div className="hidden md:flex items-center gap-2">
                   <LanguageToggle />
                 </div>

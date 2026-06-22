@@ -63,8 +63,7 @@ import {
   useDeleteAppointmentCompletion,
   type AppointmentCompletion,
 } from "@/lib/data/appointment-completions";
-import { useFamilyMembers, useInvites, useFamily, useSetHospitalMode } from "@/lib/data/family";
-import { Switch } from "@/components/ui/switch";
+import { useFamilyMembers, useInvites, useFamily } from "@/lib/data/family";
 import { Hospital } from "lucide-react";
 import {
   useCaregiverProfiles,
@@ -363,7 +362,6 @@ function DashboardPage() {
   const { data: missedChecks = [] } = useTodayMissedChecks(familyId);
   const { data: invites = [] } = useInvites(familyId);
   const { data: family } = useFamily(familyId);
-  const setHospital = useSetHospitalMode();
   const hospitalOn = !!family?.at_hospital_since;
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
@@ -928,33 +926,6 @@ function DashboardPage() {
       subtitle={today}
       actions={
         <div className="flex items-center gap-2">
-          <label
-            className={cn(
-              "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold cursor-pointer transition-colors",
-              hospitalOn
-                ? "border-red-300 bg-red-50 text-red-800"
-                : "border-input bg-background hover:bg-muted",
-            )}
-            title={t("dashboard.atHospital")}
-          >
-            <Hospital className="size-4" />
-            <span className="hidden sm:inline">{t("dashboard.atHospital")}</span>
-            <Switch
-              checked={hospitalOn}
-              disabled={!familyId || setHospital.isPending}
-              onCheckedChange={async (v) => {
-                if (!familyId) return;
-                try {
-                  await setHospital.mutateAsync({ familyId, on: v });
-                  toast.success(
-                    v ? t("dashboard.atHospitalToggleOn") : t("dashboard.atHospitalToggleOff"),
-                  );
-                } catch (e) {
-                  toast.error((e as Error).message);
-                }
-              }}
-            />
-          </label>
           <Button
             size="sm"
             className="rounded-full gap-1.5 font-semibold"
