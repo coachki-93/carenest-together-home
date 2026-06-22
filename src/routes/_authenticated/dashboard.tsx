@@ -1065,10 +1065,10 @@ function DashboardPage() {
               </div>
             ) : (() => {
               const activeTasks = tasks.filter(
-                (tk) => tk.status === "pending" || tk.status === "postponed",
+                (tk) => tk.status === "pending" || tk.status === "postponed" || tk.status === "ongoing",
               );
               const pastTasks = tasks.filter(
-                (tk) => tk.status !== "pending" && tk.status !== "postponed",
+                (tk) => tk.status !== "pending" && tk.status !== "postponed" && tk.status !== "ongoing",
               );
               const renderRow = (task: TaskItem) => {
                 const kind: AppointmentKind | "medication" | "vital" =
