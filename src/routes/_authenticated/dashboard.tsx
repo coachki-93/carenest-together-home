@@ -107,7 +107,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-type TaskStatus = "pending" | "given" | "skipped" | "postponed" | "missed";
+type TaskStatus = "pending" | "given" | "skipped" | "postponed" | "missed" | "ongoing";
 
 type TaskSource =
   | { kind: "dose"; dose: ScheduledDose }
