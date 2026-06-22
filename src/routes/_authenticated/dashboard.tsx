@@ -1099,17 +1099,19 @@ function DashboardPage() {
                           )}
                         </>
                       ) : (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="rounded-full font-semibold text-muted-foreground"
-                          onClick={() => undoTask(task)}
-                        >
-                          <Undo2 className="size-4" />
-                          <span className="ml-1">
-                            {t("schedule.undo")}
-                          </span>
-                        </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="rounded-full font-semibold text-muted-foreground"
+                            onClick={() => undoTask(task)}
+                            aria-label={t("schedule.undo")}
+                            title={t("schedule.undo")}
+                          >
+                            <Undo2 className="size-4" />
+                            <span className="ml-1 hidden sm:inline">
+                              {t("schedule.undo")}
+                            </span>
+                          </Button>
                       )}
                     </div>
                   </li>
