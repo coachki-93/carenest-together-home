@@ -965,7 +965,7 @@ function DashboardPage() {
                   <li
                     key={task.id}
                     className={cn(
-                      "group flex items-start gap-4 rounded-2xl border p-4 transition-all",
+                      "group flex items-start gap-2 sm:gap-4 rounded-2xl border p-3 sm:p-4 transition-all",
                       isCompleted
                         ? "bg-success/5 border-border/60 opacity-80"
                         : isSkipped
@@ -977,14 +977,14 @@ function DashboardPage() {
                               : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
-                    <div className="flex items-start gap-4 min-w-0 flex-1">
+                    <div className="flex items-start gap-2 sm:gap-4 min-w-0 flex-1">
                       <div
                         className={cn(
-                          "flex items-center gap-1.5 text-sm font-bold shrink-0 pt-1",
+                          "flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold shrink-0 pt-1 tabular-nums",
                           overdue ? "text-destructive" : "text-muted-foreground",
                         )}
                       >
-                        <Clock className="size-3.5" />
+                        <Clock className="size-3 sm:size-3.5" />
                         {isPostponed && task.postponedTo
                           ? task.postponedTo.toLocaleTimeString(
                               i18n.language === "sv" ? "sv-SE" : "en-US",
@@ -993,11 +993,12 @@ function DashboardPage() {
                           : task.timeLabel}
                       </div>
                       <div
-                        className="size-11 rounded-2xl flex items-center justify-center shrink-0"
+                        className="size-8 sm:size-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0"
                         style={{ backgroundColor: tone.bg, color: tone.fg }}
                       >
-                        <Icon className="size-5" />
+                        <Icon className="size-4 sm:size-5" />
                       </div>
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap min-w-0">
                           <span
