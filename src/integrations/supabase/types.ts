@@ -1295,6 +1295,8 @@ export type Database = {
           flow_lpm: number
           id: string
           notes: string | null
+          paused_at: string | null
+          paused_seconds: number
           replaced_at: string | null
           started_at: string
           tank_type: string
@@ -1307,6 +1309,8 @@ export type Database = {
           flow_lpm: number
           id?: string
           notes?: string | null
+          paused_at?: string | null
+          paused_seconds?: number
           replaced_at?: string | null
           started_at?: string
           tank_type?: string
@@ -1319,6 +1323,8 @@ export type Database = {
           flow_lpm?: number
           id?: string
           notes?: string | null
+          paused_at?: string | null
+          paused_seconds?: number
           replaced_at?: string | null
           started_at?: string
           tank_type?: string
