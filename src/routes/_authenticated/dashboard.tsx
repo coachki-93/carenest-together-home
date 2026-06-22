@@ -881,9 +881,24 @@ function DashboardPage() {
     }
   }
 
-
-
-
+  // Auto-complete tasks whose timer has elapsed.
+  const firingRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const nowMs = secondTick;
+    for (const tk of tasks) {
+      if (tk.status !== "ongoing") continue;
+      if (tk.timerMinutes == null || !tk.timerStartedAt) continue;
+      const endMs = tk.timerStartedAt.getTime() + tk.timerMinutes * 60_000;
+      if (nowMs >= endMs && !firingRef.current.has(tk.id)) {
+        firingRef.current.add(tk.id);
+        void autoCompleteTimer(tk).finally(() => {
+          // Allow re-fire if status reverts (shouldn't normally).
+          window.setTimeout(() => firingRef.current.delete(tk.id), 5000);
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [secondTick, tasks]);
 
 
   const deleteVital = useDeleteVital();
