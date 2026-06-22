@@ -651,8 +651,19 @@ function DoseRow({
   const { user } = useSession();
   const { data: membership } = useMyMembership();
   const status = dose.log?.status;
-  const isOverdue = !status && dose.scheduled_for < now;
-  const med = dose.medication;
+  const lateAfter = (med as { late_after_minutes?: number | null }).late_after_minutes ?? 0;
+  const missedAfter = (med as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15;
+  const liveState = !status
+    ? getTaskState({
+        status: "pending",
+        scheduledFor: dose.scheduled_for,
+        lateAfterMinutes: lateAfter,
+        missedAfterMinutes: missedAfter,
+        now,
+      })
+    : "given";
+  const isLate = liveState === "late";
+  const isMissed = liveState === "missed";
   const dose_label = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
   const color = med.color ?? "#A78BFA";
 
@@ -662,13 +673,20 @@ function DoseRow({
         "card-soft p-4 flex items-center gap-4 transition-opacity",
         status === "given" && "opacity-70",
         status === "skipped" && "opacity-60",
+        isMissed && "border-destructive/40 bg-destructive/5",
+        isLate && "border-amber-300 bg-amber-50 dark:border-amber-700/50 dark:bg-amber-950/20",
       )}
     >
       <div className="text-center shrink-0 w-16">
         <div className="text-xl font-extrabold tabular-nums">{dose.time}</div>
-        {isOverdue && (
+        {isMissed && (
           <div className="text-[10px] font-bold uppercase text-destructive mt-0.5">
-            {t("schedule.overdue")}
+            {t("schedule.missed")}
+          </div>
+        )}
+        {isLate && (
+          <div className="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400 mt-0.5">
+            {t("schedule.late")}
           </div>
         )}
       </div>
