@@ -651,6 +651,7 @@ function DoseRow({
   const { user } = useSession();
   const { data: membership } = useMyMembership();
   const status = dose.log?.status;
+  const med = dose.medication;
   const lateAfter = (med as { late_after_minutes?: number | null }).late_after_minutes ?? 0;
   const missedAfter = (med as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15;
   const liveState = !status
