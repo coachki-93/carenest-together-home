@@ -965,7 +965,7 @@ function DashboardPage() {
                   <li
                     key={task.id}
                     className={cn(
-                      "group flex items-start gap-4 rounded-2xl border p-3 md:p-4 transition-all",
+                      "group flex items-start gap-4 rounded-2xl border p-4 transition-all",
                       isCompleted
                         ? "bg-success/5 border-border/60 opacity-80"
                         : isSkipped
@@ -977,7 +977,7 @@ function DashboardPage() {
                               : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
-                    <div className="flex items-start gap-3 md:gap-4 min-w-0 flex-1">
+                    <div className="flex items-start gap-4 min-w-0 flex-1">
                       <div
                         className={cn(
                           "flex items-center gap-1.5 text-sm font-bold shrink-0 pt-1",
