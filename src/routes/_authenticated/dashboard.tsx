@@ -131,6 +131,8 @@ interface TaskItem {
   lateAfterMinutes: number;
   missedAfterMinutes: number;
   allDay: boolean;
+  allowOngoing: boolean;
+  ongoingStartedAt: Date | null;
   /** Author / caregiver attribution when completed. */
   byUserId: string | null;
   byProfileId: string | null;
