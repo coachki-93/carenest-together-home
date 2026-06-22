@@ -96,7 +96,11 @@ export type Database = {
           family_id: string
           id: string
           kind: Database["public"]["Enums"]["appointment_kind"]
+          late_after_minutes: number
+          late_notified_at: string | null
           location: string | null
+          missed_after_minutes: number
+          missed_notified_at: string | null
           notes: string | null
           notified_at: string | null
           recurrence_byweekday: number[] | null
@@ -122,7 +126,11 @@ export type Database = {
           family_id: string
           id?: string
           kind?: Database["public"]["Enums"]["appointment_kind"]
+          late_after_minutes?: number
+          late_notified_at?: string | null
           location?: string | null
+          missed_after_minutes?: number
+          missed_notified_at?: string | null
           notes?: string | null
           notified_at?: string | null
           recurrence_byweekday?: number[] | null
@@ -148,7 +156,11 @@ export type Database = {
           family_id?: string
           id?: string
           kind?: Database["public"]["Enums"]["appointment_kind"]
+          late_after_minutes?: number
+          late_notified_at?: string | null
           location?: string | null
+          missed_after_minutes?: number
+          missed_notified_at?: string | null
           notes?: string | null
           notified_at?: string | null
           recurrence_byweekday?: number[] | null
@@ -1035,6 +1047,44 @@ export type Database = {
           },
         ]
       }
+      med_dose_events: {
+        Row: {
+          created_at: string
+          late_notified_at: string | null
+          medication_id: string
+          missed_notified_at: string | null
+          scheduled_for: string
+          started_notified_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          late_notified_at?: string | null
+          medication_id: string
+          missed_notified_at?: string | null
+          scheduled_for: string
+          started_notified_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          late_notified_at?: string | null
+          medication_id?: string
+          missed_notified_at?: string | null
+          scheduled_for?: string
+          started_notified_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "med_dose_events_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       med_logs: {
         Row: {
           caregiver_profile_id: string | null
@@ -1127,6 +1177,8 @@ export type Database = {
           family_id: string
           id: string
           instructions: string | null
+          late_after_minutes: number
+          missed_after_minutes: number
           name: string
           route: Database["public"]["Enums"]["med_route"]
           times: string[]
@@ -1143,6 +1195,8 @@ export type Database = {
           family_id: string
           id?: string
           instructions?: string | null
+          late_after_minutes?: number
+          missed_after_minutes?: number
           name: string
           route?: Database["public"]["Enums"]["med_route"]
           times?: string[]
@@ -1159,6 +1213,8 @@ export type Database = {
           family_id?: string
           id?: string
           instructions?: string | null
+          late_after_minutes?: number
+          missed_after_minutes?: number
           name?: string
           route?: Database["public"]["Enums"]["med_route"]
           times?: string[]
