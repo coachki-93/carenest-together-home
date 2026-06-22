@@ -1222,7 +1222,7 @@ function DashboardPage() {
                               {t("dashboard.markDone")}
                             </span>
                           </Button>
-                          {task.allowOngoing && !isOngoing && (
+                          {task.allowOngoing && !isOngoing && task.scheduledFor.getTime() - now.getTime() <= 5 * 60 * 1000 && (
                             <Button
                               size="sm"
                               variant="outline"
