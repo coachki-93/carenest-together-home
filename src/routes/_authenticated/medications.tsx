@@ -288,6 +288,9 @@ function MedicationDialog({
   const [missedAfter, setMissedAfter] = useState<string>(
     String((medication as { missed_after_minutes?: number } | undefined)?.missed_after_minutes ?? 15),
   );
+  const [allowOngoing, setAllowOngoing] = useState<boolean>(
+    !!(medication as { allow_ongoing?: boolean } | undefined)?.allow_ongoing,
+  );
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
