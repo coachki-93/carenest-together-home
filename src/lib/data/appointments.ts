@@ -509,6 +509,7 @@ type InstanceOverrideInput = {
     late_after_minutes?: number;
     missed_after_minutes?: number;
     allow_ongoing?: boolean;
+    timer_minutes?: number | null;
   };
 };
 
