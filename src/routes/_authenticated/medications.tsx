@@ -318,6 +318,7 @@ function MedicationDialog({
         active,
         late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
         missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
+        allow_ongoing: allowOngoing,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
