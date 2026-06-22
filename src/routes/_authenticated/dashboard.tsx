@@ -375,6 +375,13 @@ function DashboardPage() {
     return () => window.clearInterval(id);
   }, []);
 
+  // Faster ticker for live timer countdowns (1s). Always on while page mounted.
+  const [secondTick, setSecondTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setSecondTick(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
   const { currentShifts, nextShifts } = useMemo(() => {
     const now = new Date(nowTick);
     const horizon = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
