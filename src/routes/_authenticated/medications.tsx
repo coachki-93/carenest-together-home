@@ -441,7 +441,10 @@ function MedicationDialog({
                   aria-label={c}
                 />
               ))}
+            </div>
           </div>
+
+
 
           <div className="rounded-2xl border border-border/60 p-3 space-y-2">
             <Label className="font-semibold">
