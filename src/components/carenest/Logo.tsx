@@ -4,6 +4,11 @@ import logoAsset from "@/assets/carenest-logo.png.asset.json";
 interface LogoProps {
   /** Height of the logo in pixels. */
   size?: number;
+  /**
+   * Kept for backward compatibility; the current CareNest logo already
+   * includes the wordmark, so this prop no longer changes rendering.
+   */
+  withWordmark?: boolean;
   className?: string;
 }
 
@@ -23,6 +28,7 @@ export function Logo({ size = 40, className }: LogoProps) {
     </div>
   );
 }
+
 
 
 
