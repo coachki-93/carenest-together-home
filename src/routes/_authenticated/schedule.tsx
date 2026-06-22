@@ -965,6 +965,8 @@ function AppointmentDialog({
       setLateAfter("0");
       setMissedAfter("15");
       setAllowOngoing(false);
+      setEnableTimer(false);
+      setTimerMinutes("1");
     }
   }, [open, editing, defaultDay]);
 
