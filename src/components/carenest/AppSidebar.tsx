@@ -19,6 +19,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -29,6 +30,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Logo } from "./Logo";
+import { LanguageToggle } from "./LanguageToggle";
 
 export function AppSidebar() {
   const { t } = useTranslation();
