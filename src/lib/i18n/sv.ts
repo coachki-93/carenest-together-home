@@ -664,6 +664,10 @@ export const sv = {
       repeat: "Upprepa",
       reminder: "Påminnelse",
       amountMl: "Mängd (ml)",
+      lateAfter: "Visa som 'Sen' efter",
+      missedAfter: "Räknas som 'Missad' efter",
+      minutes: "minuter",
+      lateMissedHint: "Sen visar en gul varning. Missad blir röd och skickar en notis.",
     },
     placeholders: {
       title: "t.ex. Återbesök hos neurolog",
