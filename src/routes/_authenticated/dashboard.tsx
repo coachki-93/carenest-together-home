@@ -801,6 +801,82 @@ function DashboardPage() {
     }
   }
 
+  // ---- Timer ---------------------------------------------------------------
+  async function startTimer(task: TaskItem) {
+    if (!familyId || task.timerMinutes == null) return;
+    const profileId = activeCaregiverId ?? null;
+    const nowIso = new Date().toISOString();
+    try {
+      if (task.source.kind === "dose") {
+        if (!child) return;
+        await logDose.mutateAsync({
+          family_id: familyId,
+          child_id: child.id,
+          medication_id: task.source.dose.medication.id,
+          scheduled_for: task.source.dose.scheduled_for.toISOString(),
+          status: "ongoing" as never,
+          given_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          ongoing_started_at: nowIso,
+          ongoing_started_by: user?.id ?? null,
+          timer_started_at: nowIso,
+          timer_started_by: profileId,
+        } as never);
+      } else if (task.source.kind === "appt") {
+        const a = task.source.appt;
+        await logAppt.mutateAsync({
+          family_id: familyId,
+          appointment_id: a.master_id ?? a.id,
+          occurrence_at: a.occurrence_start,
+          status: "ongoing" as never,
+          completed_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          ongoing_started_at: nowIso,
+          ongoing_started_by: user?.id ?? null,
+          timer_started_at: nowIso,
+          timer_started_by: profileId,
+        } as never);
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
+  async function autoCompleteTimer(task: TaskItem) {
+    if (!familyId) return;
+    const profileId = task.byProfileId ?? activeCaregiverId ?? null;
+    try {
+      if (task.source.kind === "dose") {
+        if (!child) return;
+        await logDose.mutateAsync({
+          family_id: familyId,
+          child_id: child.id,
+          medication_id: task.source.dose.medication.id,
+          scheduled_for: task.source.dose.scheduled_for.toISOString(),
+          status: "given",
+          given_by: task.byUserId ?? user?.id ?? null,
+          caregiver_profile_id: profileId,
+        });
+      } else if (task.source.kind === "appt") {
+        const a = task.source.appt;
+        await logAppt.mutateAsync({
+          family_id: familyId,
+          appointment_id: a.master_id ?? a.id,
+          occurrence_at: a.occurrence_start,
+          status: "done",
+          completed_by: task.byUserId ?? user?.id ?? null,
+          caregiver_profile_id: profileId,
+        });
+      }
+      toast.success(t("schedule.autoCompleted", { title: task.title }));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
+
+
+
 
 
   const deleteVital = useDeleteVital();
