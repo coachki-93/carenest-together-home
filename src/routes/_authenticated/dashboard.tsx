@@ -94,6 +94,9 @@ import { useLowStockSummary } from "@/lib/data/inventory";
 import { Boxes } from "lucide-react";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
 import { getTaskState } from "@/lib/schedule/task-state";
+import { notifyOngoing } from "@/lib/data/ongoing-notify.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { Play } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
 
@@ -107,7 +110,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-type TaskStatus = "pending" | "given" | "skipped" | "postponed" | "missed";
+type TaskStatus = "pending" | "given" | "skipped" | "postponed" | "missed" | "ongoing";
 
 type TaskSource =
   | { kind: "dose"; dose: ScheduledDose }
@@ -131,6 +134,8 @@ interface TaskItem {
   lateAfterMinutes: number;
   missedAfterMinutes: number;
   allDay: boolean;
+  allowOngoing: boolean;
+  ongoingStartedAt: Date | null;
   /** Author / caregiver attribution when completed. */
   byUserId: string | null;
   byProfileId: string | null;
@@ -546,7 +551,9 @@ function DashboardPage() {
             ? "skipped"
             : logStatus === "postponed"
               ? "postponed"
-              : "pending";
+              : (logStatus as string) === "ongoing"
+                ? "ongoing"
+                : "pending";
       const isOverdue = status === "pending" && d.scheduled_for < now;
       items.push({
         id: `dose-${d.key}`,
@@ -560,6 +567,10 @@ function DashboardPage() {
         lateAfterMinutes: (med as { late_after_minutes?: number | null }).late_after_minutes ?? 0,
         missedAfterMinutes: (med as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15,
         allDay: false,
+        allowOngoing: !!(med as { allow_ongoing?: boolean }).allow_ongoing,
+        ongoingStartedAt: (d.log as { ongoing_started_at?: string | null } | undefined)?.ongoing_started_at
+          ? new Date((d.log as { ongoing_started_at: string }).ongoing_started_at)
+          : null,
         byUserId: d.log?.given_by ?? null,
         byProfileId: d.log?.caregiver_profile_id ?? null,
         reason: d.log?.reason ?? null,
@@ -584,7 +595,9 @@ function DashboardPage() {
             ? "skipped"
             : completion?.status === "postponed"
               ? "postponed"
-              : "pending";
+              : (completion?.status as string) === "ongoing"
+                ? "ongoing"
+                : "pending";
       const isOverdue = status === "pending" && !a.all_day && at < now;
       const amountStr = a.amount_ml != null ? `${a.amount_ml} ml` : null;
       const detail = [amountStr, a.location, a.notes].filter(Boolean).join(" • ");
@@ -600,6 +613,10 @@ function DashboardPage() {
         lateAfterMinutes: (a as { late_after_minutes?: number | null }).late_after_minutes ?? 0,
         missedAfterMinutes: (a as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15,
         allDay: a.all_day,
+        allowOngoing: !!(a as { allow_ongoing?: boolean }).allow_ongoing,
+        ongoingStartedAt: (completion as { ongoing_started_at?: string | null } | null)?.ongoing_started_at
+          ? new Date((completion as { ongoing_started_at: string }).ongoing_started_at)
+          : null,
         byUserId: completion?.completed_by ?? null,
         byProfileId: completion?.caregiver_profile_id ?? null,
         reason: completion?.reason ?? null,
@@ -634,6 +651,8 @@ function DashboardPage() {
         lateAfterMinutes: 0,
         missedAfterMinutes: 15,
         allDay: false,
+        allowOngoing: false,
+        ongoingStartedAt: null,
         byUserId: v.logged_by ?? null,
         byProfileId: null,
         reason: null,
@@ -716,6 +735,61 @@ function DashboardPage() {
     }
     setPendingAction(null);
   }
+
+  const notifyOngoingFn = useServerFn(notifyOngoing);
+
+  async function markOngoing(task: TaskItem) {
+    if (!familyId) return;
+    const profileId = activeCaregiverId ?? null;
+    const nowIso = new Date().toISOString();
+    try {
+      if (task.source.kind === "dose") {
+        if (!child) return;
+        await logDose.mutateAsync({
+          family_id: familyId,
+          child_id: child.id,
+          medication_id: task.source.dose.medication.id,
+          scheduled_for: task.source.dose.scheduled_for.toISOString(),
+          status: "ongoing" as never,
+          given_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          ongoing_started_at: nowIso,
+          ongoing_started_by: user?.id ?? null,
+        } as never);
+      } else if (task.source.kind === "appt") {
+        const a = task.source.appt;
+        await logAppt.mutateAsync({
+          family_id: familyId,
+          appointment_id: a.master_id ?? a.id,
+          occurrence_at: a.occurrence_start,
+          status: "ongoing" as never,
+          completed_by: user?.id ?? null,
+          caregiver_profile_id: profileId,
+          ongoing_started_at: nowIso,
+          ongoing_started_by: user?.id ?? null,
+        } as never);
+      } else {
+        return;
+      }
+      try {
+        await notifyOngoingFn({
+          data: {
+            family_id: familyId,
+            title: task.title,
+            task_key: task.id,
+            url: "/dashboard",
+          },
+        });
+      } catch (e) {
+        console.warn("notifyOngoing failed", e);
+      }
+      toast.success(t("schedule.ongoing"));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
+
 
   const deleteVital = useDeleteVital();
   async function undoTask(task: TaskItem) {
@@ -991,10 +1065,10 @@ function DashboardPage() {
               </div>
             ) : (() => {
               const activeTasks = tasks.filter(
-                (tk) => tk.status === "pending" || tk.status === "postponed",
+                (tk) => tk.status === "pending" || tk.status === "postponed" || tk.status === "ongoing",
               );
               const pastTasks = tasks.filter(
-                (tk) => tk.status !== "pending" && tk.status !== "postponed",
+                (tk) => tk.status !== "pending" && tk.status !== "postponed" && tk.status !== "ongoing",
               );
               const renderRow = (task: TaskItem) => {
                 const kind: AppointmentKind | "medication" | "vital" =
@@ -1012,9 +1086,10 @@ function DashboardPage() {
                 const isCompleted = task.status === "given";
                 const isSkipped = task.status === "skipped";
                 const isPostponed = task.status === "postponed";
+                const isOngoing = task.status === "ongoing";
                 const isPending = task.status === "pending";
                 const liveState = getTaskState({
-                  status: task.status === "missed" ? "pending" : task.status,
+                  status: task.status === "missed" ? "pending" : (task.status as "pending" | "ongoing" | "given" | "skipped" | "postponed"),
                   scheduledFor: task.scheduledFor,
                   lateAfterMinutes: task.lateAfterMinutes,
                   missedAfterMinutes: task.missedAfterMinutes,
@@ -1023,7 +1098,6 @@ function DashboardPage() {
                 });
                 const isLate = liveState === "late";
                 const isMissed = liveState === "missed";
-                const overdue = isLate || isMissed;
                 return (
                   <li
                     key={task.id}
@@ -1033,13 +1107,15 @@ function DashboardPage() {
                         ? "bg-success/5 border-border/60 opacity-80"
                         : isSkipped
                           ? "bg-muted/40 border-border/60"
-                          : isPostponed
-                            ? "bg-warning/10 border-warning/30"
-                            : isMissed
-                              ? "bg-destructive/5 border-destructive/40"
-                              : isLate
-                                ? "bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-700/50"
-                                : "bg-card border-border/60 hover:shadow-soft",
+                          : isOngoing
+                            ? "bg-primary-soft/40 border-primary/40"
+                            : isPostponed
+                              ? "bg-warning/10 border-warning/30"
+                              : isMissed
+                                ? "bg-destructive/5 border-destructive/40"
+                                : isLate
+                                  ? "bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-700/50"
+                                  : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
                     <div className="flex items-start gap-2 sm:gap-4 min-w-0 flex-1">
@@ -1078,6 +1154,12 @@ function DashboardPage() {
                           >
                             {task.title}
                           </span>
+                          {isOngoing && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary-soft rounded-full px-2 py-0.5 inline-flex items-center gap-1">
+                              <Play className="size-3" />
+                              {t("schedule.ongoing")}
+                            </span>
+                          )}
                           {isMissed && isPending && (
                             <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
                               {t("schedule.missed")}
@@ -1104,7 +1186,7 @@ function DashboardPage() {
                             {task.detail}
                           </div>
                         )}
-                        {(isCompleted || isSkipped || isPostponed) && (
+                        {(isCompleted || isSkipped || isPostponed || isOngoing) && (
                           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                             <ByProfile
                               familyId={familyId}
@@ -1126,7 +1208,7 @@ function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 self-start">
-                      {isPending || isPostponed ? (
+                      {isPending || isPostponed || isOngoing ? (
                         <>
                           <Button
                             size="sm"
@@ -1140,6 +1222,21 @@ function DashboardPage() {
                               {t("dashboard.markDone")}
                             </span>
                           </Button>
+                          {task.allowOngoing && !isOngoing && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4 border-primary/40 text-primary hover:bg-primary-soft"
+                              onClick={() => markOngoing(task)}
+                              aria-label={t("schedule.markOngoing")}
+                              title={t("schedule.markOngoing")}
+                            >
+                              <Play className="size-4" />
+                              <span className="ml-1 hidden sm:inline">
+                                {t("schedule.markOngoing")}
+                              </span>
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="outline"
@@ -1150,17 +1247,19 @@ function DashboardPage() {
                           >
                             <X className="size-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
-                            onClick={() => setPendingAction({ task, action: "postponed" })}
-                            aria-label={t("schedule.postpone")}
-                            title={t("schedule.postpone")}
-                          >
-                            <CalendarClock className="size-4" />
-                          </Button>
-                          {isPostponed && (
+                          {!isOngoing && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
+                              onClick={() => setPendingAction({ task, action: "postponed" })}
+                              aria-label={t("schedule.postpone")}
+                              title={t("schedule.postpone")}
+                            >
+                              <CalendarClock className="size-4" />
+                            </Button>
+                          )}
+                          {(isPostponed || isOngoing) && (
                             <Button
                               size="sm"
                               variant="ghost"

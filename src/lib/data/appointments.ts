@@ -20,6 +20,7 @@ export type Appointment = AppointmentRow & {
   amount_ml: number | null;
   late_after_minutes: number;
   missed_after_minutes: number;
+  allow_ongoing: boolean;
 };
 
 export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["Insert"] & {
@@ -34,6 +35,7 @@ export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["In
   amount_ml?: number | null;
   late_after_minutes?: number;
   missed_after_minutes?: number;
+  allow_ongoing?: boolean;
 };
 
 export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Update"] & {
@@ -45,6 +47,7 @@ export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Up
   amount_ml?: number | null;
   late_after_minutes?: number;
   missed_after_minutes?: number;
+  allow_ongoing?: boolean;
 };
 
 // Locally widen the kind union — generated types lag behind the enum migration.
@@ -502,6 +505,7 @@ type InstanceOverrideInput = {
     amount_ml: number | null;
     late_after_minutes?: number;
     missed_after_minutes?: number;
+    allow_ongoing?: boolean;
   };
 };
 

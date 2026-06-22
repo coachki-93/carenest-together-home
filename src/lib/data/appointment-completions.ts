@@ -47,6 +47,8 @@ export function useLogAppointmentCompletion() {
       reason?: string | null;
       postponed_to?: string | null;
       notes?: string | null;
+      ongoing_started_at?: string | null;
+      ongoing_started_by?: string | null;
     }) => {
       const payload = {
         ...input,
@@ -54,7 +56,7 @@ export function useLogAppointmentCompletion() {
       };
       const { data, error } = await supabase
         .from("appointment_completions")
-        .upsert(payload, { onConflict: "appointment_id,occurrence_at" })
+        .upsert(payload as never, { onConflict: "appointment_id,occurrence_at" })
         .select()
         .single();
       if (error) throw error;

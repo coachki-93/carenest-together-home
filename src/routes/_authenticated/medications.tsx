@@ -288,6 +288,9 @@ function MedicationDialog({
   const [missedAfter, setMissedAfter] = useState<string>(
     String((medication as { missed_after_minutes?: number } | undefined)?.missed_after_minutes ?? 15),
   );
+  const [allowOngoing, setAllowOngoing] = useState<boolean>(
+    !!(medication as { allow_ongoing?: boolean } | undefined)?.allow_ongoing,
+  );
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
@@ -315,6 +318,7 @@ function MedicationDialog({
         active,
         late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
         missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
+        allow_ongoing: allowOngoing,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
@@ -488,6 +492,22 @@ function MedicationDialog({
             </div>
             <p className="text-xs text-muted-foreground">
               {t("scheduleEvents.fields.lateMissedHint")}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="med-allow-ongoing"
+                checked={allowOngoing}
+                onCheckedChange={setAllowOngoing}
+              />
+              <Label htmlFor="med-allow-ongoing" className="font-semibold cursor-pointer">
+                {t("scheduleEvents.fields.allowOngoing")}
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("scheduleEvents.fields.allowOngoingHelp")}
             </p>
           </div>
 

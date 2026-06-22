@@ -296,6 +296,9 @@ export const sv = {
     overdue: "Missad",
     late: "Sen",
     missed: "Missad",
+    ongoing: "Pågår",
+    markOngoing: "Pågår",
+    ongoingStartedBy: "{{name}} har påbörjat uppgiften",
     statusPostponed: "Senarelagd",
     postpone: "Senarelägg",
     was: "var",
@@ -668,6 +671,8 @@ export const sv = {
       missedAfter: "Räknas som 'Missad' efter",
       minutes: "minuter",
       lateMissedHint: "Sen visar en gul varning. Missad blir röd och skickar en notis.",
+      allowOngoing: "Tillåt status 'Pågår'",
+      allowOngoingHelp: "För längre uppgifter (besök, matning, hygien). Vårdgivare kan markera att uppgiften är påbörjad; sen/missad-varningar pausas tills den är klar.",
     },
     placeholders: {
       title: "t.ex. Återbesök hos neurolog",

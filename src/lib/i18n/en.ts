@@ -296,6 +296,9 @@ export const en = {
     overdue: "Missed",
     late: "Late",
     missed: "Missed",
+    ongoing: "In progress",
+    markOngoing: "Ongoing",
+    ongoingStartedBy: "{{name}} started this task",
     statusPostponed: "Postponed",
     postpone: "Postpone",
     was: "was",
@@ -668,6 +671,8 @@ export const en = {
       missedAfter: "Counts as 'Missed' after",
       minutes: "minutes",
       lateMissedHint: "Late shows a yellow warning. Missed turns red and sends a notification.",
+      allowOngoing: "Allow 'Ongoing' status",
+      allowOngoingHelp: "For longer tasks (visits, feeding, hygiene). Caregivers can mark it started; late/missed alerts pause until it's done.",
     },
     placeholders: {
       title: "e.g. Neurologist follow-up",

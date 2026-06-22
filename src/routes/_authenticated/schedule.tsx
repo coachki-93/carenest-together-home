@@ -117,6 +117,7 @@ type SavePayload = {
   amount_ml: number | null;
   late_after_minutes: number;
   missed_after_minutes: number;
+  allow_ongoing: boolean;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
@@ -522,6 +523,7 @@ function SchedulePage() {
                   amount_ml: values.amount_ml,
                   late_after_minutes: values.late_after_minutes,
                   missed_after_minutes: values.missed_after_minutes,
+                  allow_ongoing: values.allow_ongoing,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
@@ -544,6 +546,7 @@ function SchedulePage() {
                     reminder_minutes: values.reminder_minutes,
                     late_after_minutes: values.late_after_minutes,
                     missed_after_minutes: values.missed_after_minutes,
+                    allow_ongoing: values.allow_ongoing,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
@@ -909,6 +912,7 @@ function AppointmentDialog({
   const [amountMl, setAmountMl] = useState<string>("");
   const [lateAfter, setLateAfter] = useState<string>("0");
   const [missedAfter, setMissedAfter] = useState<string>("15");
+  const [allowOngoing, setAllowOngoing] = useState<boolean>(false);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -936,6 +940,7 @@ function AppointmentDialog({
       setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
       setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
+      setAllowOngoing(!!(editing as { allow_ongoing?: boolean }).allow_ongoing);
     } else {
       setTitle("");
       setKind("appointment");
@@ -953,6 +958,7 @@ function AppointmentDialog({
       setAmountMl("");
       setLateAfter("0");
       setMissedAfter("15");
+      setAllowOngoing(false);
     }
   }, [open, editing, defaultDay]);
 
@@ -1009,6 +1015,7 @@ function AppointmentDialog({
         : null,
       late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
       missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
+      allow_ongoing: allowOngoing,
     };
   }
 
@@ -1342,6 +1349,23 @@ function AppointmentDialog({
               </div>
               <p className="text-xs text-muted-foreground">
                 {t("scheduleEvents.fields.lateMissedHint")}
+              </p>
+            </div>
+
+            {/* Allow Ongoing */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="allow-ongoing"
+                  checked={allowOngoing}
+                  onCheckedChange={(c) => setAllowOngoing(c === true)}
+                />
+                <Label htmlFor="allow-ongoing" className="font-semibold cursor-pointer">
+                  {t("scheduleEvents.fields.allowOngoing")}
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("scheduleEvents.fields.allowOngoingHelp")}
               </p>
             </div>
 
