@@ -1295,6 +1295,52 @@ function AppointmentDialog({
               </Select>
             </div>
 
+            {/* Late / Missed thresholds */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <Label className="font-semibold">
+                {t("scheduleEvents.fields.lateAfter")} / {t("scheduleEvents.fields.missedAfter")}
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.fields.lateAfter")}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      value={lateAfter}
+                      onChange={(e) => setLateAfter(e.target.value)}
+                      className="rounded-xl w-20"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {t("scheduleEvents.fields.minutes")}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.fields.missedAfter")}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      value={missedAfter}
+                      onChange={(e) => setMissedAfter(e.target.value)}
+                      className="rounded-xl w-20"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {t("scheduleEvents.fields.minutes")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("scheduleEvents.fields.lateMissedHint")}
+              </p>
+            </div>
+
             {isInstance && (
               <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">
                 {t("scheduleEvents.repeat.instanceHint")}
