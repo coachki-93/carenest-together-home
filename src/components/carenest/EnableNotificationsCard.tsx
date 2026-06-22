@@ -24,7 +24,10 @@ export function EnableNotificationsCard() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const ua = navigator.userAgent || "";
-    const isIos = /iPad|iPhone|iPod/.test(ua);
+    // iPadOS 13+ Safari reports as "Macintosh"; detect via touch points as fallback
+    const isIpadOs =
+      /Macintosh/.test(ua) && typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 1;
+    const isIos = /iPad|iPhone|iPod/.test(ua) || isIpadOs;
     const standalone =
       window.matchMedia?.("(display-mode: standalone)").matches ||
       // @ts-expect-error iOS-only
