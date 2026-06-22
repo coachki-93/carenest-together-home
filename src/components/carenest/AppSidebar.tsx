@@ -64,7 +64,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="px-3 py-4">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <Logo size={36} />
+          <Logo size={44} />
         </Link>
       </SidebarHeader>
       <SidebarContent data-tour="sidebar">
