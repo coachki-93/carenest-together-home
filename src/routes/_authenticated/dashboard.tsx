@@ -663,6 +663,8 @@ function DashboardPage() {
         allDay: false,
         allowOngoing: false,
         ongoingStartedAt: null,
+        timerMinutes: null,
+        timerStartedAt: null,
         byUserId: v.logged_by ?? null,
         byProfileId: null,
         reason: null,
