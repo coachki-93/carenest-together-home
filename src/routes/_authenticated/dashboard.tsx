@@ -63,7 +63,9 @@ import {
   useDeleteAppointmentCompletion,
   type AppointmentCompletion,
 } from "@/lib/data/appointment-completions";
-import { useFamilyMembers, useInvites } from "@/lib/data/family";
+import { useFamilyMembers, useInvites, useFamily, useSetHospitalMode } from "@/lib/data/family";
+import { Switch } from "@/components/ui/switch";
+import { Hospital } from "lucide-react";
 import {
   useCaregiverProfiles,
   useSuggestedCaregiverProfile,
