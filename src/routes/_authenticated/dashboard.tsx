@@ -573,6 +573,10 @@ function DashboardPage() {
         ongoingStartedAt: (d.log as { ongoing_started_at?: string | null } | undefined)?.ongoing_started_at
           ? new Date((d.log as { ongoing_started_at: string }).ongoing_started_at)
           : null,
+        timerMinutes: (med as { timer_minutes?: number | null }).timer_minutes ?? null,
+        timerStartedAt: (d.log as { timer_started_at?: string | null } | undefined)?.timer_started_at
+          ? new Date((d.log as { timer_started_at: string }).timer_started_at)
+          : null,
         byUserId: d.log?.given_by ?? null,
         byProfileId: d.log?.caregiver_profile_id ?? null,
         reason: d.log?.reason ?? null,
