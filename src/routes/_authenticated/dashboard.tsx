@@ -965,7 +965,7 @@ function DashboardPage() {
                   <li
                     key={task.id}
                     className={cn(
-                      "group flex items-start gap-4 rounded-2xl border p-4 transition-all",
+                      "group flex items-start gap-2 sm:gap-4 rounded-2xl border p-3 sm:p-4 transition-all",
                       isCompleted
                         ? "bg-success/5 border-border/60 opacity-80"
                         : isSkipped
@@ -977,14 +977,14 @@ function DashboardPage() {
                               : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
-                    <div className="flex items-start gap-4 min-w-0 flex-1">
+                    <div className="flex items-start gap-2 sm:gap-4 min-w-0 flex-1">
                       <div
                         className={cn(
-                          "flex items-center gap-1.5 text-sm font-bold shrink-0 pt-1",
+                          "flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold shrink-0 pt-1 tabular-nums",
                           overdue ? "text-destructive" : "text-muted-foreground",
                         )}
                       >
-                        <Clock className="size-3.5" />
+                        <Clock className="size-3 sm:size-3.5" />
                         {isPostponed && task.postponedTo
                           ? task.postponedTo.toLocaleTimeString(
                               i18n.language === "sv" ? "sv-SE" : "en-US",
@@ -993,16 +993,17 @@ function DashboardPage() {
                           : task.timeLabel}
                       </div>
                       <div
-                        className="size-11 rounded-2xl flex items-center justify-center shrink-0"
+                        className="size-8 sm:size-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0"
                         style={{ backgroundColor: tone.bg, color: tone.fg }}
                       >
-                        <Icon className="size-5" />
+                        <Icon className="size-4 sm:size-5" />
                       </div>
-                      <div className="flex-1 min-w-[80px]">
-                        <div className="flex items-center gap-2 flex-wrap">
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap min-w-0">
                           <span
                             className={cn(
-                              "font-bold break-words",
+                              "font-bold [overflow-wrap:anywhere] min-w-0",
                               isCompleted && "line-through text-muted-foreground",
                             )}
                           >
@@ -1025,7 +1026,7 @@ function DashboardPage() {
                           )}
                         </div>
                         {task.detail && (
-                          <div className="text-sm text-muted-foreground break-words">
+                          <div className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
                             {task.detail}
                           </div>
                         )}
@@ -1050,12 +1051,12 @@ function DashboardPage() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0 self-start">
+                    <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 self-start">
                       {isPending || isPostponed ? (
                         <>
                           <Button
                             size="sm"
-                            className="rounded-full font-bold"
+                            className="rounded-full font-bold size-8 p-0 sm:size-auto sm:px-3"
                             onClick={() => setPendingAction({ task, action: "done" })}
                             aria-label={t("dashboard.markDone")}
                             title={t("dashboard.markDone")}
@@ -1068,7 +1069,7 @@ function DashboardPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="rounded-full font-bold"
+                            className="rounded-full font-bold size-8 p-0 sm:size-auto sm:px-3"
                             onClick={() => setPendingAction({ task, action: "skipped" })}
                             aria-label={t("schedule.skip")}
                             title={t("schedule.skip")}
@@ -1078,7 +1079,7 @@ function DashboardPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="rounded-full font-bold"
+                            className="rounded-full font-bold size-8 p-0 sm:size-auto sm:px-3"
                             onClick={() => setPendingAction({ task, action: "postponed" })}
                             aria-label={t("schedule.postpone")}
                             title={t("schedule.postpone")}
@@ -1089,7 +1090,7 @@ function DashboardPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="rounded-full font-semibold text-muted-foreground"
+                              className="rounded-full font-semibold text-muted-foreground size-8 p-0 sm:size-auto sm:px-3"
                               onClick={() => undoTask(task)}
                               aria-label={t("schedule.undo")}
                               title={t("schedule.undo")}
@@ -1102,7 +1103,7 @@ function DashboardPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="rounded-full font-semibold text-muted-foreground"
+                            className="rounded-full font-semibold text-muted-foreground size-8 p-0 sm:size-auto sm:px-3"
                             onClick={() => undoTask(task)}
                             aria-label={t("schedule.undo")}
                             title={t("schedule.undo")}
@@ -1114,6 +1115,7 @@ function DashboardPage() {
                           </Button>
                       )}
                     </div>
+
                   </li>
                 );
               };
