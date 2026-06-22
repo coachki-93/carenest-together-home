@@ -291,6 +291,9 @@ function MedicationDialog({
   const [allowOngoing, setAllowOngoing] = useState<boolean>(
     !!(medication as { allow_ongoing?: boolean } | undefined)?.allow_ongoing,
   );
+  const initialTimer = (medication as { timer_minutes?: number | null } | undefined)?.timer_minutes ?? null;
+  const [enableTimer, setEnableTimer] = useState<boolean>(initialTimer != null);
+  const [timerMinutes, setTimerMinutes] = useState<string>(initialTimer != null ? String(initialTimer) : "1");
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
@@ -319,6 +322,7 @@ function MedicationDialog({
         late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
         missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
         allow_ongoing: allowOngoing,
+        timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
@@ -509,6 +513,41 @@ function MedicationDialog({
             <p className="text-xs text-muted-foreground">
               {t("scheduleEvents.fields.allowOngoingHelp")}
             </p>
+          </div>
+
+          <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="med-enable-timer"
+                checked={enableTimer}
+                onCheckedChange={setEnableTimer}
+              />
+              <Label htmlFor="med-enable-timer" className="font-semibold cursor-pointer">
+                {t("scheduleEvents.fields.enableTimer")}
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("scheduleEvents.fields.enableTimerHelp")}
+            </p>
+            {enableTimer && (
+              <div className="flex items-center gap-2 pt-1">
+                <Label htmlFor="med-timer-minutes" className="text-sm">
+                  {t("scheduleEvents.fields.timerMinutes")}
+                </Label>
+                <Input
+                  id="med-timer-minutes"
+                  type="number"
+                  min={1}
+                  max={120}
+                  value={timerMinutes}
+                  onChange={(e) => setTimerMinutes(e.target.value)}
+                  className="rounded-xl w-20"
+                />
+                <span className="text-xs text-muted-foreground">
+                  {t("scheduleEvents.fields.minutes")}
+                </span>
+              </div>
+            )}
           </div>
 
 
