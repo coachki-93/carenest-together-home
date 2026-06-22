@@ -1363,6 +1363,21 @@ function DashboardPage() {
                               </span>
                             </Button>
                           )}
+                          {task.timerMinutes != null && !isOngoing && task.scheduledFor.getTime() - now.getTime() <= 5 * 60 * 1000 && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4 border-primary/40 text-primary hover:bg-primary-soft"
+                              onClick={() => startTimer(task)}
+                              aria-label={t("schedule.startTimer")}
+                              title={t("schedule.startTimer")}
+                            >
+                              <Clock className="size-4" />
+                              <span className="ml-1 hidden sm:inline">
+                                {t("schedule.startTimer")} ({task.timerMinutes}m)
+                              </span>
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="outline"
