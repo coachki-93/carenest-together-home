@@ -291,6 +291,9 @@ function MedicationDialog({
   const [allowOngoing, setAllowOngoing] = useState<boolean>(
     !!(medication as { allow_ongoing?: boolean } | undefined)?.allow_ongoing,
   );
+  const initialTimer = (medication as { timer_minutes?: number | null } | undefined)?.timer_minutes ?? null;
+  const [enableTimer, setEnableTimer] = useState<boolean>(initialTimer != null);
+  const [timerMinutes, setTimerMinutes] = useState<string>(initialTimer != null ? String(initialTimer) : "1");
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
