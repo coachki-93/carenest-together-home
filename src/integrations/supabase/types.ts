@@ -705,6 +705,7 @@ export type Database = {
       }
       families: {
         Row: {
+          at_hospital_since: string | null
           created_at: string
           id: string
           name: string
@@ -712,6 +713,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          at_hospital_since?: string | null
           created_at?: string
           id?: string
           name?: string
@@ -719,6 +721,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          at_hospital_since?: string | null
           created_at?: string
           id?: string
           name?: string
@@ -1389,6 +1392,10 @@ export type Database = {
           invite_id: string
           status: Database["public"]["Enums"]["invite_status"]
         }[]
+      }
+      set_family_hospital_mode: {
+        Args: { _family_id: string; _on: boolean }
+        Returns: string
       }
       shares_family_with: {
         Args: { _me: string; _other_user: string }
