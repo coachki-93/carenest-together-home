@@ -1186,7 +1186,7 @@ function DashboardPage() {
                             {task.detail}
                           </div>
                         )}
-                        {(isCompleted || isSkipped || isPostponed) && (
+                        {(isCompleted || isSkipped || isPostponed || isOngoing) && (
                           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                             <ByProfile
                               familyId={familyId}
