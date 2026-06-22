@@ -515,6 +515,41 @@ function MedicationDialog({
             </p>
           </div>
 
+          <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="med-enable-timer"
+                checked={enableTimer}
+                onCheckedChange={setEnableTimer}
+              />
+              <Label htmlFor="med-enable-timer" className="font-semibold cursor-pointer">
+                {t("scheduleEvents.fields.enableTimer")}
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("scheduleEvents.fields.enableTimerHelp")}
+            </p>
+            {enableTimer && (
+              <div className="flex items-center gap-2 pt-1">
+                <Label htmlFor="med-timer-minutes" className="text-sm">
+                  {t("scheduleEvents.fields.timerMinutes")}
+                </Label>
+                <Input
+                  id="med-timer-minutes"
+                  type="number"
+                  min={1}
+                  max={120}
+                  value={timerMinutes}
+                  onChange={(e) => setTimerMinutes(e.target.value)}
+                  className="rounded-xl w-20"
+                />
+                <span className="text-xs text-muted-foreground">
+                  {t("scheduleEvents.fields.minutes")}
+                </span>
+              </div>
+            )}
+          </div>
+
 
           <div className="flex items-center justify-between rounded-2xl bg-muted/50 px-4 py-3">
             <Label htmlFor="med-active" className="cursor-pointer">
