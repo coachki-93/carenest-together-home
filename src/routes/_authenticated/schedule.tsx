@@ -1013,6 +1013,7 @@ function AppointmentDialog({
         : null,
       late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
       missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
+      allow_ongoing: allowOngoing,
     };
   }
 
