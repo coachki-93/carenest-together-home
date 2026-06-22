@@ -18,6 +18,8 @@ export type Appointment = AppointmentRow & {
   recurrence_times_of_day: string[] | null;
   reminder_minutes: number | null;
   amount_ml: number | null;
+  late_after_minutes: number;
+  missed_after_minutes: number;
 };
 
 export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["Insert"] & {
@@ -30,6 +32,8 @@ export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["In
   recurrence_times_of_day?: string[] | null;
   reminder_minutes?: number | null;
   amount_ml?: number | null;
+  late_after_minutes?: number;
+  missed_after_minutes?: number;
 };
 
 export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Update"] & {
@@ -39,6 +43,8 @@ export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Up
   recurrence_times_of_day?: string[] | null;
   reminder_minutes?: number | null;
   amount_ml?: number | null;
+  late_after_minutes?: number;
+  missed_after_minutes?: number;
 };
 
 // Locally widen the kind union — generated types lag behind the enum migration.
@@ -494,6 +500,8 @@ type InstanceOverrideInput = {
     all_day: boolean;
     reminder_minutes: number | null;
     amount_ml: number | null;
+    late_after_minutes?: number;
+    missed_after_minutes?: number;
   };
 };
 
