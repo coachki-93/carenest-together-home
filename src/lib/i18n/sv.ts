@@ -676,6 +676,9 @@ export const sv = {
       lateMissedHint: "Sen visar en gul varning. Missad blir röd och skickar en notis.",
       allowOngoing: "Tillåt status 'Pågår'",
       allowOngoingHelp: "För längre uppgifter (besök, matning, hygien). Vårdgivare kan markera att uppgiften är påbörjad; sen/missad-varningar pausas tills den är klar.",
+      enableTimer: "Aktivera timer",
+      enableTimerHelp: "Vårdgivare kan starta en nedräkning. Uppgiften slutförs automatiskt när timern är klar.",
+      timerMinutes: "Längd (minuter)",
     },
     placeholders: {
       title: "t.ex. Återbesök hos neurolog",
