@@ -351,6 +351,9 @@ function DashboardPage() {
   const lowStock = useLowStockSummary(familyId);
   const { data: missedChecks = [] } = useTodayMissedChecks(familyId);
   const { data: invites = [] } = useInvites(familyId);
+  const { data: family } = useFamily(familyId);
+  const setHospital = useSetHospitalMode();
+  const hospitalOn = !!family?.at_hospital_since;
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
 
