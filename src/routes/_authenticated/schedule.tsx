@@ -1024,6 +1024,7 @@ function AppointmentDialog({
       late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
       missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
       allow_ongoing: allowOngoing,
+      timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
     };
   }
 
