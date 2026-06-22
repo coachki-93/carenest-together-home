@@ -136,6 +136,8 @@ interface TaskItem {
   allDay: boolean;
   allowOngoing: boolean;
   ongoingStartedAt: Date | null;
+  timerMinutes: number | null;
+  timerStartedAt: Date | null;
   /** Author / caregiver attribution when completed. */
   byUserId: string | null;
   byProfileId: string | null;
