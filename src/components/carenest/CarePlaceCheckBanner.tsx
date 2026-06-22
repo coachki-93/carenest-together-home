@@ -62,6 +62,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: todaysChecks = [] } = useTodayCarePlaceChecks(familyId);
   const { data: inventory = [] } = useInventoryItems(familyId);
   const { data: openAdhocs = [] } = useOpenAdhocItems(familyId);
+  const { data: family } = useFamily(familyId);
   const submit = useSubmitCarePlaceCheck();
   const resolveAdhoc = useResolveAdhocItem();
 
