@@ -17,27 +17,29 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
       <div className="min-h-screen flex w-full bg-transparent">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-10 backdrop-blur-md bg-background/70 border-b border-border/60">
-            <div className="flex items-center justify-between gap-3 px-4 md:px-8 py-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <SidebarTrigger className="rounded-full" />
+          <header className="sticky top-0 z-10 backdrop-blur-md bg-background/70 border-b border-border/60 safe-pt">
+            <div className="flex items-center justify-between gap-2 px-3 md:px-8 py-2 md:py-3">
+              <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                <SidebarTrigger className="rounded-full tap" />
                 <div className="min-w-0">
-                  <h1 className="text-xl md:text-2xl font-extrabold tracking-tight truncate">
+                  <h1 className="text-base md:text-2xl font-extrabold tracking-tight truncate">
                     {title}
                   </h1>
                   {subtitle && (
-                    <p className="text-sm text-muted-foreground truncate">{subtitle}</p>
+                    <p className="hidden md:block text-sm text-muted-foreground truncate">{subtitle}</p>
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1 md:gap-2 shrink-0">
                 {actions}
-                <LanguageToggle />
+                <div className="hidden md:flex items-center gap-2">
+                  <LanguageToggle />
+                </div>
                 <ProfileSelector />
               </div>
             </div>
           </header>
-          <main className="flex-1 px-4 md:px-8 py-6 md:py-8">{children}</main>
+          <main className="flex-1 px-3 md:px-8 py-4 md:py-8 safe-pb">{children}</main>
         </div>
       </div>
     </SidebarProvider>

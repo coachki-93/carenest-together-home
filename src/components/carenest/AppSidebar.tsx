@@ -19,6 +19,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -29,6 +30,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Logo } from "./Logo";
+import { LanguageToggle } from "./LanguageToggle";
 
 export function AppSidebar() {
   const { t } = useTranslation();
@@ -115,6 +117,11 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {!collapsed && (
+        <SidebarFooter className="px-3 py-3 safe-pb">
+          <LanguageToggle />
+        </SidebarFooter>
+      )}
     </Sidebar>
   );
 }

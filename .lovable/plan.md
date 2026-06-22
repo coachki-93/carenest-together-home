@@ -1,51 +1,72 @@
-## Goal
 
-Replace the current sonner-based toast system with a custom banner component matching the reference image: collapsed title row with chevron + close, expandable body for description/actions, 10s auto-dismiss with a colored variant-matched progress bar.
+# Mobile Optimization Plan (mobile-only, no desktop changes)
 
-## Component
+Goal: make every authenticated and auth page feel native on phones. All changes guarded by Tailwind's mobile-first defaults + `md:`/`sm:` to restore current desktop behavior unchanged.
 
-New `src/components/carenest/NotifyBanner.tsx` + provider/hook `src/lib/notify/notify.tsx` exposing:
+## 1. Foundations
 
-```ts
-notify.success(title, { description?, action?, duration? })
-notify.error(...)
-notify.warning(...)
-notify.info(...)
-```
+- **Viewport & safe areas** (`index.html` / `__root.tsx` head): ensure `viewport-fit=cover` and add `env(safe-area-inset-*)` padding utilities in `src/styles.css` for header, bottom bar, and sheet footers (iOS notch + home indicator).
+- **Touch target token**: introduce `.tap` utility (`min-h-11 min-w-11`, ~44px) in `styles.css`; apply to all icon buttons, sidebar items, toggles, list rows.
+- **Base type scale on mobile**: bump body to 16px min (prevents iOS zoom on input focus); inputs/selects explicit `text-base` on mobile, `text-sm md:text-sm`.
+- **Disable horizontal scroll**: add `overflow-x-hidden` on `<body>` and audit fixed widths.
 
-Variants → icon + accent color (semantic tokens, not hardcoded):
-- success → CheckCircle, green
-- error → AlertCircle, destructive/red
-- warning → AlertTriangle, amber
-- info → Info, blue
+## 2. App shell (`DashboardLayout` + `AppSidebar`)
 
-Layout per banner:
-- Top row: icon, title (bold), spacer, chevron-down (only if description/action present), X
-- Expanded: description text, optional action button (e.g. "Go to inventory")
-- Bottom: thin progress bar that depletes over `duration` (default 10000ms), with small caption "This message will close in Ns. Click to stop." that pauses the timer when clicked
-- Hover also pauses; closing animates out
+- On mobile, sidebar switches to `collapsible="offcanvas"` (drawer). Hamburger (`SidebarTrigger`) on the left of header.
+- Header on mobile:
+  - Row 1: hamburger + truncated page title only.
+  - Language toggle + ProfileSelector + page `actions` move into the drawer footer (and/or a "more" menu icon at right).
+  - Reduce header padding to `px-3 py-2`; title `text-lg`.
+- Drawer content: nav items at 44px rows, larger icons, language switch + active profile + sign-out pinned to drawer footer with safe-area padding.
+- Main content padding on mobile: `px-3 py-4`.
 
-Stacking: fixed top-right (top-center on mobile), newest on top, max ~5 visible. Slide-in + fade animation using existing `animate-fade-in` / `slide-in-right`.
+## 3. Dialogs → Bottom sheets on mobile
 
-Fully bilingual — all built-in strings ("Click to stop", "This message will close in {n}s") go through `t()` with new keys in `en.ts` and `sv.ts`.
+- Add a `ResponsiveDialog` wrapper (Dialog on `md+`, Drawer/Vaul bottom sheet on mobile) using existing `components/ui/drawer.tsx`.
+- Convert: `QuickLogDialog`, `TaskActionDialog`, any confirm/alert dialogs used in handover, medications, oxygen, inventory, shopping, caregivers, settings.
+- Sheets: full-width, rounded top, drag handle, sticky footer actions with safe-area inset, internal scroll.
 
-## Integration
+## 4. Page-by-page sweep (all `_authenticated/*` + auth)
 
-1. Mount `<NotifyProvider />` in `src/routes/__root.tsx` alongside (then replacing) the existing `<Toaster />` from sonner.
-2. Add a thin shim: `import { notify as toast } from "@/lib/notify"` so existing `toast.success(...)` call sites keep working without a sweep. Map sonner's `{ description, action }` shape 1:1.
-3. Remove `<Toaster />` (sonner) from the root once shim is verified.
-4. Push notifications received while the app is open (currently surfaced via `push-sw.js` / EnableNotificationsCard path): route the foreground message through `notify.warning(...)` or `notify.error(...)` with the alert details in the expanded body and a "View" action button linking to the relevant page.
+Common rules applied per page:
+- Replace multi-column grids with single column on mobile: `grid-cols-1 md:grid-cols-2/3`.
+- Cards: full-bleed style with `rounded-2xl`, `p-4`, generous spacing (`space-y-3`).
+- Tables → stacked card lists on mobile (medications, inventory, shifts, vitals history, oxygen tanks).
+- Long forms: one field per row, larger inputs (`h-11`), labels above, sticky submit bar at bottom on mobile with safe-area padding.
+- Tabs: horizontally scrollable with snap, larger hit areas.
+- Filter/sort controls: collapse into a single "Filters" sheet button on mobile.
+- Floating Action Button (FAB) for primary action where applicable (Add medication, Quick log, Add tank, etc.) bottom-right, above safe area.
+- Toast/notify positioning already centered; verify it sits above bottom nav/FAB on mobile.
 
-## Out of scope (will remind later, per request)
+Specific pages:
+- **dashboard / home**: stack hero cards; KPIs in 2-col grid on mobile, not 4-col.
+- **schedule**: day view becomes vertical timeline; weekly grid hidden < md, replaced by date picker + day list.
+- **medications**: list as cards, doses as pill chips; "Mark given" full-width.
+- **vitals / oxygen**: charts get `aspect-square` and overflow scroll; latest-reading card pinned on top.
+- **handover**: sections collapsible accordions on mobile.
+- **shifts / caregivers**: avatar + name + role stacked; actions in row sheet.
+- **inventory / shopping**: quantity stepper buttons 44px; swipe-to-delete via long-press menu instead (simpler).
+- **instructions / child / settings**: form spacing + sticky save bar.
+- **auth pages**: center card, full width with `px-4`, larger inputs and primary button.
+- **onboarding**: step indicator condenses to "Step x/y", next button sticky.
 
-- Editing thresholds for existing checklist items
-- One-click "Mark received" from shopping list
-- Notification preferences UI
+## 5. Components touched (utility, no logic changes)
 
-## Files
+- `DashboardLayout.tsx`, `AppSidebar.tsx`
+- New `src/components/ui/responsive-dialog.tsx`
+- `QuickLogDialog.tsx`, `TaskActionDialog.tsx`, `CarePlaceCheckBanner.tsx`, `EnableNotificationsCard.tsx`
+- Page files under `src/routes/_authenticated/*` and `src/routes/auth.*.tsx`
+- `src/styles.css` (safe-area utilities, `.tap`, input min-size)
+- `index.html` viewport
 
-- new: `src/lib/notify/notify.tsx` (provider, hook, store, shim export)
-- new: `src/components/carenest/NotifyBanner.tsx`
-- edit: `src/routes/__root.tsx` (mount provider, remove sonner Toaster)
-- edit: `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts` (new keys)
-- edit: foreground push handler path to call `notify.*` instead of any current toast
+## 6. Verification
+
+- Switch preview to mobile viewport.
+- Drive Playwright at 390×844 across each route: screenshot header, key cards, one dialog, one form. Confirm: no horizontal scroll, 44px targets, drawer opens, dialog renders as bottom sheet, sticky actions visible above safe area.
+- Spot-check desktop (1280×800) to confirm no regressions.
+
+## Out of scope
+
+- No business-logic, data, or backend changes.
+- No desktop layout changes beyond what's needed to introduce mobile-first classes.
+- No redesign of color/typography system.

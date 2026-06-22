@@ -171,6 +171,12 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  html {
+    /* Prevent iOS Safari from auto-zooming on text-size inputs */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -179,12 +185,40 @@
       radial-gradient(circle at 100% 100%, color-mix(in oklab, var(--lavender-deep) 35%, transparent), transparent 45%);
     background-attachment: fixed;
     min-height: 100vh;
+    /* No horizontal scroll on mobile */
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
+
+  /* Inputs >=16px on mobile to prevent iOS focus-zoom */
+  @media (max-width: 640px) {
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+}
+
+/* Mobile safe-area helpers (iOS notch + home indicator) */
+@utility safe-pt { padding-top: env(safe-area-inset-top); }
+@utility safe-pb { padding-bottom: env(safe-area-inset-bottom); }
+@utility safe-pl { padding-left: env(safe-area-inset-left); }
+@utility safe-pr { padding-right: env(safe-area-inset-right); }
+@utility safe-px {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+@utility safe-mb { margin-bottom: env(safe-area-inset-bottom); }
+
+/* 44px touch target */
+@utility tap {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
 }
 
 @utility card-soft {
