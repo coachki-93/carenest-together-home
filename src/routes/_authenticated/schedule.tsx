@@ -944,6 +944,9 @@ function AppointmentDialog({
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
       setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
       setAllowOngoing(!!(editing as { allow_ongoing?: boolean }).allow_ongoing);
+      const tm = (editing as { timer_minutes?: number | null }).timer_minutes ?? null;
+      setEnableTimer(tm != null);
+      setTimerMinutes(tm != null ? String(tm) : "1");
     } else {
       setTitle("");
       setKind("appointment");
