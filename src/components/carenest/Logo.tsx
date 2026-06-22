@@ -5,9 +5,8 @@ interface LogoProps {
   /** Height of the logo in pixels. */
   size?: number;
   /**
-   * Keeps the same footprint as the old icon + wordmark pair. When true the
-   * icon is rendered ~10% taller so it fills the vertical space previously
-   * occupied by the "CareNest" wordmark.
+   * When true the icon is rendered larger so it fills the same vertical
+   * footprint the old icon + wordmark pair used to occupy.
    */
   withWordmark?: boolean;
   className?: string;
@@ -15,18 +14,20 @@ interface LogoProps {
 
 /** CareNest brand mark (CDN-hosted artwork). */
 export function Logo({ size = 40, withWordmark = false, className }: LogoProps) {
-  const height = withWordmark ? Math.round(size * 1.1) : size;
+  const height = withWordmark ? Math.round(size * 1.25) : size;
   return (
     <div className={cn("flex items-center", className)}>
       <img
         src={logoAsset.url}
         alt="CareNest"
+        width={height}
         height={height}
-        style={{ height, width: "auto" }}
-        className="select-none"
+        style={{ height, width: height }}
+        className="select-none object-contain"
         draggable={false}
       />
     </div>
   );
 }
+
 
