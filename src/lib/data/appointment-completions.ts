@@ -49,6 +49,8 @@ export function useLogAppointmentCompletion() {
       notes?: string | null;
       ongoing_started_at?: string | null;
       ongoing_started_by?: string | null;
+      timer_started_at?: string | null;
+      timer_started_by?: string | null;
     }) => {
       const payload = {
         ...input,
