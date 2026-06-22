@@ -94,8 +94,8 @@ export function usePushSubscription(familyId: string | null | undefined) {
         try {
           sub = await reg.pushManager.subscribe({
             userVisibleOnly: true,
-            // iOS Safari is picky: pass a Uint8Array directly, NOT an ArrayBuffer.
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+            // iOS Safari is picky: pass a BufferSource (Uint8Array), NOT an ArrayBuffer.
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
           });
         } catch (err) {
           const msg = (err as Error)?.message || String(err);
