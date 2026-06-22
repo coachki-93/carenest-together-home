@@ -1767,8 +1767,18 @@ function OxygenBar({
     { weekday: "short", hour: "2-digit", minute: "2-digit" },
   );
 
+  const isPaused = remainingInfo?.paused ?? false;
+
   return (
+    <div className="space-y-3">
+      {isPaused && (
+        <div className="card-soft p-3 flex items-center gap-3 border border-red-200 bg-red-50/60 text-red-900">
+          <Hospital className="size-5 shrink-0" />
+          <p className="text-sm font-medium">{t("oxygen.pausedHospital")}</p>
+        </div>
+      )}
     <section className="card-soft p-4">
+
       {isLoading ? (
         <div className="flex items-center gap-3">
           <Skeleton className="size-10 rounded-xl" />
