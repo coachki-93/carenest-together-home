@@ -495,6 +495,22 @@ function MedicationDialog({
             </p>
           </div>
 
+          <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="med-allow-ongoing"
+                checked={allowOngoing}
+                onCheckedChange={setAllowOngoing}
+              />
+              <Label htmlFor="med-allow-ongoing" className="font-semibold cursor-pointer">
+                {t("scheduleEvents.fields.allowOngoing")}
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("scheduleEvents.fields.allowOngoingHelp")}
+            </p>
+          </div>
+
 
           <div className="flex items-center justify-between rounded-2xl bg-muted/50 px-4 py-3">
             <Label htmlFor="med-active" className="cursor-pointer">
