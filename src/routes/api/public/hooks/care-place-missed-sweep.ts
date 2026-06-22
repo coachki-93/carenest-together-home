@@ -44,6 +44,13 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         if (tErr) return Response.json({ ok: false, error: tErr.message }, { status: 500 });
         if (!times?.length) return Response.json({ ok: true, missed: 0 });
 
+        // Skip families currently in "at hospital" mode.
+        const { data: hospFams } = await supabaseAdmin
+          .from("families")
+          .select("id")
+          .not("at_hospital_since", "is", null);
+        const hospitalFamilyIds = new Set((hospFams ?? []).map((f) => f.id));
+
         const { data: todaysChecks } = await supabaseAdmin
           .from("care_place_checks")
           .select("family_id, scheduled_time")
