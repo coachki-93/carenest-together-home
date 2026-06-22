@@ -119,6 +119,8 @@ export function useLogDose() {
       notes?: string | null;
       reason?: string | null;
       postponed_to?: string | null;
+      ongoing_started_at?: string | null;
+      ongoing_started_by?: string | null;
     }) => {
       const payload = {
         ...input,
@@ -126,7 +128,7 @@ export function useLogDose() {
       };
       const { data, error } = await supabase
         .from("med_logs")
-        .upsert(payload, { onConflict: "medication_id,scheduled_for" })
+        .upsert(payload as never, { onConflict: "medication_id,scheduled_for" })
         .select()
         .single();
       if (error) throw error;
