@@ -549,6 +549,7 @@ function SchedulePage() {
                     late_after_minutes: values.late_after_minutes,
                     missed_after_minutes: values.missed_after_minutes,
                     allow_ongoing: values.allow_ongoing,
+                    timer_minutes: values.timer_minutes,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
