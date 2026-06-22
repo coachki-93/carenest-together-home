@@ -117,6 +117,7 @@ type SavePayload = {
   amount_ml: number | null;
   late_after_minutes: number;
   missed_after_minutes: number;
+  allow_ongoing: boolean;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
