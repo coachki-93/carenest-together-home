@@ -31,6 +31,7 @@ import {
   type AdhocItem,
 } from "@/lib/data/adhoc-items";
 import { useInventoryItems, isLowStock, type InventoryItem } from "@/lib/data/inventory";
+import { useFamily } from "@/lib/data/family";
 
 interface Props {
   familyId: string | undefined | null;
