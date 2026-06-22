@@ -867,7 +867,7 @@ export const sv = {
     estimatedEmpty: "Beräknat slut",
     percentLeft: "{{percent}}% kvar",
     status: { ok: "OK", low: "Lågt", critical: "Kritiskt", empty: "Tom", paused: "Pausad" },
-    pausedHospital: "Pausad — på sjukhus",
+    pausedHospital: "Syrgas pausad på sjukhus. Stäng av när du är på väg att lämna sjukhuset.",
     changeFlow: "Ändra flöde",
     replaceTank: "Byt tub",
     startTank: "Starta ny tub",

@@ -867,7 +867,7 @@ export const en = {
     estimatedEmpty: "Estimated empty",
     percentLeft: "{{percent}}% left",
     status: { ok: "OK", low: "Low", critical: "Critical", empty: "Empty", paused: "Paused" },
-    pausedHospital: "Paused — at hospital",
+    pausedHospital: "Oxygen paused while at hospital. Toggle off when you're about to leave the hospital.",
     changeFlow: "Change flow rate",
     replaceTank: "Replace tank",
     startTank: "Start new tank",
