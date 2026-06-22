@@ -648,6 +648,8 @@ function DashboardPage() {
         lateAfterMinutes: 0,
         missedAfterMinutes: 15,
         allDay: false,
+        allowOngoing: false,
+        ongoingStartedAt: null,
         byUserId: v.logged_by ?? null,
         byProfileId: null,
         reason: null,
