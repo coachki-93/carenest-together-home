@@ -31,6 +31,7 @@ import {
   type AdhocItem,
 } from "@/lib/data/adhoc-items";
 import { useInventoryItems, isLowStock, type InventoryItem } from "@/lib/data/inventory";
+import { useFamily } from "@/lib/data/family";
 
 interface Props {
   familyId: string | undefined | null;
@@ -61,6 +62,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: todaysChecks = [] } = useTodayCarePlaceChecks(familyId);
   const { data: inventory = [] } = useInventoryItems(familyId);
   const { data: openAdhocs = [] } = useOpenAdhocItems(familyId);
+  const { data: family } = useFamily(familyId);
   const submit = useSubmitCarePlaceCheck();
   const resolveAdhoc = useResolveAdhocItem();
 
@@ -90,6 +92,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const [notes, setNotes] = useState("");
 
   if (!familyId || !userId || !currentSlot) return null;
+  if (family?.at_hospital_since) return null;
 
   const activeItems = items.filter((i) => i.active);
 

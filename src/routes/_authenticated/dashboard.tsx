@@ -63,7 +63,9 @@ import {
   useDeleteAppointmentCompletion,
   type AppointmentCompletion,
 } from "@/lib/data/appointment-completions";
-import { useFamilyMembers, useInvites } from "@/lib/data/family";
+import { useFamilyMembers, useInvites, useFamily, useSetHospitalMode } from "@/lib/data/family";
+import { Switch } from "@/components/ui/switch";
+import { Hospital } from "lucide-react";
 import {
   useCaregiverProfiles,
   useSuggestedCaregiverProfile,
@@ -349,6 +351,9 @@ function DashboardPage() {
   const lowStock = useLowStockSummary(familyId);
   const { data: missedChecks = [] } = useTodayMissedChecks(familyId);
   const { data: invites = [] } = useInvites(familyId);
+  const { data: family } = useFamily(familyId);
+  const setHospital = useSetHospitalMode();
+  const hospitalOn = !!family?.at_hospital_since;
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
 
@@ -725,15 +730,50 @@ function DashboardPage() {
       title={t("dashboard.today")}
       subtitle={today}
       actions={
-        <Button
-          size="sm"
-          className="rounded-full gap-1.5 font-semibold"
-          onClick={() => setQuickLogOpen(true)}
-        >
-          <Plus className="size-4" /> {t("dashboard.logEvent")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <label
+            className={cn(
+              "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold cursor-pointer transition-colors",
+              hospitalOn
+                ? "border-red-300 bg-red-50 text-red-800"
+                : "border-input bg-background hover:bg-muted",
+            )}
+            title={t("dashboard.atHospital")}
+          >
+            <Hospital className="size-4" />
+            <span className="hidden sm:inline">{t("dashboard.atHospital")}</span>
+            <Switch
+              checked={hospitalOn}
+              disabled={!familyId || setHospital.isPending}
+              onCheckedChange={async (v) => {
+                if (!familyId) return;
+                try {
+                  await setHospital.mutateAsync({ familyId, on: v });
+                  toast.success(
+                    v ? t("dashboard.atHospitalToggleOn") : t("dashboard.atHospitalToggleOff"),
+                  );
+                } catch (e) {
+                  toast.error((e as Error).message);
+                }
+              }}
+            />
+          </label>
+          <Button
+            size="sm"
+            className="rounded-full gap-1.5 font-semibold"
+            onClick={() => setQuickLogOpen(true)}
+          >
+            <Plus className="size-4" /> {t("dashboard.logEvent")}
+          </Button>
+        </div>
       }
     >
+      {hospitalOn && (
+        <div className="card-soft mb-6 p-3 flex items-center gap-3 border border-red-200 bg-red-50/60 text-red-900">
+          <Hospital className="size-5 shrink-0" />
+          <p className="text-sm font-medium">{t("dashboard.atHospitalOn")}</p>
+        </div>
+      )}
       {(() => {
         const isOwner = profile?.account_type === "family";
         const hasChild = !!child;
