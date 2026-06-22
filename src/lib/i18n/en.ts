@@ -664,6 +664,10 @@ export const en = {
       repeat: "Repeat",
       reminder: "Reminder",
       amountMl: "Amount (ml)",
+      lateAfter: "Show as 'Late' after",
+      missedAfter: "Counts as 'Missed' after",
+      minutes: "minutes",
+      lateMissedHint: "Late shows a yellow warning. Missed turns red and sends a notification.",
     },
     placeholders: {
       title: "e.g. Neurologist follow-up",
