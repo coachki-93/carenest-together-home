@@ -1352,6 +1352,23 @@ function AppointmentDialog({
               </p>
             </div>
 
+            {/* Allow Ongoing */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="allow-ongoing"
+                  checked={allowOngoing}
+                  onCheckedChange={(c) => setAllowOngoing(c === true)}
+                />
+                <Label htmlFor="allow-ongoing" className="font-semibold cursor-pointer">
+                  {t("scheduleEvents.fields.allowOngoing")}
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("scheduleEvents.fields.allowOngoingHelp")}
+              </p>
+            </div>
+
             {isInstance && (
               <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">
                 {t("scheduleEvents.repeat.instanceHint")}
