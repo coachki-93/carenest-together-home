@@ -592,7 +592,9 @@ function DashboardPage() {
             ? "skipped"
             : completion?.status === "postponed"
               ? "postponed"
-              : "pending";
+              : (completion?.status as string) === "ongoing"
+                ? "ongoing"
+                : "pending";
       const isOverdue = status === "pending" && !a.all_day && at < now;
       const amountStr = a.amount_ml != null ? `${a.amount_ml} ml` : null;
       const detail = [amountStr, a.location, a.notes].filter(Boolean).join(" • ");
@@ -608,6 +610,10 @@ function DashboardPage() {
         lateAfterMinutes: (a as { late_after_minutes?: number | null }).late_after_minutes ?? 0,
         missedAfterMinutes: (a as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15,
         allDay: a.all_day,
+        allowOngoing: !!(a as { allow_ongoing?: boolean }).allow_ongoing,
+        ongoingStartedAt: (completion as { ongoing_started_at?: string | null } | null)?.ongoing_started_at
+          ? new Date((completion as { ongoing_started_at: string }).ongoing_started_at)
+          : null,
         byUserId: completion?.completed_by ?? null,
         byProfileId: completion?.caregiver_profile_id ?? null,
         reason: completion?.reason ?? null,
