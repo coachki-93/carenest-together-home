@@ -1,72 +1,60 @@
+## Goal
 
-# Mobile Optimization Plan (mobile-only, no desktop changes)
+Two visual states for unfinished tasks on the Today/Schedule lists, a per-task "missed after X minutes" setting, and push notifications for the full lifecycle (start, late, missed) — sent to everyone in the family except the actor.
 
-Goal: make every authenticated and auth page feel native on phones. All changes guarded by Tailwind's mobile-first defaults + `md:`/`sm:` to restore current desktop behavior unchanged.
+## 1. Data model (one migration)
 
-## 1. Foundations
+Add a `late_after_minutes` (default `0`) and `missed_after_minutes` (default `15`) column to both `medications` and `appointments`. These let the family pick per-task when the slot turns yellow and when it turns red.
 
-- **Viewport & safe areas** (`index.html` / `__root.tsx` head): ensure `viewport-fit=cover` and add `env(safe-area-inset-*)` padding utilities in `src/styles.css` for header, bottom bar, and sheet footers (iOS notch + home indicator).
-- **Touch target token**: introduce `.tap` utility (`min-h-11 min-w-11`, ~44px) in `styles.css`; apply to all icon buttons, sidebar items, toggles, list rows.
-- **Base type scale on mobile**: bump body to 16px min (prevents iOS zoom on input focus); inputs/selects explicit `text-base` on mobile, `text-sm md:text-sm`.
-- **Disable horizontal scroll**: add `overflow-x-hidden` on `<body>` and audit fixed widths.
+Add lifecycle tracking columns:
+- `appointments.late_notified_at` and `appointments.missed_notified_at` (timestamptz)
+- `med_logs` already exists per dose; we need a separate tracking table because doses are virtual. Add `public.med_dose_events (medication_id, scheduled_for, late_notified_at, missed_notified_at)` with PK `(medication_id, scheduled_for)`, RLS scoped through `is_family_member` via the parent medication, GRANTs for `authenticated` and `service_role`.
 
-## 2. App shell (`DashboardLayout` + `AppSidebar`)
+## 2. Status logic (shared helper)
 
-- On mobile, sidebar switches to `collapsible="offcanvas"` (drawer). Hamburger (`SidebarTrigger`) on the left of header.
-- Header on mobile:
-  - Row 1: hamburger + truncated page title only.
-  - Language toggle + ProfileSelector + page `actions` move into the drawer footer (and/or a "more" menu icon at right).
-  - Reduce header padding to `px-3 py-2`; title `text-lg`.
-- Drawer content: nav items at 44px rows, larger icons, language switch + active profile + sign-out pinned to drawer footer with safe-area padding.
-- Main content padding on mobile: `px-3 py-4`.
+New `src/lib/schedule/task-state.ts` exporting:
 
-## 3. Dialogs → Bottom sheets on mobile
+```text
+getTaskState(scheduledFor, lateAfterMin, missedAfterMin, now, status)
+  -> "pending" | "late" | "missed" | "given" | "skipped" | "postponed"
+```
 
-- Add a `ResponsiveDialog` wrapper (Dialog on `md+`, Drawer/Vaul bottom sheet on mobile) using existing `components/ui/drawer.tsx`.
-- Convert: `QuickLogDialog`, `TaskActionDialog`, any confirm/alert dialogs used in handover, medications, oxygen, inventory, shopping, caregivers, settings.
-- Sheets: full-width, rounded top, drag handle, sticky footer actions with safe-area inset, internal scroll.
+Replace the current `isOverdue` boolean in `dashboard.tsx` and `schedule.tsx` with this helper so the row colour, badge text, and notification dispatcher agree.
 
-## 4. Page-by-page sweep (all `_authenticated/*` + auth)
+Visual mapping:
+- `late` — amber border + amber `Late / Sen` badge
+- `missed` — red border + red `Missed / Missad` badge (current "försenad" styling, just renamed)
 
-Common rules applied per page:
-- Replace multi-column grids with single column on mobile: `grid-cols-1 md:grid-cols-2/3`.
-- Cards: full-bleed style with `rounded-2xl`, `p-4`, generous spacing (`space-y-3`).
-- Tables → stacked card lists on mobile (medications, inventory, shifts, vitals history, oxygen tanks).
-- Long forms: one field per row, larger inputs (`h-11`), labels above, sticky submit bar at bottom on mobile with safe-area padding.
-- Tabs: horizontally scrollable with snap, larger hit areas.
-- Filter/sort controls: collapse into a single "Filters" sheet button on mobile.
-- Floating Action Button (FAB) for primary action where applicable (Add medication, Quick log, Add tank, etc.) bottom-right, above safe area.
-- Toast/notify positioning already centered; verify it sits above bottom nav/FAB on mobile.
+i18n: add `schedule.late` ("Late" / "Sen") and rename `schedule.overdue` -> `schedule.missed` ("Missed" / "Missad"). Update both `en.ts` and `sv.ts`.
 
-Specific pages:
-- **dashboard / home**: stack hero cards; KPIs in 2-col grid on mobile, not 4-col.
-- **schedule**: day view becomes vertical timeline; weekly grid hidden < md, replaced by date picker + day list.
-- **medications**: list as cards, doses as pill chips; "Mark given" full-width.
-- **vitals / oxygen**: charts get `aspect-square` and overflow scroll; latest-reading card pinned on top.
-- **handover**: sections collapsible accordions on mobile.
-- **shifts / caregivers**: avatar + name + role stacked; actions in row sheet.
-- **inventory / shopping**: quantity stepper buttons 44px; swipe-to-delete via long-press menu instead (simpler).
-- **instructions / child / settings**: form spacing + sticky save bar.
-- **auth pages**: center card, full width with `px-4`, larger inputs and primary button.
-- **onboarding**: step indicator condenses to "Step x/y", next button sticky.
+## 3. Per-task customization in the schedule creator
 
-## 5. Components touched (utility, no logic changes)
+In the appointment/medication create+edit dialogs (under `src/routes/_authenticated/schedule.tsx` and the medication form), add a small "Counts as missed after" numeric input (minutes, default 15) plus an optional "Show late warning after" input (minutes, default 0 = immediately). Owner/family-member RLS already gates writes.
 
-- `DashboardLayout.tsx`, `AppSidebar.tsx`
-- New `src/components/ui/responsive-dialog.tsx`
-- `QuickLogDialog.tsx`, `TaskActionDialog.tsx`, `CarePlaceCheckBanner.tsx`, `EnableNotificationsCard.tsx`
-- Page files under `src/routes/_authenticated/*` and `src/routes/auth.*.tsx`
-- `src/styles.css` (safe-area utilities, `.tap`, input min-size)
-- `index.html` viewport
+## 4. Notifications (extend existing dispatcher)
 
-## 6. Verification
+`src/routes/api/public/hooks/dispatch-task-notifications.ts` already handles the "start time" push for appointments. Extend it to three passes per run:
 
-- Switch preview to mobile viewport.
-- Drive Playwright at 390×844 across each route: screenshot header, key cards, one dialog, one form. Confirm: no horizontal scroll, 44px targets, drawer opens, dialog renders as bottom sheet, sticky actions visible above safe area.
-- Spot-check desktop (1280×800) to confirm no regressions.
+1. **Start** — existing logic, plus a new pass for medication doses (join `medications` for `family_id`, write to `med_dose_events.late_notified_at` only after the start push so we don't double-send; actually use a dedicated `started_notified_at` — see below).
+2. **Late** — find pending items where `now >= scheduled + late_after_minutes` and `late_notified_at IS NULL`, push "Late: {title}", stamp the column.
+3. **Missed** — same shape with `missed_after_minutes` and `missed_notified_at`, push "Missed: {title}".
 
-## Out of scope
+"Pending" means no completed `med_log`/`appointment_completion` for that slot. The dispatcher already runs each minute via pg_cron (kept as-is; cron config not changed).
 
-- No business-logic, data, or backend changes.
-- No desktop layout changes beyond what's needed to introduce mobile-first classes.
-- No redesign of color/typography system.
+**Actor exclusion**: when a caregiver logs done/skipped/postponed we don't push a "handled" notification (the user picked the first three events only). But the late/missed passes naturally stop once a log exists, so no extra work.
+
+To keep the start-time column on med doses, add `started_notified_at` to `med_dose_events` in the same migration.
+
+## 5. UI plumbing
+
+- Dashboard task row: use `getTaskState`; render the amber pill when `late`, red pill when `missed`. Reuse the existing red border styling for `missed` rows.
+- Schedule page list: same treatment.
+- Per-task inputs surface the new columns; existing tasks fall back to defaults via column defaults.
+
+## Technical notes
+
+- All new columns nullable except the two `_after_minutes` ints (NOT NULL with defaults), so existing rows keep working.
+- `med_dose_events` is keyed `(medication_id, scheduled_for)` and uses `ON CONFLICT DO UPDATE` so the dispatcher can upsert stamps idempotently.
+- RLS on `med_dose_events`: `USING (EXISTS (SELECT 1 FROM medications m WHERE m.id = medication_id AND public.is_family_member(m.family_id, auth.uid())))`; service_role bypasses for the dispatcher.
+- No changes to the cron schedule — the same 1-minute job covers all three passes.
+- Actor-exclusion for push: the dispatcher only fires on time-based transitions, so it never sends as a result of a user action; nothing extra needed.
