@@ -832,6 +832,8 @@ export const sv = {
     unsupported: "Den här enheten eller webbläsaren stöder inte pushnotiser.",
     denied: "Notiser är blockerade i enhetens inställningar. Öppna Inställningar → Notiser → CareNest för att tillåta.",
     iosHint: "På iPad/iPhone: lägg först till CareNest på hemskärmen, öppna sedan från ikonen och tryck Slå på.",
+    diagnostics: "Felsökning av notiser",
+    iosNotStandalone: "Du är i Safari, inte den installerade appen. Tryck Dela-ikonen → Lägg till på hemskärmen, öppna sedan CareNest från den nya ikonen.",
   },
   oxygen: {
     title: "Syrgas",

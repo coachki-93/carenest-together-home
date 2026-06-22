@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Bell, BellOff, BellRing } from "lucide-react";
 import { toast } from "@/lib/notify";
@@ -5,11 +6,38 @@ import { Button } from "@/components/ui/button";
 import { usePushSubscription } from "@/lib/push/use-push-subscription";
 import { useMyMembership } from "@/lib/auth/use-profile";
 
+type IosDiag = {
+  isIos: boolean;
+  standalone: boolean;
+  permission: NotificationPermission | "unknown";
+  swSupported: boolean;
+  pushSupported: boolean;
+};
+
 export function EnableNotificationsCard() {
   const { t } = useTranslation();
   const membership = useMyMembership();
   const familyId = membership.data?.family_id ?? null;
   const { status, loading, enable, disable } = usePushSubscription(familyId);
+  const [diag, setDiag] = useState<IosDiag | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ua = navigator.userAgent || "";
+    const isIos = /iPad|iPhone|iPod/.test(ua);
+    const standalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      // @ts-expect-error iOS-only
+      window.navigator.standalone === true;
+    setDiag({
+      isIos,
+      standalone,
+      permission: "Notification" in window ? Notification.permission : "unknown",
+      swSupported: "serviceWorker" in navigator,
+      pushSupported: "PushManager" in window,
+    });
+  }, [status]);
+
 
   const onEnable = async () => {
     try {
@@ -63,6 +91,23 @@ export function EnableNotificationsCard() {
           </div>
 
           <p className="mt-3 text-xs text-muted-foreground">{t("push.iosHint")}</p>
+
+          {diag && (diag.isIos || status !== "granted-subscribed") && (
+            <details className="mt-3 rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
+              <summary className="cursor-pointer font-medium">{t("push.diagnostics")}</summary>
+              <ul className="mt-2 space-y-1">
+                <li>iOS: {diag.isIos ? "yes" : "no"}</li>
+                <li>Installed (home-screen): {diag.standalone ? "yes" : "no"}</li>
+                <li>Permission: {diag.permission}</li>
+                <li>Service Worker supported: {diag.swSupported ? "yes" : "no"}</li>
+                <li>Push supported: {diag.pushSupported ? "yes" : "no"}</li>
+                <li>Status: {status}</li>
+              </ul>
+              {diag.isIos && !diag.standalone && (
+                <p className="mt-2 text-destructive">{t("push.iosNotStandalone")}</p>
+              )}
+            </details>
+          )}
         </div>
       </div>
     </div>
