@@ -215,13 +215,20 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 });
 
 async function hasCompletion(
-  client: { from: (t: string) => { select: (c: string) => { eq: (k: string, v: string) => { eq: (k: string, v: string) => { limit: (n: number) => Promise<{ data: unknown[] | null }> } } } } },
+  client: { from: (t: string) => unknown },
   appointmentId: string,
   occurrenceAt: string,
-) {
-  const { data } = await client
+): Promise<boolean> {
+  const builder = (client as { from: (t: string) => { select: (c: string) => unknown } })
     .from("appointment_completions")
-    .select("id")
+    .select("id") as unknown as {
+      eq: (k: string, v: string) => {
+        eq: (k: string, v: string) => {
+          limit: (n: number) => Promise<{ data: { id: string }[] | null }>;
+        };
+      };
+    };
+  const { data } = await builder
     .eq("appointment_id", appointmentId)
     .eq("occurrence_at", occurrenceAt)
     .limit(1);
