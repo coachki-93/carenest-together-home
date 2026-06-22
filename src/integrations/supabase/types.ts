@@ -25,6 +25,8 @@ export type Database = {
           id: string
           notes: string | null
           occurrence_at: string
+          ongoing_started_at: string | null
+          ongoing_started_by: string | null
           postponed_to: string | null
           reason: string | null
           status: Database["public"]["Enums"]["appointment_completion_status"]
@@ -40,6 +42,8 @@ export type Database = {
           id?: string
           notes?: string | null
           occurrence_at: string
+          ongoing_started_at?: string | null
+          ongoing_started_by?: string | null
           postponed_to?: string | null
           reason?: string | null
           status: Database["public"]["Enums"]["appointment_completion_status"]
@@ -55,6 +59,8 @@ export type Database = {
           id?: string
           notes?: string | null
           occurrence_at?: string
+          ongoing_started_at?: string | null
+          ongoing_started_by?: string | null
           postponed_to?: string | null
           reason?: string | null
           status?: Database["public"]["Enums"]["appointment_completion_status"]
@@ -87,6 +93,7 @@ export type Database = {
       appointments: {
         Row: {
           all_day: boolean
+          allow_ongoing: boolean
           amount_ml: number | null
           child_id: string | null
           color: string | null
@@ -117,6 +124,7 @@ export type Database = {
         }
         Insert: {
           all_day?: boolean
+          allow_ongoing?: boolean
           amount_ml?: number | null
           child_id?: string | null
           color?: string | null
@@ -147,6 +155,7 @@ export type Database = {
         }
         Update: {
           all_day?: boolean
+          allow_ongoing?: boolean
           amount_ml?: number | null
           child_id?: string | null
           color?: string | null
@@ -1096,6 +1105,8 @@ export type Database = {
           id: string
           medication_id: string
           notes: string | null
+          ongoing_started_at: string | null
+          ongoing_started_by: string | null
           postponed_to: string | null
           reason: string | null
           scheduled_for: string
@@ -1112,6 +1123,8 @@ export type Database = {
           id?: string
           medication_id: string
           notes?: string | null
+          ongoing_started_at?: string | null
+          ongoing_started_by?: string | null
           postponed_to?: string | null
           reason?: string | null
           scheduled_for: string
@@ -1128,6 +1141,8 @@ export type Database = {
           id?: string
           medication_id?: string
           notes?: string | null
+          ongoing_started_at?: string | null
+          ongoing_started_by?: string | null
           postponed_to?: string | null
           reason?: string | null
           scheduled_for?: string
@@ -1168,6 +1183,7 @@ export type Database = {
       medications: {
         Row: {
           active: boolean
+          allow_ongoing: boolean
           child_id: string
           color: string | null
           created_at: string
@@ -1186,6 +1202,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          allow_ongoing?: boolean
           child_id: string
           color?: string | null
           created_at?: string
@@ -1204,6 +1221,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          allow_ongoing?: boolean
           child_id?: string
           color?: string | null
           created_at?: string
@@ -1464,7 +1482,11 @@ export type Database = {
     }
     Enums: {
       account_type: "family" | "caregiver"
-      appointment_completion_status: "done" | "skipped" | "postponed"
+      appointment_completion_status:
+        | "done"
+        | "skipped"
+        | "postponed"
+        | "ongoing"
       appointment_kind:
         | "appointment"
         | "therapy"
@@ -1495,7 +1517,7 @@ export type Database = {
         | "received"
         | "days_left_update"
       invite_status: "pending" | "accepted" | "revoked"
-      med_log_status: "given" | "skipped" | "missed" | "postponed"
+      med_log_status: "given" | "skipped" | "missed" | "postponed" | "ongoing"
       med_route:
         | "oral"
         | "g_tube"
@@ -1643,7 +1665,12 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["family", "caregiver"],
-      appointment_completion_status: ["done", "skipped", "postponed"],
+      appointment_completion_status: [
+        "done",
+        "skipped",
+        "postponed",
+        "ongoing",
+      ],
       appointment_kind: [
         "appointment",
         "therapy",
@@ -1677,7 +1704,7 @@ export const Constants = {
         "days_left_update",
       ],
       invite_status: ["pending", "accepted", "revoked"],
-      med_log_status: ["given", "skipped", "missed", "postponed"],
+      med_log_status: ["given", "skipped", "missed", "postponed", "ongoing"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
       shift_label: ["morning", "afternoon", "night", "custom"],
