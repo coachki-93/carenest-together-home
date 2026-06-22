@@ -910,6 +910,7 @@ function AppointmentDialog({
   const [amountMl, setAmountMl] = useState<string>("");
   const [lateAfter, setLateAfter] = useState<string>("0");
   const [missedAfter, setMissedAfter] = useState<string>("15");
+  const [allowOngoing, setAllowOngoing] = useState<boolean>(false);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
