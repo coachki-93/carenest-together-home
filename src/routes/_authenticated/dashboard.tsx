@@ -1264,12 +1264,28 @@ function DashboardPage() {
                           >
                             {task.title}
                           </span>
-                          {isOngoing && (
-                            <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary-soft rounded-full px-2 py-0.5 inline-flex items-center gap-1">
-                              <Play className="size-3" />
-                              {t("schedule.ongoing")}
-                            </span>
-                          )}
+                          {isOngoing && (() => {
+                            const hasTimer = task.timerMinutes != null && task.timerStartedAt;
+                            if (hasTimer) {
+                              const endMs = task.timerStartedAt!.getTime() + task.timerMinutes! * 60_000;
+                              const remaining = Math.max(0, endMs - secondTick);
+                              const mm = Math.floor(remaining / 60_000);
+                              const ss = Math.floor((remaining % 60_000) / 1000);
+                              const timeStr = `${mm}:${String(ss).padStart(2, "0")}`;
+                              return (
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary-soft rounded-full px-2 py-0.5 inline-flex items-center gap-1 tabular-nums">
+                                  <Clock className="size-3" />
+                                  {t("schedule.timerRunning", { time: timeStr })}
+                                </span>
+                              );
+                            }
+                            return (
+                              <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary-soft rounded-full px-2 py-0.5 inline-flex items-center gap-1">
+                                <Play className="size-3" />
+                                {t("schedule.ongoing")}
+                              </span>
+                            );
+                          })()}
                           {isMissed && isPending && (
                             <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
                               {t("schedule.missed")}
