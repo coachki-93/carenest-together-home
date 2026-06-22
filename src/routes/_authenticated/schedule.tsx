@@ -546,6 +546,7 @@ function SchedulePage() {
                     reminder_minutes: values.reminder_minutes,
                     late_after_minutes: values.late_after_minutes,
                     missed_after_minutes: values.missed_after_minutes,
+                    allow_ongoing: values.allow_ongoing,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
