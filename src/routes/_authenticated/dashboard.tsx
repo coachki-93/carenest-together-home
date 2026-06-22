@@ -1057,9 +1057,11 @@ function DashboardPage() {
                             size="sm"
                             className="rounded-full font-bold"
                             onClick={() => setPendingAction({ task, action: "done" })}
+                            aria-label={t("dashboard.markDone")}
+                            title={t("dashboard.markDone")}
                           >
                             <CheckCircle2 className="size-4" />
-                            <span className="ml-1">
+                            <span className="ml-1 hidden sm:inline">
                               {t("dashboard.markDone")}
                             </span>
                           </Button>
