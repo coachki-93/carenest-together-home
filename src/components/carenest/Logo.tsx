@@ -1,33 +1,34 @@
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/carenest-icon.png.asset.json";
+import logoAsset from "@/assets/carenest-logo.png.asset.json";
 
 interface LogoProps {
   /** Height of the logo in pixels. */
   size?: number;
   /**
-   * When true the icon is rendered larger so it fills the same vertical
-   * footprint the old icon + wordmark pair used to occupy.
+   * Kept for backward compatibility; the current CareNest logo already
+   * includes the wordmark, so this prop no longer changes rendering.
    */
   withWordmark?: boolean;
   className?: string;
 }
 
 /** CareNest brand mark (CDN-hosted artwork). */
-export function Logo({ size = 40, withWordmark = false, className }: LogoProps) {
-  const height = withWordmark ? Math.round(size * 1.3) : size;
+export function Logo({ size = 40, className }: LogoProps) {
   return (
     <div className={cn("flex items-center", className)}>
       <img
         src={logoAsset.url}
         alt="CareNest"
-        width={height}
-        height={height}
-        style={{ height, width: height }}
+        width={size}
+        height={size}
+        style={{ height: size, width: size }}
         className="select-none object-contain"
         draggable={false}
       />
     </div>
   );
 }
+
+
 
 
