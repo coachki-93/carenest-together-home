@@ -676,6 +676,9 @@ export const en = {
       lateMissedHint: "Late shows a yellow warning. Missed turns red and sends a notification.",
       allowOngoing: "Allow 'Ongoing' status",
       allowOngoingHelp: "For longer tasks (visits, feeding, hygiene). Caregivers can mark it started; late/missed alerts pause until it's done.",
+      enableTimer: "Enable timer",
+      enableTimerHelp: "Caregivers can start a countdown. The task is auto-completed when the timer ends.",
+      timerMinutes: "Duration (minutes)",
     },
     placeholders: {
       title: "e.g. Neurologist follow-up",
