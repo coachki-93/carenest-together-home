@@ -548,7 +548,9 @@ function DashboardPage() {
             ? "skipped"
             : logStatus === "postponed"
               ? "postponed"
-              : "pending";
+              : (logStatus as string) === "ongoing"
+                ? "ongoing"
+                : "pending";
       const isOverdue = status === "pending" && d.scheduled_for < now;
       items.push({
         id: `dose-${d.key}`,
@@ -562,6 +564,10 @@ function DashboardPage() {
         lateAfterMinutes: (med as { late_after_minutes?: number | null }).late_after_minutes ?? 0,
         missedAfterMinutes: (med as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15,
         allDay: false,
+        allowOngoing: !!(med as { allow_ongoing?: boolean }).allow_ongoing,
+        ongoingStartedAt: (d.log as { ongoing_started_at?: string | null } | undefined)?.ongoing_started_at
+          ? new Date((d.log as { ongoing_started_at: string }).ongoing_started_at)
+          : null,
         byUserId: d.log?.given_by ?? null,
         byProfileId: d.log?.caregiver_profile_id ?? null,
         reason: d.log?.reason ?? null,
