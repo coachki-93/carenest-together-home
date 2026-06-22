@@ -998,7 +998,7 @@ function DashboardPage() {
                       >
                         <Icon className="size-5" />
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 min-w-[120px]">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
                             className={cn(
