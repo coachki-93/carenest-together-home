@@ -938,6 +938,7 @@ function AppointmentDialog({
       setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
       setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
+      setAllowOngoing(!!(editing as { allow_ongoing?: boolean }).allow_ongoing);
     } else {
       setTitle("");
       setKind("appointment");
@@ -955,6 +956,7 @@ function AppointmentDialog({
       setAmountMl("");
       setLateAfter("0");
       setMissedAfter("15");
+      setAllowOngoing(false);
     }
   }, [open, editing, defaultDay]);
 
