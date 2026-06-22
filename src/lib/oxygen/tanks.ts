@@ -63,6 +63,8 @@ export interface OxygenTankRow {
   started_at: string;
   replaced_at: string | null;
   notes: string | null;
+  paused_at?: string | null;
+  paused_seconds?: number | null;
 }
 
 export interface RemainingInfo {
@@ -71,20 +73,39 @@ export interface RemainingInfo {
   remainingMinutes: number;
   emptyAt: Date;
   percentRemaining: number;
-  status: "ok" | "low" | "critical" | "empty";
+  status: "ok" | "low" | "critical" | "empty" | "paused";
+  paused: boolean;
 }
 
 export function computeRemaining(tank: OxygenTankRow, now: Date = new Date()): RemainingInfo | null {
   const total = durationMinutes(tank.tank_type as TankType, Number(tank.flow_lpm));
   if (total == null) return null;
   const startedMs = new Date(tank.started_at).getTime();
-  const elapsed = Math.max(0, (now.getTime() - startedMs) / 60000);
+  const pausedSec = Number(tank.paused_seconds ?? 0);
+  const isPaused = !!tank.paused_at;
+  const liveExtraSec = isPaused
+    ? Math.max(0, (now.getTime() - new Date(tank.paused_at!).getTime()) / 1000)
+    : 0;
+  const totalPausedMin = (pausedSec + liveExtraSec) / 60;
+  const elapsed = Math.max(0, (now.getTime() - startedMs) / 60000 - totalPausedMin);
   const remaining = Math.max(0, total - elapsed);
-  const emptyAt = new Date(startedMs + total * 60000);
+  // Empty time accounts for paused time so far; if currently paused it shifts
+  // forward in real time as the clock ticks.
+  const emptyAt = new Date(startedMs + (total + totalPausedMin) * 60000);
   const pct = total > 0 ? Math.max(0, Math.min(100, (remaining / total) * 100)) : 0;
   let status: RemainingInfo["status"] = "ok";
-  if (remaining <= 0) status = "empty";
-  else if (remaining < 120) status = "critical"; // < 2h
-  else if (remaining < 720) status = "low"; // < 12h
-  return { totalMinutes: total, elapsedMinutes: elapsed, remainingMinutes: remaining, emptyAt, percentRemaining: pct, status };
+  if (isPaused) status = "paused";
+  else if (remaining <= 0) status = "empty";
+  else if (remaining < 120) status = "critical";
+  else if (remaining < 720) status = "low";
+  return {
+    totalMinutes: total,
+    elapsedMinutes: elapsed,
+    remainingMinutes: remaining,
+    emptyAt,
+    percentRemaining: pct,
+    status,
+    paused: isPaused,
+  };
 }
+

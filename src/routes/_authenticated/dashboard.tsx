@@ -1787,7 +1787,9 @@ function OxygenBar({
     low: "bg-warning",
     critical: "bg-destructive",
     empty: "bg-muted",
+    paused: "bg-muted",
   };
+
 
   const dateFmt = new Intl.DateTimeFormat(
     i18n.language === "sv" ? "sv-SE" : "en-US",

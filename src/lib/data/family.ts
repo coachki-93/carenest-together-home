@@ -197,6 +197,8 @@ export function useSetHospitalMode() {
     },
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+      qc.invalidateQueries({ queryKey: ["oxygen-active"] });
+      qc.invalidateQueries({ queryKey: ["oxygen-history"] });
     },
   });
 }

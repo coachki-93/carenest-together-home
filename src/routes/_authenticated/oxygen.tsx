@@ -140,10 +140,13 @@ function statusClass(status: string) {
       return "bg-destructive/10 text-destructive";
     case "low":
       return "bg-amber-100 text-amber-700";
+    case "paused":
+      return "bg-muted text-muted-foreground";
     default:
       return "bg-emerald-100 text-emerald-700";
   }
 }
+
 
 function CurrentTankCard({
   tank,
@@ -181,6 +184,11 @@ function CurrentTankCard({
 
       {info ? (
         <>
+          {info.paused && (
+            <div className="rounded-xl bg-muted px-4 py-3 text-sm text-muted-foreground">
+              {t("oxygen.pausedHospital")}
+            </div>
+          )}
           <div className="text-center py-4">
             <p className="text-sm text-muted-foreground mb-1">{t("oxygen.timeRemaining")}</p>
             <p className="text-5xl font-extrabold tracking-tight tabular-nums">
@@ -196,12 +204,13 @@ function CurrentTankCard({
           <div className="grid sm:grid-cols-3 gap-4 text-sm">
             <Stat label={t("oxygen.flowRate")} value={formatFlow(Number(tank.flow_lpm))} />
             <Stat label={t("oxygen.startedAt")} value={format(new Date(tank.started_at), "MMM d, HH:mm")} />
-            <Stat label={t("oxygen.estimatedEmpty")} value={format(info.emptyAt, "MMM d, HH:mm")} />
+            <Stat label={t("oxygen.estimatedEmpty")} value={info.paused ? "—" : format(info.emptyAt, "MMM d, HH:mm")} />
           </div>
         </>
       ) : (
         <p className="text-sm text-destructive">Unknown flow setting.</p>
       )}
+
 
       <div className="flex flex-wrap gap-3 pt-2">
         <Button variant="outline" onClick={onChangeFlow} className="rounded-full">
