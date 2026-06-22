@@ -115,6 +115,8 @@ type SavePayload = {
   recurrence_times_of_day: string[] | null;
   reminder_minutes: number | null;
   amount_ml: number | null;
+  late_after_minutes: number;
+  missed_after_minutes: number;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
@@ -901,6 +903,8 @@ function AppointmentDialog({
   const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
   const [reminderMinutes, setReminderMinutes] = useState<number | null>(null);
   const [amountMl, setAmountMl] = useState<string>("");
+  const [lateAfter, setLateAfter] = useState<string>("0");
+  const [missedAfter, setMissedAfter] = useState<string>("15");
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -926,6 +930,8 @@ function AppointmentDialog({
       setTimesOfDay(editing.recurrence_times_of_day ?? []);
       setReminderMinutes(editing.reminder_minutes ?? null);
       setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
+      setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
+      setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
     } else {
       setTitle("");
       setKind("appointment");
@@ -941,6 +947,8 @@ function AppointmentDialog({
       setTimesOfDay([]);
       setReminderMinutes(null);
       setAmountMl("");
+      setLateAfter("0");
+      setMissedAfter("15");
     }
   }, [open, editing, defaultDay]);
 
@@ -995,6 +1003,8 @@ function AppointmentDialog({
       amount_ml: kind === "meal" && amountMl.trim() !== "" && !Number.isNaN(Number(amountMl))
         ? Number(amountMl)
         : null,
+      late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
+      missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
     };
   }
 
