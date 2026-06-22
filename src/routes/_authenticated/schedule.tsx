@@ -520,6 +520,8 @@ function SchedulePage() {
                   all_day: values.all_day,
                   reminder_minutes: values.reminder_minutes,
                   amount_ml: values.amount_ml,
+                  late_after_minutes: values.late_after_minutes,
+                  missed_after_minutes: values.missed_after_minutes,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
@@ -540,6 +542,8 @@ function SchedulePage() {
                     starts_at: values.starts_at,
                     ends_at: values.ends_at,
                     reminder_minutes: values.reminder_minutes,
+                    late_after_minutes: values.late_after_minutes,
+                    missed_after_minutes: values.missed_after_minutes,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
