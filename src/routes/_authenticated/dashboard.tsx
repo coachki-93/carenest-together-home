@@ -998,7 +998,7 @@ function DashboardPage() {
                       >
                         <Icon className="size-5" />
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-[80px]">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
                             className={cn(
@@ -1057,9 +1057,11 @@ function DashboardPage() {
                             size="sm"
                             className="rounded-full font-bold"
                             onClick={() => setPendingAction({ task, action: "done" })}
+                            aria-label={t("dashboard.markDone")}
+                            title={t("dashboard.markDone")}
                           >
                             <CheckCircle2 className="size-4" />
-                            <span className="ml-1">
+                            <span className="ml-1 hidden sm:inline">
                               {t("dashboard.markDone")}
                             </span>
                           </Button>
@@ -1097,17 +1099,19 @@ function DashboardPage() {
                           )}
                         </>
                       ) : (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="rounded-full font-semibold text-muted-foreground"
-                          onClick={() => undoTask(task)}
-                        >
-                          <Undo2 className="size-4" />
-                          <span className="ml-1">
-                            {t("schedule.undo")}
-                          </span>
-                        </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="rounded-full font-semibold text-muted-foreground"
+                            onClick={() => undoTask(task)}
+                            aria-label={t("schedule.undo")}
+                            title={t("schedule.undo")}
+                          >
+                            <Undo2 className="size-4" />
+                            <span className="ml-1 hidden sm:inline">
+                              {t("schedule.undo")}
+                            </span>
+                          </Button>
                       )}
                     </div>
                   </li>
