@@ -282,6 +282,12 @@ function MedicationDialog({
   const [color, setColor] = useState(medication?.color ?? COLOR_OPTIONS[0]);
   const [active, setActive] = useState(medication?.active ?? true);
   const [newTime, setNewTime] = useState("08:00");
+  const [lateAfter, setLateAfter] = useState<string>(
+    String((medication as { late_after_minutes?: number } | undefined)?.late_after_minutes ?? 0),
+  );
+  const [missedAfter, setMissedAfter] = useState<string>(
+    String((medication as { missed_after_minutes?: number } | undefined)?.missed_after_minutes ?? 15),
+  );
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
@@ -307,7 +313,9 @@ function MedicationDialog({
         times,
         color,
         active,
-      });
+        late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
+        missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
+      } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
     } catch (err) {
@@ -435,6 +443,54 @@ function MedicationDialog({
               ))}
             </div>
           </div>
+
+
+
+          <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+            <Label className="font-semibold">
+              {t("scheduleEvents.fields.lateAfter")} / {t("scheduleEvents.fields.missedAfter")}
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">
+                  {t("scheduleEvents.fields.lateAfter")}
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={lateAfter}
+                    onChange={(e) => setLateAfter(e.target.value)}
+                    className="rounded-xl w-20"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.fields.minutes")}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">
+                  {t("scheduleEvents.fields.missedAfter")}
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={missedAfter}
+                    onChange={(e) => setMissedAfter(e.target.value)}
+                    className="rounded-xl w-20"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.fields.minutes")}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t("scheduleEvents.fields.lateMissedHint")}
+            </p>
+          </div>
+
 
           <div className="flex items-center justify-between rounded-2xl bg-muted/50 px-4 py-3">
             <Label htmlFor="med-active" className="cursor-pointer">

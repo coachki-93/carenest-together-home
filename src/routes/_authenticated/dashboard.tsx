@@ -93,6 +93,7 @@ import { useTodayMissedChecks } from "@/lib/data/missed-checks";
 import { useLowStockSummary } from "@/lib/data/inventory";
 import { Boxes } from "lucide-react";
 import { isTourDone, markTourDone, resetTour } from "@/lib/onboarding/tour-state";
+import { getTaskState } from "@/lib/schedule/task-state";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
 
@@ -127,6 +128,9 @@ interface TaskItem {
   status: TaskStatus;
   scheduledFor: Date;
   isOverdue: boolean;
+  lateAfterMinutes: number;
+  missedAfterMinutes: number;
+  allDay: boolean;
   /** Author / caregiver attribution when completed. */
   byUserId: string | null;
   byProfileId: string | null;
@@ -553,6 +557,9 @@ function DashboardPage() {
         status,
         scheduledFor: d.scheduled_for,
         isOverdue,
+        lateAfterMinutes: (med as { late_after_minutes?: number | null }).late_after_minutes ?? 0,
+        missedAfterMinutes: (med as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15,
+        allDay: false,
         byUserId: d.log?.given_by ?? null,
         byProfileId: d.log?.caregiver_profile_id ?? null,
         reason: d.log?.reason ?? null,
@@ -590,6 +597,9 @@ function DashboardPage() {
         status,
         scheduledFor: at,
         isOverdue,
+        lateAfterMinutes: (a as { late_after_minutes?: number | null }).late_after_minutes ?? 0,
+        missedAfterMinutes: (a as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15,
+        allDay: a.all_day,
         byUserId: completion?.completed_by ?? null,
         byProfileId: completion?.caregiver_profile_id ?? null,
         reason: completion?.reason ?? null,
@@ -621,6 +631,9 @@ function DashboardPage() {
         status: "given",
         scheduledFor: at,
         isOverdue: false,
+        lateAfterMinutes: 0,
+        missedAfterMinutes: 15,
+        allDay: false,
         byUserId: v.logged_by ?? null,
         byProfileId: null,
         reason: null,
@@ -1000,7 +1013,17 @@ function DashboardPage() {
                 const isSkipped = task.status === "skipped";
                 const isPostponed = task.status === "postponed";
                 const isPending = task.status === "pending";
-                const overdue = task.isOverdue;
+                const liveState = getTaskState({
+                  status: task.status === "missed" ? "pending" : task.status,
+                  scheduledFor: task.scheduledFor,
+                  lateAfterMinutes: task.lateAfterMinutes,
+                  missedAfterMinutes: task.missedAfterMinutes,
+                  now: new Date(nowTick),
+                  allDay: task.allDay,
+                });
+                const isLate = liveState === "late";
+                const isMissed = liveState === "missed";
+                const overdue = isLate || isMissed;
                 return (
                   <li
                     key={task.id}
@@ -1012,16 +1035,22 @@ function DashboardPage() {
                           ? "bg-muted/40 border-border/60"
                           : isPostponed
                             ? "bg-warning/10 border-warning/30"
-                            : overdue
+                            : isMissed
                               ? "bg-destructive/5 border-destructive/40"
-                              : "bg-card border-border/60 hover:shadow-soft",
+                              : isLate
+                                ? "bg-amber-50 border-amber-300 dark:bg-amber-950/20 dark:border-amber-700/50"
+                                : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
                     <div className="flex items-start gap-2 sm:gap-4 min-w-0 flex-1">
                       <div
                         className={cn(
                           "flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold shrink-0 pt-1 tabular-nums",
-                          overdue ? "text-destructive" : "text-muted-foreground",
+                          isMissed
+                            ? "text-destructive"
+                            : isLate
+                              ? "text-amber-700 dark:text-amber-400"
+                              : "text-muted-foreground",
                         )}
                       >
                         <Clock className="size-3 sm:size-3.5" />
@@ -1049,9 +1078,14 @@ function DashboardPage() {
                           >
                             {task.title}
                           </span>
-                          {overdue && isPending && (
+                          {isMissed && isPending && (
                             <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
-                              {t("schedule.overdue")}
+                              {t("schedule.missed")}
+                            </span>
+                          )}
+                          {isLate && isPending && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 rounded-full px-2 py-0.5">
+                              {t("schedule.late")}
                             </span>
                           )}
                           {isSkipped && (

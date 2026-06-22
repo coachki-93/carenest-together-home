@@ -32,6 +32,7 @@ import {
   StickyNote,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
+import { getTaskState } from "@/lib/schedule/task-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,6 +115,8 @@ type SavePayload = {
   recurrence_times_of_day: string[] | null;
   reminder_minutes: number | null;
   amount_ml: number | null;
+  late_after_minutes: number;
+  missed_after_minutes: number;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
@@ -517,6 +520,8 @@ function SchedulePage() {
                   all_day: values.all_day,
                   reminder_minutes: values.reminder_minutes,
                   amount_ml: values.amount_ml,
+                  late_after_minutes: values.late_after_minutes,
+                  missed_after_minutes: values.missed_after_minutes,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
@@ -537,6 +542,8 @@ function SchedulePage() {
                     starts_at: values.starts_at,
                     ends_at: values.ends_at,
                     reminder_minutes: values.reminder_minutes,
+                    late_after_minutes: values.late_after_minutes,
+                    missed_after_minutes: values.missed_after_minutes,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
@@ -651,8 +658,20 @@ function DoseRow({
   const { user } = useSession();
   const { data: membership } = useMyMembership();
   const status = dose.log?.status;
-  const isOverdue = !status && dose.scheduled_for < now;
   const med = dose.medication;
+  const lateAfter = (med as { late_after_minutes?: number | null }).late_after_minutes ?? 0;
+  const missedAfter = (med as { missed_after_minutes?: number | null }).missed_after_minutes ?? 15;
+  const liveState = !status
+    ? getTaskState({
+        status: "pending",
+        scheduledFor: dose.scheduled_for,
+        lateAfterMinutes: lateAfter,
+        missedAfterMinutes: missedAfter,
+        now,
+      })
+    : "given";
+  const isLate = liveState === "late";
+  const isMissed = liveState === "missed";
   const dose_label = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
   const color = med.color ?? "#A78BFA";
 
@@ -662,13 +681,20 @@ function DoseRow({
         "card-soft p-4 flex items-center gap-4 transition-opacity",
         status === "given" && "opacity-70",
         status === "skipped" && "opacity-60",
+        isMissed && "border-destructive/40 bg-destructive/5",
+        isLate && "border-amber-300 bg-amber-50 dark:border-amber-700/50 dark:bg-amber-950/20",
       )}
     >
       <div className="text-center shrink-0 w-16">
         <div className="text-xl font-extrabold tabular-nums">{dose.time}</div>
-        {isOverdue && (
+        {isMissed && (
           <div className="text-[10px] font-bold uppercase text-destructive mt-0.5">
-            {t("schedule.overdue")}
+            {t("schedule.missed")}
+          </div>
+        )}
+        {isLate && (
+          <div className="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400 mt-0.5">
+            {t("schedule.late")}
           </div>
         )}
       </div>
@@ -881,6 +907,8 @@ function AppointmentDialog({
   const [timesOfDay, setTimesOfDay] = useState<string[]>([]);
   const [reminderMinutes, setReminderMinutes] = useState<number | null>(null);
   const [amountMl, setAmountMl] = useState<string>("");
+  const [lateAfter, setLateAfter] = useState<string>("0");
+  const [missedAfter, setMissedAfter] = useState<string>("15");
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -906,6 +934,8 @@ function AppointmentDialog({
       setTimesOfDay(editing.recurrence_times_of_day ?? []);
       setReminderMinutes(editing.reminder_minutes ?? null);
       setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
+      setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
+      setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
     } else {
       setTitle("");
       setKind("appointment");
@@ -921,6 +951,8 @@ function AppointmentDialog({
       setTimesOfDay([]);
       setReminderMinutes(null);
       setAmountMl("");
+      setLateAfter("0");
+      setMissedAfter("15");
     }
   }, [open, editing, defaultDay]);
 
@@ -975,6 +1007,8 @@ function AppointmentDialog({
       amount_ml: kind === "meal" && amountMl.trim() !== "" && !Number.isNaN(Number(amountMl))
         ? Number(amountMl)
         : null,
+      late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
+      missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
     };
   }
 
@@ -1263,6 +1297,52 @@ function AppointmentDialog({
                   <SelectItem value="1440">{t("scheduleEvents.reminder.day1")}</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Late / Missed thresholds */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <Label className="font-semibold">
+                {t("scheduleEvents.fields.lateAfter")} / {t("scheduleEvents.fields.missedAfter")}
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.fields.lateAfter")}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      value={lateAfter}
+                      onChange={(e) => setLateAfter(e.target.value)}
+                      className="rounded-xl w-20"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {t("scheduleEvents.fields.minutes")}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.fields.missedAfter")}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      value={missedAfter}
+                      onChange={(e) => setMissedAfter(e.target.value)}
+                      className="rounded-xl w-20"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {t("scheduleEvents.fields.minutes")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("scheduleEvents.fields.lateMissedHint")}
+              </p>
             </div>
 
             {isInstance && (

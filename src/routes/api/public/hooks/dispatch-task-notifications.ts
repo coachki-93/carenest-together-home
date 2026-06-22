@@ -1,13 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
-// anon `apikey` header. It finds appointments whose start time has arrived
-// (within the last 2 minutes) and whose `notified_at` is still null, then
-// fans out a Web Push to every subscription in that family.
+// anon `apikey` header. Runs three passes per call:
+//
+//   1. START   — appointments whose start time just arrived (existing flow)
+//   2. LATE    — appointments still pending past `late_after_minutes`
+//   3. MISSED  — appointments still pending past `missed_after_minutes`
+//
+// Each pass stamps a `*_notified_at` column on the row so we never push twice
+// for the same transition, and skips any appointment that already has a
+// completion (done/skipped/postponed) recorded for that occurrence.
 //
 // Auth model: /api/public/* bypasses Lovable's edge auth. We additionally
 // verify the `apikey` header matches the project's anon publishable key so
 // random callers can't trigger fan-out.
+
+type Appt = {
+  id: string;
+  family_id: string;
+  title: string | null;
+  kind: string | null;
+  starts_at: string;
+  late_after_minutes?: number | null;
+  missed_after_minutes?: number | null;
+};
+
+type Sub = { endpoint: string; p256dh: string; auth: string };
+
+type WebPushModule = {
+  setVapidDetails: (subject: string, pub: string, priv: string) => void;
+  sendNotification: (
+    sub: { endpoint: string; keys: { p256dh: string; auth: string } },
+    payload: string,
+    opts?: { TTL?: number },
+  ) => Promise<unknown>;
+};
 
 export const Route = createFileRoute("/api/public/hooks/dispatch-task-notifications")({
   server: {
@@ -23,7 +50,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const webpush = (await import("web-push")).default;
+        const webpush = ((await import("web-push")) as unknown as { default: WebPushModule }).default;
 
         const vapidPublic =
           "BKhqzimlxSXKmf1FK9n0jaINDW5QKsWBwQBD_LZYhpE2GPPdLIDPQAQz2oo4UNQP0riQtptO71Mu2zU5cvoyP38";
@@ -35,67 +62,138 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
 
         const now = new Date();
-        // Window: anything that should have fired in the last 2 minutes
-        // and is still unnotified. 2 min gives slack for cron drift.
-        const windowStart = new Date(now.getTime() - 2 * 60 * 1000).toISOString();
-        const windowEnd = now.toISOString();
+        const nowIso = now.toISOString();
+        const staleEndpoints: string[] = [];
+        let dispatched = 0;
 
-        const { data: appts, error: apptErr } = await supabaseAdmin
+        // Helper: fetch subs for a family
+        const getSubs = async (familyId: string): Promise<Sub[]> => {
+          const { data } = await supabaseAdmin
+            .from("push_subscriptions")
+            .select("endpoint, p256dh, auth")
+            .eq("family_id", familyId);
+          return (data ?? []) as Sub[];
+        };
+
+        // Helper: push to all subs
+        const fanout = async (
+          familyId: string,
+          payload: { title: string; body: string; tag: string; url: string },
+        ) => {
+          const subs = await getSubs(familyId);
+          if (subs.length === 0) return;
+          const json = JSON.stringify(payload);
+          await Promise.allSettled(
+            subs.map(async (s) => {
+              try {
+                await webpush.sendNotification(
+                  { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+                  json,
+                  { TTL: 60 * 60 },
+                );
+                dispatched++;
+              } catch (e: unknown) {
+                const status = (e as { statusCode?: number })?.statusCode;
+                if (status === 404 || status === 410) {
+                  staleEndpoints.push(s.endpoint);
+                } else {
+                  console.error("push send failed", status, e);
+                }
+              }
+            }),
+          );
+        };
+
+        const fmtTime = (iso: string) =>
+          new Date(iso).toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+        // -------- PASS 1: start-time --------
+        // Anything that should have fired in the last 2 minutes and is still
+        // unnotified. 2 min gives slack for cron drift.
+        const startWindow = new Date(now.getTime() - 2 * 60 * 1000).toISOString();
+        const { data: startAppts } = await supabaseAdmin
           .from("appointments")
           .select("id, family_id, title, kind, starts_at")
           .is("notified_at", null)
-          .gte("starts_at", windowStart)
-          .lte("starts_at", windowEnd)
+          .gte("starts_at", startWindow)
+          .lte("starts_at", nowIso)
           .limit(200);
 
-        if (apptErr) {
-          return Response.json({ ok: false, error: apptErr.message }, { status: 500 });
-        }
-        if (!appts || appts.length === 0) {
-          return Response.json({ ok: true, dispatched: 0 });
-        }
-
-        let dispatched = 0;
-        const staleEndpoints: string[] = [];
-
-        for (const a of appts) {
-          const { data: subs } = await supabaseAdmin
-            .from("push_subscriptions")
-            .select("endpoint, p256dh, auth")
-            .eq("family_id", a.family_id);
-
-          if (subs && subs.length > 0) {
-            const payload = JSON.stringify({
-              title: a.title || "CareNest",
-              body: formatBody(a.kind, a.starts_at),
-              tag: `appt-${a.id}`,
-              url: "/dashboard",
-            });
-
-            await Promise.allSettled(
-              subs.map(async (s) => {
-                try {
-                  await webpush.sendNotification(
-                    { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-                    payload,
-                    { TTL: 60 * 60 },
-                  );
-                  dispatched++;
-                } catch (e: unknown) {
-                  const status = (e as { statusCode?: number })?.statusCode;
-                  if (status === 404 || status === 410) {
-                    staleEndpoints.push(s.endpoint);
-                  } else {
-                    console.error("push send failed", status, e);
-                  }
-                }
-              }),
-            );
-          }
-
+        for (const a of (startAppts ?? []) as Appt[]) {
+          await fanout(a.family_id, {
+            title: a.title || "CareNest",
+            body: `${humanKind(a.kind)} • ${fmtTime(a.starts_at)}`,
+            tag: `appt-${a.id}-start`,
+            url: "/dashboard",
+          });
           await supabaseAdmin
             .from("appointments")
-            .update({ notified_at: new Date().toISOString() })
+            .update({ notified_at: nowIso })
+            .eq("id", a.id);
+        }
+
+        // -------- PASS 2: late --------
+        // starts_at + late_after_minutes <= now, no late_notified_at, no
+        // completion logged for this occurrence yet.
+        const { data: lateCandidates } = await supabaseAdmin
+          .from("appointments")
+          .select(
+            "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
+          )
+          .is("late_notified_at", null)
+          .lte("starts_at", nowIso)
+          .eq("all_day", false)
+          .limit(500);
+
+        for (const a of (lateCandidates ?? []) as Appt[]) {
+          const lateMin = a.late_after_minutes ?? 0;
+          const dueAt = new Date(new Date(a.starts_at).getTime() + lateMin * 60_000);
+          if (dueAt > now) continue;
+
+          if (await hasCompletion(supabaseAdmin, a.id, a.starts_at)) continue;
+
+          await fanout(a.family_id, {
+            title: `⏰ ${a.title || "CareNest"}`,
+            body: `Late since ${fmtTime(a.starts_at)}`,
+            tag: `appt-${a.id}-late`,
+            url: "/dashboard",
+          });
+          await supabaseAdmin
+            .from("appointments")
+            .update({ late_notified_at: nowIso })
+            .eq("id", a.id);
+        }
+
+        // -------- PASS 3: missed --------
+        const { data: missedCandidates } = await supabaseAdmin
+          .from("appointments")
+          .select(
+            "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
+          )
+          .is("missed_notified_at", null)
+          .lte("starts_at", nowIso)
+          .eq("all_day", false)
+          .limit(500);
+
+        for (const a of (missedCandidates ?? []) as Appt[]) {
+          const missedMin = a.missed_after_minutes ?? 15;
+          const dueAt = new Date(new Date(a.starts_at).getTime() + missedMin * 60_000);
+          if (dueAt > now) continue;
+
+          if (await hasCompletion(supabaseAdmin, a.id, a.starts_at)) continue;
+
+          await fanout(a.family_id, {
+            title: `❗ ${a.title || "CareNest"}`,
+            body: `Missed — scheduled ${fmtTime(a.starts_at)}`,
+            tag: `appt-${a.id}-missed`,
+            url: "/dashboard",
+          });
+          await supabaseAdmin
+            .from("appointments")
+            .update({ missed_notified_at: nowIso })
             .eq("id", a.id);
         }
 
@@ -108,7 +206,6 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         return Response.json({
           ok: true,
-          considered: appts.length,
           dispatched,
           cleaned: staleEndpoints.length,
         });
@@ -117,13 +214,28 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
   },
 });
 
-function formatBody(kind: string | null, startsAt: string): string {
-  const t = new Date(startsAt);
-  const time = t.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-  return kind ? `${humanKind(kind)} • ${time}` : time;
+async function hasCompletion(
+  client: { from: (t: string) => unknown },
+  appointmentId: string,
+  occurrenceAt: string,
+): Promise<boolean> {
+  const builder = (client as { from: (t: string) => { select: (c: string) => unknown } })
+    .from("appointment_completions")
+    .select("id") as unknown as {
+      eq: (k: string, v: string) => {
+        eq: (k: string, v: string) => {
+          limit: (n: number) => Promise<{ data: { id: string }[] | null }>;
+        };
+      };
+    };
+  const { data } = await builder
+    .eq("appointment_id", appointmentId)
+    .eq("occurrence_at", occurrenceAt)
+    .limit(1);
+  return Array.isArray(data) && data.length > 0;
 }
 
-function humanKind(kind: string): string {
+function humanKind(kind: string | null): string {
   switch (kind) {
     case "temperature": return "Temperature";
     case "heart_rate": return "Heart rate";
