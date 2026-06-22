@@ -965,7 +965,7 @@ function DashboardPage() {
                   <li
                     key={task.id}
                     className={cn(
-                      "group flex items-start gap-3 md:gap-4 rounded-2xl border p-3 md:p-4 transition-all",
+                      "group flex flex-col md:flex-row md:items-start gap-3 md:gap-4 rounded-2xl border p-3 md:p-4 transition-all",
                       isCompleted
                         ? "bg-success/5 border-border/60 opacity-80"
                         : isSkipped
@@ -977,78 +977,80 @@ function DashboardPage() {
                               : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
-                    <div
-                      className={cn(
-                        "flex items-center gap-1.5 text-sm font-bold w-14 shrink-0 pt-1",
-                        overdue ? "text-destructive" : "text-muted-foreground",
-                      )}
-                    >
-                      <Clock className="size-3.5" />
-                      {isPostponed && task.postponedTo
-                        ? task.postponedTo.toLocaleTimeString(
-                            i18n.language === "sv" ? "sv-SE" : "en-US",
-                            { hour: "2-digit", minute: "2-digit" },
-                          )
-                        : task.timeLabel}
-                    </div>
-                    <div
-                      className="size-11 rounded-2xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: tone.bg, color: tone.fg }}
-                    >
-                      <Icon className="size-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className={cn(
-                            "font-bold truncate",
-                            isCompleted && "line-through text-muted-foreground",
-                          )}
-                        >
-                          {task.title}
-                        </span>
-                        {overdue && isPending && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
-                            {t("schedule.overdue")}
-                          </span>
+                    <div className="flex items-start gap-3 md:gap-4 min-w-0 flex-1">
+                      <div
+                        className={cn(
+                          "flex items-center gap-1.5 text-sm font-bold shrink-0 pt-1",
+                          overdue ? "text-destructive" : "text-muted-foreground",
                         )}
-                        {isSkipped && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground bg-muted rounded-full px-2 py-0.5">
-                            {t("schedule.statusSkipped")}
-                          </span>
-                        )}
-                        {isPostponed && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-warning-foreground bg-warning/30 rounded-full px-2 py-0.5">
-                            {t("schedule.statusPostponed")}
-                          </span>
-                        )}
+                      >
+                        <Clock className="size-3.5" />
+                        {isPostponed && task.postponedTo
+                          ? task.postponedTo.toLocaleTimeString(
+                              i18n.language === "sv" ? "sv-SE" : "en-US",
+                              { hour: "2-digit", minute: "2-digit" },
+                            )
+                          : task.timeLabel}
                       </div>
-                      {task.detail && (
-                        <div className="text-sm text-muted-foreground truncate">
-                          {task.detail}
-                        </div>
-                      )}
-                      {(isCompleted || isSkipped || isPostponed) && (
-                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                          <ByProfile
-                            familyId={familyId}
-                            caregiverProfileId={task.byProfileId}
-                            authorUserId={task.byUserId}
-                            viewerUserId={user?.id}
-                          />
-                          {task.reason && (
-                            <span className="italic">"{task.reason}"</span>
+                      <div
+                        className="size-11 rounded-2xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: tone.bg, color: tone.fg }}
+                      >
+                        <Icon className="size-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={cn(
+                              "font-bold break-words",
+                              isCompleted && "line-through text-muted-foreground",
+                            )}
+                          >
+                            {task.title}
+                          </span>
+                          {overdue && isPending && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
+                              {t("schedule.overdue")}
+                            </span>
                           )}
-                          {isPostponed && task.postponedTo && (
-                            <span>
-                              {t("schedule.was")}{" "}
-                              {task.timeLabel}
+                          {isSkipped && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+                              {t("schedule.statusSkipped")}
+                            </span>
+                          )}
+                          {isPostponed && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-warning-foreground bg-warning/30 rounded-full px-2 py-0.5">
+                              {t("schedule.statusPostponed")}
                             </span>
                           )}
                         </div>
-                      )}
+                        {task.detail && (
+                          <div className="text-sm text-muted-foreground break-words">
+                            {task.detail}
+                          </div>
+                        )}
+                        {(isCompleted || isSkipped || isPostponed) && (
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                            <ByProfile
+                              familyId={familyId}
+                              caregiverProfileId={task.byProfileId}
+                              authorUserId={task.byUserId}
+                              viewerUserId={user?.id}
+                            />
+                            {task.reason && (
+                              <span className="italic">"{task.reason}"</span>
+                            )}
+                            {isPostponed && task.postponedTo && (
+                              <span>
+                                {t("schedule.was")}{" "}
+                                {task.timeLabel}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0 self-end md:self-start">
                       {isPending || isPostponed ? (
                         <>
                           <Button
@@ -1057,7 +1059,7 @@ function DashboardPage() {
                             onClick={() => setPendingAction({ task, action: "done" })}
                           >
                             <CheckCircle2 className="size-4" />
-                            <span className="hidden sm:inline ml-1">
+                            <span className="ml-1">
                               {t("dashboard.markDone")}
                             </span>
                           </Button>
@@ -1102,7 +1104,7 @@ function DashboardPage() {
                           onClick={() => undoTask(task)}
                         >
                           <Undo2 className="size-4" />
-                          <span className="hidden sm:inline ml-1">
+                          <span className="ml-1">
                             {t("schedule.undo")}
                           </span>
                         </Button>
