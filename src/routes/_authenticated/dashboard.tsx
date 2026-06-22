@@ -63,8 +63,7 @@ import {
   useDeleteAppointmentCompletion,
   type AppointmentCompletion,
 } from "@/lib/data/appointment-completions";
-import { useFamilyMembers, useInvites, useFamily, useSetHospitalMode } from "@/lib/data/family";
-import { Switch } from "@/components/ui/switch";
+import { useFamilyMembers, useInvites, useFamily } from "@/lib/data/family";
 import { Hospital } from "lucide-react";
 import {
   useCaregiverProfiles,
@@ -363,7 +362,6 @@ function DashboardPage() {
   const { data: missedChecks = [] } = useTodayMissedChecks(familyId);
   const { data: invites = [] } = useInvites(familyId);
   const { data: family } = useFamily(familyId);
-  const setHospital = useSetHospitalMode();
   const hospitalOn = !!family?.at_hospital_since;
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
