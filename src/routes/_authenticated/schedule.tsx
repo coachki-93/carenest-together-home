@@ -1380,6 +1380,42 @@ function AppointmentDialog({
               </p>
             </div>
 
+            {/* Enable Timer */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="enable-timer"
+                  checked={enableTimer}
+                  onCheckedChange={(c) => setEnableTimer(c === true)}
+                />
+                <Label htmlFor="enable-timer" className="font-semibold cursor-pointer">
+                  {t("scheduleEvents.fields.enableTimer")}
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("scheduleEvents.fields.enableTimerHelp")}
+              </p>
+              {enableTimer && (
+                <div className="flex items-center gap-2 pt-1">
+                  <Label htmlFor="timer-minutes" className="text-sm">
+                    {t("scheduleEvents.fields.timerMinutes")}
+                  </Label>
+                  <Input
+                    id="timer-minutes"
+                    type="number"
+                    min={1}
+                    max={120}
+                    value={timerMinutes}
+                    onChange={(e) => setTimerMinutes(e.target.value)}
+                    className="rounded-xl w-20"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {t("scheduleEvents.fields.minutes")}
+                  </span>
+                </div>
+              )}
+            </div>
+
             {isInstance && (
               <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">
                 {t("scheduleEvents.repeat.instanceHint")}
