@@ -1050,7 +1050,7 @@ function DashboardPage() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0 self-end md:self-start">
+                    <div className="flex items-center gap-1.5 shrink-0 self-start">
                       {isPending || isPostponed ? (
                         <>
                           <Button
