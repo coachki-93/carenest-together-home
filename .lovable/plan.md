@@ -1,53 +1,50 @@
-# Ongoing Task Mode
+## Timer task option
 
-Add an opt-in "Ongoing" capability to long-running tasks (appointments, medications, feeding/care-place items, hygiene). When the scheduler enables it, caregivers see an **Ongoing** button on the Today view. Tapping it marks the task as in-progress, pauses Late/Missed alerts, and notifies other family members. Status stays Ongoing until someone marks Done or Skip.
+Add an optional **timer** mode to scheduled tasks (medications + appointments), parallel to the existing "Ongoing" option. When the owner enables it and sets a duration, caregivers see a **Start timer** button on the Today page. Clicking it starts a live countdown on the row; when the countdown hits zero the task is auto-marked as Done.
 
-## UX
+### UX
 
-**Scheduler (Appointment / Medication / Care-place item dialogs)**
-- New toggle: *"Allow 'Ongoing' status"* (default off).
-- Helper text: "For longer tasks (visits, feeding, hygiene). Caregiver can mark it started; late/missed alerts pause until done."
+**Scheduler dialogs** (`schedule.tsx`, `medications.tsx`)
+- New toggle: **"Enable timer"** (below the Allow Ongoing toggle).
+- When on, show a **Duration (minutes)** number input — default 1, min 1, max 120.
+- Timer + Ongoing are independent toggles; can both be enabled on the same task (timer takes precedence on the row — if a timer is running, the Ongoing button is hidden).
 
-**Today view (Dashboard + Schedule list)**
-- If the task allows ongoing AND state is `pending`/`late`: show secondary **Ongoing** button beside Done/Skip.
-- While ongoing: row gets a blue "In progress" badge (i18n: `Ongoing` / `Pågår`), Late/Missed badges are hidden, and Done/Skip remain available.
-- Postpone is hidden while ongoing.
+**Today page** (`dashboard.tsx`)
+- For tasks with `timer_minutes` set, where the task is pending and within 5 min of scheduled start (same window as Ongoing), show a **Start timer (Xm)** button.
+- On click: record `timer_started_at = now()`; row shows a live `mm:ss` countdown badge ("Timer: 0:42") and progress bar.
+- When countdown reaches 0 on the client: automatically call the existing "Done" mutation (using the active caregiver profile, no dialog). Optimistic completion + toast: "Auto-completed: <task>".
+- Caregiver can still tap **Done** or **Skip** manually before the timer ends — that cancels the timer.
+- Countdown survives page refresh (recomputed from `timer_started_at + timer_minutes`). If a user opens the page after the timer's end time and it's still pending, the row auto-completes immediately.
 
-## Data model (one migration)
+**Notifications**: none for timer start/auto-complete (keeps noise down; differs from Ongoing which the user explicitly asked to notify). Open question below.
 
-- `appointments.allow_ongoing boolean default false`, `ongoing_started_at timestamptz`, `ongoing_started_by uuid`.
-- `medications.allow_ongoing boolean default false`.
-- `med_dose_events`: add `ongoing_started_at timestamptz`, `ongoing_started_by uuid`.
-- `care_place_checklist_items.allow_ongoing boolean default false` and `care_place_adhoc_items.allow_ongoing boolean default false`; track ongoing state on the corresponding `care_place_check_answers` row (add `ongoing_started_at`, `ongoing_started_by`).
+### Data model
 
-No new tables. RLS unchanged (family-member scope already covers these rows).
+Two new columns each on `medications` and `appointments`:
+- `timer_minutes int` (nullable; null = timer disabled)
 
-## Status logic (`src/lib/schedule/task-state.ts`)
+Two new columns each on `med_logs` and `appointment_completions`:
+- `timer_started_at timestamptz`
+- `timer_started_by uuid` (caregiver profile id)
 
-Extend `getTaskState`:
-```
-if (ongoingStartedAt && status === "pending") return "ongoing";
-```
-`"ongoing"` returns before Late/Missed checks → suppresses both badges and blocks the dispatcher's Late/Missed passes (dispatcher skips rows where `ongoing_started_at IS NOT NULL`).
+No new enums — auto-completion just writes the existing "given" / "done" status.
 
-## Notifications
+### Status / late-missed logic
 
-Dispatcher (`src/routes/api/public/hooks/dispatch-task-notifications.ts`):
-- Late/Missed passes filter out rows where `ongoing_started_at IS NOT NULL`.
-- When a caregiver taps Ongoing, the client-side mutation calls a `notifyOngoing` server fn that pushes to everyone in the family except the actor: *"{Name} started {Task}"*.
+`task-state.ts`: while a timer is running (started, not yet elapsed, status still pending) treat the task as **ongoing** for late/missed gating — i.e. suppress Late/Missed badges and skip the dispatcher, same way the Ongoing state already does. No new state value needed.
 
-## Files touched
+### Files to touch
 
-- `supabase/migrations/<new>.sql` — schema additions only.
-- `src/lib/schedule/task-state.ts` — add `"ongoing"` state.
-- `src/lib/data/appointments.ts`, `medications.ts`, `care-place.ts` — new fields + `markOngoing` / `clearOngoing` mutations.
-- `src/components/schedule/AppointmentDialog.tsx`, `MedicationDialog.tsx`, care-place item dialog — `Allow ongoing` toggle.
-- `src/routes/_authenticated/dashboard.tsx`, `schedule.tsx`, care-place page — Ongoing button + badge.
-- `src/routes/api/public/hooks/dispatch-task-notifications.ts` — skip ongoing rows.
-- New server fn `notifyOngoing` (push to family minus actor).
-- `src/lib/i18n/en.ts` + `sv.ts` — `ongoing`, `allowOngoing`, `allowOngoingHelp`, `ongoingStartedBy`.
+- `supabase/migrations/<new>.sql` — add the 4 columns described above
+- `src/lib/data/medications.ts`, `appointments.ts`, `appointment-completions.ts` — extend types + mutations to accept timer fields
+- `src/lib/schedule/task-state.ts` — treat active timer as ongoing-for-gating
+- `src/routes/_authenticated/schedule.tsx`, `medications.tsx` — toggle + minutes input
+- `src/routes/_authenticated/dashboard.tsx` — Start-timer button, countdown badge, auto-complete effect
+- `src/lib/i18n/en.ts`, `sv.ts` — new keys: `enableTimer`, `timerMinutes`, `startTimer`, `timerRunning`, `autoCompleted`
+- `src/routes/api/public/hooks/dispatch-task-notifications.ts` — ignore rows whose active timer hasn't elapsed yet (same filter as ongoing)
 
-## Out of scope
+### Open questions
 
-- No auto-end timer (per your answer: stays ongoing until Done/Skip).
-- No new analytics; ongoing duration is implicit from timestamps.
+1. **Scope** — apply timer option to medications + appointments only (same as Ongoing's first scope), or also include care-place checklist items?
+2. **Notifications on auto-complete** — silent (my default), or notify family "Timer auto-completed <task>"?
+3. **Duration presets** — free-form minutes input, or quick chips (1 / 2 / 5 / 10 / 15)?
