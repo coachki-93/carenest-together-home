@@ -1833,7 +1833,9 @@ function OxygenBar({
         </button>
       )}
     </section>
+    </div>
   );
+
 }
 
 function VitalTile({
