@@ -1096,7 +1096,7 @@ function DashboardPage() {
                         <>
                           <Button
                             size="sm"
-                            className="rounded-full font-bold size-8 p-0 sm:size-auto sm:px-3"
+                            className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
                             onClick={() => setPendingAction({ task, action: "done" })}
                             aria-label={t("dashboard.markDone")}
                             title={t("dashboard.markDone")}
@@ -1109,7 +1109,7 @@ function DashboardPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="rounded-full font-bold size-8 p-0 sm:size-auto sm:px-3"
+                            className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
                             onClick={() => setPendingAction({ task, action: "skipped" })}
                             aria-label={t("schedule.skip")}
                             title={t("schedule.skip")}
@@ -1119,7 +1119,7 @@ function DashboardPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="rounded-full font-bold size-8 p-0 sm:size-auto sm:px-3"
+                            className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
                             onClick={() => setPendingAction({ task, action: "postponed" })}
                             aria-label={t("schedule.postpone")}
                             title={t("schedule.postpone")}
@@ -1130,7 +1130,7 @@ function DashboardPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="rounded-full font-semibold text-muted-foreground size-8 p-0 sm:size-auto sm:px-3"
+                              className="rounded-full font-semibold text-muted-foreground h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
                               onClick={() => undoTask(task)}
                               aria-label={t("schedule.undo")}
                               title={t("schedule.undo")}
@@ -1143,7 +1143,7 @@ function DashboardPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="rounded-full font-semibold text-muted-foreground size-8 p-0 sm:size-auto sm:px-3"
+                            className="rounded-full font-semibold text-muted-foreground h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
                             onClick={() => undoTask(task)}
                             aria-label={t("schedule.undo")}
                             title={t("schedule.undo")}
