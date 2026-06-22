@@ -1208,7 +1208,7 @@ function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 self-start">
-                      {isPending || isPostponed ? (
+                      {isPending || isPostponed || isOngoing ? (
                         <>
                           <Button
                             size="sm"
@@ -1222,6 +1222,21 @@ function DashboardPage() {
                               {t("dashboard.markDone")}
                             </span>
                           </Button>
+                          {task.allowOngoing && !isOngoing && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4 border-primary/40 text-primary hover:bg-primary-soft"
+                              onClick={() => markOngoing(task)}
+                              aria-label={t("schedule.markOngoing")}
+                              title={t("schedule.markOngoing")}
+                            >
+                              <Play className="size-4" />
+                              <span className="ml-1 hidden sm:inline">
+                                {t("schedule.markOngoing")}
+                              </span>
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="outline"
@@ -1232,17 +1247,19 @@ function DashboardPage() {
                           >
                             <X className="size-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
-                            onClick={() => setPendingAction({ task, action: "postponed" })}
-                            aria-label={t("schedule.postpone")}
-                            title={t("schedule.postpone")}
-                          >
-                            <CalendarClock className="size-4" />
-                          </Button>
-                          {isPostponed && (
+                          {!isOngoing && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4"
+                              onClick={() => setPendingAction({ task, action: "postponed" })}
+                              aria-label={t("schedule.postpone")}
+                              title={t("schedule.postpone")}
+                            >
+                              <CalendarClock className="size-4" />
+                            </Button>
+                          )}
+                          {(isPostponed || isOngoing) && (
                             <Button
                               size="sm"
                               variant="ghost"
