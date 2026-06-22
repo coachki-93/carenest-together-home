@@ -523,6 +523,7 @@ function SchedulePage() {
                   amount_ml: values.amount_ml,
                   late_after_minutes: values.late_after_minutes,
                   missed_after_minutes: values.missed_after_minutes,
+                  allow_ongoing: values.allow_ongoing,
                 },
               });
               toast.success(t("scheduleEvents.updated"));
