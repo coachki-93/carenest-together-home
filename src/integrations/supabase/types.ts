@@ -30,6 +30,8 @@ export type Database = {
           postponed_to: string | null
           reason: string | null
           status: Database["public"]["Enums"]["appointment_completion_status"]
+          timer_started_at: string | null
+          timer_started_by: string | null
           updated_at: string
         }
         Insert: {
@@ -47,6 +49,8 @@ export type Database = {
           postponed_to?: string | null
           reason?: string | null
           status: Database["public"]["Enums"]["appointment_completion_status"]
+          timer_started_at?: string | null
+          timer_started_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -64,6 +68,8 @@ export type Database = {
           postponed_to?: string | null
           reason?: string | null
           status?: Database["public"]["Enums"]["appointment_completion_status"]
+          timer_started_at?: string | null
+          timer_started_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -86,6 +92,13 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_completions_timer_started_by_fkey"
+            columns: ["timer_started_by"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -119,6 +132,7 @@ export type Database = {
           recurrence_times_of_day: string[] | null
           reminder_minutes: number | null
           starts_at: string
+          timer_minutes: number | null
           title: string
           updated_at: string
         }
@@ -150,6 +164,7 @@ export type Database = {
           recurrence_times_of_day?: string[] | null
           reminder_minutes?: number | null
           starts_at: string
+          timer_minutes?: number | null
           title: string
           updated_at?: string
         }
@@ -181,6 +196,7 @@ export type Database = {
           recurrence_times_of_day?: string[] | null
           reminder_minutes?: number | null
           starts_at?: string
+          timer_minutes?: number | null
           title?: string
           updated_at?: string
         }
@@ -1111,6 +1127,8 @@ export type Database = {
           reason: string | null
           scheduled_for: string
           status: Database["public"]["Enums"]["med_log_status"]
+          timer_started_at: string | null
+          timer_started_by: string | null
           updated_at: string
         }
         Insert: {
@@ -1129,6 +1147,8 @@ export type Database = {
           reason?: string | null
           scheduled_for: string
           status?: Database["public"]["Enums"]["med_log_status"]
+          timer_started_at?: string | null
+          timer_started_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -1147,6 +1167,8 @@ export type Database = {
           reason?: string | null
           scheduled_for?: string
           status?: Database["public"]["Enums"]["med_log_status"]
+          timer_started_at?: string | null
+          timer_started_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1178,6 +1200,13 @@ export type Database = {
             referencedRelation: "medications"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_logs_timer_started_by_fkey"
+            columns: ["timer_started_by"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       medications: {
@@ -1197,6 +1226,7 @@ export type Database = {
           missed_after_minutes: number
           name: string
           route: Database["public"]["Enums"]["med_route"]
+          timer_minutes: number | null
           times: string[]
           updated_at: string
         }
@@ -1216,6 +1246,7 @@ export type Database = {
           missed_after_minutes?: number
           name: string
           route?: Database["public"]["Enums"]["med_route"]
+          timer_minutes?: number | null
           times?: string[]
           updated_at?: string
         }
@@ -1235,6 +1266,7 @@ export type Database = {
           missed_after_minutes?: number
           name?: string
           route?: Database["public"]["Enums"]["med_route"]
+          timer_minutes?: number | null
           times?: string[]
           updated_at?: string
         }
