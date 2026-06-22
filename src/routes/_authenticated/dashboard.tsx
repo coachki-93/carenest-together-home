@@ -127,6 +127,9 @@ interface TaskItem {
   status: TaskStatus;
   scheduledFor: Date;
   isOverdue: boolean;
+  lateAfterMinutes: number;
+  missedAfterMinutes: number;
+  allDay: boolean;
   /** Author / caregiver attribution when completed. */
   byUserId: string | null;
   byProfileId: string | null;
