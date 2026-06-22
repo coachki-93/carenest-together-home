@@ -623,6 +623,10 @@ function DashboardPage() {
         ongoingStartedAt: (completion as { ongoing_started_at?: string | null } | null)?.ongoing_started_at
           ? new Date((completion as { ongoing_started_at: string }).ongoing_started_at)
           : null,
+        timerMinutes: (a as { timer_minutes?: number | null }).timer_minutes ?? null,
+        timerStartedAt: (completion as { timer_started_at?: string | null } | null)?.timer_started_at
+          ? new Date((completion as { timer_started_at: string }).timer_started_at)
+          : null,
         byUserId: completion?.completed_by ?? null,
         byProfileId: completion?.caregiver_profile_id ?? null,
         reason: completion?.reason ?? null,
