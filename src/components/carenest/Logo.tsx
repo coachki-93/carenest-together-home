@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/carenest-logo.png.asset.json";
+import logoAsset from "@/assets/carenest-icon.png.asset.json";
 
 interface LogoProps {
   /** Height of the logo in pixels. */
   size?: number;
   /**
-   * Kept for backwards compatibility. The uploaded artwork already includes
-   * the "CareNest" wordmark, so this prop now only nudges the rendered size
-   * upward for spots that previously showed the mark + wordmark pair.
+   * Keeps the same footprint as the old icon + wordmark pair. When true the
+   * icon is rendered ~10% taller so it fills the vertical space previously
+   * occupied by the "CareNest" wordmark.
    */
   withWordmark?: boolean;
   className?: string;
@@ -29,3 +29,4 @@ export function Logo({ size = 40, withWordmark = false, className }: LogoProps) 
     </div>
   );
 }
+
