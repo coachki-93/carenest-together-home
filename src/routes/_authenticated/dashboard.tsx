@@ -998,11 +998,11 @@ function DashboardPage() {
                       >
                         <Icon className="size-5" />
                       </div>
-                      <div className="flex-1 min-w-[80px]">
-                        <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap min-w-0">
                           <span
                             className={cn(
-                              "font-bold break-words",
+                              "font-bold [overflow-wrap:anywhere] min-w-0",
                               isCompleted && "line-through text-muted-foreground",
                             )}
                           >
@@ -1025,7 +1025,7 @@ function DashboardPage() {
                           )}
                         </div>
                         {task.detail && (
-                          <div className="text-sm text-muted-foreground break-words">
+                          <div className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
                             {task.detail}
                           </div>
                         )}
