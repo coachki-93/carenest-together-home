@@ -282,6 +282,12 @@ function MedicationDialog({
   const [color, setColor] = useState(medication?.color ?? COLOR_OPTIONS[0]);
   const [active, setActive] = useState(medication?.active ?? true);
   const [newTime, setNewTime] = useState("08:00");
+  const [lateAfter, setLateAfter] = useState<string>(
+    String((medication as { late_after_minutes?: number } | undefined)?.late_after_minutes ?? 0),
+  );
+  const [missedAfter, setMissedAfter] = useState<string>(
+    String((medication as { missed_after_minutes?: number } | undefined)?.missed_after_minutes ?? 15),
+  );
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
@@ -307,7 +313,9 @@ function MedicationDialog({
         times,
         color,
         active,
-      });
+        late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
+        missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
+      } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
     } catch (err) {
