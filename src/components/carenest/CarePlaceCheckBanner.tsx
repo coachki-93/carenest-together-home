@@ -92,6 +92,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const [notes, setNotes] = useState("");
 
   if (!familyId || !userId || !currentSlot) return null;
+  if (family?.at_hospital_since) return null;
 
   const activeItems = items.filter((i) => i.active);
 
