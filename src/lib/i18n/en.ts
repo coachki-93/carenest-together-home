@@ -514,6 +514,29 @@ export const en = {
       other: "Other",
     },
     noData: "—",
+    showMore: "Show more",
+    showLess: "Show less",
+    seePediatricTable: "See pediatric table",
+    pediatricTable: {
+      title: "Pediatric reference ranges",
+      subtitle: "Awake / resting values by age — screening only.",
+      colAge: "Age",
+      colHeartRate: "Heart rate (bpm)",
+      colBreathing: "Breathing (br/min)",
+      colSpO2: "SpO₂ (%)",
+      colTemp: "Temperature",
+      tempNote: "≥ 38.0 °C = fever",
+      ages: {
+        "0_3m": "0–3 months",
+        "3_6m": "3–6 months",
+        "6_12m": "6–12 months",
+        "1_3y": "1–3 years",
+        "3_6y": "3–6 years",
+        "6_12y": "6–12 years",
+        "12_18y": "12–18 years",
+      },
+    },
+
 
   },
   demo: {
