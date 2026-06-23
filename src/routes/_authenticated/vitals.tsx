@@ -786,17 +786,23 @@ function HistoryRow({
         <Icon className={cn("size-4.5", tone.fg)} />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-bold">
-          {Number(vital.value)} {vital.unit} ·{" "}
+        <div className="font-bold flex flex-wrap items-center gap-x-1.5 gap-y-1">
+          <span>{Number(vital.value)} {vital.unit}</span>
           <span className="text-muted-foreground font-semibold">
-            {t(`vitals.${vitalI18nKey(vital.vital_type)}` as const)}
+            · {t(`vitals.${vitalI18nKey(vital.vital_type)}` as const)}
           </span>
+          {vital.context && (VITAL_CONTEXTS as readonly string[]).includes(vital.context) && (
+            <span className="text-[10px] font-bold uppercase tracking-wider rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+              {t(`vitals.context.${vital.context}` as const)}
+            </span>
+          )}
         </div>
         <div className="text-xs text-muted-foreground truncate">
           {new Date(vital.logged_at).toLocaleString(lang === "sv" ? "sv-SE" : "en-US")}
           {vital.notes ? ` · ${vital.notes}` : ""}
         </div>
       </div>
+
       <Button
         size="icon"
         variant="ghost"
