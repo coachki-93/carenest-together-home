@@ -27,6 +27,7 @@ import { Route as AuthenticatedOxygenRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedInstructionsRouteImport } from './routes/_authenticated/instructions'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -128,6 +129,11 @@ const AuthenticatedInstructionsRoute =
     path: '/instructions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/instructions': typeof AuthenticatedInstructionsRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
@@ -274,6 +283,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/handover'
     | '/home'
+    | '/insights'
     | '/instructions'
     | '/inventory'
     | '/medications'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/handover'
     | '/home'
+    | '/insights'
     | '/instructions'
     | '/inventory'
     | '/medications'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/handover'
     | '/_authenticated/home'
+    | '/_authenticated/insights'
     | '/_authenticated/instructions'
     | '/_authenticated/inventory'
     | '/_authenticated/medications'
@@ -490,6 +502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstructionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -562,6 +581,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedInstructionsRoute: typeof AuthenticatedInstructionsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
@@ -581,6 +601,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedInstructionsRoute: AuthenticatedInstructionsRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
