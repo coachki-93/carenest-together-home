@@ -466,12 +466,14 @@ function TrendCard({
   vitals,
   range,
   ageMonths,
+  overrides,
   now,
 }: {
   type: VitalType;
   vitals: Vital[];
   range: "24h" | "7d" | "30d";
   ageMonths: number | null;
+  overrides?: VitalRangeOverrides | null;
   now: number;
 }) {
   const { t, i18n } = useTranslation();
@@ -488,7 +490,8 @@ function TrendCard({
         .sort((a, b) => a.ts - b.ts),
     [vitals, type],
   );
-  const ranges = useMemo(() => getVitalRanges(ageMonths), [ageMonths]);
+  const ranges = useMemo(() => getVitalRanges(ageMonths, overrides), [ageMonths, overrides]);
+
   const r = ranges[type];
   const last = points[points.length - 1];
   const prev = points[points.length - 2];
