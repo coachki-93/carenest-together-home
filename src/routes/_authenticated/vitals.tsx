@@ -12,9 +12,6 @@ import {
   Wind,
   Plus,
   Trash2,
-  TrendingDown,
-  TrendingUp,
-  Minus,
 } from "lucide-react";
 import {
   LineChart,
@@ -122,9 +119,7 @@ function VitalsPage() {
   const [confirmDel, setConfirmDel] = useState<Vital | null>(null);
 
   const sinceHours = HOURS[range];
-  // Fetch at least 7 days so the QuickCompare card has data even on 24h view.
-  const fetchHours = Math.max(sinceHours, 24 * 7);
-  const { data: allVitals = [] } = useVitals(familyId, { sinceHours: fetchHours });
+  const { data: allVitals = [] } = useVitals(familyId, { sinceHours });
   const { data: latestMap } = useLatestVitals(familyId);
   const deleteVital = useDeleteVital();
   const now = useNow(60_000);
@@ -226,10 +221,6 @@ function VitalsPage() {
           ))}
         </section>
 
-        {/* Quick compare */}
-        {range !== "30d" && (
-          <QuickCompareCard allVitals={allVitals} ageMonths={ageMonths} now={now} />
-        )}
 
         {/* Trend charts */}
         <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -326,7 +317,6 @@ function vitalI18nKey(t: VitalType): string {
 const STALE_HOURS: Partial<Record<VitalType, number>> = {
   heart_rate: 6,
   spo2: 6,
-  breathing: 6,
   temperature: 12,
 };
 
@@ -647,125 +637,6 @@ function TrendCard({
   );
 }
 
-function QuickCompareCard({
-  allVitals,
-  ageMonths,
-  now,
-}: {
-  allVitals: Vital[];
-  ageMonths: number | null;
-  now: number;
-}) {
-  const { t } = useTranslation();
-  const types: VitalType[] = ["heart_rate", "spo2", "temperature", "breathing"];
-  const ranges = getVitalRanges(ageMonths);
-
-  const startToday = new Date(now);
-  startToday.setHours(0, 0, 0, 0);
-  const startYday = new Date(startToday);
-  startYday.setDate(startYday.getDate() - 1);
-  const sevenDayStart = now - 7 * 24 * 3_600_000;
-
-  function avgFor(type: VitalType, from: number, to: number): number | null {
-    let sum = 0;
-    let n = 0;
-    for (const v of allVitals) {
-      if (v.vital_type !== type) continue;
-      const ts = new Date(v.logged_at).getTime();
-      if (ts >= from && ts < to) {
-        sum += Number(v.value);
-        n += 1;
-      }
-    }
-    return n === 0 ? null : sum / n;
-  }
-
-  return (
-    <section className="card-soft p-5">
-      <h3 className="text-sm font-extrabold uppercase tracking-wider text-muted-foreground mb-3">
-        {t("vitals.compareTitle")}
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-        {types.map((type) => {
-          const Icon = TYPE_ICONS[type];
-          const tone = TYPE_TONES[type];
-          const today = avgFor(type, startToday.getTime(), now + 1);
-          const yday = avgFor(type, startYday.getTime(), startToday.getTime());
-          const week = avgFor(type, sevenDayStart, now + 1);
-          const status =
-            today != null ? vitalStatus(type, today, ageMonths) : "neutral";
-          let arrow: "up" | "down" | "flat" = "flat";
-          if (today != null && week != null) {
-            const delta = (today - week) / Math.abs(week || 1);
-            if (delta > 0.05) arrow = "up";
-            else if (delta < -0.05) arrow = "down";
-          }
-          const ArrowIcon =
-            arrow === "up" ? TrendingUp : arrow === "down" ? TrendingDown : Minus;
-          const r = ranges[type];
-          return (
-            <div key={type} className="rounded-2xl border border-border/60 p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div
-                  className={cn(
-                    "size-7 rounded-lg flex items-center justify-center shrink-0",
-                    tone.bg,
-                  )}
-                >
-                  <Icon className={cn("size-3.5", tone.fg)} />
-                </div>
-                <div className="text-xs font-bold truncate">
-                  {t(`vitals.${vitalI18nKey(type)}` as const)}
-                </div>
-                <ArrowIcon
-                  className={cn(
-                    "size-3.5 ml-auto",
-                    status === "ok" && "text-success-foreground",
-                    status === "low" && "text-warning-foreground",
-                    status === "high" && "text-destructive",
-                    status === "neutral" && "text-muted-foreground",
-                  )}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-1 text-center">
-                <CompareCell label={t("vitals.today")} value={today} type={type} />
-                <CompareCell label={t("vitals.yesterday")} value={yday} type={type} />
-                <CompareCell label={t("vitals.sevenDayAvg")} value={week} type={type} />
-              </div>
-              {r && (
-                <div className="mt-2 text-[10px] text-muted-foreground text-center">
-                  {fmtVal(type, r.low)}–{fmtVal(type, r.high)}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function CompareCell({
-  label,
-  value,
-  type,
-}: {
-  label: string;
-  value: number | null;
-  type: VitalType;
-}) {
-  const { t } = useTranslation();
-  return (
-    <div>
-      <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">
-        {label}
-      </div>
-      <div className="text-sm font-extrabold">
-        {value == null ? t("vitals.noData") : fmtVal(type, value)}
-      </div>
-    </div>
-  );
-}
 
 
 
