@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Loader2, Plus, X, Baby } from "lucide-react";
+import { Loader2, Plus, X, Baby, RotateCcw } from "lucide-react";
 import { z } from "zod";
 import { toast } from "@/lib/notify";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
@@ -13,6 +13,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useFamilyChild } from "@/lib/data/medications";
 import { useUpdateChild } from "@/lib/data/family";
+import {
+  ageMonthsFromDob,
+  getVitalRanges,
+  parseRangeOverrides,
+  type VitalRangeOverrides,
+  type VitalType,
+} from "@/lib/data/vitals";
+
 
 export const Route = createFileRoute("/_authenticated/child")({
   head: () => ({ meta: [{ title: "Child profile — CareNest" }] }),
@@ -48,6 +56,7 @@ function ChildProfilePage() {
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([{ name: "", phone: "", relationship: "" }]);
   const [doctors, setDoctors] = useState<Doctor[]>([{ name: "", specialty: "", phone: "" }]);
+  const [customRanges, setCustomRanges] = useState<VitalRangeOverrides>({});
 
   useEffect(() => {
     if (!child) return;
@@ -58,7 +67,11 @@ function ChildProfilePage() {
     setPhotoPath(child.photo_url ?? null);
     setContacts(asContacts(child.emergency_contacts));
     setDoctors(asDoctors(child.doctors));
+    setCustomRanges(parseRangeOverrides(child.custom_vital_ranges));
   }, [child]);
+
+  const ageMonths = ageMonthsFromDob(dob);
+  const defaultRanges = useMemo(() => getVitalRanges(ageMonths), [ageMonths]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -71,6 +84,7 @@ function ChildProfilePage() {
       toast.error(parsed.error.errors[0]?.message ?? "");
       return;
     }
+
     try {
       await updateChild.mutateAsync({
         id: child.id,
@@ -82,7 +96,9 @@ function ChildProfilePage() {
           photo_url: photoPath,
           emergency_contacts: contacts.filter((c) => c.name.trim()) as unknown as never,
           doctors: doctors.filter((d) => d.name.trim()) as unknown as never,
+          custom_vital_ranges: customRanges as unknown as never,
         },
+
       });
       toast.success(t("childPage.saved"));
     } catch (err) {
@@ -193,6 +209,88 @@ function ChildProfilePage() {
             </div>
           )}
         />
+
+        <section className="space-y-3">
+          <div>
+            <h3 className="font-semibold">{t("childPage.rangesTitle")}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t("childPage.rangesHelp")}
+            </p>
+          </div>
+          <div className="space-y-2">
+            {(["heart_rate", "spo2", "temperature", "breathing"] as VitalType[]).map((vt) => {
+              const def = defaultRanges[vt];
+              const ov = customRanges[vt];
+              const unit = vt === "heart_rate" ? "bpm" : vt === "spo2" ? "%" : vt === "temperature" ? "°C" : "br/min";
+              const setField = (field: "low" | "high", raw: string) => {
+                const n = raw === "" ? undefined : Number(raw);
+                setCustomRanges((prev) => {
+                  const next = { ...prev };
+                  const cur = { ...(next[vt] ?? {}) };
+                  if (n === undefined || Number.isNaN(n)) delete cur[field];
+                  else cur[field] = n;
+                  if (cur.low == null && cur.high == null) delete next[vt];
+                  else next[vt] = cur;
+                  return next;
+                });
+              };
+              const reset = () =>
+                setCustomRanges((prev) => {
+                  const next = { ...prev };
+                  delete next[vt];
+                  return next;
+                });
+              const hasOverride = ov?.low != null || ov?.high != null;
+              return (
+                <div key={vt} className="rounded-xl border border-border/60 p-3 flex flex-wrap items-center gap-3">
+                  <div className="min-w-[110px] font-semibold text-sm">
+                    {t(`vitals.${vt === "heart_rate" ? "heartRate" : vt === "temperature" ? "temp" : vt}` as const)}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      step={vt === "temperature" ? "0.1" : "1"}
+                      placeholder={def ? String(def.low) : ""}
+                      value={ov?.low ?? ""}
+                      onChange={(e) => setField("low", e.target.value)}
+                      className="h-10 w-20 rounded-xl"
+                    />
+                    <span className="text-muted-foreground">–</span>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      step={vt === "temperature" ? "0.1" : "1"}
+                      placeholder={def ? String(def.high) : ""}
+                      value={ov?.high ?? ""}
+                      onChange={(e) => setField("high", e.target.value)}
+                      className="h-10 w-20 rounded-xl"
+                    />
+                    <span className="text-xs text-muted-foreground font-semibold">{unit}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {def
+                      ? t("childPage.rangesDefault", { low: def.low, high: def.high })
+                      : ""}
+                  </div>
+                  {canEdit && hasOverride && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full ml-auto"
+                      onClick={reset}
+                    >
+                      <RotateCcw className="size-3.5" /> {t("childPage.rangesReset")}
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+
 
         {canEdit && (
           <div className="flex justify-end">

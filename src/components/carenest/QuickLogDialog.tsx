@@ -26,7 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/notify";
-import { useLogVital, DEFAULT_UNIT, type VitalType } from "@/lib/data/vitals";
+import { useLogVital, DEFAULT_UNIT, VITAL_CONTEXTS, type VitalType, type VitalContext } from "@/lib/data/vitals";
 
 type PresetKey =
   | "temperature"
@@ -83,6 +83,7 @@ export function QuickLogDialog({
   const [preset, setPreset] = useState<Preset | null>(null);
   const [value, setValue] = useState("");
   const [notes, setNotes] = useState("");
+  const [context, setContext] = useState<VitalContext | null>(null);
   const [loggedAt, setLoggedAt] = useState<string>(() => toLocalInput(new Date()));
 
   useEffect(() => {
@@ -90,6 +91,7 @@ export function QuickLogDialog({
       setPreset(null);
       setValue("");
       setNotes("");
+      setContext(null);
       setLoggedAt(toLocalInput(new Date()));
     }
   }, [open]);
@@ -125,10 +127,12 @@ export function QuickLogDialog({
       unit: unit || "",
       notes: finalNotes,
       logged_at: when.toISOString(),
+      context: preset.needsValue ? context : null,
     });
     toast.success(t("quickLog.saved", { label }));
     onOpenChange(false);
   }
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -225,6 +229,32 @@ export function QuickLogDialog({
                 {t("quickLog.now")}
               </button>
             </div>
+
+            {preset.needsValue && (
+              <div>
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {t("vitals.contextLabel")}
+                </Label>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  {VITAL_CONTEXTS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setContext(context === c ? null : c)}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
+                        context === c
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "border-border bg-background hover:bg-muted",
+                      )}
+                    >
+                      {t(`vitals.context.${c}` as const)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
 
             <div>
               <Label

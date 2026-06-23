@@ -694,6 +694,7 @@ export type Database = {
         Row: {
           allergies: string | null
           created_at: string
+          custom_vital_ranges: Json
           date_of_birth: string | null
           diagnosis: string | null
           doctors: Json
@@ -707,6 +708,7 @@ export type Database = {
         Insert: {
           allergies?: string | null
           created_at?: string
+          custom_vital_ranges?: Json
           date_of_birth?: string | null
           diagnosis?: string | null
           doctors?: Json
@@ -720,6 +722,7 @@ export type Database = {
         Update: {
           allergies?: string | null
           created_at?: string
+          custom_vital_ranges?: Json
           date_of_birth?: string | null
           diagnosis?: string | null
           doctors?: Json
@@ -1420,6 +1423,7 @@ export type Database = {
       vitals: {
         Row: {
           child_id: string
+          context: string | null
           created_at: string
           family_id: string
           id: string
@@ -1433,6 +1437,7 @@ export type Database = {
         }
         Insert: {
           child_id: string
+          context?: string | null
           created_at?: string
           family_id: string
           id?: string
@@ -1446,6 +1451,7 @@ export type Database = {
         }
         Update: {
           child_id?: string
+          context?: string | null
           created_at?: string
           family_id?: string
           id?: string

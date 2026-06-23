@@ -68,15 +68,20 @@ import {
   useDeleteVital,
   DEFAULT_UNIT,
   VITAL_TYPES,
+  VITAL_CONTEXTS,
   getVitalRanges,
+  parseRangeOverrides,
   ageMonthsFromDob,
   vitalStatus,
   type Vital,
   type VitalType,
+  type VitalContext,
+  type VitalRangeOverrides,
 } from "@/lib/data/vitals";
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/vitals")({
   head: () => ({ meta: [{ title: "Vitals — CareNest" }] }),
@@ -127,6 +132,11 @@ function VitalsPage() {
   const deleteVital = useDeleteVital();
   const now = useNow(60_000);
   const ageMonths = ageMonthsFromDob(child?.date_of_birth);
+  const rangeOverrides = useMemo(
+    () => parseRangeOverrides(child?.custom_vital_ranges),
+    [child?.custom_vital_ranges],
+  );
+
 
   // Vitals trimmed to the current range, used by trend charts + history.
   const rangeCutoff = now - sinceHours * 3_600_000;
@@ -185,6 +195,12 @@ function VitalsPage() {
       }
     >
       <div className="space-y-6">
+        {/* Screening disclaimer */}
+        <div className="rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground flex gap-2">
+          <Info className="size-4 shrink-0 mt-0.5" />
+          <span>{t("vitals.disclaimer")}</span>
+        </div>
+
         {/* Overview tiles */}
         <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
           {(
@@ -200,6 +216,7 @@ function VitalsPage() {
                 onLog={() => openLogFor(type)}
                 lang={i18n.language}
                 ageMonths={ageMonths}
+                overrides={rangeOverrides}
                 now={now}
               />
             );
@@ -227,12 +244,13 @@ function VitalsPage() {
 
         {/* Trend charts */}
         <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <TrendCard type="heart_rate" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
-          <TrendCard type="spo2" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
-          <TrendCard type="temperature" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
-          <TrendCard type="breathing" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
+          <TrendCard type="heart_rate" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
+          <TrendCard type="spo2" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
+          <TrendCard type="temperature" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
+          <TrendCard type="breathing" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
           <FluidsChart vitals={vitals} range={range} />
         </section>
+
 
         {/* History */}
         <section className="card-soft p-6">
@@ -357,6 +375,7 @@ function VitalOverviewTile({
   onLog,
   lang,
   ageMonths,
+  overrides,
   now,
 }: {
   type: VitalType;
@@ -365,13 +384,15 @@ function VitalOverviewTile({
   onLog: () => void;
   lang: string;
   ageMonths: number | null;
+  overrides?: VitalRangeOverrides | null;
   now: number;
 }) {
   const { t } = useTranslation();
   const Icon = TYPE_ICONS[type];
   const tone = TYPE_TONES[type];
-  const status = latest ? vitalStatus(type, Number(latest.value), ageMonths) : "neutral";
+  const status = latest ? vitalStatus(type, Number(latest.value), ageMonths, overrides) : "neutral";
   const statusLabel = t(`vitals.status${capitalize(status)}` as const);
+
   const latestTs = latest ? new Date(latest.logged_at).getTime() : null;
   const rel = useRelativeTime(latestTs, now);
   const staleHours = STALE_HOURS[type];
@@ -445,12 +466,14 @@ function TrendCard({
   vitals,
   range,
   ageMonths,
+  overrides,
   now,
 }: {
   type: VitalType;
   vitals: Vital[];
   range: "24h" | "7d" | "30d";
   ageMonths: number | null;
+  overrides?: VitalRangeOverrides | null;
   now: number;
 }) {
   const { t, i18n } = useTranslation();
@@ -467,7 +490,8 @@ function TrendCard({
         .sort((a, b) => a.ts - b.ts),
     [vitals, type],
   );
-  const ranges = useMemo(() => getVitalRanges(ageMonths), [ageMonths]);
+  const ranges = useMemo(() => getVitalRanges(ageMonths, overrides), [ageMonths, overrides]);
+
   const r = ranges[type];
   const last = points[points.length - 1];
   const prev = points[points.length - 2];
@@ -762,17 +786,23 @@ function HistoryRow({
         <Icon className={cn("size-4.5", tone.fg)} />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-bold">
-          {Number(vital.value)} {vital.unit} ·{" "}
+        <div className="font-bold flex flex-wrap items-center gap-x-1.5 gap-y-1">
+          <span>{Number(vital.value)} {vital.unit}</span>
           <span className="text-muted-foreground font-semibold">
-            {t(`vitals.${vitalI18nKey(vital.vital_type)}` as const)}
+            · {t(`vitals.${vitalI18nKey(vital.vital_type)}` as const)}
           </span>
+          {vital.context && (VITAL_CONTEXTS as readonly string[]).includes(vital.context) && (
+            <span className="text-[10px] font-bold uppercase tracking-wider rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+              {t(`vitals.context.${vital.context}` as const)}
+            </span>
+          )}
         </div>
         <div className="text-xs text-muted-foreground truncate">
           {new Date(vital.logged_at).toLocaleString(lang === "sv" ? "sv-SE" : "en-US")}
           {vital.notes ? ` · ${vital.notes}` : ""}
         </div>
       </div>
+
       <Button
         size="icon"
         variant="ghost"
@@ -807,6 +837,7 @@ function LogReadingDialog({
   const [value, setValue] = useState("");
   const [unit, setUnit] = useState(DEFAULT_UNIT[presetType ?? "heart_rate"]);
   const [notes, setNotes] = useState("");
+  const [context, setContext] = useState<VitalContext | null>(null);
 
   // Reset when opening
   useMemo(() => {
@@ -816,6 +847,7 @@ function LogReadingDialog({
       setUnit(DEFAULT_UNIT[t0]);
       setValue("");
       setNotes("");
+      setContext(null);
     }
   }, [open, presetType]);
 
@@ -833,10 +865,13 @@ function LogReadingDialog({
       value: num,
       unit: unit || DEFAULT_UNIT[type],
       notes: notes.trim() || null,
+      context: context,
     });
     toast.success(t("vitals.saved"));
     onOpenChange(false);
   }
+
+
 
   function onTypeChange(v: VitalType) {
     setType(v);
@@ -902,6 +937,28 @@ function LogReadingDialog({
             </div>
           </div>
           <div>
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {t("vitals.contextLabel")}
+            </Label>
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {VITAL_CONTEXTS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setContext(context === c ? null : c)}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
+                    context === c
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border bg-background hover:bg-muted",
+                  )}
+                >
+                  {t(`vitals.context.${c}` as const)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
             <Label
               htmlFor="vital-notes"
               className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
@@ -916,6 +973,7 @@ function LogReadingDialog({
               rows={3}
             />
           </div>
+
         </div>
         <DialogFooter>
           <Button

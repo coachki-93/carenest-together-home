@@ -500,8 +500,21 @@ export const en = {
     today: "Today",
     yesterday: "Yesterday",
     sevenDayAvg: "7-day avg",
-    rangeInfoTooltip: "Reference ranges are informational and adjusted for your child's age.",
+    rangeInfoTooltip: "Reference ranges are informational and adjusted for your child's age. Owners can set custom values from the child profile.",
+    disclaimer: "These are screening/reference ranges, not diagnosis rules. A child who is crying, febrile, dehydrated, asleep, exercising, in pain, or anxious may fall outside these.",
+    contextLabel: "Context (optional)",
+    context: {
+      awake: "Awake",
+      sleeping: "Sleeping",
+      crying: "Crying",
+      fever: "Fever",
+      pain: "In pain",
+      exercising: "Exercising",
+      anxious: "Anxious",
+      other: "Other",
+    },
     noData: "—",
+
   },
   demo: {
     med: { keppra: "Keppra", baclofen: "Baclofen" },
@@ -580,7 +593,12 @@ export const en = {
     emptyTitle: "No child profile yet",
     emptyBody: "Finish onboarding to set up your child's profile.",
     readOnlyNotice: "You're viewing this profile as a caregiver. Only family owners can make changes.",
+    rangesTitle: "Vital reference ranges",
+    rangesHelp: "Defaults are age-adjusted screening values. Override them per vital if your child's doctor recommends a different normal range.",
+    rangesDefault: "Default {{low}}–{{high}}",
+    rangesReset: "Reset",
   },
+
   caregiversPage: {
     subtitle: "Your care team and pending invites.",
     members: "Care team",
