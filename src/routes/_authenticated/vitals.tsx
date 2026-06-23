@@ -15,6 +15,8 @@ import {
   TrendingDown,
   TrendingUp,
   Minus,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import {
   LineChart,
@@ -125,6 +127,13 @@ function VitalsPage() {
   const [openLog, setOpenLog] = useState(false);
   const [presetType, setPresetType] = useState<VitalType | null>(null);
   const [confirmDel, setConfirmDel] = useState<Vital | null>(null);
+  const [showAllHistory, setShowAllHistory] = useState(false);
+
+  function scrollToPediatricTable() {
+    const el = document.getElementById("pediatric-ranges-table");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
 
   const sinceHours = HOURS[range];
   const { data: allVitals = [] } = useVitals(familyId, { sinceHours });
@@ -196,10 +205,21 @@ function VitalsPage() {
     >
       <div className="space-y-6">
         {/* Screening disclaimer */}
-        <div className="rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground flex gap-2">
-          <Info className="size-4 shrink-0 mt-0.5" />
-          <span>{t("vitals.disclaimer")}</span>
+        <div className="rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground flex flex-col sm:flex-row sm:items-start gap-2">
+          <div className="flex gap-2 flex-1">
+            <Info className="size-4 shrink-0 mt-0.5" />
+            <span>{t("vitals.disclaimer")}</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full text-xs font-bold shrink-0"
+            onClick={scrollToPediatricTable}
+          >
+            {t("vitals.seePediatricTable")}
+          </Button>
         </div>
+
 
         {/* Overview tiles */}
         <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -252,6 +272,9 @@ function VitalsPage() {
         </section>
 
 
+        {/* Pediatric reference table */}
+        <PediatricRangesTable />
+
         {/* History */}
         <section className="card-soft p-6">
           <h3 className="text-lg font-extrabold mb-4">{t("vitals.history")}</h3>
@@ -266,19 +289,42 @@ function VitalsPage() {
               </Button>
             </div>
           ) : (
-            <ul className="space-y-2">
-              {vitals.slice(0, 50).map((v) => (
-                <HistoryRow
-                  key={v.id}
-                  vital={v}
-                  onDelete={() => setConfirmDel(v)}
-                  lang={i18n.language}
-                />
-              ))}
-            </ul>
+            <>
+              <ul className="space-y-2">
+                {(showAllHistory ? vitals.slice(0, 50) : vitals.slice(0, 5)).map((v) => (
+                  <HistoryRow
+                    key={v.id}
+                    vital={v}
+                    onDelete={() => setConfirmDel(v)}
+                    lang={i18n.language}
+                  />
+                ))}
+              </ul>
+              {vitals.length > 5 && (
+                <div className="flex justify-center mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full font-bold gap-1.5"
+                    onClick={() => setShowAllHistory((s) => !s)}
+                  >
+                    {showAllHistory ? (
+                      <>
+                        {t("vitals.showLess")} <ChevronUp className="size-4" />
+                      </>
+                    ) : (
+                      <>
+                        {t("vitals.showMore")} <ChevronDown className="size-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </div>
+
 
       <LogReadingDialog
         open={openLog}
@@ -995,3 +1041,54 @@ function LogReadingDialog({
     </Dialog>
   );
 }
+
+function PediatricRangesTable() {
+  const { t } = useTranslation();
+  const rows: Array<{ key: string; hr: string; br: string; spo2: string; temp: string }> = [
+    { key: "0_3m", hr: "110–160", br: "30–60", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "3_6m", hr: "100–150", br: "30–45", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "6_12m", hr: "90–130", br: "25–40", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "1_3y", hr: "80–125", br: "20–30", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "3_6y", hr: "70–115", br: "20–25", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "6_12y", hr: "60–100", br: "14–22", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "12_18y", hr: "60–100", br: "12–18", spo2: "95–100", temp: "< 38.0 °C" },
+  ];
+  return (
+    <section id="pediatric-ranges-table" className="card-soft p-6 scroll-mt-24">
+      <h3 className="text-lg font-extrabold">{t("vitals.pediatricTable.title")}</h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        {t("vitals.pediatricTable.subtitle")}
+      </p>
+      <div className="overflow-x-auto -mx-2 px-2">
+        <table className="w-full text-sm border-separate border-spacing-0">
+          <thead>
+            <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colHeartRate")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colBreathing")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colSpO2")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colTemp")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.key} className="border-t border-border/60">
+                <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                  {t(`vitals.pediatricTable.ages.${r.key}` as const)}
+                </td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.hr}</td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.br}</td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.spo2}</td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.temp}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-muted-foreground mt-3">
+        {t("vitals.pediatricTable.tempNote")}
+      </p>
+    </section>
+  );
+}
+
