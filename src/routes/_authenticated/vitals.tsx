@@ -203,10 +203,21 @@ function VitalsPage() {
     >
       <div className="space-y-6">
         {/* Screening disclaimer */}
-        <div className="rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground flex gap-2">
-          <Info className="size-4 shrink-0 mt-0.5" />
-          <span>{t("vitals.disclaimer")}</span>
+        <div className="rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground flex flex-col sm:flex-row sm:items-start gap-2">
+          <div className="flex gap-2 flex-1">
+            <Info className="size-4 shrink-0 mt-0.5" />
+            <span>{t("vitals.disclaimer")}</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full text-xs font-bold shrink-0"
+            onClick={scrollToPediatricTable}
+          >
+            {t("vitals.seePediatricTable")}
+          </Button>
         </div>
+
 
         {/* Overview tiles */}
         <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
