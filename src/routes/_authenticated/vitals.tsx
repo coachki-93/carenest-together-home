@@ -671,8 +671,14 @@ function TrendCard({
               <YAxis
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 stroke="var(--border)"
-                domain={["auto", "auto"]}
+                domain={[
+                  (dataMin: number) =>
+                    Math.floor(Math.min(dataMin, r?.low ?? dataMin) - 2),
+                  (dataMax: number) =>
+                    Math.ceil(Math.max(dataMax, r?.high ?? dataMax) + 2),
+                ]}
               />
+
               <Tooltip
                 contentStyle={{
                   background: "var(--card)",
