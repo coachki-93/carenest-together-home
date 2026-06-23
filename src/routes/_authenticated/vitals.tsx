@@ -125,6 +125,13 @@ function VitalsPage() {
   const [openLog, setOpenLog] = useState(false);
   const [presetType, setPresetType] = useState<VitalType | null>(null);
   const [confirmDel, setConfirmDel] = useState<Vital | null>(null);
+  const [showAllHistory, setShowAllHistory] = useState(false);
+
+  function scrollToPediatricTable() {
+    const el = document.getElementById("pediatric-ranges-table");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
 
   const sinceHours = HOURS[range];
   const { data: allVitals = [] } = useVitals(familyId, { sinceHours });
