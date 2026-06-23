@@ -82,6 +82,7 @@ export function TaskActionDialog({
   const [postponedDate, setPostponedDate] = useState("");
   const [postponedTime, setPostponedTime] = useState("");
   const [vitalValue, setVitalValue] = useState("");
+  const [vitalContext, setVitalContext] = useState<VitalContext | null>(null);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -89,6 +90,7 @@ export function TaskActionDialog({
     setProfileId(defaultProfileId);
     setReason("");
     setVitalValue(vitalSpec?.defaultValue != null ? String(vitalSpec.defaultValue) : "");
+    setVitalContext(null);
     setNotes("");
     // Default postpone to scheduled + 1 hour, local
     const plusOneHour = new Date(scheduledFor.getTime() + 60 * 60 * 1000);
