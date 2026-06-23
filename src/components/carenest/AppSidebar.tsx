@@ -14,7 +14,9 @@ import {
   BookOpen,
   Boxes,
   ShoppingCart,
+  TrendingUp,
 } from "lucide-react";
+
 
 import {
   Sidebar,
@@ -48,7 +50,9 @@ export function AppSidebar() {
     { title: t("nav.instructions"), url: "/instructions", icon: BookOpen },
     { title: t("nav.inventory"), url: "/inventory", icon: Boxes },
     { title: t("nav.shopping"), url: "/shopping", icon: ShoppingCart },
+    { title: t("nav.insights"), url: "/insights", icon: TrendingUp },
   ];
+
 
   const family = [
     { title: t("nav.child"), url: "/child", icon: Baby },

@@ -164,6 +164,9 @@ export const sv = {
     instructions: "Instruktioner",
     inventory: "Förråd",
     shopping: "Inköpslista",
+    insights: "Insikter",
+
+
 
 
 
@@ -1093,6 +1096,42 @@ export const sv = {
     subtitle: "Förråd att beställa och saker som redan är på väg.",
     noFamily: "Gå med i eller skapa en familj för att se inköpslistan.",
   },
+  insights: {
+    title: "Insikter",
+    subtitle: "Trender över de senaste dagarna, veckorna eller månaderna.",
+    range7: "7 dagar",
+    range30: "30 dagar",
+    range90: "90 dagar",
+    noFamily: "Gå med i eller skapa en familj för att se insikter.",
+    empty: "Inte tillräckligt med data ännu.",
+    oxygenTitle: "Syrgasanvändning",
+    oxygenSubtitle: "Timmar på syrgas per dag och byten av tuber.",
+    oxygenHours: "Timmar på O₂",
+    oxygenTanks: "Bytta tuber",
+    oxygenAvgFlow: "Snittflöde (L/min)",
+    vitalsTitle: "Trender för mätvärden",
+    vitalsSubtitle: "Daglig min / snitt / max för varje mätning.",
+    vitalSpo2: "SpO₂",
+    vitalHr: "Puls",
+    vitalTemp: "Temperatur",
+    vitalBreathing: "Andning",
+    vitalsMin: "Min",
+    vitalsAvg: "Snitt",
+    vitalsMax: "Max",
+    carePlaceTitle: "Vårdplatskontroller",
+    carePlaceSubtitle: "Hur pålitligt kontrollerna blir gjorda.",
+    carePlaceDone: "Klara",
+    carePlaceLate: "Sena",
+    carePlaceMissed: "Missade",
+    medsTitle: "Följsamhet medicinering",
+    medsSubtitle: "% av schemalagda doser givna i tid per dag.",
+    medsOnTime: "I tid",
+    heatmapTitle: "När kontroller missas",
+    heatmapSubtitle: "Värmekarta över missade vårdplatskontroller per veckodag och timme.",
+    heatmapNone: "Inga missade kontroller i detta intervall.",
+    daysShort: "S,M,T,O,T,F,L",
+  },
 };
+
 
 

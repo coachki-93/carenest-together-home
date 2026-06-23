@@ -164,6 +164,9 @@ export const en = {
     instructions: "Instructions",
     inventory: "Inventory",
     shopping: "Shopping list",
+    insights: "Insights",
+
+
 
 
 
@@ -1093,6 +1096,42 @@ export const en = {
     subtitle: "Supplies to order and items already on the way.",
     noFamily: "Join or create a family to see its shopping list.",
   },
+  insights: {
+    title: "Insights",
+    subtitle: "Trends across the last few days, weeks or months.",
+    range7: "7 days",
+    range30: "30 days",
+    range90: "90 days",
+    noFamily: "Join or create a family to see insights.",
+    empty: "Not enough data yet.",
+    oxygenTitle: "Oxygen usage",
+    oxygenSubtitle: "Hours on oxygen per day and tanks replaced.",
+    oxygenHours: "Hours on O₂",
+    oxygenTanks: "Tanks replaced",
+    oxygenAvgFlow: "Avg flow (L/min)",
+    vitalsTitle: "Vitals trends",
+    vitalsSubtitle: "Daily min / avg / max for each reading.",
+    vitalSpo2: "SpO₂",
+    vitalHr: "Heart rate",
+    vitalTemp: "Temperature",
+    vitalBreathing: "Breathing",
+    vitalsMin: "Min",
+    vitalsAvg: "Avg",
+    vitalsMax: "Max",
+    carePlaceTitle: "Care-place checks",
+    carePlaceSubtitle: "How reliably checks are getting done.",
+    carePlaceDone: "Done",
+    carePlaceLate: "Late",
+    carePlaceMissed: "Missed",
+    medsTitle: "Medication adherence",
+    medsSubtitle: "% of scheduled doses given on time per day.",
+    medsOnTime: "On time",
+    heatmapTitle: "When checks get missed",
+    heatmapSubtitle: "Heatmap of missed care-place checks by weekday and hour.",
+    heatmapNone: "No missed checks in this range. ",
+    daysShort: "S,M,T,W,T,F,S",
+  },
 };
+
 
 
