@@ -115,47 +115,100 @@ export function useDeleteVital() {
   });
 }
 
-/** Default reference ranges when child age is unknown (rough guidance — informational only). */
-export const VITAL_RANGES: Partial<Record<VitalType, { low: number; high: number }>> = {
-  heart_rate: { low: 60, high: 130 },
-  spo2: { low: 94, high: 100 },
-  temperature: { low: 36.0, high: 37.5 },
-  breathing: { low: 12, high: 30 },
-};
+/** Optional context for a vital reading (explains out-of-range values). */
+export const VITAL_CONTEXTS = [
+  "awake",
+  "sleeping",
+  "crying",
+  "fever",
+  "pain",
+  "exercising",
+  "anxious",
+  "other",
+] as const;
+export type VitalContext = (typeof VITAL_CONTEXTS)[number];
 
 type Range = { low: number; high: number };
+export type VitalRangeOverrides = Partial<Record<VitalType, Partial<Range>>>;
 
-/** Age-adjusted reference ranges. Pass undefined ageMonths to fall back to default ranges. */
+/** Default reference ranges when child age is unknown (rough guidance — informational only). */
+export const VITAL_RANGES: Partial<Record<VitalType, Range>> = {
+  heart_rate: { low: 60, high: 100 },
+  spo2: { low: 95, high: 100 },
+  temperature: { low: 36.0, high: 37.9 },
+  breathing: { low: 12, high: 18 },
+};
+
+/**
+ * Age-adjusted screening reference ranges, aligned with the practical
+ * pediatric table. Pass `overrides` (from `children.custom_vital_ranges`) to
+ * apply parent/owner-set custom values on top of the age default.
+ */
 export function getVitalRanges(
   ageMonths: number | null | undefined,
+  overrides?: VitalRangeOverrides | null,
 ): Partial<Record<VitalType, Range>> {
-  const spo2: Range = { low: 94, high: 100 };
-  const temperature: Range = { low: 36.0, high: 37.5 };
+  const spo2: Range = { low: 95, high: 100 };
+  const temperature: Range = { low: 36.0, high: 37.9 };
+  let base: Partial<Record<VitalType, Range>>;
   if (ageMonths == null || Number.isNaN(ageMonths)) {
-    return { ...VITAL_RANGES };
-  }
-  let heart_rate: Range;
-  let breathing: Range;
-  if (ageMonths < 3) {
-    heart_rate = { low: 100, high: 160 };
-    breathing = { low: 30, high: 60 };
-  } else if (ageMonths < 12) {
-    heart_rate = { low: 90, high: 150 };
-    breathing = { low: 24, high: 40 };
-  } else if (ageMonths < 36) {
-    heart_rate = { low: 80, high: 140 };
-    breathing = { low: 20, high: 30 };
-  } else if (ageMonths < 72) {
-    heart_rate = { low: 75, high: 130 };
-    breathing = { low: 18, high: 25 };
-  } else if (ageMonths < 144) {
-    heart_rate = { low: 70, high: 120 };
-    breathing = { low: 16, high: 22 };
+    base = { ...VITAL_RANGES };
   } else {
-    heart_rate = { low: 60, high: 110 };
-    breathing = { low: 12, high: 20 };
+    let heart_rate: Range;
+    let breathing: Range;
+    if (ageMonths < 3) {
+      heart_rate = { low: 110, high: 160 };
+      breathing = { low: 30, high: 60 };
+    } else if (ageMonths < 6) {
+      heart_rate = { low: 100, high: 150 };
+      breathing = { low: 30, high: 45 };
+    } else if (ageMonths < 12) {
+      heart_rate = { low: 90, high: 130 };
+      breathing = { low: 25, high: 40 };
+    } else if (ageMonths < 36) {
+      heart_rate = { low: 80, high: 125 };
+      breathing = { low: 20, high: 30 };
+    } else if (ageMonths < 72) {
+      heart_rate = { low: 70, high: 115 };
+      breathing = { low: 20, high: 25 };
+    } else if (ageMonths < 144) {
+      heart_rate = { low: 60, high: 100 };
+      breathing = { low: 14, high: 22 };
+    } else {
+      heart_rate = { low: 60, high: 100 };
+      breathing = { low: 12, high: 18 };
+    }
+    base = { heart_rate, spo2, temperature, breathing };
   }
-  return { heart_rate, spo2, temperature, breathing };
+  if (!overrides) return base;
+  const merged: Partial<Record<VitalType, Range>> = { ...base };
+  for (const k of Object.keys(overrides) as VitalType[]) {
+    const ov = overrides[k];
+    const cur = base[k];
+    if (!ov) continue;
+    const low = typeof ov.low === "number" ? ov.low : cur?.low;
+    const high = typeof ov.high === "number" ? ov.high : cur?.high;
+    if (typeof low === "number" && typeof high === "number") {
+      merged[k] = { low, high };
+    }
+  }
+  return merged;
+}
+
+/** Parse the JSON shape stored on `children.custom_vital_ranges`. */
+export function parseRangeOverrides(value: unknown): VitalRangeOverrides {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const out: VitalRangeOverrides = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    if (!(VITAL_TYPES as string[]).includes(k)) continue;
+    if (!v || typeof v !== "object") continue;
+    const o = v as { low?: unknown; high?: unknown };
+    const r: Partial<Range> = {};
+    if (typeof o.low === "number" && Number.isFinite(o.low)) r.low = o.low;
+    if (typeof o.high === "number" && Number.isFinite(o.high)) r.high = o.high;
+    if (r.low != null || r.high != null) out[k as VitalType] = r;
+  }
+  return out;
 }
 
 export function ageMonthsFromDob(dob: string | null | undefined): number | null {
@@ -174,11 +227,14 @@ export function vitalStatus(
   type: VitalType,
   value: number,
   ageMonths?: number | null,
+  overrides?: VitalRangeOverrides | null,
 ): "low" | "ok" | "high" | "neutral" {
-  const ranges = ageMonths !== undefined ? getVitalRanges(ageMonths) : VITAL_RANGES;
+  const ranges =
+    ageMonths !== undefined ? getVitalRanges(ageMonths, overrides) : VITAL_RANGES;
   const r = ranges[type];
   if (!r) return "neutral";
   if (value < r.low) return "low";
   if (value > r.high) return "high";
   return "ok";
 }
+
