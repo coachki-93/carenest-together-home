@@ -14,7 +14,9 @@ import {
   BookOpen,
   Boxes,
   ShoppingCart,
+  TrendingUp,
 } from "lucide-react";
+
 
 import {
   Sidebar,
