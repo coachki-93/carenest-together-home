@@ -375,6 +375,7 @@ function VitalOverviewTile({
   onLog,
   lang,
   ageMonths,
+  overrides,
   now,
 }: {
   type: VitalType;
@@ -383,13 +384,15 @@ function VitalOverviewTile({
   onLog: () => void;
   lang: string;
   ageMonths: number | null;
+  overrides?: VitalRangeOverrides | null;
   now: number;
 }) {
   const { t } = useTranslation();
   const Icon = TYPE_ICONS[type];
   const tone = TYPE_TONES[type];
-  const status = latest ? vitalStatus(type, Number(latest.value), ageMonths) : "neutral";
+  const status = latest ? vitalStatus(type, Number(latest.value), ageMonths, overrides) : "neutral";
   const statusLabel = t(`vitals.status${capitalize(status)}` as const);
+
   const latestTs = latest ? new Date(latest.logged_at).getTime() : null;
   const rel = useRelativeTime(latestTs, now);
   const staleHours = STALE_HOURS[type];
