@@ -12,6 +12,9 @@ import {
   Wind,
   Plus,
   Trash2,
+  TrendingDown,
+  TrendingUp,
+  Minus,
 } from "lucide-react";
 import {
   LineChart,
