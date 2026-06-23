@@ -916,8 +916,6 @@ function AppointmentDialog({
   const [lateAfter, setLateAfter] = useState<string>("0");
   const [missedAfter, setMissedAfter] = useState<string>("15");
   const [allowOngoing, setAllowOngoing] = useState<boolean>(false);
-  const [enableTimer, setEnableTimer] = useState<boolean>(false);
-  const [timerMinutes, setTimerMinutes] = useState<string>("1");
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -946,9 +944,6 @@ function AppointmentDialog({
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
       setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
       setAllowOngoing(!!(editing as { allow_ongoing?: boolean }).allow_ongoing);
-      const tm = (editing as { timer_minutes?: number | null }).timer_minutes ?? null;
-      setEnableTimer(tm != null);
-      setTimerMinutes(tm != null ? String(tm) : "1");
     } else {
       setTitle("");
       setKind("appointment");
@@ -967,8 +962,6 @@ function AppointmentDialog({
       setLateAfter("0");
       setMissedAfter("15");
       setAllowOngoing(false);
-      setEnableTimer(false);
-      setTimerMinutes("1");
     }
   }, [open, editing, defaultDay]);
 
