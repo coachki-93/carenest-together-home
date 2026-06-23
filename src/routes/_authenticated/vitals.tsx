@@ -188,22 +188,24 @@ function VitalsPage() {
     >
       <div className="space-y-6">
         {/* Overview tiles */}
-        <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
-          {(["heart_rate", "spo2", "temperature", "weight", "fluids"] as VitalType[]).map(
-            (type) => {
-              const latest = latestMap?.get(type);
-              return (
-                <VitalOverviewTile
-                  key={type}
-                  type={type}
-                  latest={latest}
-                  fluidsTodayTotal={type === "fluids" ? fluidsToday : undefined}
-                  onLog={() => openLogFor(type)}
-                  lang={i18n.language}
-                />
-              );
-            },
-          )}
+        <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+          {(
+            ["heart_rate", "spo2", "temperature", "breathing", "weight", "fluids"] as VitalType[]
+          ).map((type) => {
+            const latest = latestMap?.get(type);
+            return (
+              <VitalOverviewTile
+                key={type}
+                type={type}
+                latest={latest}
+                fluidsTodayTotal={type === "fluids" ? fluidsToday : undefined}
+                onLog={() => openLogFor(type)}
+                lang={i18n.language}
+                ageMonths={ageMonths}
+                now={now}
+              />
+            );
+          })}
         </section>
 
         {/* Range selector */}
