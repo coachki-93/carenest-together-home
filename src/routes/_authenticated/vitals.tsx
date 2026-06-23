@@ -1041,3 +1041,54 @@ function LogReadingDialog({
     </Dialog>
   );
 }
+
+function PediatricRangesTable() {
+  const { t } = useTranslation();
+  const rows: Array<{ key: string; hr: string; br: string; spo2: string; temp: string }> = [
+    { key: "0_3m", hr: "110–160", br: "30–60", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "3_6m", hr: "100–150", br: "30–45", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "6_12m", hr: "90–130", br: "25–40", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "1_3y", hr: "80–125", br: "20–30", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "3_6y", hr: "70–115", br: "20–25", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "6_12y", hr: "60–100", br: "14–22", spo2: "95–100", temp: "< 38.0 °C" },
+    { key: "12_18y", hr: "60–100", br: "12–18", spo2: "95–100", temp: "< 38.0 °C" },
+  ];
+  return (
+    <section id="pediatric-ranges-table" className="card-soft p-6 scroll-mt-24">
+      <h3 className="text-lg font-extrabold">{t("vitals.pediatricTable.title")}</h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        {t("vitals.pediatricTable.subtitle")}
+      </p>
+      <div className="overflow-x-auto -mx-2 px-2">
+        <table className="w-full text-sm border-separate border-spacing-0">
+          <thead>
+            <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colHeartRate")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colBreathing")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colSpO2")}</th>
+              <th className="py-2 pr-3">{t("vitals.pediatricTable.colTemp")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.key} className="border-t border-border/60">
+                <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                  {t(`vitals.pediatricTable.ages.${r.key}` as const)}
+                </td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.hr}</td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.br}</td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.spo2}</td>
+                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.temp}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-muted-foreground mt-3">
+        {t("vitals.pediatricTable.tempNote")}
+      </p>
+    </section>
+  );
+}
+
