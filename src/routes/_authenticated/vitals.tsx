@@ -322,30 +322,80 @@ function vitalI18nKey(t: VitalType): string {
   }
 }
 
+// Stale thresholds (in hours) — after this gap the tile shows "Due for check".
+const STALE_HOURS: Partial<Record<VitalType, number>> = {
+  heart_rate: 6,
+  spo2: 6,
+  breathing: 6,
+  temperature: 12,
+};
+
+// Precision per type when displaying numeric value.
+function fmtVal(type: VitalType, n: number): string {
+  if (type === "temperature") return n.toFixed(1);
+  return Math.round(n).toString();
+}
+
+function useNow(intervalMs: number): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
+
+function useRelativeTime(ts: number | null | undefined, now: number): string {
+  const { t } = useTranslation();
+  if (!ts) return t("vitals.noReadings");
+  const diffMs = Math.max(0, now - ts);
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 1) return t("vitals.relJustNow");
+  if (mins < 60) return t("vitals.relMinutes", { count: mins });
+  const hours = Math.floor(mins / 60);
+  if (hours < 48) return t("vitals.relHours", { count: hours });
+  return t("vitals.relDays", { count: Math.floor(hours / 24) });
+}
+
 function VitalOverviewTile({
   type,
   latest,
   fluidsTodayTotal,
   onLog,
   lang,
+  ageMonths,
+  now,
 }: {
   type: VitalType;
   latest?: Vital;
   fluidsTodayTotal?: number;
   onLog: () => void;
   lang: string;
+  ageMonths: number | null;
+  now: number;
 }) {
   const { t } = useTranslation();
   const Icon = TYPE_ICONS[type];
   const tone = TYPE_TONES[type];
-  const status = latest ? vitalStatus(type, Number(latest.value)) : "neutral";
+  const status = latest ? vitalStatus(type, Number(latest.value), ageMonths) : "neutral";
   const statusLabel = t(`vitals.status${capitalize(status)}` as const);
+  const latestTs = latest ? new Date(latest.logged_at).getTime() : null;
+  const rel = useRelativeTime(latestTs, now);
+  const staleHours = STALE_HOURS[type];
+  const isStale =
+    type !== "fluids" &&
+    latestTs != null &&
+    staleHours != null &&
+    now - latestTs > staleHours * 3_600_000;
 
   return (
     <button
       type="button"
       onClick={onLog}
-      className="card-soft p-4 text-left hover:shadow-soft transition-shadow group"
+      className={cn(
+        "card-soft p-4 text-left hover:shadow-soft transition-shadow group",
+        isStale && "ring-2 ring-warning/60",
+      )}
     >
       <div className="flex items-start justify-between">
         <div className={cn("size-10 rounded-2xl flex items-center justify-center", tone.bg)}>
@@ -374,7 +424,7 @@ function VitalOverviewTile({
           </>
         ) : latest ? (
           <>
-            <span className="text-2xl font-extrabold">{Number(latest.value)}</span>
+            <span className="text-2xl font-extrabold">{fmtVal(type, Number(latest.value))}</span>
             <span className="text-xs text-muted-foreground font-semibold">{latest.unit}</span>
           </>
         ) : (
@@ -382,15 +432,13 @@ function VitalOverviewTile({
         )}
       </div>
       <div className="text-[11px] text-muted-foreground mt-1 truncate">
-        {type === "fluids"
-          ? t("vitals.fluidsToday")
-          : latest
-            ? new Date(latest.logged_at).toLocaleTimeString(lang === "sv" ? "sv-SE" : "en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : t("vitals.noReadings")}
+        {type === "fluids" ? t("vitals.fluidsToday") : latest ? rel : t("vitals.noReadings")}
       </div>
+      {isStale && (
+        <div className="text-[10px] font-bold uppercase tracking-wider text-warning-foreground mt-1">
+          {t("vitals.dueForCheck")}
+        </div>
+      )}
     </button>
   );
 }
@@ -403,10 +451,14 @@ function TrendCard({
   type,
   vitals,
   range,
+  ageMonths,
+  now,
 }: {
   type: VitalType;
   vitals: Vital[];
   range: "24h" | "7d" | "30d";
+  ageMonths: number | null;
+  now: number;
 }) {
   const { t, i18n } = useTranslation();
   const Icon = TYPE_ICONS[type];
@@ -422,30 +474,99 @@ function TrendCard({
         .sort((a, b) => a.ts - b.ts),
     [vitals, type],
   );
-  const r = VITAL_RANGES[type];
+  const ranges = useMemo(() => getVitalRanges(ageMonths), [ageMonths]);
+  const r = ranges[type];
   const last = points[points.length - 1];
   const prev = points[points.length - 2];
   const delta = last && prev ? last.value - prev.value : 0;
   const TrendIcon = delta > 0 ? TrendingUp : delta < 0 ? TrendingDown : Minus;
 
+  const stats = useMemo(() => {
+    if (points.length === 0) return null;
+    let sum = 0;
+    let min = Infinity;
+    let max = -Infinity;
+    let abnormal = 0;
+    let inRange = 0;
+    for (const p of points) {
+      sum += p.value;
+      if (p.value < min) min = p.value;
+      if (p.value > max) max = p.value;
+      if (r) {
+        if (p.value < r.low || p.value > r.high) abnormal += 1;
+        else inRange += 1;
+      }
+    }
+    return {
+      avg: sum / points.length,
+      min,
+      max,
+      abnormal,
+      pctInRange: r ? Math.round((inRange / points.length) * 100) : null,
+    };
+  }, [points, r]);
+
+  const relLast = useRelativeTime(last?.ts ?? null, now);
+
   return (
     <div className="card-soft p-5">
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2.5">
-          <div className={cn("size-9 rounded-xl flex items-center justify-center", tone.bg)}>
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className={cn("size-9 rounded-xl flex items-center justify-center shrink-0", tone.bg)}>
             <Icon className={cn("size-4.5", tone.fg)} />
           </div>
-          <div>
-            <div className="font-extrabold">
+          <div className="min-w-0">
+            <div className="font-extrabold flex items-center gap-2">
               {t(`vitals.${vitalI18nKey(type)}` as const)}
+              {r && (
+                <TooltipProvider delayDuration={150}>
+                  <UITooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                        {fmtVal(type, r.low)}–{fmtVal(type, r.high)}
+                        <Info className="size-3" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[220px] text-xs">
+                      {t("vitals.rangeInfoTooltip")}
+                    </TooltipContent>
+                  </UITooltip>
+                </TooltipProvider>
+              )}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground truncate">
               {t("vitals.trendLast", { count: HOURS[range] })}
+              {stats && (
+                <>
+                  {" · "}
+                  {t("vitals.avg")} {fmtVal(type, stats.avg)}
+                  {last?.unit ? ` ${last.unit}` : ""}
+                </>
+              )}
             </div>
+            {stats && (
+              <div className="text-[11px] text-muted-foreground">
+                {t("vitals.minMax", {
+                  min: fmtVal(type, stats.min),
+                  max: fmtVal(type, stats.max),
+                })}
+                {type === "spo2" && stats.pctInRange != null && (
+                  <> {" · "} {t("vitals.timeInRange", { pct: stats.pctInRange })}</>
+                )}
+                {stats.abnormal > 0 && (
+                  <>
+                    {" · "}
+                    <span className="text-destructive font-bold">
+                      {t("vitals.abnormalCount", { count: stats.abnormal })}
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
         {last && (
-          <div className="text-right">
+          <div className="text-right shrink-0">
             <div className="text-xl font-extrabold flex items-center gap-1 justify-end">
               <TrendIcon
                 className={cn(
@@ -455,16 +576,9 @@ function TrendCard({
                   delta === 0 && "text-muted-foreground",
                 )}
               />
-              {last.value}
+              {fmtVal(type, last.value)}
             </div>
-            <div className="text-[10px] text-muted-foreground">
-              {new Date(last.ts).toLocaleString(i18n.language === "sv" ? "sv-SE" : "en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-                month: "short",
-                day: "numeric",
-              })}
-            </div>
+            <div className="text-[10px] text-muted-foreground">{relLast}</div>
           </div>
         )}
       </div>
@@ -532,6 +646,128 @@ function TrendCard({
     </div>
   );
 }
+
+function QuickCompareCard({
+  allVitals,
+  ageMonths,
+  now,
+}: {
+  allVitals: Vital[];
+  ageMonths: number | null;
+  now: number;
+}) {
+  const { t } = useTranslation();
+  const types: VitalType[] = ["heart_rate", "spo2", "temperature", "breathing"];
+  const ranges = getVitalRanges(ageMonths);
+
+  const startToday = new Date(now);
+  startToday.setHours(0, 0, 0, 0);
+  const startYday = new Date(startToday);
+  startYday.setDate(startYday.getDate() - 1);
+  const sevenDayStart = now - 7 * 24 * 3_600_000;
+
+  function avgFor(type: VitalType, from: number, to: number): number | null {
+    let sum = 0;
+    let n = 0;
+    for (const v of allVitals) {
+      if (v.vital_type !== type) continue;
+      const ts = new Date(v.logged_at).getTime();
+      if (ts >= from && ts < to) {
+        sum += Number(v.value);
+        n += 1;
+      }
+    }
+    return n === 0 ? null : sum / n;
+  }
+
+  return (
+    <section className="card-soft p-5">
+      <h3 className="text-sm font-extrabold uppercase tracking-wider text-muted-foreground mb-3">
+        {t("vitals.compareTitle")}
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        {types.map((type) => {
+          const Icon = TYPE_ICONS[type];
+          const tone = TYPE_TONES[type];
+          const today = avgFor(type, startToday.getTime(), now + 1);
+          const yday = avgFor(type, startYday.getTime(), startToday.getTime());
+          const week = avgFor(type, sevenDayStart, now + 1);
+          const status =
+            today != null ? vitalStatus(type, today, ageMonths) : "neutral";
+          let arrow: "up" | "down" | "flat" = "flat";
+          if (today != null && week != null) {
+            const delta = (today - week) / Math.abs(week || 1);
+            if (delta > 0.05) arrow = "up";
+            else if (delta < -0.05) arrow = "down";
+          }
+          const ArrowIcon =
+            arrow === "up" ? TrendingUp : arrow === "down" ? TrendingDown : Minus;
+          const r = ranges[type];
+          return (
+            <div key={type} className="rounded-2xl border border-border/60 p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div
+                  className={cn(
+                    "size-7 rounded-lg flex items-center justify-center shrink-0",
+                    tone.bg,
+                  )}
+                >
+                  <Icon className={cn("size-3.5", tone.fg)} />
+                </div>
+                <div className="text-xs font-bold truncate">
+                  {t(`vitals.${vitalI18nKey(type)}` as const)}
+                </div>
+                <ArrowIcon
+                  className={cn(
+                    "size-3.5 ml-auto",
+                    status === "ok" && "text-success-foreground",
+                    status === "low" && "text-warning-foreground",
+                    status === "high" && "text-destructive",
+                    status === "neutral" && "text-muted-foreground",
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-1 text-center">
+                <CompareCell label={t("vitals.today")} value={today} type={type} />
+                <CompareCell label={t("vitals.yesterday")} value={yday} type={type} />
+                <CompareCell label={t("vitals.sevenDayAvg")} value={week} type={type} />
+              </div>
+              {r && (
+                <div className="mt-2 text-[10px] text-muted-foreground text-center">
+                  {fmtVal(type, r.low)}–{fmtVal(type, r.high)}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function CompareCell({
+  label,
+  value,
+  type,
+}: {
+  label: string;
+  value: number | null;
+  type: VitalType;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">
+        {label}
+      </div>
+      <div className="text-sm font-extrabold">
+        {value == null ? t("vitals.noData") : fmtVal(type, value)}
+      </div>
+    </div>
+  );
+}
+
+
 
 function FluidsChart({
   vitals,
