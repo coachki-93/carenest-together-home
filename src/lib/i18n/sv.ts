@@ -500,8 +500,21 @@ export const sv = {
     today: "Idag",
     yesterday: "Igår",
     sevenDayAvg: "7-dagars snitt",
-    rangeInfoTooltip: "Referensintervall är informativa och anpassade efter barnets ålder.",
+    rangeInfoTooltip: "Referensintervall är informativa och anpassade efter barnets ålder. Ägare kan ange egna värden i barnprofilen.",
+    disclaimer: "Detta är screening-/referensvärden, inte diagnosregler. Ett barn som gråter, har feber, är uttorkat, sover, tränar, har ont eller är oroligt kan ligga utanför dessa.",
+    contextLabel: "Sammanhang (valfritt)",
+    context: {
+      awake: "Vaken",
+      sleeping: "Sover",
+      crying: "Gråter",
+      fever: "Feber",
+      pain: "Har ont",
+      exercising: "Tränar",
+      anxious: "Orolig",
+      other: "Övrigt",
+    },
     noData: "—",
+
   },
   demo: {
     med: { keppra: "Keppra", baclofen: "Baclofen" },
