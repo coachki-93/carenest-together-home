@@ -772,6 +772,7 @@ function FluidsChart({
                 type="number"
                 domain={["dataMin", "dataMax"]}
                 scale="time"
+                padding={{ left: 24, right: 24 }}
                 tickFormatter={(v) =>
                   range === "24h"
                     ? new Date(v).toLocaleTimeString(i18n.language === "sv" ? "sv-SE" : "en-US", {
@@ -786,6 +787,7 @@ function FluidsChart({
                 tickMargin={6}
                 stroke="var(--border)"
               />
+
               <YAxis
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 stroke="var(--border)"
