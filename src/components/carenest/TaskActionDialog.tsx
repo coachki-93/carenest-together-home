@@ -156,6 +156,7 @@ export function TaskActionDialog({
       reason: trimmedReason ? trimmedReason : null,
       postponedTo,
       vitalValue: showVital && !Number.isNaN(vitalNum) ? vitalNum : null,
+      vitalContext: showVital ? vitalContext : null,
       notes: showNotes && trimmedNotes ? trimmedNotes : null,
     });
   }
