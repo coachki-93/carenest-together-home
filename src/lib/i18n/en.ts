@@ -164,6 +164,9 @@ export const en = {
     instructions: "Instructions",
     inventory: "Inventory",
     shopping: "Shopping list",
+    insights: "Insights",
+
+
 
 
 
