@@ -725,6 +725,7 @@ function DashboardPage() {
                 vital_type: vt,
                 value: result.vitalValue,
                 unit: DEFAULT_UNIT[vt] ?? "",
+                context: result.vitalContext,
                 notes: result.notes,
                 logged_at: new Date().toISOString(),
               });
