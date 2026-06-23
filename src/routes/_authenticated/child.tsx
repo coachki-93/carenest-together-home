@@ -56,6 +56,7 @@ function ChildProfilePage() {
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([{ name: "", phone: "", relationship: "" }]);
   const [doctors, setDoctors] = useState<Doctor[]>([{ name: "", specialty: "", phone: "" }]);
+  const [customRanges, setCustomRanges] = useState<VitalRangeOverrides>({});
 
   useEffect(() => {
     if (!child) return;
@@ -66,7 +67,11 @@ function ChildProfilePage() {
     setPhotoPath(child.photo_url ?? null);
     setContacts(asContacts(child.emergency_contacts));
     setDoctors(asDoctors(child.doctors));
+    setCustomRanges(parseRangeOverrides(child.custom_vital_ranges));
   }, [child]);
+
+  const ageMonths = ageMonthsFromDob(dob);
+  const defaultRanges = useMemo(() => getVitalRanges(ageMonths), [ageMonths]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,6 +84,7 @@ function ChildProfilePage() {
       toast.error(parsed.error.errors[0]?.message ?? "");
       return;
     }
+
     try {
       await updateChild.mutateAsync({
         id: child.id,
