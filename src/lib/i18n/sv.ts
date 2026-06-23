@@ -593,7 +593,12 @@ export const sv = {
     emptyTitle: "Ingen barnprofil än",
     emptyBody: "Slutför introduktionen för att skapa barnets profil.",
     readOnlyNotice: "Du visar profilen som vårdgivare. Endast familjens ägare kan göra ändringar.",
+    rangesTitle: "Referensintervall för värden",
+    rangesHelp: "Standard är åldersanpassade screeningvärden. Justera per värde om barnets läkare rekommenderar ett annat normalintervall.",
+    rangesDefault: "Standard {{low}}–{{high}}",
+    rangesReset: "Återställ",
   },
+
   caregiversPage: {
     subtitle: "Ditt vårdteam och väntande inbjudningar.",
     members: "Vårdteam",
