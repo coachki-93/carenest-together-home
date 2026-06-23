@@ -514,6 +514,29 @@ export const sv = {
       other: "Övrigt",
     },
     noData: "—",
+    showMore: "Visa fler",
+    showLess: "Visa färre",
+    seePediatricTable: "Se pediatrisk tabell",
+    pediatricTable: {
+      title: "Pediatriska referensvärden",
+      subtitle: "Vakna/vilovärden efter ålder — endast screening.",
+      colAge: "Ålder",
+      colHeartRate: "Puls (slag/min)",
+      colBreathing: "Andning (and/min)",
+      colSpO2: "SpO₂ (%)",
+      colTemp: "Temperatur",
+      tempNote: "≥ 38,0 °C = feber",
+      ages: {
+        "0_3m": "0–3 månader",
+        "3_6m": "3–6 månader",
+        "6_12m": "6–12 månader",
+        "1_3y": "1–3 år",
+        "3_6y": "3–6 år",
+        "6_12y": "6–12 år",
+        "12_18y": "12–18 år",
+      },
+    },
+
 
   },
   demo: {
