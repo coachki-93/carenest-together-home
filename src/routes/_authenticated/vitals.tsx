@@ -15,6 +15,8 @@ import {
   TrendingDown,
   TrendingUp,
   Minus,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import {
   LineChart,
