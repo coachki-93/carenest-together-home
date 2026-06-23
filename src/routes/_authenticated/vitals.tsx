@@ -68,15 +68,20 @@ import {
   useDeleteVital,
   DEFAULT_UNIT,
   VITAL_TYPES,
+  VITAL_CONTEXTS,
   getVitalRanges,
+  parseRangeOverrides,
   ageMonthsFromDob,
   vitalStatus,
   type Vital,
   type VitalType,
+  type VitalContext,
+  type VitalRangeOverrides,
 } from "@/lib/data/vitals";
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/vitals")({
   head: () => ({ meta: [{ title: "Vitals — CareNest" }] }),
