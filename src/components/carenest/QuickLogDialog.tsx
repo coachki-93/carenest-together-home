@@ -26,7 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/notify";
-import { useLogVital, DEFAULT_UNIT, type VitalType } from "@/lib/data/vitals";
+import { useLogVital, DEFAULT_UNIT, VITAL_CONTEXTS, type VitalType, type VitalContext } from "@/lib/data/vitals";
 
 type PresetKey =
   | "temperature"
