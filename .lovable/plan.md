@@ -1,69 +1,63 @@
-# Vitals page improvements
+## Goal
 
-Scope: enhance the existing `/vitals` page only. No new routes, no business-logic changes outside the vitals module. All strings go through i18n (en + sv).
+Three improvements to the vitals workflow:
 
-## 1. Breathing rate chart
+1. Align reference ranges with the pediatric table you shared.
+2. Let owners/parents set custom ranges per child (defaults auto-fill until overridden).
+3. Let caregivers tag a context (sleeping, awake, fever, pain, etc.) when logging a vital, since it explains out-of-range readings.
 
-- Add `breathing` to `VITAL_RANGES` in `src/lib/data/vitals.ts` with age-adjusted defaults (see section 3).
-- Add a `breathing` overview tile to the top grid (becomes 6 tiles; layout: `grid-cols-2 md:grid-cols-3 xl:grid-cols-6`).
-- Add a `<TrendCard type="breathing" />` to the trend chart grid, next to heart rate / SpO₂ / temperature.
-- Reuse existing `TrendCard` — no new chart component needed.
+---
 
-## 2. Per-range averages on each chart
+## 1. Reference ranges
 
-- In `TrendCard`, compute `avg`, `min`, `max` from the filtered `points` for the active range.
-- Show inline next to the existing "Last 24 hours" subtitle, e.g. `Last 24 hours · avg 134 bpm` (round to type-appropriate precision: integer for HR/SpO₂/breathing, 1 decimal for temp).
-- Add `min · max` as a small secondary line under the average.
-- For SpO₂, also show "% time in range" since average hides desats.
-- Skip averages on the fluids bar chart (it's a daily sum, not a trend).
-
-## 3. Age-adjusted normal ranges + out-of-range highlighting
-
-Replace the static `VITAL_RANGES` constant with a function `getVitalRanges(ageMonths)` that returns ranges based on the child's age (derived from `children.date_of_birth`):
+Currently we have age buckets but they don't match your table. Update `getVitalRanges()` in `src/lib/data/vitals.ts` to use these buckets:
 
 ```text
-Age band         HR (bpm)   Breathing (/min)   SpO₂   Temp (°C)
-0–3 mo           100–160     30–60             94–100  36.0–37.5
-3–12 mo           90–150     24–40             94–100  36.0–37.5
-1–3 yr            80–140     20–30             94–100  36.0–37.5
-3–6 yr            75–130     18–25             94–100  36.0–37.5
-6–12 yr           70–120     16–22             94–100  36.0–37.5
-12+ yr            60–110     12–20             94–100  36.0–37.5
+Age          HR        Breathing   SpO₂      Temp (fever ≥)
+0–3 mo       110–160   30–60       95–100    <38.0 °C
+3–6 mo       100–150   30–45       95–100    <38.0 °C
+6–12 mo       90–130   25–40       95–100    <38.0 °C
+1–3 yr        80–125   20–30       95–100    <38.0 °C
+3–6 yr        70–115   20–25       95–100    <38.0 °C
+6–12 yr       60–100   14–22       95–100    <38.0 °C
+12–18 yr      60–100   12–18       95–100    <38.0 °C
 ```
 
-Behaviour:
-- `vitalStatus(type, value, ageMonths)` uses the age-band ranges.
-- `TrendCard` `ReferenceArea` uses the same age-band range.
-- Add an "Abnormal readings" badge on each `TrendCard` and overview tile: count of points in the active range that fall outside the band (e.g. "3 out of range"). Clicking the badge scrolls to history filtered to that type (history filter is light — just a chip; full filter UX is out of scope).
-- Reference ranges are informational; copy makes that clear via a small `(?)` tooltip on the range chip.
+Add a disclaimer banner near the top of `/vitals` (translated EN + SV):
+> "These are screening/reference ranges, not diagnosis rules. A child who is crying, febrile, dehydrated, asleep, exercising, in pain, or anxious may fall outside these."
 
-Out of scope for this iteration: per-child custom range overrides (UI to edit ranges). Can be added later if needed.
+## 2. Custom per-child ranges (owner-only)
 
-## 4. Last-reading freshness indicator
+**Database** — add one column to `children`:
+- `custom_vital_ranges jsonb not null default '{}'::jsonb`
 
-- On each overview tile, replace the small time label with a "X min ago / X h ago" relative string (live, recomputed every 60s via a tiny `useNow()` hook).
-- When the gap exceeds a per-type stale threshold (HR 6h, SpO₂ 6h, breathing 6h, temp 12h, fluids: skip), the tile gets a soft warning border + a "Due for check" tag. No push notification in this iteration — purely visual.
-- Add the same relative timestamp under the big number inside each `TrendCard` header.
+Shape stored: `{ heart_rate?: {low,high}, spo2?: {low,high}, temperature?: {low,high}, breathing?: {low,high} }`. Missing keys fall back to the age-based default.
 
-## 5. Quick compare (today / yesterday / 7-day average)
+**Child profile page** (`src/routes/_authenticated/child.tsx`) — add a "Reference ranges" section visible to all members but **editable only by owners** (use existing role check pattern). Each of the 4 vitals shows:
+- The current age-based default as placeholder ("Default: 90–130 bpm")
+- Two number inputs for low / high
+- A "Reset to default" button per row that clears the override
 
-- New small `<QuickCompareCard />` rendered above the trend chart grid, one row of three stats per metric (HR, SpO₂, temp, breathing).
-- Columns: **Today avg**, **Yesterday avg**, **7-day avg**, with arrow indicator vs 7-day baseline (`▲` if today > 7d avg by > 5%, `▼` if lower, `–` otherwise; color follows abnormal-range status, not direction).
-- Hidden on `30d` range — only meaningful on shorter views; the user can still scroll trend charts.
-- Pull data from a single `useVitals(familyId, { sinceHours: 24*7 })` call (reuse query, no extra round trips).
+**Range lookup** — update `getVitalRanges(ageMonths, overrides?)` to merge `overrides` on top of the age-based result. All vitals page consumers (status colors, "out of range" badges, abnormal counts, chart reference lines) pass the child's `custom_vital_ranges` so the UI reflects the override everywhere automatically.
 
-## Technical details
+## 3. Context tag when logging
 
-Files changed:
-- `src/lib/data/vitals.ts` — add `breathing` range, add `getVitalRanges(ageMonths)`, update `vitalStatus` signature, add helper `ageMonthsFromDob(dob)`.
-- `src/routes/_authenticated/vitals.tsx` — add `breathing` to overview + trend grids; extend `TrendCard` with avg/min/max + abnormal count; add `QuickCompareCard`; add freshness logic + `useNow` hook.
-- `src/lib/i18n/en.ts` + `src/lib/i18n/sv.ts` — new keys: `vitals.breathing`, `vitals.avg`, `vitals.minMax`, `vitals.timeInRange`, `vitals.abnormalCount`, `vitals.dueForCheck`, `vitals.relMinutes`, `vitals.relHours`, `vitals.relDays`, `vitals.compareTitle`, `vitals.today`, `vitals.yesterday`, `vitals.sevenDayAvg`, `vitals.rangeInfoTooltip`.
+**Database** — add to `vitals`:
+- `context text` (nullable) — stores one of: `awake`, `sleeping`, `crying`, `fever`, `pain`, `exercising`, `anxious`, `other`. Null = not specified.
 
-Data: no DB schema or RLS changes. No new server functions. Pure client-side aggregation over existing `useVitals` results.
+**Quick log dialog** (`src/components/carenest/QuickLogDialog.tsx`) — add a horizontal chip selector above the Notes field, single-select, optional. Same options shown in the disclaimer wording. Save `context` alongside the existing insert.
 
-Out of scope (will revisit later per your earlier instructions):
-- Inline context per reading (oxygen flow, asleep/awake) — needs schema change.
-- Correlations (SpO₂ vs O₂ flow).
-- Export / printable doctor summary.
-- Push reminders for stale readings.
-- Per-child editable ranges UI.
+**History / recent list** — show the context as a small badge next to the value (e.g. "98 bpm · sleeping") so an out-of-range reading reads in context. Charts stay unchanged.
+
+## Files touched
+
+- migration: `children.custom_vital_ranges`, `vitals.context`
+- `src/lib/data/vitals.ts` — new range table, signature `getVitalRanges(ageMonths, overrides?)`, `VitalContext` type
+- `src/routes/_authenticated/vitals.tsx` — disclaimer banner, pass overrides into range calls, render context badges
+- `src/routes/_authenticated/child.tsx` — owner-only ranges editor + reset
+- `src/components/carenest/QuickLogDialog.tsx` — context chip selector
+- `src/lib/i18n/en.ts` + `sv.ts` — disclaimer, context labels, ranges editor labels
+
+## Open question before I implement
+
+Temperature in the table is described as a fever threshold (≥38.0 °C), not a range. I'll model it as `{low: 36.0, high: 37.9}` so anything ≥38.0 flags as high — okay, or do you want a different low bound (e.g. 36.5)?
