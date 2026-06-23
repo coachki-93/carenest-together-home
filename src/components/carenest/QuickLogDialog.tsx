@@ -83,6 +83,7 @@ export function QuickLogDialog({
   const [preset, setPreset] = useState<Preset | null>(null);
   const [value, setValue] = useState("");
   const [notes, setNotes] = useState("");
+  const [context, setContext] = useState<VitalContext | null>(null);
   const [loggedAt, setLoggedAt] = useState<string>(() => toLocalInput(new Date()));
 
   useEffect(() => {
@@ -90,6 +91,7 @@ export function QuickLogDialog({
       setPreset(null);
       setValue("");
       setNotes("");
+      setContext(null);
       setLoggedAt(toLocalInput(new Date()));
     }
   }, [open]);
@@ -125,10 +127,12 @@ export function QuickLogDialog({
       unit: unit || "",
       notes: finalNotes,
       logged_at: when.toISOString(),
+      context: preset.needsValue ? context : null,
     });
     toast.success(t("quickLog.saved", { label }));
     onOpenChange(false);
   }
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
