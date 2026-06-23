@@ -20,7 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { CaregiverProfile } from "@/lib/data/caregiver-profiles";
-import type { VitalType } from "@/lib/data/vitals";
+import { VITAL_CONTEXTS, type VitalType, type VitalContext } from "@/lib/data/vitals";
+import { cn } from "@/lib/utils";
 
 export type TaskAction = "done" | "skipped" | "postponed";
 
@@ -30,6 +31,7 @@ export interface TaskActionResult {
   reason: string | null;
   postponedTo: Date | null;
   vitalValue: number | null;
+  vitalContext: VitalContext | null;
   notes: string | null;
 }
 
