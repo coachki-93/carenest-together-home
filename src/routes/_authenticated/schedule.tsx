@@ -916,8 +916,6 @@ function AppointmentDialog({
   const [lateAfter, setLateAfter] = useState<string>("0");
   const [missedAfter, setMissedAfter] = useState<string>("15");
   const [allowOngoing, setAllowOngoing] = useState<boolean>(false);
-  const [enableTimer, setEnableTimer] = useState<boolean>(false);
-  const [timerMinutes, setTimerMinutes] = useState<string>("1");
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -946,9 +944,6 @@ function AppointmentDialog({
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
       setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
       setAllowOngoing(!!(editing as { allow_ongoing?: boolean }).allow_ongoing);
-      const tm = (editing as { timer_minutes?: number | null }).timer_minutes ?? null;
-      setEnableTimer(tm != null);
-      setTimerMinutes(tm != null ? String(tm) : "1");
     } else {
       setTitle("");
       setKind("appointment");
@@ -967,8 +962,6 @@ function AppointmentDialog({
       setLateAfter("0");
       setMissedAfter("15");
       setAllowOngoing(false);
-      setEnableTimer(false);
-      setTimerMinutes("1");
     }
   }, [open, editing, defaultDay]);
 
@@ -1026,7 +1019,7 @@ function AppointmentDialog({
       late_after_minutes: Math.max(0, parseInt(lateAfter, 10) || 0),
       missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
       allow_ongoing: allowOngoing,
-      timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
+      timer_minutes: null,
     };
   }
 
@@ -1380,41 +1373,6 @@ function AppointmentDialog({
               </p>
             </div>
 
-            {/* Enable Timer */}
-            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="enable-timer"
-                  checked={enableTimer}
-                  onCheckedChange={(c) => setEnableTimer(c === true)}
-                />
-                <Label htmlFor="enable-timer" className="font-semibold cursor-pointer">
-                  {t("scheduleEvents.fields.enableTimer")}
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t("scheduleEvents.fields.enableTimerHelp")}
-              </p>
-              {enableTimer && (
-                <div className="flex items-center gap-2 pt-1">
-                  <Label htmlFor="timer-minutes" className="text-sm">
-                    {t("scheduleEvents.fields.timerMinutes")}
-                  </Label>
-                  <Input
-                    id="timer-minutes"
-                    type="number"
-                    min={1}
-                    max={120}
-                    value={timerMinutes}
-                    onChange={(e) => setTimerMinutes(e.target.value)}
-                    className="rounded-xl w-20"
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    {t("scheduleEvents.fields.minutes")}
-                  </span>
-                </div>
-              )}
-            </div>
 
             {isInstance && (
               <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">

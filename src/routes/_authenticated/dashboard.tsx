@@ -373,12 +373,6 @@ function DashboardPage() {
     return () => window.clearInterval(id);
   }, []);
 
-  // Faster ticker for live timer countdowns (1s). Always on while page mounted.
-  const [secondTick, setSecondTick] = useState(() => Date.now());
-  useEffect(() => {
-    const id = window.setInterval(() => setSecondTick(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
 
   const { currentShifts, nextShifts } = useMemo(() => {
     const now = new Date(nowTick);
@@ -806,97 +800,6 @@ function DashboardPage() {
     }
   }
 
-  // ---- Timer ---------------------------------------------------------------
-  async function startTimer(task: TaskItem) {
-    if (!familyId || task.timerMinutes == null) return;
-    const profileId = activeCaregiverId ?? null;
-    const nowIso = new Date().toISOString();
-    try {
-      if (task.source.kind === "dose") {
-        if (!child) return;
-        await logDose.mutateAsync({
-          family_id: familyId,
-          child_id: child.id,
-          medication_id: task.source.dose.medication.id,
-          scheduled_for: task.source.dose.scheduled_for.toISOString(),
-          status: "ongoing" as never,
-          given_by: user?.id ?? null,
-          caregiver_profile_id: profileId,
-          ongoing_started_at: nowIso,
-          ongoing_started_by: user?.id ?? null,
-          timer_started_at: nowIso,
-          timer_started_by: profileId,
-        } as never);
-      } else if (task.source.kind === "appt") {
-        const a = task.source.appt;
-        await logAppt.mutateAsync({
-          family_id: familyId,
-          appointment_id: a.master_id ?? a.id,
-          occurrence_at: a.occurrence_start,
-          status: "ongoing" as never,
-          completed_by: user?.id ?? null,
-          caregiver_profile_id: profileId,
-          ongoing_started_at: nowIso,
-          ongoing_started_by: user?.id ?? null,
-          timer_started_at: nowIso,
-          timer_started_by: profileId,
-        } as never);
-      }
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
-  }
-
-  async function autoCompleteTimer(task: TaskItem) {
-    if (!familyId) return;
-    const profileId = task.byProfileId ?? activeCaregiverId ?? null;
-    try {
-      if (task.source.kind === "dose") {
-        if (!child) return;
-        await logDose.mutateAsync({
-          family_id: familyId,
-          child_id: child.id,
-          medication_id: task.source.dose.medication.id,
-          scheduled_for: task.source.dose.scheduled_for.toISOString(),
-          status: "given",
-          given_by: task.byUserId ?? user?.id ?? null,
-          caregiver_profile_id: profileId,
-        });
-      } else if (task.source.kind === "appt") {
-        const a = task.source.appt;
-        await logAppt.mutateAsync({
-          family_id: familyId,
-          appointment_id: a.master_id ?? a.id,
-          occurrence_at: a.occurrence_start,
-          status: "done",
-          completed_by: task.byUserId ?? user?.id ?? null,
-          caregiver_profile_id: profileId,
-        });
-      }
-      toast.success(t("schedule.autoCompleted", { title: task.title }));
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
-  }
-
-  // Auto-complete tasks whose timer has elapsed.
-  const firingRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    const nowMs = secondTick;
-    for (const tk of tasks) {
-      if (tk.status !== "ongoing") continue;
-      if (tk.timerMinutes == null || !tk.timerStartedAt) continue;
-      const endMs = tk.timerStartedAt.getTime() + tk.timerMinutes * 60_000;
-      if (nowMs >= endMs && !firingRef.current.has(tk.id)) {
-        firingRef.current.add(tk.id);
-        void autoCompleteTimer(tk).finally(() => {
-          // Allow re-fire if status reverts (shouldn't normally).
-          window.setTimeout(() => firingRef.current.delete(tk.id), 5000);
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [secondTick, tasks]);
 
 
   const deleteVital = useDeleteVital();
@@ -1235,28 +1138,12 @@ function DashboardPage() {
                           >
                             {task.title}
                           </span>
-                          {isOngoing && (() => {
-                            const hasTimer = task.timerMinutes != null && task.timerStartedAt;
-                            if (hasTimer) {
-                              const endMs = task.timerStartedAt!.getTime() + task.timerMinutes! * 60_000;
-                              const remaining = Math.max(0, endMs - secondTick);
-                              const mm = Math.floor(remaining / 60_000);
-                              const ss = Math.floor((remaining % 60_000) / 1000);
-                              const timeStr = `${mm}:${String(ss).padStart(2, "0")}`;
-                              return (
-                                <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary-soft rounded-full px-2 py-0.5 inline-flex items-center gap-1 tabular-nums">
-                                  <Clock className="size-3" />
-                                  {t("schedule.timerRunning", { time: timeStr })}
-                                </span>
-                              );
-                            }
-                            return (
-                              <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary-soft rounded-full px-2 py-0.5 inline-flex items-center gap-1">
-                                <Play className="size-3" />
-                                {t("schedule.ongoing")}
-                              </span>
-                            );
-                          })()}
+                          {isOngoing && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary-soft rounded-full px-2 py-0.5 inline-flex items-center gap-1">
+                              <Play className="size-3" />
+                              {t("schedule.ongoing")}
+                            </span>
+                          )}
                           {isMissed && isPending && (
                             <span className="text-[10px] font-bold uppercase tracking-wide text-destructive bg-destructive/10 rounded-full px-2 py-0.5">
                               {t("schedule.missed")}
@@ -1331,21 +1218,6 @@ function DashboardPage() {
                               <Play className="size-4" />
                               <span className="ml-1 hidden sm:inline">
                                 {t("schedule.markOngoing")}
-                              </span>
-                            </Button>
-                          )}
-                          {task.timerMinutes != null && !isOngoing && task.scheduledFor.getTime() - now.getTime() <= 5 * 60 * 1000 && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="rounded-full font-bold h-9 w-9 p-0 sm:h-10 sm:w-auto sm:px-4 border-primary/40 text-primary hover:bg-primary-soft"
-                              onClick={() => startTimer(task)}
-                              aria-label={t("schedule.startTimer")}
-                              title={t("schedule.startTimer")}
-                            >
-                              <Clock className="size-4" />
-                              <span className="ml-1 hidden sm:inline">
-                                {t("schedule.startTimer")} ({task.timerMinutes}m)
                               </span>
                             </Button>
                           )}
