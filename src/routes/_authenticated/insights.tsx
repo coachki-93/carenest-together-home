@@ -424,11 +424,8 @@ function HeatmapSection({ data }: { data: NonNullable<ReturnType<typeof useInsig
               </div>
             ))}
             {Array.from({ length: 7 }).map((_, dow) => (
-              <>
-                <div
-                  key={`label-${dow}`}
-                  className="text-[10px] text-muted-foreground pr-1 flex items-center"
-                >
+              <div key={`row-${dow}`} className="contents">
+                <div className="text-[10px] text-muted-foreground pr-1 flex items-center">
                   {days[dow] ?? ""}
                 </div>
                 {Array.from({ length: 24 }).map((_, hour) => {
@@ -451,8 +448,9 @@ function HeatmapSection({ data }: { data: NonNullable<ReturnType<typeof useInsig
                     />
                   );
                 })}
-              </>
+              </div>
             ))}
+
           </div>
         </div>
       )}
