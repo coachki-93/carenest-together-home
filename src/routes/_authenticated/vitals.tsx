@@ -695,7 +695,7 @@ function FluidsChart({
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={bucketed} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+            <BarChart data={bucketed} margin={{ top: 5, right: 8, left: 0, bottom: 8 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="ts"
@@ -719,6 +719,7 @@ function FluidsChart({
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 stroke="var(--border)"
                 tickFormatter={(v) => `${v}ml`}
+                width={48}
               />
               <Tooltip
                 contentStyle={{
