@@ -195,6 +195,12 @@ function VitalsPage() {
       }
     >
       <div className="space-y-6">
+        {/* Screening disclaimer */}
+        <div className="rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground flex gap-2">
+          <Info className="size-4 shrink-0 mt-0.5" />
+          <span>{t("vitals.disclaimer")}</span>
+        </div>
+
         {/* Overview tiles */}
         <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
           {(
@@ -210,6 +216,7 @@ function VitalsPage() {
                 onLog={() => openLogFor(type)}
                 lang={i18n.language}
                 ageMonths={ageMonths}
+                overrides={rangeOverrides}
                 now={now}
               />
             );
@@ -237,12 +244,13 @@ function VitalsPage() {
 
         {/* Trend charts */}
         <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <TrendCard type="heart_rate" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
-          <TrendCard type="spo2" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
-          <TrendCard type="temperature" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
-          <TrendCard type="breathing" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
+          <TrendCard type="heart_rate" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
+          <TrendCard type="spo2" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
+          <TrendCard type="temperature" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
+          <TrendCard type="breathing" vitals={vitals} range={range} ageMonths={ageMonths} overrides={rangeOverrides} now={now} />
           <FluidsChart vitals={vitals} range={range} />
         </section>
+
 
         {/* History */}
         <section className="card-soft p-6">
