@@ -270,6 +270,9 @@ function VitalsPage() {
         </section>
 
 
+        {/* Pediatric reference table */}
+        <PediatricRangesTable />
+
         {/* History */}
         <section className="card-soft p-6">
           <h3 className="text-lg font-extrabold mb-4">{t("vitals.history")}</h3>
@@ -284,19 +287,42 @@ function VitalsPage() {
               </Button>
             </div>
           ) : (
-            <ul className="space-y-2">
-              {vitals.slice(0, 50).map((v) => (
-                <HistoryRow
-                  key={v.id}
-                  vital={v}
-                  onDelete={() => setConfirmDel(v)}
-                  lang={i18n.language}
-                />
-              ))}
-            </ul>
+            <>
+              <ul className="space-y-2">
+                {(showAllHistory ? vitals.slice(0, 50) : vitals.slice(0, 5)).map((v) => (
+                  <HistoryRow
+                    key={v.id}
+                    vital={v}
+                    onDelete={() => setConfirmDel(v)}
+                    lang={i18n.language}
+                  />
+                ))}
+              </ul>
+              {vitals.length > 5 && (
+                <div className="flex justify-center mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full font-bold gap-1.5"
+                    onClick={() => setShowAllHistory((s) => !s)}
+                  >
+                    {showAllHistory ? (
+                      <>
+                        {t("vitals.showLess")} <ChevronUp className="size-4" />
+                      </>
+                    ) : (
+                      <>
+                        {t("vitals.showMore")} <ChevronDown className="size-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </div>
+
 
       <LogReadingDialog
         open={openLog}
