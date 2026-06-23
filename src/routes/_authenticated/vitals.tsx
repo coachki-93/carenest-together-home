@@ -540,7 +540,7 @@ function TrendCard({
                 <>
                   {" · "}
                   {t("vitals.avg")} {fmtVal(type, stats.avg)}
-                  {last?.unit ? ` ${last.unit}` : ""}
+                  {` ${DEFAULT_UNIT[type]}`}
                 </>
               )}
             </div>
