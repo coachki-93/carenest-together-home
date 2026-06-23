@@ -132,6 +132,11 @@ function VitalsPage() {
   const deleteVital = useDeleteVital();
   const now = useNow(60_000);
   const ageMonths = ageMonthsFromDob(child?.date_of_birth);
+  const rangeOverrides = useMemo(
+    () => parseRangeOverrides(child?.custom_vital_ranges),
+    [child?.custom_vital_ranges],
+  );
+
 
   // Vitals trimmed to the current range, used by trend charts + history.
   const rangeCutoff = now - sinceHours * 3_600_000;
