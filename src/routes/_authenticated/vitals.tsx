@@ -226,11 +226,17 @@ function VitalsPage() {
           ))}
         </section>
 
+        {/* Quick compare */}
+        {range !== "30d" && (
+          <QuickCompareCard allVitals={allVitals} ageMonths={ageMonths} now={now} />
+        )}
+
         {/* Trend charts */}
         <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <TrendCard type="heart_rate" vitals={vitals} range={range} />
-          <TrendCard type="spo2" vitals={vitals} range={range} />
-          <TrendCard type="temperature" vitals={vitals} range={range} />
+          <TrendCard type="heart_rate" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
+          <TrendCard type="spo2" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
+          <TrendCard type="temperature" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
+          <TrendCard type="breathing" vitals={vitals} range={range} ageMonths={ageMonths} now={now} />
           <FluidsChart vitals={vitals} range={range} />
         </section>
 
