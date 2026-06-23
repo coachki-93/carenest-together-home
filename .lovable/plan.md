@@ -1,80 +1,69 @@
-## Trends & Insights — implementation plan
+# Vitals page improvements
 
-A new `/insights` page that turns existing oxygen, vitals, care-place check, and medication data into weekly/monthly views the team and doctors can act on.
+Scope: enhance the existing `/vitals` page only. No new routes, no business-logic changes outside the vitals module. All strings go through i18n (en + sv).
 
----
+## 1. Breathing rate chart
 
-### Scope
+- Add `breathing` to `VITAL_RANGES` in `src/lib/data/vitals.ts` with age-adjusted defaults (see section 3).
+- Add a `breathing` overview tile to the top grid (becomes 6 tiles; layout: `grid-cols-2 md:grid-cols-3 xl:grid-cols-6`).
+- Add a `<TrendCard type="breathing" />` to the trend chart grid, next to heart rate / SpO₂ / temperature.
+- Reuse existing `TrendCard` — no new chart component needed.
 
-- New top-level authenticated route `/insights` with a sidebar entry.
-- Range picker: **7 days** (default), **30 days**, **90 days**.
-- Five sections, in this order, each scoped to the active child via `useActiveProfile` / family context already in the app:
-  1. **Oxygen usage** — daily L/min hours + tanks replaced (line + small stat).
-  2. **Vitals trends** — small-multiples line charts per metric (SpO₂, heart rate, temperature, respiration). Each chart shows min/avg/max per day.
-  3. **Care-place check reliability** — stacked bar per day: done / late / missed.
-  4. **Medication adherence** — line of % scheduled doses logged on time per day.
-  5. **Missed-check heatmap** — 7×24 grid (day-of-week × hour) coloured by miss density across the range.
-- Empty states per section ("Not enough data yet").
-- Bilingual: all new strings in both `en.ts` and `sv.ts`.
-- `<LanguageToggle />` in the page header per project rule.
+## 2. Per-range averages on each chart
 
-Out of scope for this slice: PDF export, doctor share link, incident overlay (depends on #2 which is dropped), push notifications. Can come later if useful.
+- In `TrendCard`, compute `avg`, `min`, `max` from the filtered `points` for the active range.
+- Show inline next to the existing "Last 24 hours" subtitle, e.g. `Last 24 hours · avg 134 bpm` (round to type-appropriate precision: integer for HR/SpO₂/breathing, 1 decimal for temp).
+- Add `min · max` as a small secondary line under the average.
+- For SpO₂, also show "% time in range" since average hides desats.
+- Skip averages on the fluids bar chart (it's a daily sum, not a trend).
 
----
+## 3. Age-adjusted normal ranges + out-of-range highlighting
 
-### Data flow
+Replace the static `VITAL_RANGES` constant with a function `getVitalRanges(ageMonths)` that returns ranges based on the child's age (derived from `children.date_of_birth`):
 
-One server function powers the whole page:
-
-```
-getInsights({ range: '7d' | '30d' | '90d' })
-  → { oxygen, vitals, carePlace, medications, missedHeatmap }
-```
-
-- File: `src/lib/data/insights.functions.ts`.
-- Uses `createServerFn({ method: 'GET' })` + `.middleware([requireSupabaseAuth])` so RLS scopes everything to the caller's family automatically.
-- Reads the active child id from input (validated with Zod), defaults to the family's primary child.
-- Aggregates server-side (a few `select` queries + JS bucketing by day/hour) so the client gets ~5 small arrays, not raw rows.
-- Returns plain DTOs only.
-
-Route shape (per project canonical pattern):
-
-```
-src/routes/_authenticated/insights.tsx
-  loader: ensureQueryData(insightsQueryOptions(range, childId))
-  component: useSuspenseQuery(...)
+```text
+Age band         HR (bpm)   Breathing (/min)   SpO₂   Temp (°C)
+0–3 mo           100–160     30–60             94–100  36.0–37.5
+3–12 mo           90–150     24–40             94–100  36.0–37.5
+1–3 yr            80–140     20–30             94–100  36.0–37.5
+3–6 yr            75–130     18–25             94–100  36.0–37.5
+6–12 yr           70–120     16–22             94–100  36.0–37.5
+12+ yr            60–110     12–20             94–100  36.0–37.5
 ```
 
-`range` lives in URL search params via `validateSearch` so it's bookmarkable and survives reload. `loaderDeps` includes range + childId so changing either refetches.
+Behaviour:
+- `vitalStatus(type, value, ageMonths)` uses the age-band ranges.
+- `TrendCard` `ReferenceArea` uses the same age-band range.
+- Add an "Abnormal readings" badge on each `TrendCard` and overview tile: count of points in the active range that fall outside the band (e.g. "3 out of range"). Clicking the badge scrolls to history filtered to that type (history filter is light — just a chip; full filter UX is out of scope).
+- Reference ranges are informational; copy makes that clear via a small `(?)` tooltip on the range chip.
 
-### Aggregation per section (using existing tables)
+Out of scope for this iteration: per-child custom range overrides (UI to edit ranges). Can be added later if needed.
 
-- **Oxygen** — `oxygen_tanks` rows whose `start_at` overlaps the range. For each day, sum effective minutes (`end_at|now − start_at − paused_seconds`) × L/min. Count tanks where `replaced_at` falls in the day. No schema change.
-- **Vitals** — `vitals` rows in the range. Group by `recorded_at::date` and metric type; compute min/avg/max per (day, metric).
-- **Care-place reliability** — join `care_place_check_times` (scheduled) with `care_place_checks` (done) and `care_place_missed_checks` (missed). Per day: done count, late count (done > scheduled + grace), missed count.
-- **Medication adherence** — for each `medications` row with a schedule in range, count expected doses vs `med_dose_events` / `med_logs` where `taken_at` ≤ scheduled + window. Per day: `% on_time`.
-- **Heatmap** — `care_place_missed_checks` in range, bucketed by `extract(dow)` × `extract(hour)`.
+## 4. Last-reading freshness indicator
 
-### UI
+- On each overview tile, replace the small time label with a "X min ago / X h ago" relative string (live, recomputed every 60s via a tiny `useNow()` hook).
+- When the gap exceeds a per-type stale threshold (HR 6h, SpO₂ 6h, breathing 6h, temp 12h, fluids: skip), the tile gets a soft warning border + a "Due for check" tag. No push notification in this iteration — purely visual.
+- Add the same relative timestamp under the big number inside each `TrendCard` header.
 
-- `recharts` (add via `bun add recharts` if not present). All charts use semantic tokens from `src/styles.css`, no hardcoded colors.
-- Layout: page header (title, range picker, child switcher already global), then a `card-soft` per section using the same shell the rest of the app uses.
-- Each section is a small `Insights*Section.tsx` component under `src/components/carenest/insights/` — keeps the route file thin.
-- Loading: route `pendingComponent` shows skeleton cards. Errors: route `errorComponent` with retry that calls `router.invalidate()`.
-- Mobile-first; charts use `ResponsiveContainer`.
+## 5. Quick compare (today / yesterday / 7-day average)
 
-### Navigation
+- New small `<QuickCompareCard />` rendered above the trend chart grid, one row of three stats per metric (HR, SpO₂, temp, breathing).
+- Columns: **Today avg**, **Yesterday avg**, **7-day avg**, with arrow indicator vs 7-day baseline (`▲` if today > 7d avg by > 5%, `▼` if lower, `–` otherwise; color follows abnormal-range status, not direction).
+- Hidden on `30d` range — only meaningful on shorter views; the user can still scroll trend charts.
+- Pull data from a single `useVitals(familyId, { sinceHours: 24*7 })` call (reuse query, no extra round trips).
 
-- Add an entry to `AppSidebar` between Today and Schedule.
-- Add `t('insights.*')` keys for: page title, range labels (7d/30d/90d), section titles, empty states, metric names.
+## Technical details
 
-### Build order (single slice)
+Files changed:
+- `src/lib/data/vitals.ts` — add `breathing` range, add `getVitalRanges(ageMonths)`, update `vitalStatus` signature, add helper `ageMonthsFromDob(dob)`.
+- `src/routes/_authenticated/vitals.tsx` — add `breathing` to overview + trend grids; extend `TrendCard` with avg/min/max + abnormal count; add `QuickCompareCard`; add freshness logic + `useNow` hook.
+- `src/lib/i18n/en.ts` + `src/lib/i18n/sv.ts` — new keys: `vitals.breathing`, `vitals.avg`, `vitals.minMax`, `vitals.timeInRange`, `vitals.abnormalCount`, `vitals.dueForCheck`, `vitals.relMinutes`, `vitals.relHours`, `vitals.relDays`, `vitals.compareTitle`, `vitals.today`, `vitals.yesterday`, `vitals.sevenDayAvg`, `vitals.rangeInfoTooltip`.
 
-1. Add `recharts` if missing.
-2. Write `getInsights` server fn + Zod validator + tests via the dev server preview.
-3. Add i18n keys to `en.ts` + `sv.ts`.
-4. Create the route + section components.
-5. Add sidebar entry.
-6. Verify with real data on `/insights?range=7d`, then 30d/90d.
+Data: no DB schema or RLS changes. No new server functions. Pure client-side aggregation over existing `useVitals` results.
 
-No schema changes, no RLS work, no new tables. After this lands and you've used it for a bit, ping me and we'll restart on **Hospital mode = full context** (#3).
+Out of scope (will revisit later per your earlier instructions):
+- Inline context per reading (oxygen flow, asleep/awake) — needs schema change.
+- Correlations (SpO₂ vs O₂ flow).
+- Export / printable doctor summary.
+- Push reminders for stale readings.
+- Per-child editable ranges UI.
