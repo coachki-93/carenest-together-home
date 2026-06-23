@@ -937,6 +937,28 @@ function LogReadingDialog({
             </div>
           </div>
           <div>
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {t("vitals.contextLabel")}
+            </Label>
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {VITAL_CONTEXTS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setContext(context === c ? null : c)}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
+                    context === c
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border bg-background hover:bg-muted",
+                  )}
+                >
+                  {t(`vitals.context.${c}` as const)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
             <Label
               htmlFor="vital-notes"
               className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
@@ -951,6 +973,7 @@ function LogReadingDialog({
               rows={3}
             />
           </div>
+
         </div>
         <DialogFooter>
           <Button
