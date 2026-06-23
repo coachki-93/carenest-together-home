@@ -210,6 +210,88 @@ function ChildProfilePage() {
           )}
         />
 
+        <section className="space-y-3">
+          <div>
+            <h3 className="font-semibold">{t("childPage.rangesTitle")}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t("childPage.rangesHelp")}
+            </p>
+          </div>
+          <div className="space-y-2">
+            {(["heart_rate", "spo2", "temperature", "breathing"] as VitalType[]).map((vt) => {
+              const def = defaultRanges[vt];
+              const ov = customRanges[vt];
+              const unit = vt === "heart_rate" ? "bpm" : vt === "spo2" ? "%" : vt === "temperature" ? "°C" : "br/min";
+              const setField = (field: "low" | "high", raw: string) => {
+                const n = raw === "" ? undefined : Number(raw);
+                setCustomRanges((prev) => {
+                  const next = { ...prev };
+                  const cur = { ...(next[vt] ?? {}) };
+                  if (n === undefined || Number.isNaN(n)) delete cur[field];
+                  else cur[field] = n;
+                  if (cur.low == null && cur.high == null) delete next[vt];
+                  else next[vt] = cur;
+                  return next;
+                });
+              };
+              const reset = () =>
+                setCustomRanges((prev) => {
+                  const next = { ...prev };
+                  delete next[vt];
+                  return next;
+                });
+              const hasOverride = ov?.low != null || ov?.high != null;
+              return (
+                <div key={vt} className="rounded-xl border border-border/60 p-3 flex flex-wrap items-center gap-3">
+                  <div className="min-w-[110px] font-semibold text-sm">
+                    {t(`vitals.${vt === "heart_rate" ? "heartRate" : vt === "temperature" ? "temp" : vt}` as const)}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      step={vt === "temperature" ? "0.1" : "1"}
+                      placeholder={def ? String(def.low) : ""}
+                      value={ov?.low ?? ""}
+                      onChange={(e) => setField("low", e.target.value)}
+                      className="h-10 w-20 rounded-xl"
+                    />
+                    <span className="text-muted-foreground">–</span>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      step={vt === "temperature" ? "0.1" : "1"}
+                      placeholder={def ? String(def.high) : ""}
+                      value={ov?.high ?? ""}
+                      onChange={(e) => setField("high", e.target.value)}
+                      className="h-10 w-20 rounded-xl"
+                    />
+                    <span className="text-xs text-muted-foreground font-semibold">{unit}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {def
+                      ? t("childPage.rangesDefault", { low: def.low, high: def.high })
+                      : ""}
+                  </div>
+                  {canEdit && hasOverride && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full ml-auto"
+                      onClick={reset}
+                    >
+                      <RotateCcw className="size-3.5" /> {t("childPage.rangesReset")}
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+
+
         {canEdit && (
           <div className="flex justify-end">
             <Button type="submit" disabled={updateChild.isPending} className="rounded-full h-12 px-8 text-base font-semibold">
