@@ -593,7 +593,12 @@ export const en = {
     emptyTitle: "No child profile yet",
     emptyBody: "Finish onboarding to set up your child's profile.",
     readOnlyNotice: "You're viewing this profile as a caregiver. Only family owners can make changes.",
+    rangesTitle: "Vital reference ranges",
+    rangesHelp: "Defaults are age-adjusted screening values. Override them per vital if your child's doctor recommends a different normal range.",
+    rangesDefault: "Default {{low}}–{{high}}",
+    rangesReset: "Reset",
   },
+
   caregiversPage: {
     subtitle: "Your care team and pending invites.",
     members: "Care team",
