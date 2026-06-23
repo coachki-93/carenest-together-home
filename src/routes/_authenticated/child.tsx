@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Loader2, Plus, X, Baby } from "lucide-react";
+import { Loader2, Plus, X, Baby, RotateCcw } from "lucide-react";
 import { z } from "zod";
 import { toast } from "@/lib/notify";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
@@ -13,6 +13,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useFamilyChild } from "@/lib/data/medications";
 import { useUpdateChild } from "@/lib/data/family";
+import {
+  ageMonthsFromDob,
+  getVitalRanges,
+  parseRangeOverrides,
+  type VitalRangeOverrides,
+  type VitalType,
+} from "@/lib/data/vitals";
+
 
 export const Route = createFileRoute("/_authenticated/child")({
   head: () => ({ meta: [{ title: "Child profile — CareNest" }] }),
