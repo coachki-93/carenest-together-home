@@ -20,7 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { CaregiverProfile } from "@/lib/data/caregiver-profiles";
-import type { VitalType } from "@/lib/data/vitals";
+import { VITAL_CONTEXTS, type VitalType, type VitalContext } from "@/lib/data/vitals";
+import { cn } from "@/lib/utils";
 
 export type TaskAction = "done" | "skipped" | "postponed";
 
@@ -30,6 +31,7 @@ export interface TaskActionResult {
   reason: string | null;
   postponedTo: Date | null;
   vitalValue: number | null;
+  vitalContext: VitalContext | null;
   notes: string | null;
 }
 
@@ -80,6 +82,7 @@ export function TaskActionDialog({
   const [postponedDate, setPostponedDate] = useState("");
   const [postponedTime, setPostponedTime] = useState("");
   const [vitalValue, setVitalValue] = useState("");
+  const [vitalContext, setVitalContext] = useState<VitalContext | null>(null);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -87,6 +90,7 @@ export function TaskActionDialog({
     setProfileId(defaultProfileId);
     setReason("");
     setVitalValue(vitalSpec?.defaultValue != null ? String(vitalSpec.defaultValue) : "");
+    setVitalContext(null);
     setNotes("");
     // Default postpone to scheduled + 1 hour, local
     const plusOneHour = new Date(scheduledFor.getTime() + 60 * 60 * 1000);
@@ -152,6 +156,7 @@ export function TaskActionDialog({
       reason: trimmedReason ? trimmedReason : null,
       postponedTo,
       vitalValue: showVital && !Number.isNaN(vitalNum) ? vitalNum : null,
+      vitalContext: showVital ? vitalContext : null,
       notes: showNotes && trimmedNotes ? trimmedNotes : null,
     });
   }
@@ -183,6 +188,28 @@ export function TaskActionDialog({
                 />
                 <div className="h-9 px-3 rounded-xl border border-input bg-muted/40 flex items-center text-sm font-semibold text-muted-foreground">
                   {vitalSpec.unit || "—"}
+                </div>
+              </div>
+              <div className="pt-1">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {t("vitals.contextLabel")}
+                </Label>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  {VITAL_CONTEXTS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setVitalContext(vitalContext === c ? null : c)}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
+                        vitalContext === c
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "border-border bg-background hover:bg-muted",
+                      )}
+                    >
+                      {t(`vitals.context.${c}` as const)}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
