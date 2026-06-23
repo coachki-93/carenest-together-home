@@ -837,6 +837,7 @@ function LogReadingDialog({
   const [value, setValue] = useState("");
   const [unit, setUnit] = useState(DEFAULT_UNIT[presetType ?? "heart_rate"]);
   const [notes, setNotes] = useState("");
+  const [context, setContext] = useState<VitalContext | null>(null);
 
   // Reset when opening
   useMemo(() => {
@@ -846,6 +847,7 @@ function LogReadingDialog({
       setUnit(DEFAULT_UNIT[t0]);
       setValue("");
       setNotes("");
+      setContext(null);
     }
   }, [open, presetType]);
 
@@ -863,10 +865,13 @@ function LogReadingDialog({
       value: num,
       unit: unit || DEFAULT_UNIT[type],
       notes: notes.trim() || null,
+      context: context,
     });
     toast.success(t("vitals.saved"));
     onOpenChange(false);
   }
+
+
 
   function onTypeChange(v: VitalType) {
     setType(v);
