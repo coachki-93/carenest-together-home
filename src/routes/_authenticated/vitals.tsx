@@ -122,9 +122,20 @@ function VitalsPage() {
   const [confirmDel, setConfirmDel] = useState<Vital | null>(null);
 
   const sinceHours = HOURS[range];
-  const { data: vitals = [] } = useVitals(familyId, { sinceHours });
+  // Fetch at least 7 days so the QuickCompare card has data even on 24h view.
+  const fetchHours = Math.max(sinceHours, 24 * 7);
+  const { data: allVitals = [] } = useVitals(familyId, { sinceHours: fetchHours });
   const { data: latestMap } = useLatestVitals(familyId);
   const deleteVital = useDeleteVital();
+  const now = useNow(60_000);
+  const ageMonths = ageMonthsFromDob(child?.date_of_birth);
+
+  // Vitals trimmed to the current range, used by trend charts + history.
+  const rangeCutoff = now - sinceHours * 3_600_000;
+  const vitals = useMemo(
+    () => allVitals.filter((v) => new Date(v.logged_at).getTime() >= rangeCutoff),
+    [allVitals, rangeCutoff],
+  );
 
   const childName = child?.name ?? t("dashboard.yourChild");
 
