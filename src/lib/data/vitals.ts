@@ -115,15 +115,68 @@ export function useDeleteVital() {
   });
 }
 
-/** Healthy reference ranges (rough guidance — informational only). */
+/** Default reference ranges when child age is unknown (rough guidance — informational only). */
 export const VITAL_RANGES: Partial<Record<VitalType, { low: number; high: number }>> = {
   heart_rate: { low: 60, high: 130 },
   spo2: { low: 94, high: 100 },
   temperature: { low: 36.0, high: 37.5 },
+  breathing: { low: 12, high: 30 },
 };
 
-export function vitalStatus(type: VitalType, value: number): "low" | "ok" | "high" | "neutral" {
-  const r = VITAL_RANGES[type];
+type Range = { low: number; high: number };
+
+/** Age-adjusted reference ranges. Pass undefined ageMonths to fall back to default ranges. */
+export function getVitalRanges(
+  ageMonths: number | null | undefined,
+): Partial<Record<VitalType, Range>> {
+  const spo2: Range = { low: 94, high: 100 };
+  const temperature: Range = { low: 36.0, high: 37.5 };
+  if (ageMonths == null || Number.isNaN(ageMonths)) {
+    return { ...VITAL_RANGES };
+  }
+  let heart_rate: Range;
+  let breathing: Range;
+  if (ageMonths < 3) {
+    heart_rate = { low: 100, high: 160 };
+    breathing = { low: 30, high: 60 };
+  } else if (ageMonths < 12) {
+    heart_rate = { low: 90, high: 150 };
+    breathing = { low: 24, high: 40 };
+  } else if (ageMonths < 36) {
+    heart_rate = { low: 80, high: 140 };
+    breathing = { low: 20, high: 30 };
+  } else if (ageMonths < 72) {
+    heart_rate = { low: 75, high: 130 };
+    breathing = { low: 18, high: 25 };
+  } else if (ageMonths < 144) {
+    heart_rate = { low: 70, high: 120 };
+    breathing = { low: 16, high: 22 };
+  } else {
+    heart_rate = { low: 60, high: 110 };
+    breathing = { low: 12, high: 20 };
+  }
+  return { heart_rate, spo2, temperature, breathing };
+}
+
+export function ageMonthsFromDob(dob: string | null | undefined): number | null {
+  if (!dob) return null;
+  const d = new Date(dob);
+  if (Number.isNaN(d.getTime())) return null;
+  const now = new Date();
+  return (
+    (now.getFullYear() - d.getFullYear()) * 12 +
+    (now.getMonth() - d.getMonth()) +
+    (now.getDate() < d.getDate() ? -1 : 0)
+  );
+}
+
+export function vitalStatus(
+  type: VitalType,
+  value: number,
+  ageMonths?: number | null,
+): "low" | "ok" | "high" | "neutral" {
+  const ranges = ageMonths !== undefined ? getVitalRanges(ageMonths) : VITAL_RANGES;
+  const r = ranges[type];
   if (!r) return "neutral";
   if (value < r.low) return "low";
   if (value > r.high) return "high";
