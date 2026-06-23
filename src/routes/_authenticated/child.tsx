@@ -96,7 +96,9 @@ function ChildProfilePage() {
           photo_url: photoPath,
           emergency_contacts: contacts.filter((c) => c.name.trim()) as unknown as never,
           doctors: doctors.filter((d) => d.name.trim()) as unknown as never,
+          custom_vital_ranges: customRanges as unknown as never,
         },
+
       });
       toast.success(t("childPage.saved"));
     } catch (err) {
