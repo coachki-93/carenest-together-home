@@ -519,23 +519,50 @@ export const en = {
     seePediatricTable: "See pediatric table",
     pediatricTable: {
       title: "Pediatric reference ranges",
-      subtitle: "Awake / resting values by age — screening only.",
+      subtitle: "Age-based screening values — not a substitute for clinical assessment.",
+      footer:
+        "Reference ranges based on Fleming et al. 2011 (Lancet), PALS 2015, WHO guidelines, and AAP recommendations. For caregiver guidance only — not a substitute for clinical assessment.",
       colAge: "Age",
-      colHeartRate: "Heart rate (bpm)",
-      colBreathing: "Breathing (br/min)",
-      colSpO2: "SpO₂ (%)",
-      colTemp: "Temperature",
-      tempNote: "≥ 38.0 °C = fever",
-      ages: {
-        "0_3m": "0–3 months",
-        "3_6m": "3–6 months",
-        "6_12m": "6–12 months",
-        "1_3y": "1–3 years",
-        "3_6y": "3–6 years",
-        "6_12y": "6–12 years",
-        "12_18y": "12–18 years",
+      hr: {
+        title: "Heart rate (beats per minute)",
+        note: "Measure only when the child is calm and resting. Crying, feeding, or activity will raise heart rate significantly and make the reading meaningless. Count for 60 seconds or use a pulse oximeter.",
+        colAwake: "Awake, resting",
+        colAsleep: "Asleep",
+        warning:
+          "Heart rate below 60 bpm in an infant with signs of poor colour, limpness, or not responding — call emergency services immediately.",
+      },
+      br: {
+        title: "Breathing rate (breaths per minute)",
+        note: "Count only when the child is calm, preferably asleep or just woken. Watch the chest rise for a full 60 seconds — do not estimate. Breathing rate is the most sensitive early warning sign of respiratory illness in children.",
+        colNormal: "Normal (10th–90th centile)",
+        colTachy: "Tachypnoea threshold (WHO)",
+        footnote:
+          "Tachypnoea = breathing too fast. Values at or above this threshold warrant medical review.",
+      },
+      spo2: {
+        title: "Oxygen saturation — SpO₂ (%)",
+        note: "Use a pulse oximeter on a calm, still child. Movement and cold hands cause inaccurate readings. SpO₂ is naturally lower in the first days of life — the ranges below apply from 1 week of age onward. Nail polish or dark skin tone can slightly affect accuracy; reposition the probe if reading seems inconsistent.",
+        colNormal: "Normal SpO₂",
+        colAdvice: "Seek medical advice",
+        colEmergency: "Emergency threshold",
+        warning:
+          "SpO₂ below 92% at any age after the first week of life — seek emergency care. Do not wait to see if it improves.",
+        newbornNote:
+          "The 0–24 hour and 1–7 day rows are included for completeness. Newborns in this period should be under hospital or midwife care — this tool is not a substitute for that.",
+      },
+      temp: {
+        title: "Body temperature",
+        note: "The fever threshold is the same for all ages: 38.0 °C or above. Method matters — rectal is most accurate in infants under 3 years. Axillary (armpit) readings run approximately 0.5 °C lower than true temperature. Tympanic (ear) thermometers are unreliable under 6 months.",
+        colNormal: "Normal range",
+        colFever: "Fever",
+        colAction: "Action",
+        methodTitle: "Measurement method offsets",
+        colMethod: "Method",
+        colOffset: "Typical offset vs. true temperature",
+        colSuitable: "Suitable from",
       },
     },
+
 
 
   },
