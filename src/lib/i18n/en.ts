@@ -560,7 +560,27 @@ export const en = {
         colMethod: "Method",
         colOffset: "Typical offset vs. true temperature",
         colSuitable: "Suitable from",
+      ages: {
+        "0_1m": "0–1 month",
+        "1_3m": "1–3 months",
+        "3_6m": "3–6 months",
+        "6_12m": "6–12 months",
+        "1_2y": "1–2 years",
+        "2_3y": "2–3 years",
+        "3_5y": "3–5 years",
+        "6_9y": "6–9 years",
+        "10_12y": "10–12 years",
+        "12_18y": "12–18 years",
+        "0_3m": "0–3 months",
+        "0_24h": "0–24 hours",
+        "1_7d": "1–7 days",
+        "1w_3m": "1 week – 3 months",
+        "3m_18y": "3 months – 18 years",
+        "u3m": "Under 3 months",
+        "6m_2y": "6 months – 2 years",
+        "2_18y": "2–18 years",
       },
+
     },
 
 
