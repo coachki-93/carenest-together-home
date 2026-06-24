@@ -1084,8 +1084,6 @@ function PediatricRangesTable() {
   ];
 
   const spo2Rows = [
-    { k: "0_24h", normal: "90–100%", advice: "Below 90%", emerg: "Below 85%" },
-    { k: "1_7d", normal: "93–100%", advice: "Below 92%", emerg: "Below 88%" },
     { k: "1w_3m", normal: "95–100%", advice: "Below 94%", emerg: "Below 90%" },
     { k: "3m_18y", normal: "96–100%", advice: "Below 95%", emerg: "Below 92%" },
   ];
