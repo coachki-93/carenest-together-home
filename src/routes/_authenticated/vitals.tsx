@@ -1099,6 +1099,39 @@ function PediatricRangesTable() {
 
   const methodKeys = ["rectal", "temporal", "tympanic", "oral", "axillary"] as const;
 
+  const tabs = [
+    { id: "hr" as const, label: t("vitals.pediatricTable.hr.title"), accent: "sky" },
+    { id: "br" as const, label: t("vitals.pediatricTable.br.title"), accent: "emerald" },
+    { id: "spo2" as const, label: t("vitals.pediatricTable.spo2.title"), accent: "orange" },
+    { id: "temp" as const, label: t("vitals.pediatricTable.temp.title"), accent: "rose" },
+  ];
+  type TabId = (typeof tabs)[number]["id"];
+  const [active, setActive] = useState<TabId>("hr");
+  const accentMap: Record<string, { border: string; text: string; btn: string }> = {
+    sky: {
+      border: "border-l-sky-500",
+      text: "text-sky-700 dark:text-sky-300",
+      btn: "bg-sky-500 text-white hover:bg-sky-500 border-sky-500",
+    },
+    emerald: {
+      border: "border-l-emerald-500",
+      text: "text-emerald-700 dark:text-emerald-300",
+      btn: "bg-emerald-500 text-white hover:bg-emerald-500 border-emerald-500",
+    },
+    orange: {
+      border: "border-l-orange-500",
+      text: "text-orange-700 dark:text-orange-300",
+      btn: "bg-orange-500 text-white hover:bg-orange-500 border-orange-500",
+    },
+    rose: {
+      border: "border-l-rose-500",
+      text: "text-rose-700 dark:text-rose-300",
+      btn: "bg-rose-500 text-white hover:bg-rose-500 border-rose-500",
+    },
+  };
+  const activeTab = tabs.find((tb) => tb.id === active)!;
+  const accent = accentMap[activeTab.accent];
+
   return (
     <section id="pediatric-ranges-table" className="space-y-5 scroll-mt-24">
       <div className="px-1">
