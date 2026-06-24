@@ -541,30 +541,37 @@ export const sv = {
       },
       spo2: {
         title: "Syremättnad — SpO₂ (%)",
-        note: "Använd pulsoximeter på ett lugnt och stilla barn. Rörelse och kalla händer ger felaktiga värden. SpO₂ är naturligt lägre under de första levnadsdagarna — värdena nedan gäller från 1 veckas ålder. Nagellack eller mörk hudton kan något påverka noggrannheten; flytta proben om värdet verkar inkonsekvent.",
+        note: "Dessa värden gäller från 1 veckas ålder. Om ditt barn är under 1 vecka gammalt och du är orolig — kontakta barnmorska, BVC eller larmnumret. Använd inte detta verktyg som referens för nyfödda under första levnadsveckan. Använd pulsoximeter på ett lugnt och stilla barn; rörelse och kalla händer ger felaktiga värden. Nagellack eller mörk hudton kan något påverka noggrannheten — flytta proben om värdet verkar inkonsekvent.",
         colNormal: "Normal SpO₂",
         colAdvice: "Sök vård",
         colEmergency: "Akut tröskel",
         warning:
           "SpO₂ under 92 % i någon ålder efter första levnadsveckan — sök akut vård. Vänta inte på förbättring.",
-        newbornNote:
-          "Raderna 0–24 timmar och 1–7 dagar är med för fullständighet. Nyfödda i denna period bör vara under sjukhus- eller barnmorskevård — detta verktyg ersätter inte den vården.",
       },
       temp: {
         title: "Kroppstemperatur",
         note: "Febergränsen är densamma i alla åldrar: 38,0 °C eller högre. Mätmetoden spelar roll — rektal mätning är mest tillförlitlig hos barn under 3 år. Axillär (armhåla) ligger ungefär 0,5 °C lägre än verklig temperatur. Tympanisk (öra) är opålitlig under 6 månader.",
         colNormal: "Normalt intervall",
         colFever: "Feber",
-        colAction: "Åtgärd",
+        colEmergency: "Sök akut vård om",
+        colSafe: "Tryggt att övervaka hemma om",
+        assessmentNote:
+          "Febertopp är ett dåligt mått på allvarlighetsgrad hos barn över 3 månader. Ett barn med 40 °C som är vaket och dricker är mindre oroande än ett barn med 38,5 °C som är slappt och inte svarar. Bedöm alltid hur barnet ser ut och beter sig, inte bara siffran.",
         methodTitle: "Avvikelser för mätmetoder",
         colMethod: "Metod",
         colOffset: "Typisk avvikelse mot verklig temperatur",
         colSuitable: "Lämplig från",
-        actions: {
-          u3m: "Akut — ring larmnumret omedelbart, vänta inte",
-          "3_6m": "Sök vård samma dag",
-          "6m_2y": "Sök vård om febern kvarstår i över 24 timmar",
-          "2_18y": "Övervaka; sök vård om över 48 timmar eller om barnet är påverkat",
+        emergency: {
+          u3m: "All feber i denna ålder — sök alltid akut vård omedelbart, vänta inte",
+          "3_6m": "Feber ≥ 39,0 °C, barnet ser sjukt ut, dricker inte, andas snabbt eller har utslag",
+          "6m_2y": "Feber ≥ 40,0 °C, feberkramp, barnet är slappt eller svarar inte, har utslag eller dricker inte",
+          "2_18y": "Feber i mer än 5 dagar, nackstelhet, utslag som inte bleknar under ett glas, barnet är mycket trött eller förvirrat",
+        },
+        safe: {
+          u3m: "—",
+          "3_6m": "Feber 38–39 °C och barnet är vaket, lugnt och dricker normalt",
+          "6m_2y": "Feber 38–40 °C och barnet är vaket och dricker normalt",
+          "2_18y": "Feber där barnet är vaket, dricker och reagerar normalt — övervaka och ge paracetamol eller ibuprofen enligt anvisning",
         },
         methods: {
           rectal: { name: "Rektalt", offset: "Referensstandard (mest tillförlitlig)", from: "Födsel" },
