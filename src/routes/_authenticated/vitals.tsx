@@ -1133,7 +1133,7 @@ function PediatricRangesTable() {
   return (
     <section
       id="pediatric-ranges-table"
-      className={`card-soft p-6 scroll-mt-24 border-l-4 ${accent.border}`}
+      className={"card-soft p-4 sm:p-5 scroll-mt-24"}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -1145,7 +1145,7 @@ function PediatricRangesTable() {
       </div>
 
       {/* Tab selector */}
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-1.5">
         {tabs.map((tb) => {
           const isActive = tb.id === active;
           const acc = accentMap[tb.accent];
@@ -1154,7 +1154,7 @@ function PediatricRangesTable() {
               key={tb.id}
               type="button"
               onClick={() => setActive(tb.id)}
-              className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition ${
+              className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition ${
                 isActive
                   ? acc.btn
                   : "bg-background text-foreground border-border hover:bg-muted"
@@ -1166,33 +1166,33 @@ function PediatricRangesTable() {
         })}
       </div>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <h4 className={`text-base font-extrabold ${accent.text}`}>{activeTab.label}</h4>
 
         {active === "hr" && (
           <>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
               {t("vitals.pediatricTable.hr.note")}
             </p>
             <div className="overflow-x-auto -mx-2 px-2">
-              <table className="w-full text-sm border-separate border-spacing-0 min-w-[480px]">
+              <table className="w-full text-xs sm:text-sm border-separate border-spacing-0 min-w-[480px]">
                 <thead>
                   <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.hr.colAwake")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.hr.colAsleep")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.colAge")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.hr.colAwake")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.hr.colAsleep")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {hrRows.map((r) => (
                     <tr key={r.k}>
-                      <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                      <td className="py-1.5 pr-2 font-semibold border-t border-border/60">
                         {age(r.k)}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60">
                         {r.awake}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60">
                         {r.asleep}
                       </td>
                     </tr>
@@ -1200,7 +1200,7 @@ function PediatricRangesTable() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs mt-3 rounded-md bg-destructive/10 text-destructive px-3 py-2">
+            <p className="text-xs mt-2 rounded-md bg-destructive/10 text-destructive px-2.5 py-1.5">
               {t("vitals.pediatricTable.hr.warning")}
             </p>
           </>
@@ -1208,28 +1208,28 @@ function PediatricRangesTable() {
 
         {active === "br" && (
           <>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
               {t("vitals.pediatricTable.br.note")}
             </p>
             <div className="overflow-x-auto -mx-2 px-2">
-              <table className="w-full text-sm border-separate border-spacing-0 min-w-[480px]">
+              <table className="w-full text-xs sm:text-sm border-separate border-spacing-0 min-w-[480px]">
                 <thead>
                   <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.br.colNormal")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.br.colTachy")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.colAge")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.br.colNormal")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.br.colTachy")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {brRows.map((r) => (
                     <tr key={r.k}>
-                      <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                      <td className="py-1.5 pr-2 font-semibold border-t border-border/60">
                         {age(r.k)}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60">
                         {r.normal}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60">
                         {r.tachy}
                       </td>
                     </tr>
@@ -1237,7 +1237,7 @@ function PediatricRangesTable() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-muted-foreground mt-3">
+            <p className="text-xs text-muted-foreground mt-2">
               {t("vitals.pediatricTable.br.footnote")}
             </p>
           </>
@@ -1245,32 +1245,32 @@ function PediatricRangesTable() {
 
         {active === "spo2" && (
           <>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
               {t("vitals.pediatricTable.spo2.note")}
             </p>
             <div className="overflow-x-auto -mx-2 px-2">
-              <table className="w-full text-sm border-separate border-spacing-0 min-w-[520px]">
+              <table className="w-full text-xs sm:text-sm border-separate border-spacing-0 min-w-[520px]">
                 <thead>
                   <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.spo2.colNormal")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.spo2.colAdvice")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.spo2.colEmergency")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.colAge")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.spo2.colNormal")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.spo2.colAdvice")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.spo2.colEmergency")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {spo2Rows.map((r) => (
                     <tr key={r.k}>
-                      <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                      <td className="py-1.5 pr-2 font-semibold border-t border-border/60">
                         {age(r.k)}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60">
                         {r.normal}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60">
                         {r.advice}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60">
                         {r.emerg}
                       </td>
                     </tr>
@@ -1278,7 +1278,7 @@ function PediatricRangesTable() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs mt-3 rounded-md bg-destructive/10 text-destructive px-3 py-2">
+            <p className="text-xs mt-2 rounded-md bg-destructive/10 text-destructive px-2.5 py-1.5">
               {t("vitals.pediatricTable.spo2.warning")}
             </p>
 
@@ -1287,36 +1287,36 @@ function PediatricRangesTable() {
 
         {active === "temp" && (
           <>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
               {t("vitals.pediatricTable.temp.note")}
             </p>
             <div className="overflow-x-auto -mx-2 px-2">
-              <table className="w-full text-sm border-separate border-spacing-0 min-w-[760px]">
+              <table className="w-full text-xs sm:text-sm border-separate border-spacing-0 min-w-[760px]">
                 <thead>
                   <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colNormal")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colFever")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colEmergency")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colSafe")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.colAge")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.temp.colNormal")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.temp.colFever")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.temp.colEmergency")}</th>
+                    <th className="py-1.5 pr-2">{t("vitals.pediatricTable.temp.colSafe")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tempRows.map((r) => (
                     <tr key={r.k}>
-                      <td className="py-2 pr-3 font-semibold border-t border-border/60 align-top">
+                      <td className="py-1.5 pr-2 font-semibold border-t border-border/60 align-top">
                         {age(r.k)}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60 align-top">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60 align-top">
                         {r.normal}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60 align-top">
+                      <td className="py-1.5 pr-2 tabular-nums border-t border-border/60 align-top">
                         {r.fever}
                       </td>
-                      <td className="py-2 pr-3 border-t border-border/60 align-top">
+                      <td className="py-1.5 pr-2 border-t border-border/60 align-top">
                         {t(`vitals.pediatricTable.temp.emergency.${r.k}` as const)}
                       </td>
-                      <td className="py-2 pr-3 border-t border-border/60 align-top">
+                      <td className="py-1.5 pr-2 border-t border-border/60 align-top">
                         {t(`vitals.pediatricTable.temp.safe.${r.k}` as const)}
                       </td>
                     </tr>
@@ -1325,26 +1325,26 @@ function PediatricRangesTable() {
               </table>
             </div>
 
-            <p className="text-xs mt-3 rounded-md bg-muted/40 text-muted-foreground px-3 py-2">
+            <p className="text-xs mt-2 rounded-md bg-muted/40 text-muted-foreground px-2.5 py-1.5">
               {t("vitals.pediatricTable.temp.assessmentNote")}
             </p>
 
 
-            <div className="mt-5">
+            <div className="mt-4">
               <h5 className="text-sm font-bold mb-2">
                 {t("vitals.pediatricTable.temp.methodTitle")}
               </h5>
               <div className="overflow-x-auto -mx-2 px-2">
-                <table className="w-full text-sm border-separate border-spacing-0 min-w-[520px]">
+                <table className="w-full text-xs sm:text-sm border-separate border-spacing-0 min-w-[520px]">
                   <thead>
                     <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      <th className="py-2 pr-3">
+                      <th className="py-1.5 pr-2">
                         {t("vitals.pediatricTable.temp.colMethod")}
                       </th>
-                      <th className="py-2 pr-3">
+                      <th className="py-1.5 pr-2">
                         {t("vitals.pediatricTable.temp.colOffset")}
                       </th>
-                      <th className="py-2 pr-3">
+                      <th className="py-1.5 pr-2">
                         {t("vitals.pediatricTable.temp.colSuitable")}
                       </th>
                     </tr>
@@ -1352,13 +1352,13 @@ function PediatricRangesTable() {
                   <tbody>
                     {methodKeys.map((m) => (
                       <tr key={m}>
-                        <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                        <td className="py-1.5 pr-2 font-semibold border-t border-border/60">
                           {t(`vitals.pediatricTable.temp.methods.${m}.name` as const)}
                         </td>
-                        <td className="py-2 pr-3 border-t border-border/60">
+                        <td className="py-1.5 pr-2 border-t border-border/60">
                           {t(`vitals.pediatricTable.temp.methods.${m}.offset` as const)}
                         </td>
-                        <td className="py-2 pr-3 border-t border-border/60">
+                        <td className="py-1.5 pr-2 border-t border-border/60">
                           {t(`vitals.pediatricTable.temp.methods.${m}.from` as const)}
                         </td>
                       </tr>
@@ -1371,7 +1371,7 @@ function PediatricRangesTable() {
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground mt-5">
+      <p className="text-xs text-muted-foreground mt-4">
         {t("vitals.pediatricTable.footer")}
       </p>
     </section>
