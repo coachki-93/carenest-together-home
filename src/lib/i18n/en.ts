@@ -560,6 +560,19 @@ export const en = {
         colMethod: "Method",
         colOffset: "Typical offset vs. true temperature",
         colSuitable: "Suitable from",
+        actions: {
+          u3m: "Emergency — call services immediately, do not wait",
+          "3_6m": "Seek same-day medical review",
+          "6m_2y": "Seek medical advice if fever persists over 24 hours",
+          "2_18y": "Monitor; seek advice if over 48 hours or child is unwell",
+        },
+        methods: {
+          rectal: { name: "Rectal", offset: "Reference standard (most accurate)", from: "Birth" },
+          temporal: { name: "Temporal artery", offset: "± 0.3 °C", from: "3 months" },
+          tympanic: { name: "Tympanic (ear)", offset: "± 0.5 °C (unreliable in infants)", from: "6 months" },
+          oral: { name: "Oral", offset: "−0.3 to −0.5 °C", from: "5 years" },
+          axillary: { name: "Axillary (armpit)", offset: "−0.5 to −1.0 °C (least accurate)", from: "Any age" },
+        },
       },
       ages: {
         "0_1m": "0–1 month",
