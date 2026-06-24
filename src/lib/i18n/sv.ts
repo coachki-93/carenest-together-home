@@ -519,23 +519,50 @@ export const sv = {
     seePediatricTable: "Se pediatrisk tabell",
     pediatricTable: {
       title: "Pediatriska referensvärden",
-      subtitle: "Vakna/vilovärden efter ålder — endast screening.",
+      subtitle: "Åldersbaserade screeningvärden — ersätter inte klinisk bedömning.",
+      footer:
+        "Referensvärden baserade på Fleming m.fl. 2011 (Lancet), PALS 2015, WHO:s riktlinjer och AAP:s rekommendationer. Endast som vägledning för vårdgivare — ersätter inte klinisk bedömning.",
       colAge: "Ålder",
-      colHeartRate: "Puls (slag/min)",
-      colBreathing: "Andning (and/min)",
-      colSpO2: "SpO₂ (%)",
-      colTemp: "Temperatur",
-      tempNote: "≥ 38,0 °C = feber",
-      ages: {
-        "0_3m": "0–3 månader",
-        "3_6m": "3–6 månader",
-        "6_12m": "6–12 månader",
-        "1_3y": "1–3 år",
-        "3_6y": "3–6 år",
-        "6_12y": "6–12 år",
-        "12_18y": "12–18 år",
+      hr: {
+        title: "Puls (slag per minut)",
+        note: "Mät endast när barnet är lugnt och i vila. Gråt, matning eller aktivitet höjer pulsen betydligt och gör mätningen meningslös. Räkna i 60 sekunder eller använd pulsoximeter.",
+        colAwake: "Vaken, i vila",
+        colAsleep: "Sovande",
+        warning:
+          "Puls under 60 slag/min hos spädbarn med tecken på dålig färg, slapphet eller bristande svar — ring larmnumret omedelbart.",
+      },
+      br: {
+        title: "Andningsfrekvens (andetag per minut)",
+        note: "Räkna endast när barnet är lugnt, helst sovande eller nyvaket. Iaktta bröstkorgens rörelser i hela 60 sekunder — uppskatta inte. Andningsfrekvensen är det känsligaste tidiga varningstecknet vid luftvägssjukdom hos barn.",
+        colNormal: "Normalt (10:e–90:e percentilen)",
+        colTachy: "Takypné-gräns (WHO)",
+        footnote:
+          "Takypné = för snabb andning. Värden vid eller över denna gräns kräver medicinsk bedömning.",
+      },
+      spo2: {
+        title: "Syremättnad — SpO₂ (%)",
+        note: "Använd pulsoximeter på ett lugnt och stilla barn. Rörelse och kalla händer ger felaktiga värden. SpO₂ är naturligt lägre under de första levnadsdagarna — värdena nedan gäller från 1 veckas ålder. Nagellack eller mörk hudton kan något påverka noggrannheten; flytta proben om värdet verkar inkonsekvent.",
+        colNormal: "Normal SpO₂",
+        colAdvice: "Sök vård",
+        colEmergency: "Akut tröskel",
+        warning:
+          "SpO₂ under 92 % i någon ålder efter första levnadsveckan — sök akut vård. Vänta inte på förbättring.",
+        newbornNote:
+          "Raderna 0–24 timmar och 1–7 dagar är med för fullständighet. Nyfödda i denna period bör vara under sjukhus- eller barnmorskevård — detta verktyg ersätter inte den vården.",
+      },
+      temp: {
+        title: "Kroppstemperatur",
+        note: "Febergränsen är densamma i alla åldrar: 38,0 °C eller högre. Mätmetoden spelar roll — rektal mätning är mest tillförlitlig hos barn under 3 år. Axillär (armhåla) ligger ungefär 0,5 °C lägre än verklig temperatur. Tympanisk (öra) är opålitlig under 6 månader.",
+        colNormal: "Normalt intervall",
+        colFever: "Feber",
+        colAction: "Åtgärd",
+        methodTitle: "Avvikelser för mätmetoder",
+        colMethod: "Metod",
+        colOffset: "Typisk avvikelse mot verklig temperatur",
+        colSuitable: "Lämplig från",
       },
     },
+
 
 
   },
