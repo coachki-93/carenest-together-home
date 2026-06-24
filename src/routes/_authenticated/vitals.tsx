@@ -1291,35 +1291,44 @@ function PediatricRangesTable() {
               {t("vitals.pediatricTable.temp.note")}
             </p>
             <div className="overflow-x-auto -mx-2 px-2">
-              <table className="w-full text-sm border-separate border-spacing-0 min-w-[640px]">
+              <table className="w-full text-sm border-separate border-spacing-0 min-w-[760px]">
                 <thead>
                   <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
                     <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colNormal")}</th>
                     <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colFever")}</th>
-                    <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colAction")}</th>
+                    <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colEmergency")}</th>
+                    <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colSafe")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tempRows.map((r) => (
                     <tr key={r.k}>
-                      <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                      <td className="py-2 pr-3 font-semibold border-t border-border/60 align-top">
                         {age(r.k)}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-2 pr-3 tabular-nums border-t border-border/60 align-top">
                         {r.normal}
                       </td>
-                      <td className="py-2 pr-3 tabular-nums border-t border-border/60">
+                      <td className="py-2 pr-3 tabular-nums border-t border-border/60 align-top">
                         {r.fever}
                       </td>
-                      <td className="py-2 pr-3 border-t border-border/60">
-                        {t(`vitals.pediatricTable.temp.actions.${r.k}` as const)}
+                      <td className="py-2 pr-3 border-t border-border/60 align-top">
+                        {t(`vitals.pediatricTable.temp.emergency.${r.k}` as const)}
+                      </td>
+                      <td className="py-2 pr-3 border-t border-border/60 align-top">
+                        {t(`vitals.pediatricTable.temp.safe.${r.k}` as const)}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            <p className="text-xs mt-3 rounded-md bg-muted/40 text-muted-foreground px-3 py-2">
+              {t("vitals.pediatricTable.temp.assessmentNote")}
+            </p>
+
 
             <div className="mt-5">
               <h5 className="text-sm font-bold mb-2">
