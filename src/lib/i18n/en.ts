@@ -560,6 +560,7 @@ export const en = {
         colMethod: "Method",
         colOffset: "Typical offset vs. true temperature",
         colSuitable: "Suitable from",
+      },
       ages: {
         "0_1m": "0–1 month",
         "1_3m": "1–3 months",
@@ -580,7 +581,6 @@ export const en = {
         "6m_2y": "6 months – 2 years",
         "2_18y": "2–18 years",
       },
-
     },
 
 
