@@ -1281,9 +1281,7 @@ function PediatricRangesTable() {
             <p className="text-xs mt-3 rounded-md bg-destructive/10 text-destructive px-3 py-2">
               {t("vitals.pediatricTable.spo2.warning")}
             </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {t("vitals.pediatricTable.spo2.newbornNote")}
-            </p>
+
           </>
         )}
 
