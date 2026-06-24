@@ -541,30 +541,37 @@ export const en = {
       },
       spo2: {
         title: "Oxygen saturation — SpO₂ (%)",
-        note: "Use a pulse oximeter on a calm, still child. Movement and cold hands cause inaccurate readings. SpO₂ is naturally lower in the first days of life — the ranges below apply from 1 week of age onward. Nail polish or dark skin tone can slightly affect accuracy; reposition the probe if reading seems inconsistent.",
+        note: "These ranges apply from 1 week of age onward. If your child is under 1 week old and you have concerns, contact your midwife, health visitor, or emergency services — do not use this tool as a reference for newborns in the first week of life. Use a pulse oximeter on a calm, still child; movement and cold hands cause inaccurate readings. Nail polish or dark skin tone can slightly affect accuracy — reposition the probe if a reading seems inconsistent.",
         colNormal: "Normal SpO₂",
         colAdvice: "Seek medical advice",
         colEmergency: "Emergency threshold",
         warning:
           "SpO₂ below 92% at any age after the first week of life — seek emergency care. Do not wait to see if it improves.",
-        newbornNote:
-          "The 0–24 hour and 1–7 day rows are included for completeness. Newborns in this period should be under hospital or midwife care — this tool is not a substitute for that.",
       },
       temp: {
         title: "Body temperature",
         note: "The fever threshold is the same for all ages: 38.0 °C or above. Method matters — rectal is most accurate in infants under 3 years. Axillary (armpit) readings run approximately 0.5 °C lower than true temperature. Tympanic (ear) thermometers are unreliable under 6 months.",
         colNormal: "Normal range",
         colFever: "Fever",
-        colAction: "Action",
+        colEmergency: "Seek emergency care if",
+        colSafe: "Safe to monitor at home if",
+        assessmentNote:
+          "Fever height alone is a poor predictor of severity in children over 3 months. A child with 40 °C who is alert and drinking is less concerning than a child with 38.5 °C who is limp and not responding. Always assess how the child looks and behaves, not just the number.",
         methodTitle: "Measurement method offsets",
         colMethod: "Method",
         colOffset: "Typical offset vs. true temperature",
         colSuitable: "Suitable from",
-        actions: {
-          u3m: "Emergency — call services immediately, do not wait",
-          "3_6m": "Seek same-day medical review",
-          "6m_2y": "Seek medical advice if fever persists over 24 hours",
-          "2_18y": "Monitor; seek advice if over 48 hours or child is unwell",
+        emergency: {
+          u3m: "Any fever at this age — always seek emergency care immediately, do not wait",
+          "3_6m": "Fever ≥ 39.0 °C, child looks unwell, not drinking, breathing fast, or has a rash",
+          "6m_2y": "Fever ≥ 40.0 °C, febrile seizure, child is limp or not responding, has a rash, or is not drinking",
+          "2_18y": "Fever lasting more than 5 days, stiff neck, rash that doesn't fade under a glass, child is very lethargic or confused",
+        },
+        safe: {
+          u3m: "—",
+          "3_6m": "Fever 38–39 °C and child is alert, calm, and drinking normally",
+          "6m_2y": "Fever 38–40 °C and child is alert and drinking normally",
+          "2_18y": "Fever with child alert, drinking, and responding normally — monitor and give paracetamol or ibuprofen as directed",
         },
         methods: {
           rectal: { name: "Rectal", offset: "Reference standard (most accurate)", from: "Birth" },
