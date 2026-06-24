@@ -560,6 +560,19 @@ export const sv = {
         colMethod: "Metod",
         colOffset: "Typisk avvikelse mot verklig temperatur",
         colSuitable: "Lämplig från",
+        actions: {
+          u3m: "Akut — ring larmnumret omedelbart, vänta inte",
+          "3_6m": "Sök vård samma dag",
+          "6m_2y": "Sök vård om febern kvarstår i över 24 timmar",
+          "2_18y": "Övervaka; sök vård om över 48 timmar eller om barnet är påverkat",
+        },
+        methods: {
+          rectal: { name: "Rektalt", offset: "Referensstandard (mest tillförlitlig)", from: "Födsel" },
+          temporal: { name: "Tinningartär", offset: "± 0,3 °C", from: "3 månader" },
+          tympanic: { name: "Tympaniskt (öra)", offset: "± 0,5 °C (opålitlig hos spädbarn)", from: "6 månader" },
+          oral: { name: "Oralt", offset: "−0,3 till −0,5 °C", from: "5 år" },
+          axillary: { name: "Axillärt (armhåla)", offset: "−0,5 till −1,0 °C (minst tillförlitlig)", from: "Alla åldrar" },
+        },
       },
       ages: {
         "0_1m": "0–1 månad",
