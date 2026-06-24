@@ -1056,51 +1056,231 @@ function LogReadingDialog({
 
 function PediatricRangesTable() {
   const { t } = useTranslation();
-  const rows: Array<{ key: string; hr: string; br: string; spo2: string; temp: string }> = [
-    { key: "0_3m", hr: "110–160", br: "30–60", spo2: "95–100", temp: "< 38.0 °C" },
-    { key: "3_6m", hr: "100–150", br: "30–45", spo2: "95–100", temp: "< 38.0 °C" },
-    { key: "6_12m", hr: "90–130", br: "25–40", spo2: "95–100", temp: "< 38.0 °C" },
-    { key: "1_3y", hr: "80–125", br: "20–30", spo2: "95–100", temp: "< 38.0 °C" },
-    { key: "3_6y", hr: "70–115", br: "20–25", spo2: "95–100", temp: "< 38.0 °C" },
-    { key: "6_12y", hr: "60–100", br: "14–22", spo2: "95–100", temp: "< 38.0 °C" },
-    { key: "12_18y", hr: "60–100", br: "12–18", spo2: "95–100", temp: "< 38.0 °C" },
+  const age = (k: string) => t(`vitals.pediatricTable.ages.${k}` as const);
+
+  const hrRows = [
+    { k: "0_1m", awake: "100–165 bpm", asleep: "90–160 bpm" },
+    { k: "1_3m", awake: "100–165 bpm", asleep: "90–160 bpm" },
+    { k: "3_6m", awake: "90–160 bpm", asleep: "80–150 bpm" },
+    { k: "6_12m", awake: "80–155 bpm", asleep: "75–135 bpm" },
+    { k: "1_2y", awake: "80–140 bpm", asleep: "70–120 bpm" },
+    { k: "2_3y", awake: "80–135 bpm", asleep: "60–115 bpm" },
+    { k: "3_5y", awake: "75–130 bpm", asleep: "60–110 bpm" },
+    { k: "6_9y", awake: "70–115 bpm", asleep: "58–100 bpm" },
+    { k: "10_12y", awake: "60–110 bpm", asleep: "55–95 bpm" },
+    { k: "12_18y", awake: "60–100 bpm", asleep: "50–90 bpm" },
   ];
+
+  const brRows = [
+    { k: "0_3m", normal: "34–57", tachy: "≥ 60" },
+    { k: "3_6m", normal: "33–55", tachy: "≥ 60" },
+    { k: "6_12m", normal: "30–50", tachy: "≥ 50" },
+    { k: "1_2y", normal: "25–40", tachy: "≥ 40" },
+    { k: "2_3y", normal: "22–34", tachy: "≥ 40" },
+    { k: "3_5y", normal: "20–29", tachy: "≥ 40" },
+    { k: "6_9y", normal: "18–24", tachy: "≥ 30" },
+    { k: "10_12y", normal: "16–22", tachy: "≥ 30" },
+    { k: "12_18y", normal: "14–20", tachy: "≥ 30" },
+  ];
+
+  const spo2Rows = [
+    { k: "0_24h", normal: "90–100%", advice: "Below 90%", emerg: "Below 85%" },
+    { k: "1_7d", normal: "93–100%", advice: "Below 92%", emerg: "Below 88%" },
+    { k: "1w_3m", normal: "95–100%", advice: "Below 94%", emerg: "Below 90%" },
+    { k: "3m_18y", normal: "96–100%", advice: "Below 95%", emerg: "Below 92%" },
+  ];
+
+  const tempRows = [
+    { k: "u3m", normal: "36.3–37.5 °C", fever: "≥ 38.0 °C" },
+    { k: "3_6m", normal: "36.3–37.5 °C", fever: "≥ 38.0 °C" },
+    { k: "6m_2y", normal: "36.3–37.5 °C", fever: "≥ 38.0 °C" },
+    { k: "2_18y", normal: "36.1–37.5 °C", fever: "≥ 38.0 °C" },
+  ];
+
+  const methodKeys = ["rectal", "temporal", "tympanic", "oral", "axillary"] as const;
+
   return (
-    <section id="pediatric-ranges-table" className="card-soft p-6 scroll-mt-24">
-      <h3 className="text-lg font-extrabold">{t("vitals.pediatricTable.title")}</h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        {t("vitals.pediatricTable.subtitle")}
-      </p>
-      <div className="overflow-x-auto -mx-2 px-2">
-        <table className="w-full text-sm border-separate border-spacing-0">
-          <thead>
-            <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
-              <th className="py-2 pr-3">{t("vitals.pediatricTable.colHeartRate")}</th>
-              <th className="py-2 pr-3">{t("vitals.pediatricTable.colBreathing")}</th>
-              <th className="py-2 pr-3">{t("vitals.pediatricTable.colSpO2")}</th>
-              <th className="py-2 pr-3">{t("vitals.pediatricTable.colTemp")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.key} className="border-t border-border/60">
-                <td className="py-2 pr-3 font-semibold border-t border-border/60">
-                  {t(`vitals.pediatricTable.ages.${r.key}` as const)}
-                </td>
-                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.hr}</td>
-                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.br}</td>
-                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.spo2}</td>
-                <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.temp}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <section id="pediatric-ranges-table" className="space-y-5 scroll-mt-24">
+      <div className="px-1">
+        <h3 className="text-lg font-extrabold">{t("vitals.pediatricTable.title")}</h3>
+        <p className="text-sm text-muted-foreground">{t("vitals.pediatricTable.subtitle")}</p>
       </div>
-      <p className="text-xs text-muted-foreground mt-3">
-        {t("vitals.pediatricTable.tempNote")}
+
+      {/* Heart Rate */}
+      <div className="card-soft p-6 border-l-4 border-l-sky-500">
+        <h4 className="text-base font-extrabold text-sky-700 dark:text-sky-300">
+          {t("vitals.pediatricTable.hr.title")}
+        </h4>
+        <p className="text-sm text-muted-foreground mt-1 mb-4">
+          {t("vitals.pediatricTable.hr.note")}
+        </p>
+        <div className="overflow-x-auto -mx-2 px-2">
+          <table className="w-full text-sm border-separate border-spacing-0 min-w-[480px]">
+            <thead>
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.hr.colAwake")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.hr.colAsleep")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hrRows.map((r) => (
+                <tr key={r.k}>
+                  <td className="py-2 pr-3 font-semibold border-t border-border/60">{age(r.k)}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.awake}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.asleep}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs mt-3 rounded-md bg-destructive/10 text-destructive px-3 py-2">
+          {t("vitals.pediatricTable.hr.warning")}
+        </p>
+      </div>
+
+      {/* Breathing */}
+      <div className="card-soft p-6 border-l-4 border-l-emerald-500">
+        <h4 className="text-base font-extrabold text-emerald-700 dark:text-emerald-300">
+          {t("vitals.pediatricTable.br.title")}
+        </h4>
+        <p className="text-sm text-muted-foreground mt-1 mb-4">
+          {t("vitals.pediatricTable.br.note")}
+        </p>
+        <div className="overflow-x-auto -mx-2 px-2">
+          <table className="w-full text-sm border-separate border-spacing-0 min-w-[480px]">
+            <thead>
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.br.colNormal")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.br.colTachy")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {brRows.map((r) => (
+                <tr key={r.k}>
+                  <td className="py-2 pr-3 font-semibold border-t border-border/60">{age(r.k)}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.normal}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.tachy}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          {t("vitals.pediatricTable.br.footnote")}
+        </p>
+      </div>
+
+      {/* SpO2 */}
+      <div className="card-soft p-6 border-l-4 border-l-orange-500">
+        <h4 className="text-base font-extrabold text-orange-700 dark:text-orange-300">
+          {t("vitals.pediatricTable.spo2.title")}
+        </h4>
+        <p className="text-sm text-muted-foreground mt-1 mb-4">
+          {t("vitals.pediatricTable.spo2.note")}
+        </p>
+        <div className="overflow-x-auto -mx-2 px-2">
+          <table className="w-full text-sm border-separate border-spacing-0 min-w-[520px]">
+            <thead>
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.spo2.colNormal")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.spo2.colAdvice")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.spo2.colEmergency")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {spo2Rows.map((r) => (
+                <tr key={r.k}>
+                  <td className="py-2 pr-3 font-semibold border-t border-border/60">{age(r.k)}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.normal}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.advice}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.emerg}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs mt-3 rounded-md bg-destructive/10 text-destructive px-3 py-2">
+          {t("vitals.pediatricTable.spo2.warning")}
+        </p>
+        <p className="text-xs text-muted-foreground mt-2">
+          {t("vitals.pediatricTable.spo2.newbornNote")}
+        </p>
+      </div>
+
+      {/* Temperature */}
+      <div className="card-soft p-6 border-l-4 border-l-rose-500">
+        <h4 className="text-base font-extrabold text-rose-700 dark:text-rose-300">
+          {t("vitals.pediatricTable.temp.title")}
+        </h4>
+        <p className="text-sm text-muted-foreground mt-1 mb-4">
+          {t("vitals.pediatricTable.temp.note")}
+        </p>
+        <div className="overflow-x-auto -mx-2 px-2">
+          <table className="w-full text-sm border-separate border-spacing-0 min-w-[640px]">
+            <thead>
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.colAge")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colNormal")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colFever")}</th>
+                <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colAction")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tempRows.map((r) => (
+                <tr key={r.k}>
+                  <td className="py-2 pr-3 font-semibold border-t border-border/60">{age(r.k)}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.normal}</td>
+                  <td className="py-2 pr-3 tabular-nums border-t border-border/60">{r.fever}</td>
+                  <td className="py-2 pr-3 border-t border-border/60">
+                    {t(`vitals.pediatricTable.temp.actions.${r.k}` as const)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-5">
+          <h5 className="text-sm font-bold mb-2">
+            {t("vitals.pediatricTable.temp.methodTitle")}
+          </h5>
+          <div className="overflow-x-auto -mx-2 px-2">
+            <table className="w-full text-sm border-separate border-spacing-0 min-w-[520px]">
+              <thead>
+                <tr className="text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colMethod")}</th>
+                  <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colOffset")}</th>
+                  <th className="py-2 pr-3">{t("vitals.pediatricTable.temp.colSuitable")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {methodKeys.map((m) => (
+                  <tr key={m}>
+                    <td className="py-2 pr-3 font-semibold border-t border-border/60">
+                      {t(`vitals.pediatricTable.temp.methods.${m}.name` as const)}
+                    </td>
+                    <td className="py-2 pr-3 border-t border-border/60">
+                      {t(`vitals.pediatricTable.temp.methods.${m}.offset` as const)}
+                    </td>
+                    <td className="py-2 pr-3 border-t border-border/60">
+                      {t(`vitals.pediatricTable.temp.methods.${m}.from` as const)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-xs text-muted-foreground px-1">
+        {t("vitals.pediatricTable.footer")}
       </p>
     </section>
   );
 }
+
 
