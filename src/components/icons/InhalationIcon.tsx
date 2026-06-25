@@ -3,8 +3,8 @@ import type { SVGProps } from "react";
 type Props = SVGProps<SVGSVGElement> & { size?: number | string };
 
 /**
- * Side-profile head breathing in wind streaks.
- * Drawn in the lucide style: currentColor stroke, no fill.
+ * Side-profile head inhaling wind streaks.
+ * Lucide-style: currentColor stroke, no fill, optimized for 24px.
  */
 export function InhalationIcon({
   size = 24,
@@ -27,16 +27,12 @@ export function InhalationIcon({
       aria-hidden="true"
       {...rest}
     >
-      {/* Head profile: forehead, nose, mouth notch, chin, jaw */}
-      <path d="M19 12c0-3.9-2.9-7-6.5-7S6 8.1 6 12c0 1.3.3 2.4.9 3.4.3.5.4 1 .4 1.5V20" />
-      {/* Nose tip */}
-      <path d="M6 12.2l-1.6.8 1.6 1" />
-      {/* Mouth */}
-      <path d="M6.8 16h2.4" />
-      {/* Wind streaks flowing into the mouth */}
-      <path d="M3 14.5h2.2" />
-      <path d="M1.5 16.2h3" />
-      <path d="M2.5 17.9c.6.5 1.4.5 2 0" />
+      {/* Head profile facing left: forehead → nose → lips → chin → jaw → neck */}
+      <path d="M20 4c-4 0-7 3-7 7 0 1 .2 1.8.6 2.5L11 14l1.2 1.2-1 1.8 1.6.6-.3 1.9c2.1.3 3.5-.4 3.5-2V16" />
+      {/* Wind streaks flowing toward the nose */}
+      <path d="M3 11h6" />
+      <path d="M2 14h5" />
+      <path d="M5 17h3" />
     </svg>
   );
 }
