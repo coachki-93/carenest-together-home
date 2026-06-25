@@ -259,7 +259,7 @@ function apptKindToVitalType(kind: AppointmentKind): VitalType | null {
 
 function vitalIconAndTone(
   vital: Vital,
-): { icon: typeof Activity; tone: { bg: string; fg: string } } {
+): { icon: React.ComponentType<{ className?: string; size?: number | string }>; tone: { bg: string; fg: string } } {
   switch (vital.vital_type) {
     case "temperature":
       return { icon: Thermometer, tone: { bg: "#FFE4E6", fg: "#BE123C" } };
