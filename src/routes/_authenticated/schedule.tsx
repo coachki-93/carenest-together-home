@@ -1554,7 +1554,7 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
     case "heart_rate":
       return { bg: "#FCE7F3", fg: "#BE185D" };
     case "spo2":
-      return { bg: "#E0F2FE", fg: "#0369A1" };
+      return { bg: "#FEE2E2", fg: "#B91C1C" };
     case "breathing":
       return { bg: "#CFFAFE", fg: "#0E7490" };
     case "fluids":

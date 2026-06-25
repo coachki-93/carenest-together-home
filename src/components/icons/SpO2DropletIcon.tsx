@@ -7,16 +7,18 @@ type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
 
 /**
  * SpO₂ icon — custom user-provided red droplet with white bubbles.
+ * Sizing follows the className (e.g. `h-5 w-5`) so it matches the
+ * surrounding Lucide icons in lists and headers.
  */
-export function SpO2DropletIcon({ size = 24, className, style, ...rest }: Props) {
+export function SpO2DropletIcon({ size, className, style, ...rest }: Props) {
+  const sizeStyle =
+    size !== undefined ? { width: size, height: size } : undefined;
   return (
     <img
       src={spo2IconAsset.url}
       alt=""
-      width={size}
-      height={size}
       className={className}
-      style={{ objectFit: "contain", ...style }}
+      style={{ objectFit: "contain", ...sizeStyle, ...style }}
       aria-hidden="true"
       {...rest}
     />
