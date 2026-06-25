@@ -1,13 +1,22 @@
-I'll hand-draw a custom SVG component matching your reference (head profile with wind streaks blowing into the mouth) and wire it into the schedule.
+Replace the current `InhalationIcon` with a classic L-shaped asthma inhaler (puffer) with a short spray burst at the mouthpiece. No other changes — the icon is already wired into the schedule page's `KindIcon` for the "inhalation" appointment kind.
 
-## What I'll change
+## What changes
 
-1. Create `src/components/icons/InhalationIcon.tsx` — a lucide-styled React component that returns an SVG of a side-profile head with three curved wind streaks flowing into the mouth. Uses `currentColor` stroke and accepts `className` / `size` so it drops in like any lucide icon.
-2. In `src/routes/_authenticated/schedule.tsx`:
-   - Remove the `CloudFog` import and import `InhalationIcon` instead.
-   - Swap `<CloudFog className={className} />` for `<InhalationIcon className={className} />` in the `KindIcon` switch's `"inhalation"` case.
-   - Keep the existing teal tone (`bg: "#CCFBF1", fg: "#0F766E"`).
+- `src/components/icons/InhalationIcon.tsx` — rewrite the SVG paths to draw:
+  - A vertical canister (rounded rectangle, top portion) sitting on top of
+  - A horizontal mouthpiece extending to the left (forming the L shape)
+  - 2–3 short spray lines puffing out from the mouthpiece tip
 
-## Notes
+Keep the existing component API unchanged: same props (`size`, `strokeWidth`, `className`, ...rest), Lucide-style `currentColor` stroke, no fill, 24×24 viewBox, `strokeLinecap="round"`. This way every existing import site (currently just `schedule.tsx`) keeps working with no further edits.
 
-The icon will be drawn from scratch as an outline (stroke `currentColor`, `strokeWidth={1.75}`, `strokeLinecap="round"`, `strokeLinejoin="round"`) so its weight and feel match the other lucide icons used across the schedule. No data, i18n, or DB changes needed — those were done last turn.
+## Technical details
+
+```text
+   ┌──┐        canister (top)
+   │  │
+┌──┴──┴──┐     body + mouthpiece junction
+│        │
+└────────┘ ))) spray puffs to the left
+```
+
+No new files, no dependency changes, no i18n changes.
