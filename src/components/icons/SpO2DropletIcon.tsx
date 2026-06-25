@@ -3,12 +3,11 @@ import type { SVGProps } from "react";
 type Props = SVGProps<SVGSVGElement> & { size?: number | string };
 
 /**
- * SpO₂ droplet icon — Lucide-style outlined droplet with "O₂" mark inside.
- * Uses currentColor so it inherits tone classes like other icons.
+ * SpO₂ droplet icon — solid red droplet with white "oxygen bubbles" inside.
+ * Uses explicit colors so it reads as an oxygen/blood-oxygen mark regardless of tone.
  */
 export function SpO2DropletIcon({
   size = 24,
-  strokeWidth = 1.75,
   className,
   ...rest
 }: Props) {
@@ -19,20 +18,19 @@ export function SpO2DropletIcon({
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
       className={className}
       aria-hidden="true"
       {...rest}
     >
-      {/* Droplet outline */}
-      <path d="M12 2.5c3.2 4 6.5 7.6 6.5 11.5a6.5 6.5 0 1 1-13 0c0-3.9 3.3-7.5 6.5-11.5z" />
-      {/* "O" */}
-      <ellipse cx="10.5" cy="14.5" rx="2.1" ry="2.6" />
-      {/* "₂" subscript */}
-      <path d="M13.8 16.2c.2-.5.8-.7 1.2-.4.4.3.4.9 0 1.3l-1.2 1.1h1.4" />
+      {/* Red droplet body */}
+      <path
+        d="M12 2.5c3.4 4.2 6.8 7.9 6.8 11.9a6.8 6.8 0 1 1-13.6 0c0-4 3.4-7.7 6.8-11.9z"
+        fill="#DC2626"
+      />
+      {/* White oxygen bubbles */}
+      <circle cx="9.2" cy="13" r="1.6" fill="#ffffff" />
+      <circle cx="13.6" cy="15.6" r="2.1" fill="#ffffff" />
+      <circle cx="11" cy="17.8" r="0.9" fill="#ffffff" />
     </svg>
   );
 }
