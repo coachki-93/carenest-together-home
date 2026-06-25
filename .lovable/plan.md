@@ -1,14 +1,13 @@
-## Changes to Pediatric Reference Ranges card
+I'll hand-draw a custom SVG component matching your reference (head profile with wind streaks blowing into the mouth) and wire it into the schedule.
 
-In `src/routes/_authenticated/vitals.tsx`:
+## What I'll change
 
-1. **Remove the colored side accent** — drop the `border-l-4 ${accent.border}` class from the card so no colored stripe appears on the left edge regardless of which tab is active.
+1. Create `src/components/icons/InhalationIcon.tsx` — a lucide-styled React component that returns an SVG of a side-profile head with three curved wind streaks flowing into the mouth. Uses `currentColor` stroke and accepts `className` / `size` so it drops in like any lucide icon.
+2. In `src/routes/_authenticated/schedule.tsx`:
+   - Remove the `CloudFog` import and import `InhalationIcon` instead.
+   - Swap `<CloudFog className={className} />` for `<InhalationIcon className={className} />` in the `KindIcon` switch's `"inhalation"` case.
+   - Keep the existing teal tone (`bg: "#CCFBF1", fg: "#0F766E"`).
 
-2. **Make the card more compact** without removing any info:
-   - Reduce card padding (e.g. `p-6` → `p-4`, header spacing tightened)
-   - Tighten table density: smaller row padding (`py-2` → `py-1.5`), smaller text where safe (`text-sm` → `text-xs` for table cells, keep headers readable)
-   - Reduce gaps between tab buttons, table, clinical note, and warning blocks
-   - Slightly smaller pill tab buttons (reduced vertical padding)
-   - Tighten the temperature method-offset table the same way
+## Notes
 
-No information removed — only spacing/typography tightened and the left color stripe deleted. Tab pill colors and section accents inside content stay as they are so each vital is still visually distinguishable.
+The icon will be drawn from scratch as an outline (stroke `currentColor`, `strokeWidth={1.75}`, `strokeLinecap="round"`, `strokeLinejoin="round"`) so its weight and feel match the other lucide icons used across the schedule. No data, i18n, or DB changes needed — those were done last turn.
