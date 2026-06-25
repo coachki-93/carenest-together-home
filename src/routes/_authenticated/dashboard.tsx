@@ -266,7 +266,7 @@ function vitalIconAndTone(
     case "heart_rate":
       return { icon: Heart, tone: { bg: "#FCE7F3", fg: "#BE185D" } };
     case "spo2":
-      return { icon: SpO2DropletIcon, tone: { bg: "#E0F2FE", fg: "#0369A1" } };
+      return { icon: SpO2DropletIcon, tone: { bg: "#FEE2E2", fg: "#B91C1C" } };
     case "breathing":
       return { icon: Activity, tone: { bg: "#CFFAFE", fg: "#0E7490" } };
     case "fluids":
