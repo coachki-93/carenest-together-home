@@ -31,7 +31,7 @@ import {
   Zap,
   StickyNote,
 } from "lucide-react";
-import { InhalationIcon } from "@/components/icons/InhalationIcon";
+import { SpO2DropletIcon } from "@/components/icons/SpO2DropletIcon";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { getTaskState } from "@/lib/schedule/task-state";
 import { Button } from "@/components/ui/button";
@@ -1519,7 +1519,7 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
     case "heart_rate":
       return <Heart className={className} />;
     case "spo2":
-      return <Wind className={className} />;
+      return <SpO2DropletIcon className={className} />;
     case "breathing":
       return <Activity className={className} />;
     case "fluids":
@@ -1531,7 +1531,7 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
     case "note":
       return <StickyNote className={className} />;
     case "inhalation":
-      return <InhalationIcon className={className} />;
+      return <Wind className={className} />;
     default:
       return <CalendarIcon className={className} />;
   }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -31,6 +31,7 @@ import {
   Frown,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
+import { SpO2DropletIcon } from "@/components/icons/SpO2DropletIcon";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
@@ -164,7 +165,7 @@ function useChild() {
   });
 }
 
-function kindIcon(kind: AppointmentKind | "medication"): typeof Pill {
+function kindIcon(kind: AppointmentKind | "medication"): React.ComponentType<{ className?: string; size?: number | string }> {
   switch (kind) {
     case "medication":
       return Pill;
@@ -183,7 +184,7 @@ function kindIcon(kind: AppointmentKind | "medication"): typeof Pill {
     case "heart_rate":
       return Heart;
     case "spo2":
-      return Wind;
+      return SpO2DropletIcon;
     case "breathing":
       return Activity;
     case "fluids":
@@ -194,6 +195,8 @@ function kindIcon(kind: AppointmentKind | "medication"): typeof Pill {
       return Zap;
     case "note":
       return StickyNote;
+    case "inhalation":
+      return Wind;
     default:
       return CalendarIcon;
   }
@@ -256,14 +259,14 @@ function apptKindToVitalType(kind: AppointmentKind): VitalType | null {
 
 function vitalIconAndTone(
   vital: Vital,
-): { icon: typeof Activity; tone: { bg: string; fg: string } } {
+): { icon: React.ComponentType<{ className?: string; size?: number | string }>; tone: { bg: string; fg: string } } {
   switch (vital.vital_type) {
     case "temperature":
       return { icon: Thermometer, tone: { bg: "#FFE4E6", fg: "#BE123C" } };
     case "heart_rate":
       return { icon: Heart, tone: { bg: "#FCE7F3", fg: "#BE185D" } };
     case "spo2":
-      return { icon: Wind, tone: { bg: "#E0F2FE", fg: "#0369A1" } };
+      return { icon: SpO2DropletIcon, tone: { bg: "#E0F2FE", fg: "#0369A1" } };
     case "breathing":
       return { icon: Activity, tone: { bg: "#CFFAFE", fg: "#0E7490" } };
     case "fluids":
