@@ -826,6 +826,7 @@ export const sv = {
       fluids: "Vätska",
       diaper: "Blöjbyte",
       seizure: "Anfall",
+      inhalation: "Inhalation",
       note: "Anteckning",
       other: "Övrigt",
     },
