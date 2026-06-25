@@ -68,6 +68,7 @@ export type AppointmentKind =
   | "diaper"
   | "seizure"
   | "breathing"
+  | "inhalation"
   | "note";
 
 /**
@@ -96,6 +97,7 @@ export const APPOINTMENT_KINDS: AppointmentKind[] = [
   "diaper",
   "seizure",
   "breathing",
+  "inhalation",
   "note",
   "other",
 ];

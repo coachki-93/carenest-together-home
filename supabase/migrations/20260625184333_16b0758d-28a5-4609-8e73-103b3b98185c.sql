@@ -1,0 +1,1 @@
+ALTER TYPE appointment_kind ADD VALUE IF NOT EXISTS 'inhalation';

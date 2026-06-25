@@ -826,6 +826,7 @@ export const en = {
       fluids: "Fluids",
       diaper: "Diaper change",
       seizure: "Seizure",
+      inhalation: "Inhalation",
       note: "Note",
       other: "Other",
     },

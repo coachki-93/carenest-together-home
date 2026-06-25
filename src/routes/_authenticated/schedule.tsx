@@ -30,6 +30,7 @@ import {
   Baby,
   Zap,
   StickyNote,
+  Cloud,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { getTaskState } from "@/lib/schedule/task-state";
@@ -1529,6 +1530,8 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
       return <Zap className={className} />;
     case "note":
       return <StickyNote className={className} />;
+    case "inhalation":
+      return <Cloud className={className} />;
     default:
       return <CalendarIcon className={className} />;
   }
@@ -1562,6 +1565,8 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
       return { bg: "#EDE9FE", fg: "#6D28D9" };
     case "note":
       return { bg: "#F1F5F9", fg: "#334155" };
+    case "inhalation":
+      return { bg: "#CCFBF1", fg: "#0F766E" };
     default:
       return { bg: "#F3E8FF", fg: "#7C3AED" };
   }
