@@ -30,7 +30,7 @@ import {
   Baby,
   Zap,
   StickyNote,
-  Cloud,
+  CloudFog,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { getTaskState } from "@/lib/schedule/task-state";
@@ -1531,7 +1531,7 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
     case "note":
       return <StickyNote className={className} />;
     case "inhalation":
-      return <Cloud className={className} />;
+      return <CloudFog className={className} />;
     default:
       return <CalendarIcon className={className} />;
   }
