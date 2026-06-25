@@ -31,7 +31,6 @@ import {
   Zap,
   StickyNote,
 } from "lucide-react";
-import { InhalationIcon } from "@/components/icons/InhalationIcon";
 import { SpO2DropletIcon } from "@/components/icons/SpO2DropletIcon";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { getTaskState } from "@/lib/schedule/task-state";
