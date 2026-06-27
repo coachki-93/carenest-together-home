@@ -1070,7 +1070,8 @@ function AppointmentDialog({
 
   const showInterval = repeat === "hourly" || repeat === "daily" || repeat === "monthly";
   const showWeekdays = repeat === "weekly";
-  const showTimesOfDay = repeat === "daily" || repeat === "weekly" || repeat === "monthly";
+  const showTimesOfDay =
+    repeat === "daily" || repeat === "weekly" || repeat === "monthly" || repeat === "specific_times";
 
   function addTimeOfDay() {
     setTimesOfDay((prev) => [...prev, "12:00"]);
