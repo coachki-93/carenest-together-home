@@ -1204,6 +1204,7 @@ function AppointmentDialog({
                     <SelectItem value="daily">{t("scheduleEvents.repeat.daily")}</SelectItem>
                     <SelectItem value="weekly">{t("scheduleEvents.repeat.weekly")}</SelectItem>
                     <SelectItem value="monthly">{t("scheduleEvents.repeat.monthly")}</SelectItem>
+                    <SelectItem value="specific_times">{t("scheduleEvents.repeat.specificTimes")}</SelectItem>
                   </SelectContent>
                 </Select>
                 {showInterval && (
