@@ -97,7 +97,7 @@ import {
 } from "@/lib/data/handover-due";
 import { ClipboardCheck } from "lucide-react";
 
-type RepeatMode = "none" | RecurrenceFreq;
+type RepeatMode = "none" | RecurrenceFreq | "specific_times";
 
 type SavePayload = {
   family_id: string;
@@ -936,10 +936,15 @@ function AppointmentDialog({
       setAllDay(editing.all_day);
       setLocation(editing.location ?? "");
       setNotes(editing.notes ?? "");
-      setRepeat((editing.recurrence_freq as RepeatMode | null) ?? "none");
-      setInterval(editing.recurrence_interval || 1);
+      const loadedFreq = (editing.recurrence_freq as RecurrenceFreq | null) ?? null;
+      const loadedTimes = editing.recurrence_times_of_day ?? [];
+      const loadedInterval = editing.recurrence_interval || 1;
+      const isSpecificTimes =
+        loadedFreq === "daily" && loadedInterval === 1 && loadedTimes.length > 0;
+      setRepeat(isSpecificTimes ? "specific_times" : ((loadedFreq as RepeatMode | null) ?? "none"));
+      setInterval(loadedInterval);
       setWeekdays(editing.recurrence_byweekday ?? []);
-      setTimesOfDay(editing.recurrence_times_of_day ?? []);
+      setTimesOfDay(loadedTimes);
       setReminderMinutes(editing.reminder_minutes ?? null);
       setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
@@ -985,9 +990,13 @@ function AppointmentDialog({
       toast.error(t("scheduleEvents.weekdaysRequired"));
       return null;
     }
-    // Times-of-day only apply to daily/weekly/monthly (not hourly).
+    // Times-of-day apply to daily/weekly/monthly and the "specific_times" preset.
     const allowTimes =
-      showsRepeat && (repeat === "daily" || repeat === "weekly" || repeat === "monthly");
+      showsRepeat &&
+      (repeat === "daily" ||
+        repeat === "weekly" ||
+        repeat === "monthly" ||
+        repeat === "specific_times");
     const cleanedTimes = allowTimes
       ? Array.from(
           new Set(
@@ -997,6 +1006,23 @@ function AppointmentDialog({
           ),
         ).sort()
       : [];
+    if (repeat === "specific_times" && showsRepeat && cleanedTimes.length === 0) {
+      toast.error(t("scheduleEvents.repeat.specificTimesRequired"));
+      return null;
+    }
+    // Map UI repeat -> persisted freq/interval/weekdays.
+    const persistedFreq: RecurrenceFreq | null =
+      showsRepeat && repeat !== "none"
+        ? repeat === "specific_times"
+          ? "daily"
+          : (repeat as RecurrenceFreq)
+        : null;
+    const persistedInterval =
+      showsRepeat && repeat !== "none"
+        ? repeat === "specific_times"
+          ? 1
+          : Math.max(1, interval)
+        : 1;
     return {
       family_id: familyId,
       child_id: childId,
@@ -1008,8 +1034,8 @@ function AppointmentDialog({
       starts_at: startDt.toISOString(),
       ends_at: endDt ? endDt.toISOString() : null,
       all_day: allDay,
-      recurrence_freq: showsRepeat && repeat !== "none" ? repeat : null,
-      recurrence_interval: showsRepeat && repeat !== "none" ? Math.max(1, interval) : 1,
+      recurrence_freq: persistedFreq,
+      recurrence_interval: persistedInterval,
       recurrence_byweekday:
         showsRepeat && repeat === "weekly" ? [...weekdays].sort() : null,
       recurrence_times_of_day: cleanedTimes.length > 0 ? cleanedTimes : null,
@@ -1044,7 +1070,8 @@ function AppointmentDialog({
 
   const showInterval = repeat === "hourly" || repeat === "daily" || repeat === "monthly";
   const showWeekdays = repeat === "weekly";
-  const showTimesOfDay = repeat === "daily" || repeat === "weekly" || repeat === "monthly";
+  const showTimesOfDay =
+    repeat === "daily" || repeat === "weekly" || repeat === "monthly" || repeat === "specific_times";
 
   function addTimeOfDay() {
     setTimesOfDay((prev) => [...prev, "12:00"]);
@@ -1177,6 +1204,7 @@ function AppointmentDialog({
                     <SelectItem value="daily">{t("scheduleEvents.repeat.daily")}</SelectItem>
                     <SelectItem value="weekly">{t("scheduleEvents.repeat.weekly")}</SelectItem>
                     <SelectItem value="monthly">{t("scheduleEvents.repeat.monthly")}</SelectItem>
+                    <SelectItem value="specific_times">{t("scheduleEvents.repeat.specificTimes")}</SelectItem>
                   </SelectContent>
                 </Select>
                 {showInterval && (
@@ -1236,7 +1264,9 @@ function AppointmentDialog({
                       {t("scheduleEvents.repeat.timesOfDay")}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      {t("scheduleEvents.repeat.timesOfDayHint")}
+                      {repeat === "specific_times"
+                        ? t("scheduleEvents.repeat.specificTimesHint")
+                        : t("scheduleEvents.repeat.timesOfDayHint")}
                     </p>
                     <div className="space-y-2">
                       {timesOfDay.map((tod, i) => (
