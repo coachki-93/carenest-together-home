@@ -97,7 +97,7 @@ import {
 } from "@/lib/data/handover-due";
 import { ClipboardCheck } from "lucide-react";
 
-type RepeatMode = "none" | RecurrenceFreq;
+type RepeatMode = "none" | RecurrenceFreq | "specific_times";
 
 type SavePayload = {
   family_id: string;
