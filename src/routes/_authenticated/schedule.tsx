@@ -990,9 +990,13 @@ function AppointmentDialog({
       toast.error(t("scheduleEvents.weekdaysRequired"));
       return null;
     }
-    // Times-of-day only apply to daily/weekly/monthly (not hourly).
+    // Times-of-day apply to daily/weekly/monthly and the "specific_times" preset.
     const allowTimes =
-      showsRepeat && (repeat === "daily" || repeat === "weekly" || repeat === "monthly");
+      showsRepeat &&
+      (repeat === "daily" ||
+        repeat === "weekly" ||
+        repeat === "monthly" ||
+        repeat === "specific_times");
     const cleanedTimes = allowTimes
       ? Array.from(
           new Set(
@@ -1002,6 +1006,23 @@ function AppointmentDialog({
           ),
         ).sort()
       : [];
+    if (repeat === "specific_times" && showsRepeat && cleanedTimes.length === 0) {
+      toast.error(t("scheduleEvents.repeat.specificTimesRequired"));
+      return null;
+    }
+    // Map UI repeat -> persisted freq/interval/weekdays.
+    const persistedFreq: RecurrenceFreq | null =
+      showsRepeat && repeat !== "none"
+        ? repeat === "specific_times"
+          ? "daily"
+          : (repeat as RecurrenceFreq)
+        : null;
+    const persistedInterval =
+      showsRepeat && repeat !== "none"
+        ? repeat === "specific_times"
+          ? 1
+          : Math.max(1, interval)
+        : 1;
     return {
       family_id: familyId,
       child_id: childId,
@@ -1013,8 +1034,8 @@ function AppointmentDialog({
       starts_at: startDt.toISOString(),
       ends_at: endDt ? endDt.toISOString() : null,
       all_day: allDay,
-      recurrence_freq: showsRepeat && repeat !== "none" ? repeat : null,
-      recurrence_interval: showsRepeat && repeat !== "none" ? Math.max(1, interval) : 1,
+      recurrence_freq: persistedFreq,
+      recurrence_interval: persistedInterval,
       recurrence_byweekday:
         showsRepeat && repeat === "weekly" ? [...weekdays].sort() : null,
       recurrence_times_of_day: cleanedTimes.length > 0 ? cleanedTimes : null,
