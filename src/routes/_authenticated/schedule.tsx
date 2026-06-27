@@ -1264,7 +1264,9 @@ function AppointmentDialog({
                       {t("scheduleEvents.repeat.timesOfDay")}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      {t("scheduleEvents.repeat.timesOfDayHint")}
+                      {repeat === "specific_times"
+                        ? t("scheduleEvents.repeat.specificTimesHint")
+                        : t("scheduleEvents.repeat.timesOfDayHint")}
                     </p>
                     <div className="space-y-2">
                       {timesOfDay.map((tod, i) => (
