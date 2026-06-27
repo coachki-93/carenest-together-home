@@ -936,10 +936,15 @@ function AppointmentDialog({
       setAllDay(editing.all_day);
       setLocation(editing.location ?? "");
       setNotes(editing.notes ?? "");
-      setRepeat((editing.recurrence_freq as RepeatMode | null) ?? "none");
-      setInterval(editing.recurrence_interval || 1);
+      const loadedFreq = (editing.recurrence_freq as RecurrenceFreq | null) ?? null;
+      const loadedTimes = editing.recurrence_times_of_day ?? [];
+      const loadedInterval = editing.recurrence_interval || 1;
+      const isSpecificTimes =
+        loadedFreq === "daily" && loadedInterval === 1 && loadedTimes.length > 0;
+      setRepeat(isSpecificTimes ? "specific_times" : ((loadedFreq as RepeatMode | null) ?? "none"));
+      setInterval(loadedInterval);
       setWeekdays(editing.recurrence_byweekday ?? []);
-      setTimesOfDay(editing.recurrence_times_of_day ?? []);
+      setTimesOfDay(loadedTimes);
       setReminderMinutes(editing.reminder_minutes ?? null);
       setAmountMl(editing.amount_ml != null ? String(editing.amount_ml) : "");
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
