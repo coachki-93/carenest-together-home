@@ -143,11 +143,13 @@ function StepWelcome({ onNext, onSkip }: { onNext: () => void; onSkip: () => voi
         <h1 className="text-3xl md:text-4xl font-extrabold">
           {firstName ? t("wizard.welcomeHi", { name: firstName }) : t("wizard.welcome")}
         </h1>
-        <p className="text-muted-foreground">{t("wizard.welcomeSub")}</p>
+        <p className="text-muted-foreground">{t("wizard.welcomeSub2")}</p>
       </div>
       <ul className="text-left max-w-md mx-auto space-y-3">
         <BulletRow icon={Baby} title={t("wizard.b1Title")} body={t("wizard.b1Body")} />
         <BulletRow icon={Pill} title={t("wizard.b2Title")} body={t("wizard.b2Body")} />
+        <BulletRow icon={Activity} title={t("wizard.b4Title")} body={t("wizard.b4Body")} />
+        <BulletRow icon={Siren} title={t("wizard.b5Title")} body={t("wizard.b5Body")} />
         <BulletRow icon={Users} title={t("wizard.b3Title")} body={t("wizard.b3Body")} />
       </ul>
       <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
