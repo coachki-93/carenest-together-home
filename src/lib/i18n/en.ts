@@ -145,6 +145,7 @@ export const en = {
     namePh: "What should the family call you?",
     finish: "Finish setup",
     saved: "Profile saved",
+    intro: "You'll see Today's tasks, vitals to log (with context like awake, sleeping, fever), oxygen status, and a handover at the end of your shift. The hospital toggle pauses care-place checks and oxygen tracking when you're at hospital.",
   },
   home: {
     allSet: "You're all set 🎉",
