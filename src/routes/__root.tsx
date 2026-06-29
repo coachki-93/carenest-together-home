@@ -14,6 +14,7 @@ import appleTouchIcon from "@/assets/apple-touch-icon.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { OfflineBanner } from "@/components/carenest/OfflineBanner";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import {
   resolveClientLanguage,
@@ -31,21 +32,30 @@ const resolveLanguageIso = createIsomorphicFn()
 function NotFoundComponent() {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="card-soft max-w-md text-center p-10">
-        <h1 className="text-7xl font-extrabold text-primary">404</h1>
+    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
+      <div className="card-soft max-w-md w-full text-center p-8 md:p-10">
+        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          {t("notFound.kicker")}
+        </p>
+        <h1 className="mt-2 text-7xl font-extrabold text-primary">404</h1>
         <h2 className="mt-4 text-xl font-semibold">{t("notFound.title")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{t("notFound.body")}</p>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {t("notFound.goDashboard")}
+          </Link>
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-full border border-input bg-card px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {t("notFound.goHome")}
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -186,6 +196,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <OfflineBanner />
       <Outlet />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>

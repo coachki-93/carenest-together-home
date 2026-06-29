@@ -19,9 +19,9 @@ export function HospitalToggle() {
   return (
     <label
       className={cn(
-        "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold cursor-pointer transition-colors",
+        "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold cursor-pointer transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
         hospitalOn
-          ? "border-red-300 bg-red-50 text-red-800"
+          ? "border-red-400 bg-red-50 text-red-900"
           : "border-input bg-background hover:bg-muted",
       )}
       title={t("dashboard.atHospital")}

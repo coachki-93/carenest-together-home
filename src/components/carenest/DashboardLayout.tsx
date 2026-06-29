@@ -39,10 +39,11 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
                 {actions}
                 <Link
                   to="/emergency"
+                  aria-label={t("emergency.title")}
                   title={t("emergency.title")}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-50 text-red-800 px-3 py-1.5 text-sm font-bold hover:bg-red-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-red-400 bg-red-50 text-red-900 px-3 py-1.5 text-sm font-bold hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
                 >
-                  <AlertTriangle className="size-4" />
+                  <AlertTriangle className="size-4" aria-hidden="true" />
                   <span className="hidden sm:inline">{t("emergency.open")}</span>
                 </Link>
                 <HospitalToggle />

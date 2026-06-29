@@ -958,8 +958,18 @@ export const sv = {
     navBody: "Schema, mediciner, värden, överlämning, vårdgivare och inställningar finns i sidofältet.",
   },
   notFound: {
-    title: "Sidan hittades inte",
-    body: "Sidan kan ha flyttats. Vi tar dig hem.",
+    kicker: "Sidan hittades inte",
+    title: "Vi kunde inte hitta sidan",
+    body: "Länken kan vara gammal eller så har sidan flyttats. Vi tar dig tillbaka till vården.",
+    goHome: "Hem",
+    goDashboard: "Öppna översikt",
+  },
+  offline: {
+    banner: "Du är offline — ändringar synkas när du är ansluten igen.",
+    title: "Du är offline",
+    body: "CareNest behöver internet för att ladda färska data. Anslut igen och försök på nytt.",
+    reconnected: "Du är ansluten igen. Tryck på försök igen för att ladda om.",
+    retry: "Försök igen",
     goHome: "Till startsidan",
   },
   notify: {

@@ -844,7 +844,7 @@ function DashboardPage() {
       }
     >
       {hospitalOn && (
-        <div className="card-soft mb-6 p-3 flex items-center gap-3 border border-red-200 bg-red-50/60 text-red-900">
+        <div className="card-soft mb-6 p-3 flex items-center gap-3 border border-red-200 bg-red-50 text-red-900">
           <Hospital className="size-5 shrink-0" />
           <p className="text-sm font-medium">{t("dashboard.atHospitalOn")}</p>
         </div>
@@ -1646,7 +1646,7 @@ function OxygenBar({
   const isPaused = remainingInfo?.paused ?? false;
 
   return (
-    <section className={cn("card-soft p-4", isPaused && "border border-red-200 bg-red-50/60 text-red-900")}>
+    <section className={cn("card-soft p-4", isPaused && "border border-red-200 bg-red-50 text-red-900")}>
       {isPaused && (
         <div className="flex items-center gap-3 mb-3">
           <Hospital className="size-5 shrink-0" />
@@ -1675,7 +1675,7 @@ function OxygenBar({
               <div className="min-w-0">
                 <div className="text-sm font-extrabold truncate">{t("dashboard.oxygenTitle")}</div>
                 {activeOxygen && remainingInfo ? (
-                  <div className={cn("text-xs font-medium truncate", isPaused ? "text-red-900/80" : "text-muted-foreground")}>
+                  <div className={cn("text-xs font-medium truncate", isPaused ? "text-red-900" : "text-muted-foreground")}>
                     {formatFlow(activeOxygen.flow_lpm)} · {formatDuration(remainingInfo.remainingMinutes)}{" "}
                     {t("dashboard.oxygenRemaining")}
                   </div>
@@ -1696,7 +1696,7 @@ function OxygenBar({
                   style={{ width: `${percent}%` }}
                 />
               </div>
-              <div className={cn("mt-1.5 flex justify-between text-xs font-medium", isPaused ? "text-red-900/80" : "text-muted-foreground")}>
+              <div className={cn("mt-1.5 flex justify-between text-xs font-medium", isPaused ? "text-red-900" : "text-muted-foreground")}>
                 <span>{t("oxygen.percentLeft", { percent })}</span>
                 <span>
                   {t("oxygen.estimatedEmpty")}: {remainingInfo.remainingMinutes > 0 ? dateFmt.format(remainingInfo.emptyAt) : "—"}
