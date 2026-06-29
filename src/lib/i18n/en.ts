@@ -135,6 +135,7 @@ export const en = {
     saveBtn: "Save child profile",
     nameRequired: "Child's name is required",
     saved: "Child profile saved",
+    dobHint: "We use date of birth to show age-appropriate vital reference ranges.",
   },
   onboardingCaregiver: {
     title: "Welcome, caregiver",
