@@ -14,6 +14,7 @@ import appleTouchIcon from "@/assets/apple-touch-icon.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { OfflineBanner } from "@/components/carenest/OfflineBanner";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import {
   resolveClientLanguage,
