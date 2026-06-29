@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users } from "lucide-react";
+import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users, Activity, Wind, CalendarCheck, Siren, ArrowRight } from "lucide-react";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,10 +23,21 @@ const stepSchema = z.object({
 export const Route = createFileRoute("/_authenticated/onboarding/child")({
   head: () => ({ meta: [{ title: "Welcome to CareNest" }] }),
   validateSearch: stepSchema,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarded")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (profile?.onboarded) throw redirect({ to: "/dashboard" });
+  },
   component: ChildOnboarding,
 });
 
 const TOTAL_STEPS = 5;
+
 
 interface Contact {
   name: string;
@@ -132,11 +143,13 @@ function StepWelcome({ onNext, onSkip }: { onNext: () => void; onSkip: () => voi
         <h1 className="text-3xl md:text-4xl font-extrabold">
           {firstName ? t("wizard.welcomeHi", { name: firstName }) : t("wizard.welcome")}
         </h1>
-        <p className="text-muted-foreground">{t("wizard.welcomeSub")}</p>
+        <p className="text-muted-foreground">{t("wizard.welcomeSub2")}</p>
       </div>
       <ul className="text-left max-w-md mx-auto space-y-3">
         <BulletRow icon={Baby} title={t("wizard.b1Title")} body={t("wizard.b1Body")} />
         <BulletRow icon={Pill} title={t("wizard.b2Title")} body={t("wizard.b2Body")} />
+        <BulletRow icon={Activity} title={t("wizard.b4Title")} body={t("wizard.b4Body")} />
+        <BulletRow icon={Siren} title={t("wizard.b5Title")} body={t("wizard.b5Body")} />
         <BulletRow icon={Users} title={t("wizard.b3Title")} body={t("wizard.b3Body")} />
       </ul>
       <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
@@ -355,6 +368,7 @@ function StepChild({
             onChange={(e) => setDob(e.target.value)}
             className="h-12 rounded-xl"
           />
+          <p className="text-xs text-muted-foreground mt-1">{t("onboardingChild.dobHint")}</p>
         </Field>
       </div>
 
@@ -694,15 +708,35 @@ function StepInvite({
 function StepDone({ onBack, onFinish }: { onBack: () => void; onFinish: () => void }) {
   const { t } = useTranslation();
   return (
-    <div className="card-soft p-8 md:p-10 text-center space-y-6">
-      <div className="size-16 rounded-2xl bg-success/20 text-success-foreground flex items-center justify-center mx-auto">
-        <Check className="size-8" />
+    <div className="card-soft p-8 md:p-10 space-y-6">
+      <div className="text-center space-y-4">
+        <div className="size-16 rounded-2xl bg-success/20 text-success-foreground flex items-center justify-center mx-auto">
+          <Check className="size-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl md:text-3xl font-extrabold">{t("wizard.doneTitle")}</h2>
+          <p className="text-muted-foreground">{t("wizard.doneSub")}</p>
+        </div>
       </div>
-      <div className="space-y-2">
-        <h2 className="text-2xl md:text-3xl font-extrabold">
-          {t("wizard.doneTitle")}
-        </h2>
-        <p className="text-muted-foreground">{t("wizard.doneSub")}</p>
+      <div className="rounded-2xl border bg-card/60 p-5 text-left space-y-3">
+        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          {t("wizard.doneCheckTitle")}
+        </p>
+        <ul className="space-y-2 text-sm">
+          {[
+            { icon: Activity, label: t("wizard.doneCheck1") },
+            { icon: Wind, label: t("wizard.doneCheck2") },
+            { icon: CalendarCheck, label: t("wizard.doneCheck3") },
+            { icon: Siren, label: t("wizard.doneCheck4") },
+          ].map(({ icon: Icon, label }) => (
+            <li key={label} className="flex items-center gap-3">
+              <span className="size-8 rounded-lg bg-primary-soft text-primary flex items-center justify-center">
+                <Icon className="size-4" />
+              </span>
+              <span>{label}</span>
+            </li>
+          ))}
+        </ul>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
         <Button variant="ghost" className="rounded-full" onClick={onBack}>
@@ -713,6 +747,7 @@ function StepDone({ onBack, onFinish }: { onBack: () => void; onFinish: () => vo
           onClick={onFinish}
         >
           {t("wizard.openDashboard")}
+          <ArrowRight className="size-4 ml-2" />
         </Button>
       </div>
     </div>
