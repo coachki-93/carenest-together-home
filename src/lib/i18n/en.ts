@@ -673,7 +673,13 @@ export const en = {
       apptMissed: "missed",
       apptCancelled: "skipped",
       vitalAbnormal: "Out-of-range reading",
+      oxygenStarted: "New oxygen tank started",
+      oxygenReplaced: "Oxygen tank replaced",
+      hospital: "Family was at hospital during this shift (oxygen paused).",
+      carePlaceIssue: "Care-place check flagged",
+      taskNote: "Note",
     },
+
   },
   childPage: {
     subtitle: "View and update your child's profile.",

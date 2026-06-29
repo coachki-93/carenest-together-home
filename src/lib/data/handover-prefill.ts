@@ -31,7 +31,13 @@ interface Labels {
   apptCancelled: string;
   vitalAbnormal: string;
   empty: string;
+  oxygenStarted: string;
+  oxygenReplaced: string;
+  hospital: string;
+  carePlaceIssue: string;
+  taskNote: string;
 }
+
 
 function fmtTime(d: Date) {
   return d.toTimeString().slice(0, 5);
