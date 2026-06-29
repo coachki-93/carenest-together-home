@@ -2,38 +2,56 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/carenest/Logo";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
-import { Button } from "@/components/ui/button";
 
 export function MarketingHeader() {
   const { t } = useTranslation();
   return (
-    <header className="px-6 md:px-8 pt-6 md:pt-8 flex items-center justify-between gap-3">
-      <Link to="/" className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full">
-        <Logo size={40} />
-      </Link>
-      <nav className="hidden md:flex items-center gap-1 text-sm font-semibold">
+    <header className="w-full">
+      <div className="max-w-6xl mx-auto px-6 md:px-8 pt-7 pb-2 flex items-center justify-between gap-3">
         <Link
-          to="/features"
-          className="px-3 py-2 rounded-full text-foreground/80 hover:text-foreground hover:bg-lavender transition-colors"
-          activeProps={{ className: "text-primary" }}
+          to="/"
+          className="flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage rounded-full"
         >
-          {t("marketing.nav.features")}
+          <Logo size={36} />
+          <span
+            className="text-2xl tracking-tight text-marketing-ink"
+            style={{ fontFamily: "var(--font-serif)" }}
+          >
+            CareNest
+          </span>
         </Link>
-        <a
-          href="#faq"
-          className="px-3 py-2 rounded-full text-foreground/80 hover:text-foreground hover:bg-lavender transition-colors"
-        >
-          {t("marketing.nav.faq")}
-        </a>
-      </nav>
-      <div className="flex items-center gap-2">
-        <LanguageToggle />
-        <Button asChild variant="ghost" className="rounded-full hidden sm:inline-flex">
-          <Link to="/auth/login">{t("splash.login")}</Link>
-        </Button>
-        <Button asChild className="rounded-full px-5">
-          <Link to="/auth/signup">{t("splash.getStarted")}</Link>
-        </Button>
+
+        <nav className="hidden md:flex items-center gap-8 text-sm text-marketing-muted">
+          <Link
+            to="/features"
+            className="hover:text-marketing-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage rounded-md"
+            activeProps={{ className: "text-marketing-ink" }}
+          >
+            {t("marketing.nav.features")}
+          </Link>
+          <a
+            href="#faq"
+            className="hover:text-marketing-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage rounded-md"
+          >
+            {t("marketing.nav.faq")}
+          </a>
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <LanguageToggle />
+          <Link
+            to="/auth/login"
+            className="hidden sm:inline-block text-sm text-marketing-muted hover:text-marketing-ink transition-colors"
+          >
+            {t("splash.login")}
+          </Link>
+          <Link
+            to="/auth/signup"
+            className="inline-flex items-center rounded-full bg-marketing-ink px-5 py-2.5 text-sm font-medium text-marketing-bg hover:bg-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
+          >
+            {t("splash.getStarted")}
+          </Link>
+        </div>
       </div>
     </header>
   );
