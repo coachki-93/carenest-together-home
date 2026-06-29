@@ -94,9 +94,25 @@ export function useLogVital() {
       if (error) throw error;
       return data as Vital;
     },
-    onSuccess: () => {
+    onSuccess: (row) => {
       qc.invalidateQueries({ queryKey: ["vitals"] });
       qc.invalidateQueries({ queryKey: ["vitals-latest"] });
+      // Fire-and-forget streak check. Non-blocking.
+      if (row?.family_id && row?.child_id) {
+        import("./vitals-streak.functions")
+          .then(({ notifyVitalStreak }) =>
+            notifyVitalStreak({
+              data: {
+                family_id: row.family_id,
+                child_id: row.child_id!,
+                vital_type: row.vital_type,
+              },
+            }),
+          )
+          .catch(() => {
+            /* non-blocking */
+          });
+      }
     },
   });
 }
