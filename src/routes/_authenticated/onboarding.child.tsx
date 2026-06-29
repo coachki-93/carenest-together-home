@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users } from "lucide-react";
+import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users, Activity, Wind, CalendarCheck, Siren, ArrowRight } from "lucide-react";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,10 +23,21 @@ const stepSchema = z.object({
 export const Route = createFileRoute("/_authenticated/onboarding/child")({
   head: () => ({ meta: [{ title: "Welcome to CareNest" }] }),
   validateSearch: stepSchema,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarded")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (profile?.onboarded) throw redirect({ to: "/dashboard" });
+  },
   component: ChildOnboarding,
 });
 
 const TOTAL_STEPS = 5;
+
 
 interface Contact {
   name: string;
