@@ -164,8 +164,7 @@ export const en = {
     instructions: "Instructions",
     inventory: "Inventory",
     shopping: "Shopping list",
-
-
+    emergency: "Emergency info",
 
 
 
