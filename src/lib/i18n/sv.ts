@@ -164,8 +164,7 @@ export const sv = {
     instructions: "Instruktioner",
     inventory: "Förråd",
     shopping: "Inköpslista",
-
-
+    emergency: "Nödinformation",
 
 
 
