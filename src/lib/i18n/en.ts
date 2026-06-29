@@ -958,8 +958,18 @@ export const en = {
     navBody: "Schedule, Meds, Vitals, Handover, Caregivers and Settings live in the sidebar.",
   },
   notFound: {
-    title: "Page not found",
-    body: "That page may have moved. Let's get you home.",
+    kicker: "Page not found",
+    title: "We couldn't find that page",
+    body: "The link may be old, or the page may have moved. Let's get you back to care.",
+    goHome: "Home",
+    goDashboard: "Open dashboard",
+  },
+  offline: {
+    banner: "You're offline — changes will sync when you're back online.",
+    title: "You're offline",
+    body: "CareNest needs an internet connection to load fresh data. Reconnect and try again.",
+    reconnected: "You're back online. Tap retry to reload.",
+    retry: "Retry",
     goHome: "Go home",
   },
   notify: {
