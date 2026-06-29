@@ -3,23 +3,25 @@ import spo2IconAsset from "@/assets/spo2-icon.png.asset.json";
 
 type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
   size?: number | string;
+  /**
+   * Accessible label. Provide when the icon stands alone (no adjacent text).
+   * Omit to keep the icon decorative (`aria-hidden`).
+   */
+  label?: string;
 };
 
-/**
- * SpO₂ icon — custom user-provided red droplet with white bubbles.
- * Sizing follows the className (e.g. `h-5 w-5`) so it matches the
- * surrounding Lucide icons in lists and headers.
- */
-export function SpO2DropletIcon({ size, className, style, ...rest }: Props) {
+export function SpO2DropletIcon({ size, className, style, label, ...rest }: Props) {
   const sizeStyle =
     size !== undefined ? { width: size, height: size } : undefined;
+  const a11y = label
+    ? { role: "img" as const, "aria-label": label, alt: label }
+    : { "aria-hidden": true, alt: "" };
   return (
     <img
       src={spo2IconAsset.url}
-      alt=""
       className={className}
       style={{ objectFit: "contain", ...sizeStyle, ...style }}
-      aria-hidden="true"
+      {...a11y}
       {...rest}
     />
   );
