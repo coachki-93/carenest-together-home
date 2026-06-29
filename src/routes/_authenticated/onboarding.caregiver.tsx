@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Activity, Wind, Siren, ClipboardList } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession, useProfile, useMyMembership } from "@/lib/auth/use-profile";
@@ -16,6 +16,16 @@ import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/_authenticated/onboarding/caregiver")({
   head: () => ({ meta: [{ title: "Set up your caregiver profile — CareNest" }] }),
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarded")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (profile?.onboarded) throw redirect({ to: "/dashboard" });
+  },
   component: CaregiverOnboarding,
 });
 
