@@ -124,6 +124,25 @@ function CaregiverOnboarding() {
             {save.isPending ? t("common.saving") : t("onboardingCaregiver.finish")}
           </Button>
         </form>
+
+        <div className="card-soft p-6 space-y-4">
+          <p className="text-sm text-muted-foreground">{t("onboardingCaregiver.intro")}</p>
+          <ul className="grid grid-cols-2 gap-3 text-xs">
+            {[
+              { icon: ClipboardList, label: t("nav.today") },
+              { icon: Activity, label: t("nav.vitals") },
+              { icon: Wind, label: t("nav.oxygen") },
+              { icon: Siren, label: t("emergency.open") },
+            ].map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-2 rounded-xl border bg-card/60 px-3 py-2">
+                <span className="size-8 rounded-lg bg-primary-soft text-primary flex items-center justify-center">
+                  <Icon className="size-4" />
+                </span>
+                <span className="font-medium">{label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
