@@ -283,3 +283,18 @@
   height: 0;
 }
 
+/* ----- Marketing / landing tokens (editorial direction) ----- */
+@theme inline {
+  --color-marketing-bg: #FDFCFB;
+  --color-marketing-surface: #F9F8F6;
+  --color-marketing-ink: #2D2926;
+  --color-marketing-muted: #5F5A54;
+  --color-marketing-line: #E5E1DA;
+  --color-marketing-faint: #F3F1ED;
+  --color-marketing-sage: #5B8257;
+  --color-marketing-sage-soft: #E8F0E6;
+  --color-marketing-sage-line: #D1DDD0;
+  --font-serif: "Instrument Serif", "Iowan Old Style", "Apple Garamond", Georgia, serif;
+  --font-sans-marketing: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
