@@ -1229,6 +1229,23 @@ export const sv = {
     subtitle: "Förråd att beställa och saker som redan är på väg.",
     noFamily: "Gå med i eller skapa en familj för att se inköpslistan.",
   },
+  emergency: {
+    title: "Nödinformation",
+    child: "Barn",
+    back: "Tillbaka",
+    call112: "Ring 112",
+    call112Sub: "Larma räddningstjänsten",
+    diagnosis: "Diagnos / tillstånd",
+    allergies: "Allergier",
+    noneKnown: "Inga kända",
+    activeMeds: "Aktiva mediciner",
+    noMeds: "Inga aktiva mediciner",
+    contacts: "Nödkontakter",
+    doctors: "Läkare & specialister",
+    notSet: "Inte angivet",
+    disclaimer: "Visa den här skärmen för räddningspersonal. Informationen kommer från barnets profil — håll den uppdaterad.",
+    open: "Nöd",
+  },
 };
 
 
