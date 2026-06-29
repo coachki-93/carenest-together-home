@@ -368,6 +368,7 @@ function StepChild({
             onChange={(e) => setDob(e.target.value)}
             className="h-12 rounded-xl"
           />
+          <p className="text-xs text-muted-foreground mt-1">{t("onboardingChild.dobHint")}</p>
         </Field>
       </div>
 
