@@ -135,6 +135,7 @@ export const sv = {
     saveBtn: "Spara barnprofil",
     nameRequired: "Barnets namn krävs",
     saved: "Barnprofil sparad",
+    dobHint: "Vi använder födelsedatum för att visa åldersanpassade referensvärden för vitalparametrar.",
   },
   onboardingCaregiver: {
     title: "Välkommen, vårdgivare",
