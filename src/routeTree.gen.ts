@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -43,6 +44,11 @@ import { Route as ApiPublicHooksCarePlaceMissedSweepRouteImport } from './routes
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -200,6 +206,7 @@ const ApiPublicHooksCarePlaceMissedSweepRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/features': typeof FeaturesRoute
   '/offline': typeof OfflineRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/features': typeof FeaturesRoute
   '/offline': typeof OfflineRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
@@ -264,6 +272,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/features': typeof FeaturesRoute
   '/offline': typeof OfflineRoute
   '/_authenticated/caregivers': typeof AuthenticatedCaregiversRoute
   '/_authenticated/child': typeof AuthenticatedChildRoute
@@ -297,6 +306,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/features'
     | '/offline'
     | '/caregivers'
     | '/child'
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/features'
     | '/offline'
     | '/caregivers'
     | '/child'
@@ -360,6 +371,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/features'
     | '/offline'
     | '/_authenticated/caregivers'
     | '/_authenticated/child'
@@ -393,6 +405,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  FeaturesRoute: typeof FeaturesRoute
   OfflineRoute: typeof OfflineRoute
   InviteCodeRoute: typeof InviteCodeRoute
   InviteIndexRoute: typeof InviteIndexRoute
@@ -408,6 +421,13 @@ declare module '@tanstack/react-router' {
       path: '/offline'
       fullPath: '/offline'
       preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -679,6 +699,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  FeaturesRoute: FeaturesRoute,
   OfflineRoute: OfflineRoute,
   InviteCodeRoute: InviteCodeRoute,
   InviteIndexRoute: InviteIndexRoute,
