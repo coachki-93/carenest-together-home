@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { notifyVitalStreak } from "./vitals-streak.functions";
 
 export type Vital = Database["public"]["Tables"]["vitals"]["Row"];
 export type VitalInsert = Database["public"]["Tables"]["vitals"]["Insert"];
@@ -99,19 +100,15 @@ export function useLogVital() {
       qc.invalidateQueries({ queryKey: ["vitals-latest"] });
       // Fire-and-forget streak check. Non-blocking.
       if (row?.family_id && row?.child_id) {
-        import("./vitals-streak.functions")
-          .then(({ notifyVitalStreak }) =>
-            notifyVitalStreak({
-              data: {
-                family_id: row.family_id,
-                child_id: row.child_id!,
-                vital_type: row.vital_type,
-              },
-            }),
-          )
-          .catch(() => {
-            /* non-blocking */
-          });
+        notifyVitalStreak({
+          data: {
+            family_id: row.family_id,
+            child_id: row.child_id,
+            vital_type: row.vital_type,
+          },
+        }).catch(() => {
+          /* non-blocking */
+        });
       }
     },
   });
