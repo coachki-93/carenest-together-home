@@ -145,6 +145,7 @@ export const sv = {
     namePh: "Vad ska familjen kalla dig?",
     finish: "Slutför",
     saved: "Profil sparad",
+    intro: "Du ser dagens uppgifter, vitalvärden att logga (med kontext som vaken, sover, feber), syrgasstatus och en överlämning i slutet av passet. Sjukhusknappen pausar vårdplatschecker och syrgasuppföljning när ni är på sjukhus.",
   },
   home: {
     allSet: "Allt klart 🎉",
