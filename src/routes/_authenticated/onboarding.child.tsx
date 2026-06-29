@@ -708,15 +708,35 @@ function StepInvite({
 function StepDone({ onBack, onFinish }: { onBack: () => void; onFinish: () => void }) {
   const { t } = useTranslation();
   return (
-    <div className="card-soft p-8 md:p-10 text-center space-y-6">
-      <div className="size-16 rounded-2xl bg-success/20 text-success-foreground flex items-center justify-center mx-auto">
-        <Check className="size-8" />
+    <div className="card-soft p-8 md:p-10 space-y-6">
+      <div className="text-center space-y-4">
+        <div className="size-16 rounded-2xl bg-success/20 text-success-foreground flex items-center justify-center mx-auto">
+          <Check className="size-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl md:text-3xl font-extrabold">{t("wizard.doneTitle")}</h2>
+          <p className="text-muted-foreground">{t("wizard.doneSub")}</p>
+        </div>
       </div>
-      <div className="space-y-2">
-        <h2 className="text-2xl md:text-3xl font-extrabold">
-          {t("wizard.doneTitle")}
-        </h2>
-        <p className="text-muted-foreground">{t("wizard.doneSub")}</p>
+      <div className="rounded-2xl border bg-card/60 p-5 text-left space-y-3">
+        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          {t("wizard.doneCheckTitle")}
+        </p>
+        <ul className="space-y-2 text-sm">
+          {[
+            { icon: Activity, label: t("wizard.doneCheck1") },
+            { icon: Wind, label: t("wizard.doneCheck2") },
+            { icon: CalendarCheck, label: t("wizard.doneCheck3") },
+            { icon: Siren, label: t("wizard.doneCheck4") },
+          ].map(({ icon: Icon, label }) => (
+            <li key={label} className="flex items-center gap-3">
+              <span className="size-8 rounded-lg bg-primary-soft text-primary flex items-center justify-center">
+                <Icon className="size-4" />
+              </span>
+              <span>{label}</span>
+            </li>
+          ))}
+        </ul>
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
         <Button variant="ghost" className="rounded-full" onClick={onBack}>
@@ -727,6 +747,7 @@ function StepDone({ onBack, onFinish }: { onBack: () => void; onFinish: () => vo
           onClick={onFinish}
         >
           {t("wizard.openDashboard")}
+          <ArrowRight className="size-4 ml-2" />
         </Button>
       </div>
     </div>
