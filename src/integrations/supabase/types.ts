@@ -750,6 +750,8 @@ export type Database = {
           id: string
           name: string
           owner_id: string
+          oxygen_critical_minutes: number
+          oxygen_warn_minutes: number
           updated_at: string
         }
         Insert: {
@@ -758,6 +760,8 @@ export type Database = {
           id?: string
           name?: string
           owner_id: string
+          oxygen_critical_minutes?: number
+          oxygen_warn_minutes?: number
           updated_at?: string
         }
         Update: {
@@ -766,6 +770,8 @@ export type Database = {
           id?: string
           name?: string
           owner_id?: string
+          oxygen_critical_minutes?: number
+          oxygen_warn_minutes?: number
           updated_at?: string
         }
         Relationships: []
@@ -1294,9 +1300,11 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          critical_alert_sent_at: string | null
           family_id: string
           flow_lpm: number
           id: string
+          low_alert_sent_at: string | null
           notes: string | null
           paused_at: string | null
           paused_seconds: number
@@ -1308,9 +1316,11 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          critical_alert_sent_at?: string | null
           family_id: string
           flow_lpm: number
           id?: string
+          low_alert_sent_at?: string | null
           notes?: string | null
           paused_at?: string | null
           paused_seconds?: number
@@ -1322,9 +1332,11 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          critical_alert_sent_at?: string | null
           family_id?: string
           flow_lpm?: number
           id?: string
+          low_alert_sent_at?: string | null
           notes?: string | null
           paused_at?: string | null
           paused_seconds?: number
