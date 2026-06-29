@@ -164,8 +164,7 @@ export const en = {
     instructions: "Instructions",
     inventory: "Inventory",
     shopping: "Shopping list",
-
-
+    emergency: "Emergency info",
 
 
 
@@ -1229,6 +1228,23 @@ export const en = {
     title: "Shopping list",
     subtitle: "Supplies to order and items already on the way.",
     noFamily: "Join or create a family to see its shopping list.",
+  },
+  emergency: {
+    title: "Emergency info",
+    child: "Child",
+    back: "Back",
+    call112: "Call 112",
+    call112Sub: "Emergency services",
+    diagnosis: "Diagnosis / conditions",
+    allergies: "Allergies",
+    noneKnown: "None known",
+    activeMeds: "Active medications",
+    noMeds: "No active medications",
+    contacts: "Emergency contacts",
+    doctors: "Doctors & specialists",
+    notSet: "Not set",
+    disclaimer: "Show this screen to first responders. Information comes from the child's profile — keep it up to date.",
+    open: "Emergency",
   },
 };
 

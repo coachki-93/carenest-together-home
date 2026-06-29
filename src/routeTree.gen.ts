@@ -29,6 +29,7 @@ import { Route as AuthenticatedInventoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInstructionsRouteImport } from './routes/_authenticated/instructions'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
+import { Route as AuthenticatedEmergencyRouteImport } from './routes/_authenticated/emergency'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedChildRouteImport } from './routes/_authenticated/child'
 import { Route as AuthenticatedCaregiversRouteImport } from './routes/_authenticated/caregivers'
@@ -138,6 +139,11 @@ const AuthenticatedHandoverRoute = AuthenticatedHandoverRouteImport.update({
   path: '/handover',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEmergencyRoute = AuthenticatedEmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/emergency': typeof AuthenticatedEmergencyRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/emergency': typeof AuthenticatedEmergencyRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/_authenticated/caregivers': typeof AuthenticatedCaregiversRoute
   '/_authenticated/child': typeof AuthenticatedChildRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/emergency': typeof AuthenticatedEmergencyRoute
   '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/instructions': typeof AuthenticatedInstructionsRoute
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/caregivers'
     | '/child'
     | '/dashboard'
+    | '/emergency'
     | '/handover'
     | '/home'
     | '/instructions'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/caregivers'
     | '/child'
     | '/dashboard'
+    | '/emergency'
     | '/handover'
     | '/home'
     | '/instructions'
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/_authenticated/caregivers'
     | '/_authenticated/child'
     | '/_authenticated/dashboard'
+    | '/_authenticated/emergency'
     | '/_authenticated/handover'
     | '/_authenticated/home'
     | '/_authenticated/instructions'
@@ -504,6 +516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHandoverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/emergency': {
+      id: '/_authenticated/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof AuthenticatedEmergencyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -560,6 +579,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCaregiversRoute: typeof AuthenticatedCaregiversRoute
   AuthenticatedChildRoute: typeof AuthenticatedChildRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEmergencyRoute: typeof AuthenticatedEmergencyRoute
   AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInstructionsRoute: typeof AuthenticatedInstructionsRoute
@@ -579,6 +599,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCaregiversRoute: AuthenticatedCaregiversRoute,
   AuthenticatedChildRoute: AuthenticatedChildRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEmergencyRoute: AuthenticatedEmergencyRoute,
   AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInstructionsRoute: AuthenticatedInstructionsRoute,

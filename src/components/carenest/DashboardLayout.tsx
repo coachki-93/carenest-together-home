@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { AlertTriangle } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { LanguageToggle } from "./LanguageToggle";
@@ -13,6 +16,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ title, subtitle, actions, children }: DashboardLayoutProps) {
+  const { t } = useTranslation();
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-transparent">
@@ -33,6 +37,14 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
               </div>
               <div className="flex items-center gap-1 md:gap-2 shrink-0">
                 {actions}
+                <Link
+                  to="/emergency"
+                  title={t("emergency.title")}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-50 text-red-800 px-3 py-1.5 text-sm font-bold hover:bg-red-100 transition-colors"
+                >
+                  <AlertTriangle className="size-4" />
+                  <span className="hidden sm:inline">{t("emergency.open")}</span>
+                </Link>
                 <HospitalToggle />
                 <div className="hidden md:flex items-center gap-2">
                   <LanguageToggle />
