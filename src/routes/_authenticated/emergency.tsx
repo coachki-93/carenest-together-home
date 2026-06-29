@@ -144,9 +144,9 @@ function EmergencyPage() {
                   className="rounded-lg bg-white px-3 py-2 border border-border"
                 >
                   <div className="text-base font-bold">{m.name}</div>
-                  {(m.dose || m.unit) && (
+                  {(m.dose_amount != null || m.dose_unit) && (
                     <div className="text-sm text-muted-foreground">
-                      {[m.dose, m.unit].filter(Boolean).join(" ")}
+                      {[m.dose_amount, m.dose_unit].filter(Boolean).join(" ")}
                     </div>
                   )}
                 </li>
