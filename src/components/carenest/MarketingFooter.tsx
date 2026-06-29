@@ -5,30 +5,49 @@ import { Logo } from "@/components/carenest/Logo";
 export function MarketingFooter() {
   const { t } = useTranslation();
   return (
-    <footer className="mt-20 border-t border-border/60 bg-card/40">
-      <div className="max-w-6xl mx-auto px-6 md:px-8 py-10 grid gap-6 md:grid-cols-3 items-start">
-        <div className="space-y-2">
-          <Logo size={36} />
-          <p className="text-sm text-muted-foreground max-w-xs">
+    <footer className="border-t border-marketing-line bg-marketing-bg">
+      <div className="max-w-6xl mx-auto px-6 md:px-8 py-14 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr] items-start">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <Logo size={32} />
+            <span
+              className="text-xl tracking-tight text-marketing-ink"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
+              CareNest
+            </span>
+          </div>
+          <p className="text-sm text-marketing-muted max-w-sm leading-relaxed">
             {t("marketing.footer.tagline")}
           </p>
         </div>
         <div className="text-sm">
-          <h4 className="font-bold mb-2">{t("marketing.footer.product")}</h4>
-          <ul className="space-y-1.5 text-muted-foreground">
-            <li><Link to="/features" className="hover:text-foreground">{t("marketing.nav.features")}</Link></li>
-            <li><Link to="/auth/signup" className="hover:text-foreground">{t("splash.ctaCreate")}</Link></li>
-            <li><Link to="/invite" className="hover:text-foreground">{t("splash.ctaInvite")}</Link></li>
-            <li><Link to="/auth/login" className="hover:text-foreground">{t("splash.login")}</Link></li>
+          <h4 className="text-xs uppercase tracking-[0.18em] text-marketing-muted/80 mb-4">
+            {t("marketing.footer.product")}
+          </h4>
+          <ul className="space-y-2.5 text-marketing-ink">
+            <li><Link to="/features" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.features")}</Link></li>
+            <li><Link to="/auth/signup" className="hover:text-marketing-sage transition-colors">{t("splash.ctaCreate")}</Link></li>
+            <li><Link to="/invite" className="hover:text-marketing-sage transition-colors">{t("splash.ctaInvite")}</Link></li>
+            <li><Link to="/auth/login" className="hover:text-marketing-sage transition-colors">{t("splash.login")}</Link></li>
           </ul>
         </div>
         <div className="text-sm">
-          <h4 className="font-bold mb-2">{t("marketing.footer.about")}</h4>
-          <p className="text-muted-foreground">{t("marketing.footer.disclaimer")}</p>
+          <h4 className="text-xs uppercase tracking-[0.18em] text-marketing-muted/80 mb-4">
+            {t("marketing.footer.about")}
+          </h4>
+          <p className="text-marketing-muted leading-relaxed">
+            {t("marketing.footer.disclaimer")}
+          </p>
         </div>
       </div>
-      <div className="border-t border-border/60 py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} CareNest
+      <div className="border-t border-marketing-line">
+        <div className="max-w-6xl mx-auto px-6 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-marketing-muted">
+          <p>© {new Date().getFullYear()} CareNest</p>
+          <p className="italic" style={{ fontFamily: "var(--font-serif)" }}>
+            {t("marketing.hero.trust")}
+          </p>
+        </div>
       </div>
     </footer>
   );
