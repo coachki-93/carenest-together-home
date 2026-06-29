@@ -673,7 +673,13 @@ export const sv = {
       apptMissed: "missad",
       apptCancelled: "hoppad över",
       vitalAbnormal: "Värde utanför normalområdet",
+      oxygenStarted: "Ny syrgastub påbörjad",
+      oxygenReplaced: "Syrgastub utbytt",
+      hospital: "Familjen var på sjukhus under passet (syrgas pausad).",
+      carePlaceIssue: "Vårdplats-kontroll flaggad",
+      taskNote: "Anteckning",
     },
+
   },
   childPage: {
     subtitle: "Visa och uppdatera barnets profil.",

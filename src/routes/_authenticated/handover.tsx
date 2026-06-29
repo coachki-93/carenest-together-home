@@ -99,9 +99,15 @@ function HandoverPage() {
       apptCancelled: t("handoverPage.prefill.apptCancelled"),
       vitalAbnormal: t("handoverPage.prefill.vitalAbnormal"),
       empty: t("handoverPage.prefill.empty"),
+      oxygenStarted: t("handoverPage.prefill.oxygenStarted"),
+      oxygenReplaced: t("handoverPage.prefill.oxygenReplaced"),
+      hospital: t("handoverPage.prefill.hospital"),
+      carePlaceIssue: t("handoverPage.prefill.carePlaceIssue"),
+      taskNote: t("handoverPage.prefill.taskNote"),
     }),
     [t],
   );
+
   const prefillInput =
     membership?.family_id && shiftWindow
       ? {
