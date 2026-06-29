@@ -16,6 +16,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ title, subtitle, actions, children }: DashboardLayoutProps) {
+  const { t } = useTranslation();
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-transparent">
