@@ -5,7 +5,7 @@ import {
   getVitalRanges,
   parseRangeOverrides,
   type VitalType,
-} from "@/lib/data/vitals";
+} from "@/lib/vitals/ranges";
 
 interface StreakInput {
   family_id: string;
