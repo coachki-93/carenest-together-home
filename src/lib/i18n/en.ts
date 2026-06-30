@@ -1304,7 +1304,7 @@ export const en = {
       s3Title: "Shift change",
       s3Body: "End-of-shift handover is pre-filled with the day so far — sleep, mood, oxygen, notes.",
       s4Title: "Evening",
-      s4Body: "Quiet hours, low-oxygen warnings if a tank is getting close, and a calm overview for tomorrow.",
+      s4Body: "A calm overview for tomorrow, with low-oxygen warnings if a tank is running close.",
     },
     inside: {
       kicker: "What's inside",
