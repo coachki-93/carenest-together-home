@@ -1340,7 +1340,7 @@ export const en = {
     tablet: {
       kicker: "Designed for the tablet on the wall",
       title: "Made for tired hands at 3 a.m.",
-      body: "Large touch targets, calm typography, dark-mode friendly. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
+      body: "Large touch targets, calm typography, and a layout made for a tablet on the wall. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
       t1: "Installable on iPad & Android",
       t2: "English & Svenska",
       t3: "Private to your family",
