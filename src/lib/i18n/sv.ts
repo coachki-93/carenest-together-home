@@ -1290,6 +1290,8 @@ export const sv = {
       chip1: "Föräldrar",
       chip2: "Familjemedlemmar",
       chip3: "Vårdgivare & PA",
+      caregiverTitle: "Jobbar du i skift?",
+      caregiverBody: "CareNest ger varje vårdgivare samma delade bild av dagen, med överlämningsanteckningar redan förifyllda från det som hänt hittills.",
     },
     day: {
       kicker: "En dag med CareNest",
