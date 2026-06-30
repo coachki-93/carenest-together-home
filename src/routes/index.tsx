@@ -266,7 +266,18 @@ function Landing() {
             <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
               {t("marketing.pricing.monthlyPrice")}
             </p>
-            <p className="text-sm text-marketing-muted mb-8">{t("marketing.pricing.monthlySub")}</p>
+            <p className="text-sm text-marketing-muted mb-6">{t("marketing.pricing.monthlySub")}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
+              {t("marketing.pricing.featuresLabel")}
+            </p>
+            <ul className="space-y-2.5 mb-8">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <li key={n} className="flex items-start gap-2.5 text-sm text-marketing-ink">
+                  <Check className="size-4 text-marketing-sage shrink-0 mt-0.5" />
+                  <span>{t(`marketing.pricing.f${n}`)}</span>
+                </li>
+              ))}
+            </ul>
             <Link
               to="/auth/signup"
               className="mt-auto w-full text-center px-6 py-3.5 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
@@ -284,7 +295,18 @@ function Landing() {
             <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
               {t("marketing.pricing.annualPrice")}
             </p>
-            <p className="text-sm text-marketing-muted mb-8">{t("marketing.pricing.annualSub")}</p>
+            <p className="text-sm text-marketing-muted mb-6">{t("marketing.pricing.annualSub")}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
+              {t("marketing.pricing.featuresLabel")}
+            </p>
+            <ul className="space-y-2.5 mb-8">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <li key={n} className="flex items-start gap-2.5 text-sm text-marketing-ink">
+                  <Check className="size-4 text-marketing-sage shrink-0 mt-0.5" />
+                  <span>{t(`marketing.pricing.f${n}`)}</span>
+                </li>
+              ))}
+            </ul>
             <Link
               to="/auth/signup"
               className="mt-auto w-full text-center px-6 py-3.5 rounded-xl bg-marketing-ink text-marketing-bg font-medium hover:bg-black transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
