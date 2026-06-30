@@ -1,70 +1,35 @@
-## Step 1 — New public landing page
+## Goal
+Keep the current centered-editorial design, but (a) remove or soften the few claims that aren't quite true today, and (b) raise the persuasive power with real screenshots, a clearer opening line, and a small amount of social proof.
 
-Goal: replace the current short `/` splash with a richer, family-first landing page that actually explains CareNest, plus a dedicated `/features` deep-dive route. Keep the warm/lavender + Nunito look; just go deeper.
+## 1. Truthfulness fixes (i18n only, no design change)
+- `marketing.day.s4Body`: drop "Quiet hours" — rewrite as *"A calm overview for tomorrow, and low-oxygen warnings if a tank is running close."*
+- `marketing.tablet.body`: remove "dark-mode friendly" (we don't ship a tuned dark mode).
+- `features.vitals.b1`: confirm 24h / 7d / 30d windows + shaded range all exist. If only some do, soften to *"Charts with the healthy range shaded."*
+- `marketing.faq.q4A` (pricing): add a real contact path — either a `mailto:` link in the answer or a small "Contact" link in the footer — so "reach out" isn't a dead end.
+- Render the existing `marketing.hero.trust` line ("Built with families of medically complex children") under the hero sub-paragraph as a small muted line — the string is already translated, just unused.
 
-### Routes & files
-- Rewrite `src/routes/index.tsx` as a long single-page marketing landing (anchors only for in-page scroll).
-- New `src/routes/features.tsx` — deep-dive feature reference, linked from the landing's "See all features" CTA.
-- Header/footer extracted to `src/components/carenest/MarketingHeader.tsx` and `MarketingFooter.tsx` so `/` and `/features` share them.
-- All copy goes through `t()`; add new keys to both `src/lib/i18n/en.ts` and `sv.ts`. `<LanguageToggle />` stays in the header.
-- Per-route `head()` metadata (title, description, og:title, og:description, og:url, canonical) on both routes — distinct text for `/features`.
+## 2. Pitch upgrades
+- **Sharper hero subhead.** Add a one-line plain-English descriptor above or below the poetic H1 so scanners get it instantly. Suggested: *"The shared home base for your child's care team — meds, vitals, oxygen, handovers."*
+- **Real screenshots.** Replace the abstract `HeroPreview` mock with 2–3 real screenshots:
+  1. Today page (with one task highlighted)
+  2. Vitals page with a chart + shaded range
+  3. Emergency screen
+  Captured headlessly via Playwright against a seeded demo family, saved to `src/assets/marketing/*.png`, used as `<img>` in the hero and in the *What's inside* section.
+- **One quote block** between "A day with CareNest" and "What's inside" — a single short testimonial (parent or nurse). If we don't have a real one yet, leave the slot but mark it as a placeholder we'll fill in, *not* a fabricated quote.
+- **Secondary CTA in the hero**: add a "See a day with CareNest" ghost button that anchor-scrolls to the `#day` section, alongside the existing Create / Invite buttons.
+- **Caregiver callout.** Add a small two-line band in the *Who it's for* section addressed to nurses / PAs / agencies: *"On rotating shifts? CareNest gives every caregiver the same shared picture, with handover notes already written."*
 
-### Landing sections (single scroll at `/`)
-1. **Hero** — headline, sub, primary CTA "Create your family", secondary "I have an invite", small trust line ("Built with families of medically complex children").
-2. **Who it's for** — short, warm paragraph + 3 chips (Parents · Family members · Caregivers).
-3. **A day with CareNest** — 3–4 step narrative (Morning meds → Vitals check → Handover → Quiet evening) with small illustrations/icons.
-4. **What's inside** — 6-card grid of the real features that exist today:
-   - Today's tasks & schedule (with hospital pause)
-   - Vitals tracking + pediatric reference ranges
-   - Medications & inhalations
-   - Oxygen tank tracking with low-O₂ warnings
-   - Handover notes & shift log
-   - Emergency info screen
-5. **Safety nets** — short section on missed-task alerts, low-oxygen warnings, out-of-range vital streaks.
-6. **Built for the tablet on the wall** — note on bilingual (EN/SV), installable to home screen, designed for tired hands.
-7. **FAQ** — 5–6 collapsibles (Is my data private? Who can join? Does it replace medical advice? Cost? Offline? Languages?).
-8. **Final CTA** — repeat signup + invite buttons.
-9. **Footer** — small links (Login, Invite code, Features, Language).
+## 3. Out of scope (call out explicitly)
+- No new product features. No changes to authenticated app screens. No font/color/layout overhaul — the editorial design stays.
+- No fabricated testimonials, logos, or metrics.
 
-### `/features` page
-Same shell, longer-form feature descriptions grouped by area: Today, Vitals, Medications, Oxygen, Schedule, Handover, Safety, Family & roles. Each block: short paragraph + bullet list of capabilities + small visual. No screenshots required for v1 — uses existing icons.
+## Files likely touched
+- `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts` — copy edits + new keys (subhead, caregiver callout, secondary CTA, optional quote slot)
+- `src/routes/index.tsx` — render trust line, add subhead + secondary CTA, swap `HeroPreview` for screenshot, add quote slot + caregiver band
+- `src/assets/marketing/*.png` — new screenshots (captured via Playwright)
+- `src/components/carenest/MarketingFooter.tsx` — add Contact link if we go that route for FAQ q4
 
-### Visual direction
-Keep current palette (`--primary` lavender, `bg-lavender`, `primary-soft`), Nunito, rounded `card-soft`. Add more whitespace, generous section padding, soft gradient backdrops between sections, subtle entrance fades. No new fonts, no new color tokens.
-
----
-
-## Step 2 — Onboarding refresh
-
-Goal: keep the existing 5-step wizard but update copy/inputs so it reflects current features, and confirm it only runs on first login.
-
-### "Only first time" gate — already in place, just verify
-- `src/routes/_authenticated/home.tsx` already routes to `/dashboard` when `profiles.onboarded === true` and skips both `onboarding/child` and `onboarding/caregiver`.
-- `onboarding.child.tsx` sets `onboarded: true` on finish (line 305); `onboarding.caregiver.tsx` does the same (line 41).
-- Plan: leave the flag mechanism as is. Add a guard inside each onboarding route's `beforeLoad` that redirects to `/dashboard` if `profiles.onboarded` is already true, so the wizard can't be reached by typing the URL after completion.
-
-### Family/child wizard (`onboarding.child.tsx`) — refresh content
-- **Step 1 Welcome**: new copy reflecting the broader system (vitals, oxygen, handovers, safety nets), not just meds.
-- **Step 2 Child**: add the new fields we've added since the original wizard — birthdate (used by vitals reference ranges) made prominent with a small note "We use this to show age-appropriate vital ranges." Keep existing avatar/name/notes.
-- **Step 3 First medication**: keep, but add a one-line hint that inhalations and appointments can also be scheduled later in Schedule.
-- **Step 4 Invite caregivers**: keep; clarify roles (owner / caregiver / viewer) in copy.
-- **Step 5 All set**: replace generic "you're done" with a short checklist linking into the live app — "Log your first vital", "Add an oxygen tank", "Set up your schedule", "Open Emergency info". Each is a `<Link>` to the relevant route.
-
-### Caregiver wizard (`onboarding.caregiver.tsx`)
-- Refresh copy to mention the features they'll actually use (Today, Vitals logging with context chips, Handover, Hospital toggle).
-- Confirm the flow still ends by setting `onboarded: true` and routing to `/dashboard`.
-
-### i18n
-All new/changed strings added to both `en.ts` and `sv.ts` in the same edit.
-
-### Out of scope (deferred unless you ask)
-- No new guided in-app tour (we already have `GuidedTour` for the dashboard).
-- No role-specific branching beyond the existing caregiver vs family split.
-- No DB schema changes — `profiles.onboarded` is enough.
-
----
-
-## Order of work
-1. Landing: extract marketing header/footer, rewrite `/`, add `/features`, add i18n keys.
-2. Onboarding: add `beforeLoad` guards, refresh step copy + add birthdate emphasis on Step 2, rewrite Step 5 as a checklist, refresh caregiver wizard copy, add i18n keys.
-3. Manual check via Playwright: visit `/`, `/features`, sign in as a fresh user → wizard → finish → confirm re-visiting `/onboarding/child` redirects to `/dashboard`.
+## Open questions before I build
+1. Do you want me to capture **real screenshots** now (I can drive the app with Playwright against your data), or keep the stylized mock for v1?
+2. Do you have a **real quote** from a parent or caregiver I can include, or should I leave the spot out entirely until you do?
+3. For pricing FAQ — add a **mailto contact** (which address?) or remove the question for now?
