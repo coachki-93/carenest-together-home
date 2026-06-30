@@ -85,8 +85,16 @@ function Landing() {
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-marketing-muted max-w-2xl mb-10 leading-relaxed">
+          <p className="text-lg md:text-xl text-marketing-ink/90 max-w-2xl mb-4 leading-relaxed font-medium">
+            {t("marketing.hero.subhead")}
+          </p>
+
+          <p className="text-base md:text-lg text-marketing-muted max-w-2xl mb-6 leading-relaxed">
             {t("marketing.hero.sub")}
+          </p>
+
+          <p className="text-sm text-marketing-muted/90 italic mb-10">
+            {t("marketing.hero.trust")}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-16 w-full justify-center">
@@ -96,6 +104,12 @@ function Landing() {
             >
               {t("splash.ctaCreate")}
             </Link>
+            <a
+              href="#day"
+              className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
+            >
+              {t("marketing.hero.ctaTour")}
+            </a>
             <Link
               to="/invite"
               className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
