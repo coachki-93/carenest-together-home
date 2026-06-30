@@ -1278,8 +1278,10 @@ export const sv = {
     hero: {
       h1a: "Omsorg, lugnt —",
       h1b: "tillsammans.",
+      subhead: "En delad hemmabas för ert barns vårdteam — mediciner, vitalvärden, syrgas och överlämningar på ett ställe.",
       sub: "CareNest är en varm, surfplattevänlig plats för familjer till medicinskt komplexa barn och vårdgivarna som hjälper till. Mediciner, vitalvärden, syrgas, scheman och överlämningar — på ett ställe som alla kan lita på.",
       trust: "Byggt med familjer till medicinskt komplexa barn.",
+      ctaTour: "Se en dag med CareNest",
     },
     who: {
       kicker: "För vem",
@@ -1288,6 +1290,8 @@ export const sv = {
       chip1: "Föräldrar",
       chip2: "Familjemedlemmar",
       chip3: "Vårdgivare & PA",
+      caregiverTitle: "Jobbar du i skift?",
+      caregiverBody: "CareNest ger varje vårdgivare samma delade bild av dagen, med överlämningsanteckningar redan förifyllda från det som hänt hittills.",
     },
     day: {
       kicker: "En dag med CareNest",
@@ -1300,7 +1304,7 @@ export const sv = {
       s3Title: "Skiftbyte",
       s3Body: "Överlämningen i slutet av passet är förifylld med dagen så långt — sömn, humör, syrgas, anteckningar.",
       s4Title: "Kväll",
-      s4Body: "Lugna timmar, varningar om en tub börjar ta slut och en mjuk översikt inför morgondagen.",
+      s4Body: "En mjuk översikt inför morgondagen, med varningar om en syrgastub börjar ta slut.",
     },
     inside: {
       kicker: "Vad ingår",
@@ -1336,7 +1340,7 @@ export const sv = {
     tablet: {
       kicker: "Designad för surfplattan på väggen",
       title: "Gjord för trötta händer kl 03",
-      body: "Stora knappar, lugn typografi, fungerar bra i mörkt läge. Lägg till på hemskärmen och det känns som en app — på svenska och engelska från dag ett.",
+      body: "Stora knappar, lugn typografi och en layout gjord för surfplattan på väggen. Lägg till på hemskärmen så känns det som en app — på svenska och engelska från dag ett.",
       t1: "Installerbar på iPad och Android",
       t2: "Svenska & English",
       t3: "Privat för er familj",

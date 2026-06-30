@@ -85,8 +85,16 @@ function Landing() {
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-marketing-muted max-w-2xl mb-10 leading-relaxed">
+          <p className="text-lg md:text-xl text-marketing-ink/90 max-w-2xl mb-4 leading-relaxed font-medium">
+            {t("marketing.hero.subhead")}
+          </p>
+
+          <p className="text-base md:text-lg text-marketing-muted max-w-2xl mb-6 leading-relaxed">
             {t("marketing.hero.sub")}
+          </p>
+
+          <p className="text-sm text-marketing-muted/90 italic mb-10">
+            {t("marketing.hero.trust")}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-16 w-full justify-center">
@@ -96,6 +104,12 @@ function Landing() {
             >
               {t("splash.ctaCreate")}
             </Link>
+            <a
+              href="#day"
+              className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
+            >
+              {t("marketing.hero.ctaTour")}
+            </a>
             <Link
               to="/invite"
               className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
@@ -127,11 +141,25 @@ function Landing() {
             <Chip>{t("marketing.who.chip2")}</Chip>
             <Chip>{t("marketing.who.chip3")}</Chip>
           </div>
+
+          <div className="mt-12 mx-auto max-w-2xl text-left rounded-2xl border border-marketing-line bg-marketing-surface px-6 py-5 flex gap-4 items-start">
+            <div className="size-10 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
+              <Users className="size-5" />
+            </div>
+            <div>
+              <h3 className="text-lg italic text-marketing-ink mb-1" style={serif}>
+                {t("marketing.who.caregiverTitle")}
+              </h3>
+              <p className="text-marketing-muted leading-relaxed text-sm">
+                {t("marketing.who.caregiverBody")}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ───────── A day with CareNest ───────── */}
-      <section className="px-6 md:px-8 py-20 md:py-24 bg-marketing-surface border-y border-marketing-line">
+      <section id="day" className="px-6 md:px-8 py-20 md:py-24 bg-marketing-surface border-y border-marketing-line">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 space-y-4 max-w-2xl mx-auto">
             <Kicker>{t("marketing.day.kicker")}</Kicker>

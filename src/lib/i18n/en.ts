@@ -1278,8 +1278,10 @@ export const en = {
     hero: {
       h1a: "Care, calmly —",
       h1b: "together.",
+      subhead: "The shared home base for your child's care team — meds, vitals, oxygen and handovers in one place.",
       sub: "CareNest is a warm, tablet-friendly home base for families of medically complex children and the caregivers who help. Medications, vitals, oxygen, schedules, handovers — in one place every caregiver can trust.",
       trust: "Built with families of medically complex children.",
+      ctaTour: "See a day with CareNest",
     },
     who: {
       kicker: "Who it's for",
@@ -1288,6 +1290,8 @@ export const en = {
       chip1: "Parents",
       chip2: "Family members",
       chip3: "Caregivers & PAs",
+      caregiverTitle: "On rotating shifts?",
+      caregiverBody: "CareNest gives every caregiver the same shared picture of the day, with handover notes already pre-filled from what's happened so far.",
     },
     day: {
       kicker: "A day with CareNest",
@@ -1300,7 +1304,7 @@ export const en = {
       s3Title: "Shift change",
       s3Body: "End-of-shift handover is pre-filled with the day so far — sleep, mood, oxygen, notes.",
       s4Title: "Evening",
-      s4Body: "Quiet hours, low-oxygen warnings if a tank is getting close, and a calm overview for tomorrow.",
+      s4Body: "A calm overview for tomorrow, with low-oxygen warnings if a tank is running close.",
     },
     inside: {
       kicker: "What's inside",
@@ -1336,7 +1340,7 @@ export const en = {
     tablet: {
       kicker: "Designed for the tablet on the wall",
       title: "Made for tired hands at 3 a.m.",
-      body: "Large touch targets, calm typography, dark-mode friendly. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
+      body: "Large touch targets, calm typography, and a layout made for a tablet on the wall. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
       t1: "Installable on iPad & Android",
       t2: "English & Svenska",
       t3: "Private to your family",
