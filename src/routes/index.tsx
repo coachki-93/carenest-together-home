@@ -141,11 +141,25 @@ function Landing() {
             <Chip>{t("marketing.who.chip2")}</Chip>
             <Chip>{t("marketing.who.chip3")}</Chip>
           </div>
+
+          <div className="mt-12 mx-auto max-w-2xl text-left rounded-2xl border border-marketing-line bg-marketing-surface px-6 py-5 flex gap-4 items-start">
+            <div className="size-10 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
+              <Users className="size-5" />
+            </div>
+            <div>
+              <h3 className="text-lg italic text-marketing-ink mb-1" style={serif}>
+                {t("marketing.who.caregiverTitle")}
+              </h3>
+              <p className="text-marketing-muted leading-relaxed text-sm">
+                {t("marketing.who.caregiverBody")}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ───────── A day with CareNest ───────── */}
-      <section className="px-6 md:px-8 py-20 md:py-24 bg-marketing-surface border-y border-marketing-line">
+      <section id="day" className="px-6 md:px-8 py-20 md:py-24 bg-marketing-surface border-y border-marketing-line">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 space-y-4 max-w-2xl mx-auto">
             <Kicker>{t("marketing.day.kicker")}</Kicker>
