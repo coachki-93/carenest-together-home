@@ -1278,8 +1278,10 @@ export const en = {
     hero: {
       h1a: "Care, calmly —",
       h1b: "together.",
+      subhead: "The shared home base for your child's care team — meds, vitals, oxygen and handovers in one place.",
       sub: "CareNest is a warm, tablet-friendly home base for families of medically complex children and the caregivers who help. Medications, vitals, oxygen, schedules, handovers — in one place every caregiver can trust.",
       trust: "Built with families of medically complex children.",
+      ctaTour: "See a day with CareNest",
     },
     who: {
       kicker: "Who it's for",
