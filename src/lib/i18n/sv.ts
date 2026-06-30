@@ -1278,8 +1278,10 @@ export const sv = {
     hero: {
       h1a: "Omsorg, lugnt —",
       h1b: "tillsammans.",
+      subhead: "En delad hemmabas för ert barns vårdteam — mediciner, vitalvärden, syrgas och överlämningar på ett ställe.",
       sub: "CareNest är en varm, surfplattevänlig plats för familjer till medicinskt komplexa barn och vårdgivarna som hjälper till. Mediciner, vitalvärden, syrgas, scheman och överlämningar — på ett ställe som alla kan lita på.",
       trust: "Byggt med familjer till medicinskt komplexa barn.",
+      ctaTour: "Se en dag med CareNest",
     },
     who: {
       kicker: "För vem",
