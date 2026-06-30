@@ -1304,7 +1304,7 @@ export const sv = {
       s3Title: "Skiftbyte",
       s3Body: "Överlämningen i slutet av passet är förifylld med dagen så långt — sömn, humör, syrgas, anteckningar.",
       s4Title: "Kväll",
-      s4Body: "Lugna timmar, varningar om en tub börjar ta slut och en mjuk översikt inför morgondagen.",
+      s4Body: "En mjuk översikt inför morgondagen, med varningar om en syrgastub börjar ta slut.",
     },
     inside: {
       kicker: "Vad ingår",
