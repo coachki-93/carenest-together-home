@@ -251,6 +251,50 @@ function Landing() {
         </div>
       </section>
 
+      {/* ───────── Pricing ───────── */}
+      <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
+        <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
+          <Kicker>{t("marketing.pricing.kicker")}</Kicker>
+          <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
+            {t("marketing.pricing.title")}
+          </h2>
+        </div>
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+          {/* Monthly */}
+          <div className="rounded-2xl border border-marketing-line bg-marketing-bg p-6 md:p-8 flex flex-col items-start">
+            <p className="text-sm font-medium text-marketing-muted mb-4">{t("marketing.pricing.monthlyLabel")}</p>
+            <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
+              {t("marketing.pricing.monthlyPrice")}
+            </p>
+            <p className="text-sm text-marketing-muted mb-8">{t("marketing.pricing.monthlySub")}</p>
+            <Link
+              to="/auth/signup"
+              className="mt-auto w-full text-center px-6 py-3.5 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
+            >
+              {t("marketing.pricing.monthlyCta")}
+            </Link>
+          </div>
+
+          {/* Annual — highlighted */}
+          <div className="relative rounded-2xl border-2 border-marketing-sage bg-marketing-bg p-6 md:p-8 flex flex-col items-start">
+            <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-marketing-sage text-marketing-bg px-3 py-1 text-xs font-semibold tracking-wide">
+              {t("marketing.pricing.annualBadge")}
+            </span>
+            <p className="text-sm font-medium text-marketing-muted mb-4">{t("marketing.pricing.annualLabel")}</p>
+            <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
+              {t("marketing.pricing.annualPrice")}
+            </p>
+            <p className="text-sm text-marketing-muted mb-8">{t("marketing.pricing.annualSub")}</p>
+            <Link
+              to="/auth/signup"
+              className="mt-auto w-full text-center px-6 py-3.5 rounded-xl bg-marketing-ink text-marketing-bg font-medium hover:bg-black transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
+            >
+              {t("marketing.pricing.annualCta")}
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ───────── FAQ ───────── */}
       <section id="faq" className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
         <div className="max-w-3xl mx-auto">
