@@ -1290,6 +1290,8 @@ export const en = {
       chip1: "Parents",
       chip2: "Family members",
       chip3: "Caregivers & PAs",
+      caregiverTitle: "On rotating shifts?",
+      caregiverBody: "CareNest gives every caregiver the same shared picture of the day, with handover notes already pre-filled from what's happened so far.",
     },
     day: {
       kicker: "A day with CareNest",
