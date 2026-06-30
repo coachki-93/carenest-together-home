@@ -1340,7 +1340,7 @@ export const sv = {
     tablet: {
       kicker: "Designad för surfplattan på väggen",
       title: "Gjord för trötta händer kl 03",
-      body: "Stora knappar, lugn typografi, fungerar bra i mörkt läge. Lägg till på hemskärmen och det känns som en app — på svenska och engelska från dag ett.",
+      body: "Stora knappar, lugn typografi och en layout gjord för surfplattan på väggen. Lägg till på hemskärmen så känns det som en app — på svenska och engelska från dag ett.",
       t1: "Installerbar på iPad och Android",
       t2: "Svenska & English",
       t3: "Privat för er familj",
