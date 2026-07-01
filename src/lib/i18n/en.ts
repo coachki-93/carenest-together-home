@@ -138,6 +138,9 @@ export const en = {
     nameRequired: "Child's name is required",
     saved: "Child profile saved",
     dobHint: "We use date of birth to show age-appropriate vital reference ranges.",
+    conditionDetails: "Condition & devices",
+    conditionDetailsHelp: "A longer description shown on the Emergency screen — devices (tracheostomy, PEG…), important background. Use blank lines for paragraphs and start a line with \"-\" for a bullet.",
+    conditionDetailsPh: "e.g.\nApert syndrome — affects skull and limb development.\n\n- Tracheostomy for breathing support\n- PEG tube for feeding",
   },
   onboardingCaregiver: {
     title: "Welcome, caregiver",
