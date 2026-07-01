@@ -679,6 +679,7 @@ export const sv = {
       hospital: "Familjen var på sjukhus under passet (syrgas pausad).",
       carePlaceIssue: "Vårdplats-kontroll flaggad",
       taskNote: "Anteckning",
+      tidySkipped: "Städning hoppad",
     },
 
   },
