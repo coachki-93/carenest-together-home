@@ -679,6 +679,7 @@ export const en = {
       hospital: "Family was at hospital during this shift (oxygen paused).",
       carePlaceIssue: "Care-place check flagged",
       taskNote: "Note",
+      tidySkipped: "Tidy skipped",
     },
 
   },
