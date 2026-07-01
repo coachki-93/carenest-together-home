@@ -6,14 +6,13 @@ export type TidySettings = Database["public"]["Tables"]["tidy_settings"]["Row"];
 export type TidyItem = Database["public"]["Tables"]["tidy_checklist_items"]["Row"];
 export type TidyItemInsert =
   Database["public"]["Tables"]["tidy_checklist_items"]["Insert"];
+export type TidyTime = Database["public"]["Tables"]["tidy_times"]["Row"];
+export type TidyTimeInsert =
+  Database["public"]["Tables"]["tidy_times"]["Insert"];
 export type TidySubmission =
   Database["public"]["Tables"]["tidy_submissions"]["Row"];
-export type TidyAnswer =
-  Database["public"]["Tables"]["tidy_submission_answers"]["Row"];
 
 export type TidyStatus = "done" | "skipped";
-
-export const TIDY_LEAD_OPTIONS = [15, 30, 45, 60] as const;
 
 export function useTidySettings(familyId: string | undefined | null) {
   return useQuery({
@@ -34,11 +33,7 @@ export function useTidySettings(familyId: string | undefined | null) {
 export function useUpsertTidySettings() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
-      family_id: string;
-      enabled: boolean;
-      lead_minutes: number;
-    }) => {
+    mutationFn: async (input: { family_id: string; enabled: boolean }) => {
       const { error } = await supabase
         .from("tidy_settings")
         .upsert(input, { onConflict: "family_id" });
@@ -68,9 +63,7 @@ export function useTidyItems(familyId: string | undefined | null) {
 export function useUpsertTidyItem() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (
-      input: (TidyItemInsert & { id?: string }),
-    ) => {
+    mutationFn: async (input: TidyItemInsert & { id?: string }) => {
       if (input.id) {
         const { id, ...rest } = input;
         const { error } = await supabase
@@ -103,11 +96,63 @@ export function useDeleteTidyItem() {
   });
 }
 
+/* -------- Tidy times -------- */
+
+export function useTidyTimes(familyId: string | undefined | null) {
+  return useQuery({
+    queryKey: ["tidy-times", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tidy_times")
+        .select("*")
+        .eq("family_id", familyId!)
+        .order("time_of_day", { ascending: true });
+      if (error) throw error;
+      return data as TidyTime[];
+    },
+  });
+}
+
+export function useUpsertTidyTime() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: TidyTimeInsert & { id?: string }) => {
+      if (input.id) {
+        const { id, ...rest } = input;
+        const { error } = await supabase
+          .from("tidy_times")
+          .update(rest)
+          .eq("id", id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("tidy_times").insert(input);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tidy-times"] }),
+  });
+}
+
+export function useDeleteTidyTime() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("tidy_times").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["tidy-times"] }),
+  });
+}
+
+/* -------- Submissions -------- */
+
 export interface SubmitTidyInput {
   family_id: string;
   performed_by: string;
-  shift_master_id: string | null;
-  shift_occurrence_start: string | null;
+  tidy_time_id: string;
+  slot_date: string; // YYYY-MM-DD
+  slot_time: string; // HH:MM:SS
   notes?: string | null;
   answers: {
     item_id: string;
@@ -126,8 +171,9 @@ export function useSubmitTidy() {
         .insert({
           family_id: input.family_id,
           performed_by: input.performed_by,
-          shift_master_id: input.shift_master_id,
-          shift_occurrence_start: input.shift_occurrence_start,
+          tidy_time_id: input.tidy_time_id,
+          slot_date: input.slot_date,
+          slot_time: input.slot_time,
           notes: input.notes ?? null,
         })
         .select()
@@ -156,25 +202,24 @@ export function useSubmitTidy() {
   });
 }
 
-/** Look up whether a tidy submission already exists for a given shift occurrence. */
-export function useShiftTidySubmission(
-  familyId: string | undefined | null,
-  shiftMasterId: string | null | undefined,
-  occurrenceStartIso: string | null | undefined,
-) {
+/** Today's tidy submissions for the family, keyed by slot. */
+export function useTodayTidySubmissions(familyId: string | undefined | null) {
   return useQuery({
-    queryKey: ["tidy-submissions", "shift", familyId, shiftMasterId, occurrenceStartIso],
-    enabled: !!familyId && !!shiftMasterId && !!occurrenceStartIso,
+    queryKey: ["tidy-submissions", "today", familyId],
+    enabled: !!familyId,
     queryFn: async () => {
+      const today = new Date();
+      const y = today.getFullYear();
+      const m = String(today.getMonth() + 1).padStart(2, "0");
+      const d = String(today.getDate()).padStart(2, "0");
+      const iso = `${y}-${m}-${d}`;
       const { data, error } = await supabase
         .from("tidy_submissions")
         .select("*")
         .eq("family_id", familyId!)
-        .eq("shift_master_id", shiftMasterId!)
-        .eq("shift_occurrence_start", occurrenceStartIso!)
-        .maybeSingle();
+        .eq("slot_date", iso);
       if (error) throw error;
-      return data as TidySubmission | null;
+      return data as TidySubmission[];
     },
   });
 }

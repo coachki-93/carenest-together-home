@@ -1477,19 +1477,16 @@ export type Database = {
         Row: {
           enabled: boolean
           family_id: string
-          lead_minutes: number
           updated_at: string
         }
         Insert: {
           enabled?: boolean
           family_id: string
-          lead_minutes?: number
           updated_at?: string
         }
         Update: {
           enabled?: boolean
           family_id?: string
-          lead_minutes?: number
           updated_at?: string
         }
         Relationships: [
@@ -1566,7 +1563,10 @@ export type Database = {
           performed_by: string
           shift_master_id: string | null
           shift_occurrence_start: string | null
+          slot_date: string | null
+          slot_time: string | null
           submitted_at: string
+          tidy_time_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1576,7 +1576,10 @@ export type Database = {
           performed_by: string
           shift_master_id?: string | null
           shift_occurrence_start?: string | null
+          slot_date?: string | null
+          slot_time?: string | null
           submitted_at?: string
+          tidy_time_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1586,7 +1589,10 @@ export type Database = {
           performed_by?: string
           shift_master_id?: string | null
           shift_occurrence_start?: string | null
+          slot_date?: string | null
+          slot_time?: string | null
           submitted_at?: string
+          tidy_time_id?: string | null
         }
         Relationships: [
           {
@@ -1601,6 +1607,57 @@ export type Database = {
             columns: ["shift_master_id"]
             isOneToOne: false
             referencedRelation: "caregiver_shifts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tidy_submissions_tidy_time_id_fkey"
+            columns: ["tidy_time_id"]
+            isOneToOne: false
+            referencedRelation: "tidy_times"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tidy_times: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          family_id: string
+          grace_minutes: number
+          id: string
+          label: string | null
+          time_of_day: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          family_id: string
+          grace_minutes?: number
+          id?: string
+          label?: string | null
+          time_of_day: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          grace_minutes?: number
+          id?: string
+          label?: string | null
+          time_of_day?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tidy_times_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
             referencedColumns: ["id"]
           },
         ]
