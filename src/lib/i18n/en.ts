@@ -20,6 +20,8 @@ export const en = {
     addAnother: "Add another",
     remove: "Remove",
     edit: "Edit",
+    delete: "Delete",
+    error: "Something went wrong",
     close: "Close",
     language: "Language",
     english: "English",
