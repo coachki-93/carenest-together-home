@@ -320,6 +320,20 @@ export function useHandoverPrefill(
         }
       }
 
+      // End-of-shift tidy items skipped
+      const tidySkipped = (tidyRes.data ?? []) as Array<{
+        item_label_snapshot: string;
+        note: string | null;
+        created_at: string;
+      }>;
+      for (const s of tidySkipped) {
+        const t = fmtTime(new Date(s.created_at));
+        const suffix = s.note ? ` (${s.note})` : "";
+        noteLines.push(
+          `• ${t} ${labels.tidySkipped}: ${s.item_label_snapshot}${suffix}`,
+        );
+      }
+
       const medsStr = medLines.length ? medLines.join("\n") : "";
       const notesStr = noteLines.length ? noteLines.join("\n") : "";
       const hasContent = medLines.length > 0 || noteLines.length > 0;
