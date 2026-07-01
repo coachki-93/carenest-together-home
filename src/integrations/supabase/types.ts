@@ -1432,6 +1432,179 @@ export type Database = {
           },
         ]
       }
+      tidy_checklist_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          family_id: string
+          id: string
+          label: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          family_id: string
+          id?: string
+          label: string
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          id?: string
+          label?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tidy_checklist_items_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tidy_settings: {
+        Row: {
+          enabled: boolean
+          family_id: string
+          lead_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          family_id: string
+          lead_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          family_id?: string
+          lead_minutes?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tidy_settings_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: true
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tidy_submission_answers: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          item_id: string | null
+          item_label_snapshot: string
+          note: string | null
+          status: string
+          submission_id: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          item_id?: string | null
+          item_label_snapshot: string
+          note?: string | null
+          status: string
+          submission_id: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          item_id?: string | null
+          item_label_snapshot?: string
+          note?: string | null
+          status?: string
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tidy_submission_answers_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tidy_submission_answers_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "tidy_checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tidy_submission_answers_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "tidy_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tidy_submissions: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          notes: string | null
+          performed_by: string
+          shift_master_id: string | null
+          shift_occurrence_start: string | null
+          submitted_at: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          notes?: string | null
+          performed_by: string
+          shift_master_id?: string | null
+          shift_occurrence_start?: string | null
+          submitted_at?: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          notes?: string | null
+          performed_by?: string
+          shift_master_id?: string | null
+          shift_occurrence_start?: string | null
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tidy_submissions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tidy_submissions_shift_master_id_fkey"
+            columns: ["shift_master_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vitals: {
         Row: {
           child_id: string

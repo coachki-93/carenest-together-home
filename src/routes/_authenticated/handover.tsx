@@ -104,6 +104,7 @@ function HandoverPage() {
       hospital: t("handoverPage.prefill.hospital"),
       carePlaceIssue: t("handoverPage.prefill.carePlaceIssue"),
       taskNote: t("handoverPage.prefill.taskNote"),
+      tidySkipped: t("handoverPage.prefill.tidySkipped"),
     }),
     [t],
   );

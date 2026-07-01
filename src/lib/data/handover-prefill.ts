@@ -36,6 +36,7 @@ interface Labels {
   hospital: string;
   carePlaceIssue: string;
   taskNote: string;
+  tidySkipped: string;
 }
 
 
@@ -88,7 +89,7 @@ export function useHandoverPrefill(
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
-      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes] =
+      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes] =
         await Promise.all([
           supabase
             .from("medications")
@@ -143,6 +144,13 @@ export function useHandoverPrefill(
             .eq("family_id", familyId)
             .gte("checked_at", startIso)
             .lt("checked_at", endIso),
+          supabase
+            .from("tidy_submission_answers")
+            .select("item_label_snapshot, status, note, created_at")
+            .eq("family_id", familyId)
+            .eq("status", "skipped")
+            .gte("created_at", startIso)
+            .lt("created_at", endIso),
         ]);
 
       const meds = (medsRes.data ?? []) as Medication[];
@@ -310,6 +318,20 @@ export function useHandoverPrefill(
             `• ${t} ${labels.carePlaceIssue}: ${a.item_label_snapshot}`,
           );
         }
+      }
+
+      // End-of-shift tidy items skipped
+      const tidySkipped = (tidyRes.data ?? []) as Array<{
+        item_label_snapshot: string;
+        note: string | null;
+        created_at: string;
+      }>;
+      for (const s of tidySkipped) {
+        const t = fmtTime(new Date(s.created_at));
+        const suffix = s.note ? ` (${s.note})` : "";
+        noteLines.push(
+          `• ${t} ${labels.tidySkipped}: ${s.item_label_snapshot}${suffix}`,
+        );
       }
 
       const medsStr = medLines.length ? medLines.join("\n") : "";

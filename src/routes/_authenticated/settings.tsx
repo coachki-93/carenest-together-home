@@ -8,6 +8,7 @@ import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
 import { EnableNotificationsCard } from "@/components/carenest/EnableNotificationsCard";
 import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSettings";
+import { TidySettings } from "@/components/carenest/TidySettings";
 import {
   AvatarColorPicker,
   AVATAR_COLORS,
@@ -256,6 +257,15 @@ function SettingsPage() {
           userId={user?.id}
           isOwner={membership.data?.role === "owner"}
         />
+
+        {/* End-of-Shift Tidy */}
+        <TidySettings
+          familyId={membership.data?.family_id}
+          userId={user?.id}
+          isOwner={membership.data?.role === "owner"}
+        />
+
+
 
 
 
