@@ -1,17 +1,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Sparkles, Plus, Trash2 } from "lucide-react";
+import { Sparkles, Plus, Trash2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "@/lib/notify";
 import {
   useTidySettings,
@@ -19,7 +12,9 @@ import {
   useTidyItems,
   useUpsertTidyItem,
   useDeleteTidyItem,
-  TIDY_LEAD_OPTIONS,
+  useTidyTimes,
+  useUpsertTidyTime,
+  useDeleteTidyTime,
 } from "@/lib/data/tidy";
 
 interface Props {
@@ -32,29 +27,27 @@ export function TidySettings({ familyId, userId, isOwner }: Props) {
   const { t } = useTranslation();
   const { data: settings } = useTidySettings(familyId);
   const { data: items = [] } = useTidyItems(familyId);
+  const { data: times = [] } = useTidyTimes(familyId);
   const upsertSettings = useUpsertTidySettings();
   const upsertItem = useUpsertTidyItem();
   const deleteItem = useDeleteTidyItem();
+  const upsertTime = useUpsertTidyTime();
+  const deleteTime = useDeleteTidyTime();
 
   const [enabled, setEnabled] = useState(false);
-  const [lead, setLead] = useState<number>(30);
   const [newLabel, setNewLabel] = useState("");
+  const [newTime, setNewTime] = useState("22:00");
+  const [newTimeLabel, setNewTimeLabel] = useState("");
+  const [newGrace, setNewGrace] = useState("30");
 
   useEffect(() => {
-    if (settings) {
-      setEnabled(settings.enabled);
-      setLead(settings.lead_minutes);
-    }
+    if (settings) setEnabled(settings.enabled);
   }, [settings]);
 
-  async function saveSettings(nextEnabled: boolean, nextLead: number) {
+  async function saveEnabled(next: boolean) {
     if (!familyId) return;
     try {
-      await upsertSettings.mutateAsync({
-        family_id: familyId,
-        enabled: nextEnabled,
-        lead_minutes: nextLead,
-      });
+      await upsertSettings.mutateAsync({ family_id: familyId, enabled: next });
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -72,6 +65,25 @@ export function TidySettings({ familyId, userId, isOwner }: Props) {
       });
       setNewLabel("");
       toast.success(t("tidy.itemAdded"));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
+  async function addTime() {
+    if (!familyId || !userId || !newTime) return;
+    try {
+      await upsertTime.mutateAsync({
+        family_id: familyId,
+        created_by: userId,
+        time_of_day: `${newTime}:00`,
+        label: newTimeLabel.trim() || null,
+        grace_minutes: Math.max(0, Math.min(720, Number(newGrace) || 30)),
+        active: true,
+      });
+      setNewTimeLabel("");
+      setNewGrace("30");
+      toast.success(t("tidy.timeAdded"));
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -97,50 +109,146 @@ export function TidySettings({ familyId, userId, isOwner }: Props) {
         </p>
       )}
 
-      {/* Enable + lead time */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex items-center justify-between rounded-xl border p-3">
-          <div>
-            <Label className="text-sm font-semibold">{t("tidy.enableLabel")}</Label>
-            <p className="text-xs text-muted-foreground">
-              {t("tidy.enableHint")}
-            </p>
-          </div>
-          <Switch
-            checked={enabled}
-            disabled={!isOwner}
-            onCheckedChange={(v) => {
-              setEnabled(!!v);
-              void saveSettings(!!v, lead);
-            }}
-          />
-        </div>
-        <div className="rounded-xl border p-3 space-y-2">
-          <Label className="text-sm font-semibold">{t("tidy.leadLabel")}</Label>
-          <Select
-            value={String(lead)}
-            disabled={!isOwner}
-            onValueChange={(v) => {
-              const n = Number(v);
-              setLead(n);
-              void saveSettings(enabled, n);
-            }}
-          >
-            <SelectTrigger className="h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {TIDY_LEAD_OPTIONS.map((n) => (
-                <SelectItem key={n} value={String(n)}>
-                  {t("tidy.leadMinutes", { n })}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-[11px] text-muted-foreground">
-            {t("tidy.leadHint")}
+      {/* Enable */}
+      <div className="flex items-center justify-between rounded-xl border p-3">
+        <div>
+          <Label className="text-sm font-semibold">{t("tidy.enableLabel")}</Label>
+          <p className="text-xs text-muted-foreground">
+            {t("tidy.enableHint")}
           </p>
         </div>
+        <Switch
+          checked={enabled}
+          disabled={!isOwner}
+          onCheckedChange={(v) => {
+            setEnabled(!!v);
+            void saveEnabled(!!v);
+          }}
+        />
+      </div>
+
+      {/* Times */}
+      <div className="space-y-3">
+        <h3 className="font-semibold text-sm flex items-center gap-2">
+          <Clock className="size-4" />
+          {t("tidy.timesTitle")}
+        </h3>
+        <div className="space-y-2">
+          {times.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              {t("tidy.noTimes")}
+            </p>
+          )}
+          {times.map((tm) => (
+            <div
+              key={tm.id}
+              className="flex items-center gap-2 rounded-xl border p-3"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="font-mono font-bold">
+                  {tm.time_of_day.slice(0, 5)}
+                </div>
+                {tm.label && (
+                  <div className="text-xs text-muted-foreground">
+                    {tm.label}
+                  </div>
+                )}
+                <div className="text-[11px] text-muted-foreground">
+                  {t("tidy.graceShort", { n: tm.grace_minutes ?? 30 })}
+                </div>
+              </div>
+              {isOwner && (
+                <>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={720}
+                    value={tm.grace_minutes ?? 30}
+                    onChange={(e) =>
+                      upsertTime.mutate({
+                        id: tm.id,
+                        family_id: tm.family_id,
+                        created_by: tm.created_by,
+                        time_of_day: tm.time_of_day,
+                        label: tm.label,
+                        active: tm.active,
+                        grace_minutes: Math.max(
+                          0,
+                          Math.min(720, Number(e.target.value) || 0),
+                        ),
+                      })
+                    }
+                    className="w-20 h-9"
+                    aria-label={t("tidy.grace")}
+                  />
+                  <Switch
+                    checked={tm.active}
+                    onCheckedChange={(v) =>
+                      upsertTime.mutate({
+                        id: tm.id,
+                        family_id: tm.family_id,
+                        created_by: tm.created_by,
+                        time_of_day: tm.time_of_day,
+                        label: tm.label,
+                        grace_minutes: tm.grace_minutes,
+                        active: !!v,
+                      })
+                    }
+                    aria-label={t("tidy.toggleActive")}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteTime.mutate(tm.id)}
+                    aria-label={t("common.delete")}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+        {isOwner && (
+          <div className="rounded-xl border-dashed border-2 p-3 space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                type="time"
+                value={newTime}
+                onChange={(e) => setNewTime(e.target.value)}
+                className="w-32"
+              />
+              <Input
+                placeholder={t("tidy.timeLabelPlaceholder")}
+                value={newTimeLabel}
+                onChange={(e) => setNewTimeLabel(e.target.value)}
+                className="flex-1 min-w-[160px]"
+              />
+              <Input
+                type="number"
+                min={0}
+                max={720}
+                value={newGrace}
+                onChange={(e) => setNewGrace(e.target.value)}
+                className="w-20"
+                aria-label={t("tidy.grace")}
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              {t("tidy.graceHint")}
+            </p>
+            <Button
+              type="button"
+              onClick={addTime}
+              disabled={upsertTime.isPending}
+              className="w-full sm:w-auto"
+            >
+              <Plus className="size-4" />
+              {t("tidy.addTime")}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Items */}
