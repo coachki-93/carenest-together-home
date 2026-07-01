@@ -258,6 +258,15 @@ function SettingsPage() {
           isOwner={membership.data?.role === "owner"}
         />
 
+        {/* End-of-Shift Tidy */}
+        <TidySettings
+          familyId={membership.data?.family_id}
+          userId={user?.id}
+          isOwner={membership.data?.role === "owner"}
+        />
+
+
+
 
 
         {/* Password */}
