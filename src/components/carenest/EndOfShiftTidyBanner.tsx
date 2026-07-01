@@ -15,11 +15,12 @@ import { toast } from "@/lib/notify";
 import {
   useTidySettings,
   useTidyItems,
-  useShiftTidySubmission,
+  useTidyTimes,
+  useTodayTidySubmissions,
   useSubmitTidy,
   type TidyStatus,
+  type TidyTime,
 } from "@/lib/data/tidy";
-import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
 
 interface Props {
   familyId: string | undefined | null;
@@ -31,26 +32,25 @@ interface AnswerState {
   note: string;
 }
 
-function findCurrentShift(
-  shifts: ReturnType<typeof useShifts>["data"],
-  userId: string,
-  now: Date,
-): ShiftOccurrence | null {
-  if (!shifts?.length) return null;
-  const start = new Date(now.getTime() - 12 * 60 * 60 * 1000);
-  const end = new Date(now.getTime() + 12 * 60 * 60 * 1000);
-  const occurrences = expandShifts(shifts, start, end);
-  const active = occurrences
-    .filter((o) => o.caregiverUserId === userId && o.start <= now && o.end > now)
-    .sort((a, b) => a.end.getTime() - b.end.getTime());
-  return active[0] ?? null;
+function todayIso(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** Convert "HH:MM:SS" or "HH:MM" to minutes since midnight. */
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":");
+  return Number(h) * 60 + Number(m);
 }
 
 export function EndOfShiftTidyBanner({ familyId, userId }: Props) {
   const { t } = useTranslation();
   const { data: settings } = useTidySettings(familyId);
   const { data: items = [] } = useTidyItems(familyId);
-  const { data: shifts } = useShifts(familyId);
+  const { data: times = [] } = useTidyTimes(familyId);
+  const { data: todaySubs = [] } = useTodayTidySubmissions(familyId);
   const submit = useSubmitTidy();
 
   const [now, setNow] = useState(() => new Date());
@@ -59,35 +59,41 @@ export function EndOfShiftTidyBanner({ familyId, userId }: Props) {
     return () => clearInterval(id);
   }, []);
 
-  const currentShift = useMemo(
-    () => (userId ? findCurrentShift(shifts, userId, now) : null),
-    [shifts, userId, now],
-  );
+  const activeItems = useMemo(() => items.filter((i) => i.active), [items]);
 
-  const occurrenceIso = currentShift?.start.toISOString() ?? null;
-  const { data: existingSubmission } = useShiftTidySubmission(
-    familyId,
-    currentShift?.masterId ?? null,
-    occurrenceIso,
-  );
+  const activeSlot = useMemo<TidyTime | null>(() => {
+    if (!settings?.enabled) return null;
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const today = todayIso(now);
+    for (const tm of times) {
+      if (!tm.active) continue;
+      const slotMin = toMinutes(tm.time_of_day);
+      const grace = tm.grace_minutes ?? 30;
+      if (nowMin < slotMin) continue;
+      if (nowMin > slotMin + grace) continue;
+      const already = todaySubs.some(
+        (s) => s.slot_date === today && s.slot_time?.slice(0, 5) === tm.time_of_day.slice(0, 5),
+      );
+      if (already) continue;
+      return tm;
+    }
+    return null;
+  }, [settings, times, todaySubs, now]);
 
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState<Record<string, AnswerState>>({});
 
   if (!familyId || !userId) return null;
-  if (!settings?.enabled) return null;
-  if (!currentShift) return null;
-  if (existingSubmission) return null;
-
-  const leadMs = (settings.lead_minutes ?? 30) * 60 * 1000;
-  const msLeft = currentShift.end.getTime() - now.getTime();
-  if (msLeft > leadMs) return null;
-  if (msLeft <= 0) return null;
-
-  const activeItems = items.filter((i) => i.active);
+  if (!activeSlot) return null;
   if (activeItems.length === 0) return null;
 
-  const minutesLeft = Math.max(1, Math.ceil(msLeft / 60_000));
+  const slotMin = toMinutes(activeSlot.time_of_day);
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const grace = activeSlot.grace_minutes ?? 30;
+  const minutesLeft = Math.max(1, slotMin + grace - nowMin);
+  const slotLabel = activeSlot.label
+    ? `${activeSlot.time_of_day.slice(0, 5)} · ${activeSlot.label}`
+    : activeSlot.time_of_day.slice(0, 5);
 
   function startTidy() {
     const initial: Record<string, AnswerState> = {};
@@ -108,8 +114,9 @@ export function EndOfShiftTidyBanner({ familyId, userId }: Props) {
       await submit.mutateAsync({
         family_id: familyId!,
         performed_by: userId!,
-        shift_master_id: currentShift!.masterId,
-        shift_occurrence_start: occurrenceIso,
+        tidy_time_id: activeSlot!.id,
+        slot_date: todayIso(now),
+        slot_time: activeSlot!.time_of_day,
         answers: activeItems.map((it) => {
           const a = answers[it.id];
           return {
@@ -136,14 +143,10 @@ export function EndOfShiftTidyBanner({ familyId, userId }: Props) {
         <div className="flex-1 min-w-0">
           <div className="font-bold text-primary">{t("tidy.bannerTitle")}</div>
           <div className="text-sm text-primary/80">
-            {t("tidy.bannerSubtitle", { n: minutesLeft })}
+            {slotLabel} — {t("tidy.bannerSubtitle", { n: minutesLeft })}
           </div>
         </div>
-        <Button
-          size="sm"
-          onClick={startTidy}
-          className="rounded-full"
-        >
+        <Button size="sm" onClick={startTidy} className="rounded-full">
           {t("tidy.start")}
         </Button>
       </div>
@@ -152,7 +155,9 @@ export function EndOfShiftTidyBanner({ familyId, userId }: Props) {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{t("tidy.dialogTitle")}</DialogTitle>
-            <DialogDescription>{t("tidy.dialogSubtitle")}</DialogDescription>
+            <DialogDescription>
+              {slotLabel} — {t("tidy.dialogSubtitle")}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 max-h-[60vh] overflow-y-auto">
             {activeItems.map((it) => {
@@ -183,7 +188,10 @@ export function EndOfShiftTidyBanner({ familyId, userId }: Props) {
                       onClick={() =>
                         setAnswers((prev) => ({
                           ...prev,
-                          [it.id]: { status: "skipped", note: prev[it.id]?.note ?? "" },
+                          [it.id]: {
+                            status: "skipped",
+                            note: prev[it.id]?.note ?? "",
+                          },
                         }))
                       }
                     >
