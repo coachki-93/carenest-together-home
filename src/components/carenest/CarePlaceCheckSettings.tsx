@@ -157,15 +157,12 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                         ? (it.min_count != null
                             ? t("carePlace.typeCountMin", { n: it.min_count })
                             : t("carePlace.typeCount"))
-                        : it.item_type === "days_left"
+                      : it.item_type === "days_left"
                           ? t("carePlace.typeDaysLeft")
                           : t("carePlace.typeQuantityEstimate")}
-                    {(it.item_type === "count" ||
-                      it.item_type === "days_left" ||
-                      it.item_type === "quantity_estimate") &&
-                      linked && (
-                        <> · {t("carePlace.linkedTo")} {linked.name}</>
-                      )}
+                    {linked && (
+                      <> · {t("carePlace.linkedTo")} {linked.name}</>
+                    )}
                   </div>
                   {isOwner && (
                     <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
