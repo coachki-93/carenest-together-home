@@ -227,6 +227,9 @@ function ChildProfilePage() {
           )}
         />
 
+        <EmergencyStepsSettings familyId={membership?.family_id} canEdit={canEdit} />
+
+
         <section className="space-y-3">
           <div>
             <h3 className="font-semibold">{t("childPage.rangesTitle")}</h3>
