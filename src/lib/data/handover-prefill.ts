@@ -89,7 +89,7 @@ export function useHandoverPrefill(
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
-      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes] =
+      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes] =
         await Promise.all([
           supabase
             .from("medications")
