@@ -36,6 +36,7 @@ interface Labels {
   hospital: string;
   carePlaceIssue: string;
   taskNote: string;
+  tidySkipped: string;
 }
 
 
