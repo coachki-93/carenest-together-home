@@ -20,6 +20,8 @@ export const sv = {
     addAnother: "Lägg till en till",
     remove: "Ta bort",
     edit: "Redigera",
+    delete: "Ta bort",
+    error: "Något gick fel",
     close: "Stäng",
     language: "Språk",
     english: "English",
