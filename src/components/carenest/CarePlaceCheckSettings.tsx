@@ -296,29 +296,27 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                 />
               </div>
             )}
-            {newType !== "yesno" && (
-              <div className="space-y-1">
-                <Label className="text-xs">{t("carePlace.linkInventory")}</Label>
-                <Select value={newInventoryId} onValueChange={setNewInventoryId}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
-                    {inventory
-                      .filter((iv) => iv.active)
-                      .map((iv) => (
-                        <SelectItem key={iv.id} value={iv.id}>
-                          {iv.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-[11px] text-muted-foreground">
-                  {t("carePlace.linkHint")}
-                </p>
-              </div>
-            )}
+            <div className="space-y-1">
+              <Label className="text-xs">{t("carePlace.linkInventory")}</Label>
+              <Select value={newInventoryId} onValueChange={setNewInventoryId}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("carePlace.linkNone")}</SelectItem>
+                  {inventory
+                    .filter((iv) => iv.active)
+                    .map((iv) => (
+                      <SelectItem key={iv.id} value={iv.id}>
+                        {iv.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">
+                {t("carePlace.linkHint")}
+              </p>
+            </div>
             <div className="grid sm:grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-xs">{t("carePlace.severityLabel")}</Label>
