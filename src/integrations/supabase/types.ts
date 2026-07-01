@@ -693,6 +693,7 @@ export type Database = {
       children: {
         Row: {
           allergies: string | null
+          condition_details: string | null
           created_at: string
           custom_vital_ranges: Json
           date_of_birth: string | null
@@ -707,6 +708,7 @@ export type Database = {
         }
         Insert: {
           allergies?: string | null
+          condition_details?: string | null
           created_at?: string
           custom_vital_ranges?: Json
           date_of_birth?: string | null
@@ -721,6 +723,7 @@ export type Database = {
         }
         Update: {
           allergies?: string | null
+          condition_details?: string | null
           created_at?: string
           custom_vital_ranges?: Json
           date_of_birth?: string | null
@@ -736,6 +739,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "children_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_steps: {
+        Row: {
+          created_at: string
+          description: string | null
+          family_id: string
+          id: string
+          position: number
+          severity: Database["public"]["Enums"]["emergency_step_severity"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          family_id: string
+          id?: string
+          position?: number
+          severity?: Database["public"]["Enums"]["emergency_step_severity"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          family_id?: string
+          id?: string
+          position?: number
+          severity?: Database["public"]["Enums"]["emergency_step_severity"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_steps_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
@@ -1795,6 +1839,7 @@ export type Database = {
         | "days_left"
         | "quantity_estimate"
       care_place_severity: "routine" | "critical"
+      emergency_step_severity: "critical" | "monitor" | "info"
       inventory_adjustment_reason:
         | "manual_set"
         | "manual_add"
@@ -1982,6 +2027,7 @@ export const Constants = {
         "quantity_estimate",
       ],
       care_place_severity: ["routine", "critical"],
+      emergency_step_severity: ["critical", "monitor", "info"],
       inventory_adjustment_reason: [
         "manual_set",
         "manual_add",

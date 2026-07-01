@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useFamilyChild } from "@/lib/data/medications";
 import { useUpdateChild } from "@/lib/data/family";
+import { EmergencyStepsSettings } from "@/components/carenest/EmergencyStepsSettings";
 import {
   ageMonthsFromDob,
   getVitalRanges,
@@ -52,6 +53,7 @@ function ChildProfilePage() {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
+  const [conditionDetails, setConditionDetails] = useState("");
   const [allergies, setAllergies] = useState("");
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([{ name: "", phone: "", relationship: "" }]);
@@ -63,6 +65,7 @@ function ChildProfilePage() {
     setName(child.name ?? "");
     setDob(child.date_of_birth ?? "");
     setDiagnosis(child.diagnosis ?? "");
+    setConditionDetails(((child as unknown as { condition_details?: string | null }).condition_details) ?? "");
     setAllergies(child.allergies ?? "");
     setPhotoPath(child.photo_url ?? null);
     setContacts(asContacts(child.emergency_contacts));
@@ -92,6 +95,7 @@ function ChildProfilePage() {
           name: parsed.data.name,
           date_of_birth: dob || null,
           diagnosis: diagnosis || null,
+          condition_details: (conditionDetails || null) as unknown as never,
           allergies: allergies || null,
           photo_url: photoPath,
           emergency_contacts: contacts.filter((c) => c.name.trim()) as unknown as never,
@@ -170,6 +174,19 @@ function ChildProfilePage() {
           />
         </Field>
 
+        <Field label={t("onboardingChild.conditionDetails")}>
+          <Textarea
+            value={conditionDetails}
+            onChange={(e) => setConditionDetails(e.target.value)}
+            rows={5}
+            className="rounded-xl"
+            placeholder={t("onboardingChild.conditionDetailsPh")}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            {t("onboardingChild.conditionDetailsHelp")}
+          </p>
+        </Field>
+
         <Field label={t("onboardingChild.allergies")}>
           <Textarea
             value={allergies}
@@ -209,6 +226,9 @@ function ChildProfilePage() {
             </div>
           )}
         />
+
+        <EmergencyStepsSettings familyId={membership?.family_id} canEdit={canEdit} />
+
 
         <section className="space-y-3">
           <div>
