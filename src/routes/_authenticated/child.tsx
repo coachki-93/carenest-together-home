@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useFamilyChild } from "@/lib/data/medications";
 import { useUpdateChild } from "@/lib/data/family";
+import { EmergencyStepsSettings } from "@/components/carenest/EmergencyStepsSettings";
 import {
   ageMonthsFromDob,
   getVitalRanges,
