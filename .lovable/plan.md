@@ -1,65 +1,61 @@
-# End-of-Shift Tidy
+## Emergency Info Page Overhaul
 
-A lightweight cleanup checklist that appears near the end of a caregiver's shift. Modeled on Care Place Control, but simpler: each task is just done / skipped with an optional note.
+Turn `/emergency` into a serious under-stress reference: a rich condition summary, an owner-editable numbered action guide with color-coded severity, and clearer med info. Offline-safe by caching the last snapshot in localStorage.
 
-## How it works
+### 1. Rich condition description
 
-- **Owner** configures the checklist in Settings (tasks + lead time).
-- Lead time is chosen from a preset (15 / 30 / 45 / 60 min before shift end).
-- When the caregiver's current shift is within that window, a banner appears at the top of the dashboard: *"Wrap up your shift"*.
-- Each task shows two buttons: **Done** / **Skip**. Skipping opens a small note field.
-- Submitting closes the banner for that shift; results are logged.
+Replace the plain `child.diagnosis` text with a structured "Condition & devices" block:
+- Owner edits from Settings → Child profile with a simple multi-line editor supporting bullet points (Markdown-lite: lines starting with `-` render as bullets; blank lines break paragraphs). No heavy WYSIWYG.
+- New nullable column `children.condition_details` (text). `diagnosis` stays as a short one-liner ("Apert syndrome") shown as a badge; `condition_details` renders below as the formatted body (tracheostomy, PEG, allergies context, etc.).
+- Allergies stay in their own red high-contrast box (already exists).
 
-## Where it appears
+### 2. Emergency Action Steps (new)
 
-- **Settings** (owner only) — new "End-of-Shift Tidy" card below Care Place Control, with:
-  - Enable toggle
-  - Lead time selector (15/30/45/60 min)
-  - Task list (add / rename / reorder / delete)
-- **Dashboard** — banner when the active caregiver's shift ends within the lead window and the tidy hasn't been submitted yet.
-- **Handover auto-prefill** — skipped tasks are appended to the outgoing notes so the next caregiver knows what's still pending.
+New owner-managed, ordered checklist rendered as huge, high-contrast cards.
 
-## Technical section
+Data model — new table `emergency_steps`:
+- `family_id` (fk families), `position` int, `title` text, `description` text nullable
+- `severity` enum: `critical` (red), `monitor` (yellow), `info` (neutral)
+- RLS: family members read; owners write. Standard GRANTs.
 
-### Database (new tables)
+UI on `/emergency`:
+- Section "Emergency action steps" above medications, below diagnosis.
+- Each step: large numbered circle, bold title (text-xl), optional description, left border + soft background tinted by severity (red-600 / amber-500 / slate-300).
+- Empty state prompts owner to add steps (owner sees "Edit steps" button linking to Settings).
 
-```
-tidy_checklist_items
-  id, family_id, label, position, active, created_at, updated_at
+Owner editor in Settings (new `EmergencyStepsSettings` component):
+- List with drag-to-reorder (or up/down buttons for simplicity/a11y), inline title, expandable description, severity selector, delete. "Add step" button.
+- Persist reorder by rewriting `position`.
 
-tidy_settings
-  family_id (PK), enabled, lead_minutes (default 30), updated_at
+### 3. Meds — dosage + route clarity
 
-tidy_submissions
-  id, family_id, shift_id (nullable), performed_by, submitted_at
+Extend the meds list on `/emergency` to render everything the responder needs at a glance:
+- Show dose (`dose_amount dose_unit`), route (existing `medications.route`), and schedule summary if present.
+- Bold name, dose/route on second line, small "PRN" pill if `as_needed`.
 
-tidy_submission_answers
-  id, submission_id, family_id, item_id, item_label_snapshot,
-  status ('done' | 'skipped'), note
-```
+### 4. Offline resilience
 
-All tables: standard grants + RLS (family members read, owners manage settings/items, members insert submissions for their own shift).
+- On every successful load of child + steps + meds + contacts, snapshot the rendered data into `localStorage` under `emergency:<familyId>`.
+- On mount, hydrate from snapshot immediately so the page renders even with no network; live query overwrites when it resolves.
+- Small "Last updated <relative time>" line at the bottom + amber "Offline — showing last saved copy" banner when `navigator.onLine === false`.
 
-### Frontend
+### 5. Small UX polish
 
-- `src/lib/data/tidy.ts` — hooks: `useTidySettings`, `useTidyItems`, `useUpsertTidyItem`, `useSubmitTidy`, `useShiftTidyStatus(shiftId)`.
-- `src/components/carenest/TidySettings.tsx` — settings card (mirrors `CarePlaceCheckSettings`).
-- `src/components/carenest/EndOfShiftTidyBanner.tsx` — dashboard banner (mirrors `CarePlaceCheckBanner`, simpler answer UI).
-- Wire the banner into `src/routes/_authenticated/dashboard.tsx` alongside the existing Care Place banner.
-- Wire the settings card into `src/routes/_authenticated/settings.tsx`.
-- Extend `src/lib/data/handover-prefill.ts` to append any skipped items from the last tidy submission of the shift being handed over.
+- Sticky "Call 112" button remains at top; add a second sticky quick-call for the first emergency contact if present.
+- Ensure text is at least `text-base`; step titles `text-xl`; tap targets ≥ 44px.
+- All new strings added to both `en.ts` and `sv.ts`.
 
-### Trigger logic
+### Technical outline
 
-Read the active caregiver's current shift (already available via `src/lib/data/shifts.ts`). Show the banner when:
-`shift.end_at - now() <= lead_minutes` AND `now() < shift.end_at` AND no submission exists yet for that `shift_id`.
+- Migration: add `children.condition_details text`; create `emergency_steps` with GRANTs, RLS (member read, owner write via `is_family_owner`), and updated_at trigger.
+- New `src/lib/data/emergency-steps.ts` with `useEmergencySteps`, `useUpsertEmergencyStep`, `useDeleteEmergencyStep`, `useReorderEmergencySteps`.
+- New `src/components/carenest/EmergencyStepsSettings.tsx` mounted inside the existing child/owner settings page.
+- Rewrite `src/routes/_authenticated/emergency.tsx` for the new layout + offline snapshot hook.
+- Extend the child edit form for `condition_details`.
+- i18n keys in `en.ts` and `sv.ts`.
 
-### i18n
+### Out of scope
 
-New keys under `tidy.*` in both `src/lib/i18n/en.ts` and `src/lib/i18n/sv.ts` (title, subtitle, "Done", "Skip", "Add note", "Wrap up your shift", settings labels, empty state).
-
-### Out of scope for v1
-
-- No push notifications (can be added later like Care Place has).
-- No inventory link on tasks.
-- No missed-tidy sweep / escalation.
+- Rich WYSIWYG / images in condition body.
+- Printable / QR-code lock-screen card (can be a follow-up).
+- Push-notification-based caregiver alerts.
