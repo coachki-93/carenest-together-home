@@ -174,6 +174,19 @@ function ChildProfilePage() {
           />
         </Field>
 
+        <Field label={t("onboardingChild.conditionDetails")}>
+          <Textarea
+            value={conditionDetails}
+            onChange={(e) => setConditionDetails(e.target.value)}
+            rows={5}
+            className="rounded-xl"
+            placeholder={t("onboardingChild.conditionDetailsPh")}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            {t("onboardingChild.conditionDetailsHelp")}
+          </p>
+        </Field>
+
         <Field label={t("onboardingChild.allergies")}>
           <Textarea
             value={allergies}
