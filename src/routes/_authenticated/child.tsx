@@ -53,6 +53,7 @@ function ChildProfilePage() {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
+  const [conditionDetails, setConditionDetails] = useState("");
   const [allergies, setAllergies] = useState("");
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([{ name: "", phone: "", relationship: "" }]);
