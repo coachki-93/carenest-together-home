@@ -95,6 +95,7 @@ function ChildProfilePage() {
           name: parsed.data.name,
           date_of_birth: dob || null,
           diagnosis: diagnosis || null,
+          condition_details: (conditionDetails || null) as unknown as never,
           allergies: allergies || null,
           photo_url: photoPath,
           emergency_contacts: contacts.filter((c) => c.name.trim()) as unknown as never,
