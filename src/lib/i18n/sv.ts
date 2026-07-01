@@ -138,6 +138,9 @@ export const sv = {
     nameRequired: "Barnets namn krävs",
     saved: "Barnprofil sparad",
     dobHint: "Vi använder födelsedatum för att visa åldersanpassade referensvärden för vitalparametrar.",
+    conditionDetails: "Tillstånd & utrustning",
+    conditionDetailsHelp: "En längre beskrivning som visas på nödskärmen — utrustning (trakeostomi, PEG…), viktig bakgrund. Använd tomma rader för stycken och börja en rad med \"-\" för punkter.",
+    conditionDetailsPh: "t.ex.\nApert syndrom — påverkar skalle och lemmar.\n\n- Trakeostomi för andningsstöd\n- PEG-sond för matning",
   },
   onboardingCaregiver: {
     title: "Välkommen, vårdgivare",
