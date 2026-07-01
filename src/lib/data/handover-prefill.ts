@@ -144,6 +144,13 @@ export function useHandoverPrefill(
             .eq("family_id", familyId)
             .gte("checked_at", startIso)
             .lt("checked_at", endIso),
+          supabase
+            .from("tidy_submission_answers")
+            .select("item_label_snapshot, status, note, created_at")
+            .eq("family_id", familyId)
+            .eq("status", "skipped")
+            .gte("created_at", startIso)
+            .lt("created_at", endIso),
         ]);
 
       const meds = (medsRes.data ?? []) as Medication[];
