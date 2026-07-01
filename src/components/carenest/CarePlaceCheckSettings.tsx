@@ -333,7 +333,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                   </SelectContent>
                 </Select>
               </div>
-              {newType !== "yesno" && newType !== "days_left" && newInventoryId !== "none" && (
+              {newType !== "days_left" && newInventoryId !== "none" && (
                 <div className="space-y-1">
                   <Label className="text-xs">{t("carePlace.decrementLabel")}</Label>
                   <Input
