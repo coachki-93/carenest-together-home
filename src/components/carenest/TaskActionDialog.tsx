@@ -309,6 +309,36 @@ export function TaskActionDialog({
                 {t("taskAction.reasonLabel")}{" "}
                 <span className="text-destructive">*</span>
               </Label>
+              {(() => {
+                const presetKeys =
+                  action === "skipped"
+                    ? (["notNeeded", "asleep", "refused", "alreadyDone", "atHospital", "missedWindow", "equipmentUnavailable"] as const)
+                    : (["asleep", "eating", "outOfHouse", "waitingSupplies", "caregiverBusy", "doctorDelay"] as const);
+                const group = action === "skipped" ? "skipReasons" : "postponeReasons";
+                return (
+                  <div className="flex flex-wrap gap-1.5">
+                    {presetKeys.map((k) => {
+                      const label = t(`taskAction.${group}.${k}` as const);
+                      const active = reason === label;
+                      return (
+                        <button
+                          key={k}
+                          type="button"
+                          onClick={() => setReason(active ? "" : label)}
+                          className={cn(
+                            "rounded-full px-3 py-1 text-xs font-semibold border transition-colors",
+                            active
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "border-border bg-background hover:bg-muted",
+                          )}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
               <Textarea
                 rows={3}
                 className="rounded-xl"

@@ -1,61 +1,35 @@
-## Emergency Info Page Overhaul
+## Add quick-reason chips to Skip / Postpone dialog
 
-Turn `/emergency` into a serious under-stress reference: a rich condition summary, an owner-editable numbered action guide with color-coded severity, and clearer med info. Offline-safe by caching the last snapshot in localStorage.
+In `TaskActionDialog.tsx`, when the action is **skip** or **postpone**, render a row of selectable chips above the reason textarea. Tapping one fills the textarea with that preset (and still allows free-text editing). Different presets per action since the situations differ.
 
-### 1. Rich condition description
+### Skip presets
+- Not needed right now
+- Child asleep
+- Child refused
+- Already done manually
+- At hospital / handled there
+- Missed the time window
+- Equipment unavailable
+- Other (clears field, focuses textarea)
 
-Replace the plain `child.diagnosis` text with a structured "Condition & devices" block:
-- Owner edits from Settings → Child profile with a simple multi-line editor supporting bullet points (Markdown-lite: lines starting with `-` render as bullets; blank lines break paragraphs). No heavy WYSIWYG.
-- New nullable column `children.condition_details` (text). `diagnosis` stays as a short one-liner ("Apert syndrome") shown as a badge; `condition_details` renders below as the formatted body (tracheostomy, PEG, allergies context, etc.).
-- Allergies stay in their own red high-contrast box (already exists).
+### Postpone presets
+- Child asleep — do later
+- Currently eating
+- Out of the house
+- Waiting on supplies
+- Caregiver busy
+- Doctor said to delay
 
-### 2. Emergency Action Steps (new)
+### UX
+- Chips = small pill buttons, same style as the existing vital-context chips already in the file (keeps visual consistency).
+- Single-select: tapping a chip replaces the textarea contents with that preset text; tapping the same chip again deselects and clears.
+- Reason textarea remains required and editable — chips are a shortcut, not a replacement.
+- Track selected chip in local state so the active one is highlighted.
 
-New owner-managed, ordered checklist rendered as huge, high-contrast cards.
+### i18n
+Add keys under `taskAction.skipReasons.*` and `taskAction.postponeReasons.*` in both `en.ts` and `sv.ts`, plus a `taskAction.quickReasonLabel` ("Quick reason").
 
-Data model — new table `emergency_steps`:
-- `family_id` (fk families), `position` int, `title` text, `description` text nullable
-- `severity` enum: `critical` (red), `monitor` (yellow), `info` (neutral)
-- RLS: family members read; owners write. Standard GRANTs.
+### Scope
+Only `src/components/carenest/TaskActionDialog.tsx`, `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts`. No DB / no schema change — the free-text `reason` column already stores whatever is submitted.
 
-UI on `/emergency`:
-- Section "Emergency action steps" above medications, below diagnosis.
-- Each step: large numbered circle, bold title (text-xl), optional description, left border + soft background tinted by severity (red-600 / amber-500 / slate-300).
-- Empty state prompts owner to add steps (owner sees "Edit steps" button linking to Settings).
-
-Owner editor in Settings (new `EmergencyStepsSettings` component):
-- List with drag-to-reorder (or up/down buttons for simplicity/a11y), inline title, expandable description, severity selector, delete. "Add step" button.
-- Persist reorder by rewriting `position`.
-
-### 3. Meds — dosage + route clarity
-
-Extend the meds list on `/emergency` to render everything the responder needs at a glance:
-- Show dose (`dose_amount dose_unit`), route (existing `medications.route`), and schedule summary if present.
-- Bold name, dose/route on second line, small "PRN" pill if `as_needed`.
-
-### 4. Offline resilience
-
-- On every successful load of child + steps + meds + contacts, snapshot the rendered data into `localStorage` under `emergency:<familyId>`.
-- On mount, hydrate from snapshot immediately so the page renders even with no network; live query overwrites when it resolves.
-- Small "Last updated <relative time>" line at the bottom + amber "Offline — showing last saved copy" banner when `navigator.onLine === false`.
-
-### 5. Small UX polish
-
-- Sticky "Call 112" button remains at top; add a second sticky quick-call for the first emergency contact if present.
-- Ensure text is at least `text-base`; step titles `text-xl`; tap targets ≥ 44px.
-- All new strings added to both `en.ts` and `sv.ts`.
-
-### Technical outline
-
-- Migration: add `children.condition_details text`; create `emergency_steps` with GRANTs, RLS (member read, owner write via `is_family_owner`), and updated_at trigger.
-- New `src/lib/data/emergency-steps.ts` with `useEmergencySteps`, `useUpsertEmergencyStep`, `useDeleteEmergencyStep`, `useReorderEmergencySteps`.
-- New `src/components/carenest/EmergencyStepsSettings.tsx` mounted inside the existing child/owner settings page.
-- Rewrite `src/routes/_authenticated/emergency.tsx` for the new layout + offline snapshot hook.
-- Extend the child edit form for `condition_details`.
-- i18n keys in `en.ts` and `sv.ts`.
-
-### Out of scope
-
-- Rich WYSIWYG / images in condition body.
-- Printable / QR-code lock-screen card (can be a follow-up).
-- Push-notification-based caregiver alerts.
+Do the preset lists above look right, or want me to trim/rename any before I build it?
