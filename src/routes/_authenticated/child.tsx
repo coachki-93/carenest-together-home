@@ -65,6 +65,7 @@ function ChildProfilePage() {
     setName(child.name ?? "");
     setDob(child.date_of_birth ?? "");
     setDiagnosis(child.diagnosis ?? "");
+    setConditionDetails(((child as unknown as { condition_details?: string | null }).condition_details) ?? "");
     setAllergies(child.allergies ?? "");
     setPhotoPath(child.photo_url ?? null);
     setContacts(asContacts(child.emergency_contacts));
