@@ -14,9 +14,7 @@ export interface EmergencyStep {
   updated_at: string;
 }
 
-// Types not yet regenerated for this table — cast at the client edge.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const table = () => (supabase as any).from("emergency_steps");
+const table = () => supabase.from("emergency_steps");
 
 export function useEmergencySteps(familyId: string | null | undefined) {
   return useQuery({

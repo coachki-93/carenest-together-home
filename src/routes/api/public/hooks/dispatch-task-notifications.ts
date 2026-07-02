@@ -135,6 +135,11 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             .eq("id", a.id);
         }
 
+        // Only look at appointments from the last 7 days — anything older
+        // won't get late/missed notifications retroactively and we don't want
+        // to fan out hundreds of Supabase round-trips per cron tick.
+        const recentWindow = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
         // -------- PASS 2: late --------
         // starts_at + late_after_minutes <= now, no late_notified_at, no
         // completion logged for this occurrence yet.
@@ -144,6 +149,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
           )
           .is("late_notified_at", null)
+          .gte("starts_at", recentWindow)
           .lte("starts_at", nowIso)
           .eq("all_day", false)
           .limit(500);
@@ -174,6 +180,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
           )
           .is("missed_notified_at", null)
+          .gte("starts_at", recentWindow)
           .lte("starts_at", nowIso)
           .eq("all_day", false)
           .limit(500);
@@ -215,20 +222,17 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 });
 
 async function hasCompletion(
-  client: { from: (t: string) => unknown },
+  client: Awaited<
+    ReturnType<typeof import("@/integrations/supabase/client.server")["supabaseAdmin"]["from"]>
+  > extends never
+    ? never
+    : import("@supabase/supabase-js").SupabaseClient,
   appointmentId: string,
   occurrenceAt: string,
 ): Promise<boolean> {
-  const builder = (client as { from: (t: string) => { select: (c: string) => unknown } })
+  const { data } = await client
     .from("appointment_completions")
-    .select("id") as unknown as {
-      eq: (k: string, v: string) => {
-        eq: (k: string, v: string) => {
-          limit: (n: number) => Promise<{ data: { id: string }[] | null }>;
-        };
-      };
-    };
-  const { data } = await builder
+    .select("id")
     .eq("appointment_id", appointmentId)
     .eq("occurrence_at", occurrenceAt)
     .limit(1);

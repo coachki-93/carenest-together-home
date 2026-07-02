@@ -19,7 +19,7 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
   const { t } = useTranslation();
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-transparent">
+      <div className="min-h-dvh flex w-full bg-transparent">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-10 backdrop-blur-md bg-background/70 border-b border-border/60 safe-pt">

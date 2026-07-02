@@ -1039,6 +1039,16 @@ export const en = {
     iosHint: "On iPad/iPhone: add CareNest to your Home Screen first, then open it from the icon and tap Enable.",
     diagnostics: "Notification diagnostics",
     iosNotStandalone: "You're in Safari, not the installed app. Tap the Share icon → Add to Home Screen, then open CareNest from the new icon.",
+    diagLabels: {
+      ios: "iOS",
+      standalone: "Installed (home-screen)",
+      permission: "Permission",
+      swSupported: "Service Worker supported",
+      pushSupported: "Push supported",
+      status: "Status",
+      yes: "yes",
+      no: "no",
+    },
   },
   oxygen: {
     title: "Oxygen",

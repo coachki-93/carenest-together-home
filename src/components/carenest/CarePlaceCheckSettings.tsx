@@ -251,9 +251,10 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                       type="button"
                       variant="ghost"
                       size="icon"
+                      aria-label={t("common.delete")}
                       onClick={() => deleteItem.mutate(it.id)}
                     >
-                      <Trash2 className="size-4 text-destructive" />
+                      <Trash2 className="size-4 text-destructive" aria-hidden="true" />
                     </Button>
                   </>
                 )}
@@ -444,9 +445,10 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
                     type="button"
                     variant="ghost"
                     size="icon"
+                    aria-label={t("common.delete")}
                     onClick={() => deleteTime.mutate(tm.id)}
                   >
-                    <Trash2 className="size-4 text-destructive" />
+                    <Trash2 className="size-4 text-destructive" aria-hidden="true" />
                   </Button>
                 </>
               )}

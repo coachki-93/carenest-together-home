@@ -34,7 +34,7 @@ export function usePushSubscription(familyId: string | null | undefined) {
       return;
     }
     try {
-      const reg = await navigator.serviceWorker.getRegistration(SW_PATH);
+      const reg = await navigator.serviceWorker.getRegistration("/");
       const sub = reg ? await reg.pushManager.getSubscription() : null;
       setStatus(sub ? "granted-subscribed" : "granted-unsubscribed");
     } catch {
@@ -65,18 +65,13 @@ export function usePushSubscription(familyId: string | null | undefined) {
     }
     setLoading(true);
     try {
-      const perm = await Notification.requestPermission();
-      if (perm !== "granted") {
-        setStatus(perm === "denied" ? "denied" : "default");
-        throw new Error("Notification permission was not granted.");
-      }
-
-      let reg = await navigator.serviceWorker.getRegistration(SW_PATH);
+      // iOS 16.4+ requires the SW to be registered and active BEFORE
+      // Notification.requestPermission() is called — otherwise the prompt
+      // never fires and subscribe() silently rejects.
+      let reg = await navigator.serviceWorker.getRegistration("/");
       if (!reg) {
         reg = await navigator.serviceWorker.register(SW_PATH, { scope: "/" });
       }
-      // Wait until the worker controlling this scope is fully active — iOS
-      // Safari often rejects subscribe() when the SW is still installing.
       await navigator.serviceWorker.ready;
       if (reg.installing || reg.waiting) {
         await new Promise<void>((resolve) => {
@@ -86,6 +81,12 @@ export function usePushSubscription(familyId: string | null | undefined) {
             if (w.state === "activated") resolve();
           });
         });
+      }
+
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        setStatus(perm === "denied" ? "denied" : "default");
+        throw new Error("Notification permission was not granted.");
       }
 
       const existing = await reg.pushManager.getSubscription();
@@ -123,7 +124,7 @@ export function usePushSubscription(familyId: string | null | undefined) {
   const disable = useCallback(async () => {
     setLoading(true);
     try {
-      const reg = await navigator.serviceWorker.getRegistration(SW_PATH);
+      const reg = await navigator.serviceWorker.getRegistration("/");
       const sub = reg ? await reg.pushManager.getSubscription() : null;
       if (sub) {
         await remove({ data: { endpoint: sub.endpoint } }).catch(() => {});

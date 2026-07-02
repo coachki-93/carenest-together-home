@@ -99,12 +99,12 @@ export function EnableNotificationsCard() {
             <details className="mt-3 rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
               <summary className="cursor-pointer font-medium">{t("push.diagnostics")}</summary>
               <ul className="mt-2 space-y-1">
-                <li>iOS: {diag.isIos ? "yes" : "no"}</li>
-                <li>Installed (home-screen): {diag.standalone ? "yes" : "no"}</li>
-                <li>Permission: {diag.permission}</li>
-                <li>Service Worker supported: {diag.swSupported ? "yes" : "no"}</li>
-                <li>Push supported: {diag.pushSupported ? "yes" : "no"}</li>
-                <li>Status: {status}</li>
+                <li>{t("push.diagLabels.ios")}: {diag.isIos ? t("push.diagLabels.yes") : t("push.diagLabels.no")}</li>
+                <li>{t("push.diagLabels.standalone")}: {diag.standalone ? t("push.diagLabels.yes") : t("push.diagLabels.no")}</li>
+                <li>{t("push.diagLabels.permission")}: {diag.permission}</li>
+                <li>{t("push.diagLabels.swSupported")}: {diag.swSupported ? t("push.diagLabels.yes") : t("push.diagLabels.no")}</li>
+                <li>{t("push.diagLabels.pushSupported")}: {diag.pushSupported ? t("push.diagLabels.yes") : t("push.diagLabels.no")}</li>
+                <li>{t("push.diagLabels.status")}: {status}</li>
               </ul>
               {diag.isIos && !diag.standalone && (
                 <p className="mt-2 text-destructive">{t("push.iosNotStandalone")}</p>
