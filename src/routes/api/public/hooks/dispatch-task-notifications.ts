@@ -222,20 +222,17 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 });
 
 async function hasCompletion(
-  client: { from: (t: string) => unknown },
+  client: Awaited<
+    ReturnType<typeof import("@/integrations/supabase/client.server")["supabaseAdmin"]["from"]>
+  > extends never
+    ? never
+    : import("@supabase/supabase-js").SupabaseClient,
   appointmentId: string,
   occurrenceAt: string,
 ): Promise<boolean> {
-  const builder = (client as { from: (t: string) => { select: (c: string) => unknown } })
+  const { data } = await client
     .from("appointment_completions")
-    .select("id") as unknown as {
-      eq: (k: string, v: string) => {
-        eq: (k: string, v: string) => {
-          limit: (n: number) => Promise<{ data: { id: string }[] | null }>;
-        };
-      };
-    };
-  const { data } = await builder
+    .select("id")
     .eq("appointment_id", appointmentId)
     .eq("occurrence_at", occurrenceAt)
     .limit(1);
