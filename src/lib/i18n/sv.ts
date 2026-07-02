@@ -1039,6 +1039,16 @@ export const sv = {
     iosHint: "På iPad/iPhone: lägg först till CareNest på hemskärmen, öppna sedan från ikonen och tryck Slå på.",
     diagnostics: "Felsökning av notiser",
     iosNotStandalone: "Du är i Safari, inte den installerade appen. Tryck Dela-ikonen → Lägg till på hemskärmen, öppna sedan CareNest från den nya ikonen.",
+    diagLabels: {
+      ios: "iOS",
+      standalone: "Installerad (hemskärm)",
+      permission: "Behörighet",
+      swSupported: "Service Worker stöds",
+      pushSupported: "Push stöds",
+      status: "Status",
+      yes: "ja",
+      no: "nej",
+    },
   },
   oxygen: {
     title: "Syrgas",
