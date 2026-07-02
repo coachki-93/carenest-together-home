@@ -135,6 +135,11 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             .eq("id", a.id);
         }
 
+        // Only look at appointments from the last 7 days — anything older
+        // won't get late/missed notifications retroactively and we don't want
+        // to fan out hundreds of Supabase round-trips per cron tick.
+        const recentWindow = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
         // -------- PASS 2: late --------
         // starts_at + late_after_minutes <= now, no late_notified_at, no
         // completion logged for this occurrence yet.
@@ -144,6 +149,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
           )
           .is("late_notified_at", null)
+          .gte("starts_at", recentWindow)
           .lte("starts_at", nowIso)
           .eq("all_day", false)
           .limit(500);
@@ -174,6 +180,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
           )
           .is("missed_notified_at", null)
+          .gte("starts_at", recentWindow)
           .lte("starts_at", nowIso)
           .eq("all_day", false)
           .limit(500);

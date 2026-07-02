@@ -42,7 +42,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
 
         const { data: families } = await supabaseAdmin
           .from("families")
-          .select("id, oxygen_warn_minutes, oxygen_critical_minutes");
+          .select("id, oxygen_warn_minutes, oxygen_critical_minutes, at_hospital_since");
         const famSettings = new Map<string, { warn: number; crit: number }>(
           (families ?? []).map((f) => [
             f.id,
@@ -52,6 +52,11 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
             },
           ]),
         );
+        // Families currently at hospital have hospital-supplied oxygen, so we
+        // skip low-tank pushes for them entirely.
+        const hospitalFamilyIds = new Set<string>(
+          (families ?? []).filter((f) => f.at_hospital_since).map((f) => f.id),
+        );
 
         let pushes = 0;
         const stale: string[] = [];
@@ -59,6 +64,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
 
         for (const tank of tanks ?? []) {
           if (tank.paused_at) continue;
+          if (hospitalFamilyIds.has(tank.family_id)) continue;
           const info = computeRemaining(tank as unknown as OxygenTankRow);
           if (!info) continue;
           const { warn, crit } = famSettings.get(tank.family_id) ?? { warn: 60, crit: 20 };
