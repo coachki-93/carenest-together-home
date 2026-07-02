@@ -32,7 +32,6 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
           webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
         }
 
-        const CARE_PLACE_WINDOW_MIN = 30;
         const now = new Date();
         const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
         const nowMin = now.getHours() * 60 + now.getMinutes();
@@ -68,7 +67,9 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
           if (hospitalFamilyIds.has(tm.family_id)) continue;
           const [h, m] = tm.time_of_day.split(":").map(Number);
           const slotMin = h * 60 + m;
-          const closedAt = slotMin + CARE_PLACE_WINDOW_MIN + (tm.grace_minutes ?? 30);
+          // `grace_minutes` is the total post-slot grace window before we
+          // consider the check missed.
+          const closedAt = slotMin + (tm.grace_minutes ?? 30);
           if (nowMin < closedAt) continue; // still inside window or grace
           const key = `${tm.family_id}|${tm.time_of_day.slice(0, 5)}`;
           if (completed.has(key)) continue;
