@@ -63,8 +63,8 @@ export interface OxygenTankRow {
   started_at: string;
   replaced_at: string | null;
   notes: string | null;
-  paused_at?: string | null;
-  paused_seconds?: number | null;
+  paused_at: string | null;
+  paused_seconds: number;
 }
 
 export interface RemainingInfo {
