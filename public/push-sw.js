@@ -37,15 +37,21 @@ self.addEventListener("notificationclick", (event) => {
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      // Prefer a window already on the target URL.
       for (const client of clients) {
-        if ("focus" in client) {
-          client.navigate(url).catch(() => {});
-          return client.focus();
+        try {
+          const u = new URL(client.url);
+          if (u.pathname === url && "focus" in client) return client.focus();
+        } catch (_) {
+          // ignore malformed client URL
         }
       }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(url);
-      }
+      // Otherwise open a fresh window at the target URL — safer than
+      // navigating an unrelated window the user was mid-flow in.
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+      // Fallback: focus something so the click isn't lost.
+      const anyClient = clients.find((c) => "focus" in c);
+      if (anyClient) return anyClient.focus();
     }),
   );
 });
