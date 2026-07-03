@@ -413,14 +413,12 @@ function DashboardPage() {
   const navigate = useNavigate();
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
     useDismissedHandovers(user?.id);
+  const { data: handoverTimes = [] } = useHandoverTimes(familyId);
   const handoverDue = useHandoverDueItem(
-    shifts,
-    user?.id,
+    handoverTimes,
+    dismissedHandovers,
     todayStart,
     todayEnd,
-    dismissedHandovers,
-    family?.handover_reminder_minutes ?? 30,
-    family?.handover_reminder_duration_minutes ?? 30,
   );
   const search = Route.useSearch();
   const [pendingAction, setPendingAction] = useState<{
