@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
-import { LanguageToggle } from "./LanguageToggle";
 import { ProfileSelector } from "./ProfileSelector";
 import { HospitalToggle } from "./HospitalToggle";
 
