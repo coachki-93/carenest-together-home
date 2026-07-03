@@ -46,9 +46,6 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
                   <span className="hidden sm:inline">{t("emergency.open")}</span>
                 </Link>
                 <HospitalToggle />
-                <div className="hidden md:flex items-center gap-2">
-                  <LanguageToggle />
-                </div>
                 <ProfileSelector />
               </div>
             </div>
