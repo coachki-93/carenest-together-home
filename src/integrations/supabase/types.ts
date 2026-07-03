@@ -791,6 +791,7 @@ export type Database = {
         Row: {
           at_hospital_since: string | null
           created_at: string
+          handover_reminder_minutes: number
           id: string
           name: string
           owner_id: string
@@ -801,6 +802,7 @@ export type Database = {
         Insert: {
           at_hospital_since?: string | null
           created_at?: string
+          handover_reminder_minutes?: number
           id?: string
           name?: string
           owner_id: string
@@ -811,6 +813,7 @@ export type Database = {
         Update: {
           at_hospital_since?: string | null
           created_at?: string
+          handover_reminder_minutes?: number
           id?: string
           name?: string
           owner_id?: string

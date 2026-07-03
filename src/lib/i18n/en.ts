@@ -1557,6 +1557,16 @@ export const en = {
     submitted: "Tidy checklist submitted",
     answerAll: "Please answer every item.",
   },
+  handoverReminder: {
+    title: "Handover reminder",
+    subtitle: "When to show the \"handover soon\" banner before a shift ends.",
+    ownerOnly: "Only the family owner can change this setting.",
+    label: "Show reminder before shift ends",
+    unit: "minutes",
+    hint: "Between 5 and 120 minutes. Default is 30.",
+    invalid: "Enter a number between 5 and 120.",
+    saved: "Handover reminder updated.",
+  },
 };
 
 

@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
-import { LanguageToggle } from "./LanguageToggle";
 import { ProfileSelector } from "./ProfileSelector";
 import { HospitalToggle } from "./HospitalToggle";
 
@@ -47,9 +46,6 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
                   <span className="hidden sm:inline">{t("emergency.open")}</span>
                 </Link>
                 <HospitalToggle />
-                <div className="hidden md:flex items-center gap-2">
-                  <LanguageToggle />
-                </div>
                 <ProfileSelector />
               </div>
             </div>

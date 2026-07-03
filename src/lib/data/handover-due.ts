@@ -21,15 +21,17 @@ export function useHandoverDueItem(
   rangeStart: Date,
   rangeEnd: Date,
   dismissed: Set<string>,
+  leadMinutes: number = 30,
 ): HandoverDueItem | null {
   return useMemo(() => {
     if (!userId) return null;
     const occs = expandShifts(shifts, rangeStart, rangeEnd);
     const now = new Date();
+    const lead = Math.max(1, leadMinutes);
     const candidates: HandoverDueItem[] = [];
     for (const o of occs) {
       if (o.caregiverUserId !== userId) continue;
-      const at = new Date(o.end.getTime() - 30 * 60 * 1000);
+      const at = new Date(o.end.getTime() - lead * 60 * 1000);
       if (at < rangeStart || at >= rangeEnd) continue;
       if (o.end <= now) continue;
       const dismissId = `${o.masterId}:${o.start.getTime()}`;
@@ -44,7 +46,7 @@ export function useHandoverDueItem(
     if (candidates.length === 0) return null;
     candidates.sort((a, b) => a.at.getTime() - b.at.getTime());
     return candidates[0];
-  }, [shifts, userId, rangeStart, rangeEnd, dismissed]);
+  }, [shifts, userId, rangeStart, rangeEnd, dismissed, leadMinutes]);
 }
 
 export function useDismissedHandovers(userId: string | undefined) {

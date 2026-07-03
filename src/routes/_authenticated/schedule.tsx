@@ -78,6 +78,7 @@ import {
   buildTodaysDoses,
   type ScheduledDose,
 } from "@/lib/data/medications";
+import { useFamily } from "@/lib/data/family";
 import {
   APPOINTMENT_KINDS,
   useAppointments,
@@ -176,6 +177,7 @@ function SchedulePage() {
   const { user } = useSession();
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
+  const { data: family } = useFamily(familyId);
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
@@ -209,6 +211,7 @@ function SchedulePage() {
     day,
     dayEnd,
     dismissedHandovers,
+    family?.handover_reminder_minutes ?? 30,
   );
   const handoverItems = useMemo<TimelineItem[]>(() => {
     if (!handoverDue) return [];
