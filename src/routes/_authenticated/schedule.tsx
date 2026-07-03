@@ -433,8 +433,8 @@ function SchedulePage() {
               <HandoverDueRow
                 key={item.key}
                 at={item.at}
-                shiftStart={item.shiftStart}
-                shiftEnd={item.shiftEnd}
+                until={item.until}
+                label={item.label}
                 onDismiss={() => dismissHandover(item.dismissId)}
               />
             );
