@@ -1607,13 +1607,13 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
 
 function HandoverDueRow({
   at,
-  shiftStart,
-  shiftEnd,
+  until,
+  label,
   onDismiss,
 }: {
   at: Date;
-  shiftStart: Date;
-  shiftEnd: Date;
+  until: Date;
+  label: string | null;
   onDismiss: () => void;
 }) {
   const { t, i18n } = useTranslation();
@@ -1636,13 +1636,10 @@ function HandoverDueRow({
       </div>
       <div className="min-w-0 flex-1">
         <h3 className="font-extrabold truncate">
-          {t("schedule.handoverDue.title")}
+          {label || t("schedule.handoverDue.title")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {t("schedule.handoverDue.body", {
-            start: timeFmt.format(shiftStart),
-            end: timeFmt.format(shiftEnd),
-          })}
+          {t("schedule.handoverDue.body", { until: timeFmt.format(until) })}
         </p>
       </div>
       <div className="flex gap-2 shrink-0">
@@ -1655,13 +1652,7 @@ function HandoverDueRow({
           {t("schedule.handoverDue.skip")}
         </Button>
         <Button asChild size="sm" className="rounded-full font-semibold">
-          <Link
-            to="/handover"
-            search={{
-              shiftStart: shiftStart.toISOString(),
-              shiftEnd: shiftEnd.toISOString(),
-            }}
-          >
+          <Link to="/handover" search={{}}>
             {t("schedule.handoverDue.start")}
           </Link>
         </Button>
