@@ -45,8 +45,8 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
                   <AlertTriangle className="size-4" aria-hidden="true" />
                   <span className="hidden sm:inline">{t("emergency.open")}</span>
                 </Link>
-                <HospitalToggle />
                 <ProfileSelector />
+
               </div>
             </div>
           </header>
