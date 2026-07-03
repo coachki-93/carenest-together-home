@@ -1145,6 +1145,8 @@ export const sv = {
     historyTitle: "Historik",
     noHistory: "Inga genomförda kontroller ännu.",
     itemsLabel: "punkter",
+    seeMore: "Visa fler ({{count}})",
+    showLess: "Visa färre",
     itemAdded: "Punkt tillagd",
     timeAdded: "Tid tillagd",
     completeWithin: "Slutför inom {{time}}",
