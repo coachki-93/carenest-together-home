@@ -167,8 +167,8 @@ type TimelineItem =
       kind: "handover";
       key: string;
       at: Date;
-      shiftStart: Date;
-      shiftEnd: Date;
+      until: Date;
+      label: string | null;
       dismissId: string;
     };
 
