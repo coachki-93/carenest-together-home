@@ -206,14 +206,12 @@ function SchedulePage() {
 
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
     useDismissedHandovers(user?.id);
+  const { data: handoverTimes = [] } = useHandoverTimes(familyId);
   const handoverDue = useHandoverDueItem(
-    shifts,
-    user?.id,
+    handoverTimes,
+    dismissedHandovers,
     day,
     dayEnd,
-    dismissedHandovers,
-    family?.handover_reminder_minutes ?? 30,
-    family?.handover_reminder_duration_minutes ?? 30,
   );
   const handoverItems = useMemo<TimelineItem[]>(() => {
     if (!handoverDue) return [];
@@ -222,8 +220,8 @@ function SchedulePage() {
         kind: "handover",
         key: `handover-${handoverDue.dismissId}`,
         at: handoverDue.at,
-        shiftStart: handoverDue.shiftStart,
-        shiftEnd: handoverDue.shiftEnd,
+        until: handoverDue.until,
+        label: handoverDue.label,
         dismissId: handoverDue.dismissId,
       },
     ];
