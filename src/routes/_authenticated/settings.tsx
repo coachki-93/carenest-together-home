@@ -9,6 +9,7 @@ import { ImageUpload } from "@/components/carenest/ImageUpload";
 import { EnableNotificationsCard } from "@/components/carenest/EnableNotificationsCard";
 import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSettings";
 import { TidySettings } from "@/components/carenest/TidySettings";
+import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
 import {
   AvatarColorPicker,
   AVATAR_COLORS,
