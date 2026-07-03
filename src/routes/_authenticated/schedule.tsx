@@ -212,6 +212,7 @@ function SchedulePage() {
     dayEnd,
     dismissedHandovers,
     family?.handover_reminder_minutes ?? 30,
+    family?.handover_reminder_duration_minutes ?? 30,
   );
   const handoverItems = useMemo<TimelineItem[]>(() => {
     if (!handoverDue) return [];
