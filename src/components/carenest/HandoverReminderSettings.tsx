@@ -16,23 +16,32 @@ export function HandoverReminderSettings({ familyId, isOwner }: Props) {
   const { t } = useTranslation();
   const { data: family } = useFamily(familyId);
   const update = useUpdateHandoverReminderMinutes();
-  const [minutes, setMinutes] = useState<string>("30");
+  const [lead, setLead] = useState<string>("30");
+  const [duration, setDuration] = useState<string>("30");
 
   useEffect(() => {
     if (family?.handover_reminder_minutes != null) {
-      setMinutes(String(family.handover_reminder_minutes));
+      setLead(String(family.handover_reminder_minutes));
     }
-  }, [family?.handover_reminder_minutes]);
+    if (family?.handover_reminder_duration_minutes != null) {
+      setDuration(String(family.handover_reminder_duration_minutes));
+    }
+  }, [family?.handover_reminder_minutes, family?.handover_reminder_duration_minutes]);
 
   async function save() {
     if (!familyId) return;
-    const n = Math.round(Number(minutes));
-    if (!Number.isFinite(n) || n < 5 || n > 120) {
-      toast.error(t("handoverReminder.invalid"));
+    const l = Math.round(Number(lead));
+    const d = Math.round(Number(duration));
+    if (!Number.isFinite(l) || l < 1 || l > 240) {
+      toast.error(t("handoverReminder.invalidLead"));
+      return;
+    }
+    if (!Number.isFinite(d) || d < 1 || d > 240) {
+      toast.error(t("handoverReminder.invalidDuration"));
       return;
     }
     try {
-      await update.mutateAsync({ familyId, minutes: n });
+      await update.mutateAsync({ familyId, leadMinutes: l, durationMinutes: d });
       toast.success(t("handoverReminder.saved"));
     } catch (e) {
       toast.error((e as Error).message);
@@ -58,28 +67,53 @@ export function HandoverReminderSettings({ familyId, isOwner }: Props) {
           {t("handoverReminder.ownerOnly")}
         </p>
       ) : (
-        <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-          <div className="flex-1 space-y-1.5">
-            <Label htmlFor="handover-lead">{t("handoverReminder.label")}</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="handover-lead"
-                type="number"
-                min={5}
-                max={120}
-                step={5}
-                value={minutes}
-                onChange={(e) => setMinutes(e.target.value)}
-                className="w-28"
-              />
-              <span className="text-sm text-muted-foreground">
-                {t("handoverReminder.unit")}
-              </span>
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="handover-lead">{t("handoverReminder.leadLabel")}</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="handover-lead"
+                  type="number"
+                  min={1}
+                  max={240}
+                  step={5}
+                  value={lead}
+                  onChange={(e) => setLead(e.target.value)}
+                  className="w-28"
+                />
+                <span className="text-sm text-muted-foreground">
+                  {t("handoverReminder.unit")}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("handoverReminder.leadHint")}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {t("handoverReminder.hint")}
-            </p>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="handover-duration">{t("handoverReminder.durationLabel")}</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="handover-duration"
+                  type="number"
+                  min={1}
+                  max={240}
+                  step={5}
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  className="w-28"
+                />
+                <span className="text-sm text-muted-foreground">
+                  {t("handoverReminder.unit")}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("handoverReminder.durationHint")}
+              </p>
+            </div>
           </div>
+
           <Button onClick={save} disabled={update.isPending}>
             {t("common.save")}
           </Button>
