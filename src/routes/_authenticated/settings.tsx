@@ -269,6 +269,7 @@ function SettingsPage() {
         {/* Handover reminder timing */}
         <HandoverReminderSettings
           familyId={membership.data?.family_id}
+          userId={user?.id}
           isOwner={membership.data?.role === "owner"}
         />
 
