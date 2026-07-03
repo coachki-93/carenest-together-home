@@ -49,7 +49,8 @@ export function useHandoverDueItem(
         const grace = Math.max(1, tm.grace_minutes ?? 30);
         const until = new Date(at.getTime() + grace * 60 * 1000);
         if (until <= rangeStart || at >= rangeEnd) continue;
-        if (until <= now) continue;
+        // Only visible between `at` and `until` (grace window).
+        if (now < at || now >= until) continue;
         const dismissId = `${tm.id}:${dateIso}`;
         if (dismissed.has(dismissId)) continue;
         candidates.push({ at, until, label: tm.label, dismissId });
