@@ -505,42 +505,71 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
             {t("carePlace.noHistory")}
           </p>
         ) : (
-          <div className="space-y-2">
-            {history.map((h) => (
-              <details key={h.id} className="rounded-xl border p-3">
-                <summary className="cursor-pointer flex items-center justify-between gap-2">
-                  <span className="font-medium">
-                    {new Date(h.performed_at).toLocaleString()} ·{" "}
-                    {h.scheduled_time.slice(0, 5)}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {h.answers.length} {t("carePlace.itemsLabel")}
-                  </span>
-                </summary>
-                <ul className="mt-2 space-y-1 text-sm">
-                  {h.answers.map((a) => (
-                    <li key={a.id} className="flex justify-between gap-3">
-                      <span>{a.item_label_snapshot}</span>
-                      <span className="font-mono text-muted-foreground">
-                        {a.item_type_snapshot === "yesno"
-                          ? a.yesno_value
-                            ? "✓"
-                            : "✗"
-                          : (a.count_value ?? "—")}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                {h.notes && (
-                  <p className="mt-2 text-xs text-muted-foreground italic">
-                    {h.notes}
-                  </p>
-                )}
-              </details>
-            ))}
-          </div>
+          <HistoryList history={history} />
         )}
       </div>
     </section>
+  );
+}
+
+function HistoryList({
+  history,
+}: {
+  history: ReturnType<typeof useCarePlaceCheckHistory>["data"] extends
+    | infer H
+    | undefined
+    ? H
+    : never;
+}) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const list = history ?? [];
+  const visible = expanded ? list : list.slice(0, 1);
+  return (
+    <div className="space-y-2">
+      {visible.map((h) => (
+        <details key={h.id} className="rounded-xl border p-3" open={visible.length === 1 && !expanded}>
+          <summary className="cursor-pointer flex items-center justify-between gap-2">
+            <span className="font-medium">
+              {new Date(h.performed_at).toLocaleString()} ·{" "}
+              {h.scheduled_time.slice(0, 5)}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {h.answers.length} {t("carePlace.itemsLabel")}
+            </span>
+          </summary>
+          <ul className="mt-2 space-y-1 text-sm">
+            {h.answers.map((a) => (
+              <li key={a.id} className="flex justify-between gap-3">
+                <span>{a.item_label_snapshot}</span>
+                <span className="font-mono text-muted-foreground">
+                  {a.item_type_snapshot === "yesno"
+                    ? a.yesno_value
+                      ? "✓"
+                      : "✗"
+                    : (a.count_value ?? "—")}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {h.notes && (
+            <p className="mt-2 text-xs text-muted-foreground italic">
+              {h.notes}
+            </p>
+          )}
+        </details>
+      ))}
+      {list.length > 1 && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+        >
+          {expanded
+            ? t("carePlace.showLess")
+            : t("carePlace.seeMore", { count: list.length - 1 })}
+        </button>
+      )}
+    </div>
   );
 }
