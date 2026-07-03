@@ -995,8 +995,8 @@ function DashboardPage() {
           {handoverDue && (
             <HandoverDueBanner
               at={handoverDue.at}
-              shiftStart={handoverDue.shiftStart}
-              shiftEnd={handoverDue.shiftEnd}
+              until={handoverDue.until}
+              label={handoverDue.label}
               onDismiss={() => dismissHandover(handoverDue.dismissId)}
             />
           )}
