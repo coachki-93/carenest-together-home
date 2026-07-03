@@ -316,7 +316,7 @@ export const en = {
     handoverDue: {
       badge: "Due",
       title: "Handover due soon",
-      body: "Your shift ends at {{end}} — write a quick handover for the next caregiver.",
+      body: "Write a quick handover for the next caregiver. Visible until {{until}}.",
       start: "Start handover",
       skip: "Skip",
     },
