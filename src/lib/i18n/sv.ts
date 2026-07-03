@@ -1557,6 +1557,16 @@ export const sv = {
     submitted: "Checklista skickad",
     answerAll: "Svara på alla punkter.",
   },
+  handoverReminder: {
+    title: "Påminnelse om överlämning",
+    subtitle: "När banner \"Överlämning snart\" ska visas innan passet slutar.",
+    ownerOnly: "Endast familjens ägare kan ändra denna inställning.",
+    label: "Visa påminnelse innan passet slutar",
+    unit: "minuter",
+    hint: "Mellan 5 och 120 minuter. Standard är 30.",
+    invalid: "Ange ett tal mellan 5 och 120.",
+    saved: "Påminnelse uppdaterad.",
+  },
 };
 
 
