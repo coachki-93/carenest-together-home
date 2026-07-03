@@ -10,6 +10,8 @@ import { EnableNotificationsCard } from "@/components/carenest/EnableNotificatio
 import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSettings";
 import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
+import { HospitalToggle } from "@/components/carenest/HospitalToggle";
+
 import {
   AvatarColorPicker,
   AVATAR_COLORS,
