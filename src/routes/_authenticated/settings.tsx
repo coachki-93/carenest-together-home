@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles } from "lucide-react";
+import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles, Hospital } from "lucide-react";
 import { resetTour } from "@/lib/onboarding/tour-state";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
@@ -10,6 +10,8 @@ import { EnableNotificationsCard } from "@/components/carenest/EnableNotificatio
 import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSettings";
 import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
+import { HospitalToggle } from "@/components/carenest/HospitalToggle";
+
 import {
   AvatarColorPicker,
   AVATAR_COLORS,
@@ -251,6 +253,23 @@ function SettingsPage() {
 
         {/* Notifications */}
         <EnableNotificationsCard />
+
+        {/* Hospital mode */}
+        <section className="card-soft p-6 md:p-8 space-y-4">
+          <header className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+              <Hospital className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold">{t("dashboard.atHospital")}</h2>
+              <p className="text-sm text-muted-foreground">
+                {t("dashboard.atHospitalDesc", { defaultValue: "Pause oxygen and mark the family as at hospital." })}
+              </p>
+            </div>
+          </header>
+          <HospitalToggle />
+        </section>
+
 
         {/* Care place control */}
         <CarePlaceCheckSettings

@@ -5,7 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { ProfileSelector } from "./ProfileSelector";
-import { HospitalToggle } from "./HospitalToggle";
+
 
 interface DashboardLayoutProps {
   title: string;
@@ -45,8 +45,8 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
                   <AlertTriangle className="size-4" aria-hidden="true" />
                   <span className="hidden sm:inline">{t("emergency.open")}</span>
                 </Link>
-                <HospitalToggle />
                 <ProfileSelector />
+
               </div>
             </div>
           </header>

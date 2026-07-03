@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
+import { HospitalToggle } from "./HospitalToggle";
+
 
 export function AppSidebar() {
   const { t } = useTranslation();
@@ -124,10 +126,12 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       {!collapsed && (
-        <SidebarFooter className="px-3 py-3 safe-pb">
+        <SidebarFooter className="px-3 py-3 safe-pb space-y-2">
+          <HospitalToggle />
           <LanguageToggle />
         </SidebarFooter>
       )}
+
     </Sidebar>
   );
 }
