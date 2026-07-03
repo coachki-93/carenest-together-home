@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
+import { HospitalToggle } from "./HospitalToggle";
+
 
 export function AppSidebar() {
   const { t } = useTranslation();
