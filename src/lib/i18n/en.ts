@@ -1145,6 +1145,8 @@ export const en = {
     historyTitle: "History",
     noHistory: "No completed checks yet.",
     itemsLabel: "items",
+    seeMore: "See more ({{count}})",
+    showLess: "Show less",
     itemAdded: "Item added",
     timeAdded: "Time added",
     completeWithin: "Complete within {{time}}",
