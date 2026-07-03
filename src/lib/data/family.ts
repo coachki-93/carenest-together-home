@@ -175,7 +175,9 @@ export function useFamily(familyId: string | undefined | null) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("families")
-        .select("id, name, owner_id, at_hospital_since, handover_reminder_minutes")
+        .select(
+          "id, name, owner_id, at_hospital_since, handover_reminder_minutes, handover_reminder_duration_minutes",
+        )
         .eq("id", familyId!)
         .single();
       if (error) throw error;
@@ -187,10 +189,21 @@ export function useFamily(familyId: string | undefined | null) {
 export function useUpdateHandoverReminderMinutes() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ familyId, minutes }: { familyId: string; minutes: number }) => {
+    mutationFn: async ({
+      familyId,
+      leadMinutes,
+      durationMinutes,
+    }: {
+      familyId: string;
+      leadMinutes: number;
+      durationMinutes: number;
+    }) => {
       const { error } = await supabase
         .from("families")
-        .update({ handover_reminder_minutes: minutes })
+        .update({
+          handover_reminder_minutes: leadMinutes,
+          handover_reminder_duration_minutes: durationMinutes,
+        })
         .eq("id", familyId);
       if (error) throw error;
     },
