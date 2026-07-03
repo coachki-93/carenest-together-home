@@ -5,7 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { ProfileSelector } from "./ProfileSelector";
-import { HospitalToggle } from "./HospitalToggle";
+
 
 interface DashboardLayoutProps {
   title: string;
