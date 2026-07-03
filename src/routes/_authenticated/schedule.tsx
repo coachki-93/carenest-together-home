@@ -176,6 +176,7 @@ function SchedulePage() {
   const { user } = useSession();
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
+  const { data: family } = useFamily(familyId);
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
