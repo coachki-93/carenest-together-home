@@ -1,0 +1,1 @@
+ALTER TABLE public.families ADD COLUMN IF NOT EXISTS handover_reminder_minutes integer NOT NULL DEFAULT 30;
