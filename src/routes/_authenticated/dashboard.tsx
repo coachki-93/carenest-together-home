@@ -419,6 +419,7 @@ function DashboardPage() {
     todayStart,
     todayEnd,
     dismissedHandovers,
+    family?.handover_reminder_minutes ?? 30,
   );
   const search = Route.useSearch();
   const [pendingAction, setPendingAction] = useState<{
