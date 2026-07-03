@@ -316,7 +316,7 @@ export const sv = {
     handoverDue: {
       badge: "Snart",
       title: "Överlämning snart",
-      body: "Ditt pass slutar {{end}} — skriv en snabb överlämning till nästa vårdgivare.",
+      body: "Skriv en snabb överlämning till nästa vårdgivare. Visas till {{until}}.",
       start: "Starta överlämning",
       skip: "Hoppa över",
     },
