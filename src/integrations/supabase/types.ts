@@ -864,6 +864,50 @@ export type Database = {
           },
         ]
       }
+      handover_times: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          family_id: string
+          grace_minutes: number
+          id: string
+          label: string | null
+          time_of_day: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          family_id: string
+          grace_minutes?: number
+          id?: string
+          label?: string | null
+          time_of_day: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          grace_minutes?: number
+          id?: string
+          label?: string | null
+          time_of_day?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handover_times_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       handovers: {
         Row: {
           author_id: string
