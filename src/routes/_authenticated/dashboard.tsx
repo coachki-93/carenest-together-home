@@ -77,6 +77,7 @@ import {
   useHandoverDueItem,
   useDismissedHandovers,
 } from "@/lib/data/handover-due";
+import { useHandoverTimes } from "@/lib/data/handover-times";
 import { ClipboardCheck } from "lucide-react";
 import {
   TaskActionDialog,
@@ -413,14 +414,12 @@ function DashboardPage() {
   const navigate = useNavigate();
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
     useDismissedHandovers(user?.id);
+  const { data: handoverTimes = [] } = useHandoverTimes(familyId);
   const handoverDue = useHandoverDueItem(
-    shifts,
-    user?.id,
+    handoverTimes,
+    dismissedHandovers,
     todayStart,
     todayEnd,
-    dismissedHandovers,
-    family?.handover_reminder_minutes ?? 30,
-    family?.handover_reminder_duration_minutes ?? 30,
   );
   const search = Route.useSearch();
   const [pendingAction, setPendingAction] = useState<{
@@ -531,7 +530,7 @@ function DashboardPage() {
 
   const handoverMinutesLeft = useMemo(() => {
     if (!handoverDue) return 0;
-    const ms = handoverDue.shiftEnd.getTime() - nowTick;
+    const ms = handoverDue.until.getTime() - nowTick;
     return Math.max(0, Math.ceil(ms / 60_000));
   }, [handoverDue, nowTick]);
 
@@ -996,8 +995,8 @@ function DashboardPage() {
           {handoverDue && (
             <HandoverDueBanner
               at={handoverDue.at}
-              shiftStart={handoverDue.shiftStart}
-              shiftEnd={handoverDue.shiftEnd}
+              until={handoverDue.until}
+              label={handoverDue.label}
               onDismiss={() => dismissHandover(handoverDue.dismissId)}
             />
           )}
@@ -1760,13 +1759,13 @@ function HandoverItem({ label, value }: { label: string; value: string }) {
 
 function HandoverDueBanner({
   at,
-  shiftStart,
-  shiftEnd,
+  until,
+  label,
   onDismiss,
 }: {
   at: Date;
-  shiftStart: Date;
-  shiftEnd: Date;
+  until: Date;
+  label: string | null;
   onDismiss: () => void;
 }) {
   const { t, i18n } = useTranslation();
@@ -1789,13 +1788,10 @@ function HandoverDueBanner({
       </div>
       <div className="min-w-0 flex-1">
         <h3 className="font-extrabold truncate">
-          {t("schedule.handoverDue.title")}
+          {label || t("schedule.handoverDue.title")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {t("schedule.handoverDue.body", {
-            start: timeFmt.format(shiftStart),
-            end: timeFmt.format(shiftEnd),
-          })}
+          {t("schedule.handoverDue.body", { until: timeFmt.format(until) })}
         </p>
       </div>
       <div className="flex gap-2 shrink-0">
@@ -1808,13 +1804,7 @@ function HandoverDueBanner({
           {t("schedule.handoverDue.skip")}
         </Button>
         <Button asChild size="sm" className="rounded-full font-semibold">
-          <Link
-            to="/handover"
-            search={{
-              shiftStart: shiftStart.toISOString(),
-              shiftEnd: shiftEnd.toISOString(),
-            }}
-          >
+          <Link to="/handover" search={{}}>
             {t("schedule.handoverDue.start")}
           </Link>
         </Button>
