@@ -819,6 +819,9 @@ export const en = {
     manage: "Manage profiles",
     addFirst: "Add your first profile",
   },
+  actor: {
+    selectProfilePrompt: "Pick which caregiver profile you're acting as before continuing.",
+  },
   scheduleEvents: {
     new: "New event",
     newTitle: "Add to schedule",
