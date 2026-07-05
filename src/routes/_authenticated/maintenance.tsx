@@ -58,7 +58,7 @@ import {
   type MachineTypePreset,
   type MaintenanceScope,
 } from "@/lib/data/maintenance";
-import { useCaregiverProfiles } from "@/lib/data/caregiver-profiles";
+
 import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { ByProfile } from "@/components/carenest/ByProfile";
 
