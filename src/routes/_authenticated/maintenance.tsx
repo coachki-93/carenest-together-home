@@ -63,7 +63,7 @@ import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { ByProfile } from "@/components/carenest/ByProfile";
 
 export const Route = createFileRoute("/_authenticated/maintenance")({
-  head: () => ({ meta: [{ title: "Underhåll — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Maintenance — CareNest" }] }),
   component: MaintenancePage,
 });
 
