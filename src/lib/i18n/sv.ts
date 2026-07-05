@@ -1624,6 +1624,8 @@ export const sv = {
     },
     lastDone: "Senast gjort",
     lastDoneNever: "Aldrig gjort",
+    lastDoneOn: "Senast gjort den",
+    lastDoneOnHelp: "Förankrar schemat till när det faktiskt gjordes senast. Förvalt till idag.",
     nextDue: "Nästa",
     dueToday: "Ska göras idag",
     markDone: "Markera som gjord",
