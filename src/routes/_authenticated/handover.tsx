@@ -90,15 +90,23 @@ function HandoverPage() {
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
   const navigate = Route.useNavigate();
-  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso } = Route.useSearch();
+  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso, compose } = Route.useSearch();
 
   const shiftWindow = useMemo(() => {
-    if (!shiftStartIso || !shiftEndIso) return null;
-    const s = new Date(shiftStartIso);
-    const e = new Date(shiftEndIso);
-    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return null;
-    return { start: s, end: e };
-  }, [shiftStartIso, shiftEndIso]);
+    if (shiftStartIso && shiftEndIso) {
+      const s = new Date(shiftStartIso);
+      const e = new Date(shiftEndIso);
+      if (!Number.isNaN(s.getTime()) && !Number.isNaN(e.getTime())) {
+        return { start: s, end: e };
+      }
+    }
+    if (compose) {
+      const end = new Date();
+      const start = inferredShiftStart(end);
+      return { start, end };
+    }
+    return null;
+  }, [shiftStartIso, shiftEndIso, compose]);
 
   const prefillLabels = useMemo(
     () => ({
