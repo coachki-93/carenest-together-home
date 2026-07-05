@@ -274,6 +274,7 @@ function HandoverPage() {
         </Button>
       }
     >
+      <ForYourShiftCard familyId={membership?.family_id} />
       {isLoading ? (
         <div className="card-soft p-10 text-center text-muted-foreground">
           {t("common.loading")}
