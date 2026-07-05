@@ -1808,7 +1808,7 @@ function HandoverDueBanner({
           {t("schedule.handoverDue.skip")}
         </Button>
         <Button asChild size="sm" className="rounded-full font-semibold">
-          <Link to="/handover" search={{}}>
+          <Link to="/handover" search={{ compose: "1" }}>
             {t("schedule.handoverDue.start")}
           </Link>
         </Button>

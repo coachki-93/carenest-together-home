@@ -51,7 +51,18 @@ import { z } from "zod";
 const handoverSearchSchema = z.object({
   shiftStart: z.string().optional(),
   shiftEnd: z.string().optional(),
+  compose: z.union([z.literal("1"), z.literal(1), z.boolean()]).optional(),
 });
+
+function inferredShiftStart(now: Date): Date {
+  const h = now.getHours();
+  const d = new Date(now);
+  d.setMinutes(0, 0, 0);
+  if (h < 12) d.setHours(0);
+  else if (h < 18) d.setHours(12);
+  else d.setHours(18);
+  return d;
+}
 
 export const Route = createFileRoute("/_authenticated/handover")({
   head: () => ({ meta: [{ title: "Handover — CareNest" }] }),
@@ -79,15 +90,23 @@ function HandoverPage() {
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
   const navigate = Route.useNavigate();
-  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso } = Route.useSearch();
+  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso, compose } = Route.useSearch();
 
   const shiftWindow = useMemo(() => {
-    if (!shiftStartIso || !shiftEndIso) return null;
-    const s = new Date(shiftStartIso);
-    const e = new Date(shiftEndIso);
-    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return null;
-    return { start: s, end: e };
-  }, [shiftStartIso, shiftEndIso]);
+    if (shiftStartIso && shiftEndIso) {
+      const s = new Date(shiftStartIso);
+      const e = new Date(shiftEndIso);
+      if (!Number.isNaN(s.getTime()) && !Number.isNaN(e.getTime())) {
+        return { start: s, end: e };
+      }
+    }
+    if (compose) {
+      const end = new Date();
+      const start = inferredShiftStart(end);
+      return { start, end };
+    }
+    return null;
+  }, [shiftStartIso, shiftEndIso, compose]);
 
   const prefillLabels = useMemo(
     () => ({
@@ -195,7 +214,7 @@ function HandoverPage() {
       toast.success(t("handoverPage.saved"));
       setOpen(false);
       resetForm();
-      if (shiftStartIso || shiftEndIso) {
+      if (shiftStartIso || shiftEndIso || compose) {
         navigate({ search: {}, replace: true });
       }
     } catch (e) {
@@ -310,7 +329,7 @@ function HandoverPage() {
           } else {
             setOpen(false);
             resetForm();
-            if (shiftStartIso || shiftEndIso) {
+            if (shiftStartIso || shiftEndIso || compose) {
               navigate({ search: {}, replace: true });
             }
           }
