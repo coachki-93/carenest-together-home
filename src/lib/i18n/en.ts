@@ -170,6 +170,7 @@ export const en = {
     handover: "Handover",
     instructions: "Instructions",
     inventory: "Inventory",
+    maintenance: "Maintenance",
     shopping: "Shopping list",
     emergency: "Emergency info",
 

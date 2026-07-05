@@ -170,6 +170,7 @@ export const sv = {
     handover: "Överlämning",
     instructions: "Instruktioner",
     inventory: "Förråd",
+    maintenance: "Underhåll",
     shopping: "Inköpslista",
     emergency: "Nödinformation",
 
