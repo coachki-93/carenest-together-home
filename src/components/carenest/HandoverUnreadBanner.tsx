@@ -16,18 +16,25 @@ const RECENCY_HOURS = 12;
 interface Props {
   familyId: string | undefined | null;
   viewerUserId: string | undefined | null;
+  /** Currently active caregiver profile for the viewer, if any. */
+  viewerProfileId?: string | null;
 }
 
 /**
  * Prominent banner shown when the latest handover for the family:
- *  - was authored by someone else,
+ *  - was authored by someone else (identified by caregiver profile on shared
+ *    accounts, else by auth user),
  *  - is recent (< 12h old),
  *  - and hasn't been read by the current viewer (or was only read before the
  *    handover was edited).
  * Clicking navigates to /handover; the actual "Mark as read" happens on the
  * card, not here — we never create false read receipts on click.
  */
-export function HandoverUnreadBanner({ familyId, viewerUserId }: Props) {
+export function HandoverUnreadBanner({
+  familyId,
+  viewerUserId,
+  viewerProfileId = null,
+}: Props) {
   const { t } = useTranslation();
   const { data: latest } = useLatestHandover(familyId);
   const { data: readsMap } = useHandoverReadsBulk(latest ? [latest.id] : []);
@@ -35,7 +42,14 @@ export function HandoverUnreadBanner({ familyId, viewerUserId }: Props) {
   const { data: members } = useFamilyMembers(familyId);
 
   if (!latest || !viewerUserId) return null;
-  if (latest.author_id === viewerUserId) return null;
+
+  // Identity gate: on shared accounts, "authored by me" is determined by the
+  // caregiver profile linked to the handover — not the auth user. Fall back to
+  // author_id only for legacy handovers with no profile linked.
+  const authoredByViewer = latest.caregiver_profile_id
+    ? latest.caregiver_profile_id === viewerProfileId
+    : latest.author_id === viewerUserId;
+  if (authoredByViewer) return null;
 
   const ageHours =
     (Date.now() - new Date(latest.created_at).getTime()) / 3_600_000;
@@ -43,7 +57,7 @@ export function HandoverUnreadBanner({ familyId, viewerUserId }: Props) {
 
   const reads = readsMap?.get(latest.id);
   const editedAt = (latest as { edited_at?: string | null }).edited_at ?? null;
-  if (!isUnreadForViewer(reads, viewerUserId, editedAt)) return null;
+  if (!isUnreadForViewer(reads, viewerUserId, viewerProfileId, editedAt)) return null;
 
   // Resolve author display name (prefer linked caregiver profile).
   const profile = latest.caregiver_profile_id

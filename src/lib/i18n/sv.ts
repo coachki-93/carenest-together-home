@@ -819,6 +819,9 @@ export const sv = {
     manage: "Hantera profiler",
     addFirst: "Lägg till din första profil",
   },
+  actor: {
+    selectProfilePrompt: "Välj vilken vårdgivarprofil du agerar som innan du fortsätter.",
+  },
   scheduleEvents: {
     new: "Nytt event",
     newTitle: "Lägg till i schemat",

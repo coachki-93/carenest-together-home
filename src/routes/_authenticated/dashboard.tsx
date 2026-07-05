@@ -994,7 +994,11 @@ function DashboardPage() {
               <ChevronRight className="size-5 text-amber-700" />
             </Link>
           )}
-          <HandoverUnreadBanner familyId={familyId} viewerUserId={user?.id} />
+          <HandoverUnreadBanner
+            familyId={familyId}
+            viewerUserId={user?.id}
+            viewerProfileId={activeCaregiverId}
+          />
           {handoverDue && (
             <HandoverDueBanner
               at={handoverDue.at}

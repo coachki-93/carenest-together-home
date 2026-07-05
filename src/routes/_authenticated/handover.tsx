@@ -35,6 +35,7 @@ import {
 import { toast } from "@/lib/notify";
 import { useMyMembership, useProfile, useSession } from "@/lib/auth/use-profile";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import {
   SHIFT_LABELS,
@@ -91,6 +92,7 @@ function HandoverPage() {
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
+  const actor = useCurrentActor(membership?.family_id);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(
     membership?.family_id,
     user?.id,
@@ -362,10 +364,23 @@ function HandoverPage() {
                   familyMembers={familyMembers ?? []}
                   caregiverProfiles={caregiverProfiles ?? []}
                   viewerUserId={user?.id ?? null}
-                  isAuthor={h.author_id === profile?.id}
+                  viewerProfileId={activeCaregiverId}
+                  isAuthor={
+                    h.caregiver_profile_id
+                      ? h.caregiver_profile_id === activeCaregiverId
+                      : h.author_id === profile?.id
+                  }
                   onMarkRead={() => {
+                    const guard = guardActingProfile(actor);
+                    if (guard.blocked) {
+                      toast.error(t("actor.selectProfilePrompt"));
+                      return;
+                    }
                     markRead
-                      .mutateAsync(h.id)
+                      .mutateAsync({
+                        handoverId: h.id,
+                        caregiverProfileId: guard.caregiverProfileId,
+                      })
                       .then(() => toast.success(t("handoverPage.reads.markedRead")))
                       .catch(() => { /* ignore */ });
                   }}
@@ -587,6 +602,7 @@ interface HandoverReadsRowProps {
   familyMembers: Array<{ user_id: string; profile?: { full_name?: string | null } | null }>;
   caregiverProfiles: Array<{ id: string; account_user_id: string | null; name: string; color: string }>;
   viewerUserId: string | null;
+  viewerProfileId: string | null;
   isAuthor: boolean;
   onMarkRead: () => void;
   timeFmt: Intl.DateTimeFormat;
@@ -598,12 +614,13 @@ function HandoverReadsRow({
   familyMembers,
   caregiverProfiles,
   viewerUserId,
+  viewerProfileId,
   isAuthor,
   onMarkRead,
   timeFmt,
 }: HandoverReadsRowProps) {
   const { t } = useTranslation();
-  const viewerUnread = isUnreadForViewer(reads, viewerUserId, editedAt);
+  const viewerUnread = isUnreadForViewer(reads, viewerUserId, viewerProfileId, editedAt);
   const editedTs = editedAt ? new Date(editedAt).getTime() : null;
 
   return (
@@ -614,10 +631,14 @@ function HandoverReadsRow({
             {t("handoverPage.reads.readBy")}
           </span>
           {reads.map((r) => {
-            // Prefer a caregiver profile matching the reader; fall back to member.
-            const profile = caregiverProfiles.find(
-              (p) => p.account_user_id === r.user_id,
-            );
+            // Prefer the caregiver profile linked to the receipt (accurate on
+            // shared accounts); fall back to profile-by-user or member name.
+            const profile =
+              (r.caregiver_profile_id
+                ? caregiverProfiles.find((p) => p.id === r.caregiver_profile_id)
+                : null) ??
+              caregiverProfiles.find((p) => p.account_user_id === r.user_id) ??
+              null;
             const memberName = familyMembers.find(
               (m) => m.user_id === r.user_id,
             )?.profile?.full_name?.trim();
@@ -627,7 +648,7 @@ function HandoverReadsRow({
               new Date(r.read_at).getTime() < editedTs;
             return (
               <span
-                key={r.user_id}
+                key={`${r.user_id}:${r.caregiver_profile_id ?? "none"}`}
                 className={cn(
                   "inline-flex items-center gap-1 rounded-full px-2 py-0.5",
                   before
