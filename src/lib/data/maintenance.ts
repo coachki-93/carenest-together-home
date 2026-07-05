@@ -204,7 +204,7 @@ export function useMarkMaintenanceDone() {
     mutationFn: async (input: { itemId: string; note?: string | null }) => {
       const { data, error } = await supabase.rpc("mark_maintenance_done", {
         _item_id: input.itemId,
-        _note: input.note ?? null,
+        _note: input.note ?? undefined,
       });
       if (error) throw error;
       return data as string;
