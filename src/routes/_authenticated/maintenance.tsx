@@ -49,6 +49,8 @@ import {
   maintenanceStatus,
   nextDueAt,
   MACHINE_TYPE_PRESETS,
+  MACHINE_SUBTYPE_PRESETS,
+  isSubtypePreset,
   type Machine,
   type MaintenanceItem,
   type MachineTypePreset,
@@ -136,6 +138,12 @@ function MaintenancePage() {
     if (isPreset(mt)) return t(`maintenance.type.${mt}` as const);
     return mt;
   }
+  function subtypeLabel(main: string, sub: string | null | undefined) {
+    if (!sub) return null;
+    if (isSubtypePreset(main, sub))
+      return t(`maintenance.subtype.${sub}` as const);
+    return sub;
+  }
 
   return (
     <DashboardLayout
@@ -195,6 +203,14 @@ function MaintenancePage() {
                       <span className="text-xs font-semibold uppercase tracking-wide rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
                         {typeLabel(machine.machine_type)}
                       </span>
+                      {machine.machine_subtype && (
+                        <span className="text-xs font-semibold uppercase tracking-wide rounded-full bg-muted/60 px-2 py-0.5 text-muted-foreground">
+                          {subtypeLabel(
+                            machine.machine_type,
+                            machine.machine_subtype,
+                          )}
+                        </span>
+                      )}
                       {!machine.active && (
                         <span className="text-xs font-semibold uppercase tracking-wide rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
                           <Archive className="inline size-3 mr-1" />
@@ -478,6 +494,7 @@ function MaintenancePage() {
                 created_by: user.id,
                 name: payload.patch.name!,
                 machine_type: payload.patch.machine_type!,
+                machine_subtype: payload.patch.machine_subtype ?? null,
                 manufacturer: payload.patch.manufacturer ?? null,
                 model: payload.patch.model ?? null,
                 serial_number: payload.patch.serial_number ?? null,
@@ -564,20 +581,37 @@ function MachineDialog({
     patch: Partial<Machine> & {
       name?: string;
       machine_type?: string;
+      machine_subtype?: string | null;
     };
   }) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const m = state.machine;
-  const initialType = m?.machine_type ?? "respiratory";
-  const initialIsPreset = isPreset(initialType);
+
+  const SUBTYPE_OTHER = "__other__";
+
+  const computeInitialSubState = (mm: Machine | null) => {
+    const mainRaw = mm?.machine_type ?? "respiratory";
+    const mainIsPreset = isPreset(mainRaw);
+    const mainSlug: MachineTypePreset = mainIsPreset
+      ? (mainRaw as MachineTypePreset)
+      : "other";
+    const sub = mm?.machine_subtype ?? null;
+    const subIsPreset = isSubtypePreset(mainSlug, sub);
+    return {
+      typeSel: mainSlug,
+      customType: mainIsPreset ? "" : mainRaw,
+      subSel: sub ? (subIsPreset ? sub : SUBTYPE_OTHER) : "",
+      customSub: sub && !subIsPreset ? sub : "",
+    };
+  };
+
+  const initial = computeInitialSubState(m);
   const [name, setName] = useState(m?.name ?? "");
-  const [typeSel, setTypeSel] = useState<MachineTypePreset>(
-    initialIsPreset ? (initialType as MachineTypePreset) : "other",
-  );
-  const [customType, setCustomType] = useState(
-    initialIsPreset ? "" : initialType,
-  );
+  const [typeSel, setTypeSel] = useState<MachineTypePreset>(initial.typeSel);
+  const [customType, setCustomType] = useState(initial.customType);
+  const [subSel, setSubSel] = useState<string>(initial.subSel);
+  const [customSub, setCustomSub] = useState<string>(initial.customSub);
   const [manufacturer, setManufacturer] = useState(m?.manufacturer ?? "");
   const [model, setModel] = useState(m?.model ?? "");
   const [serial, setSerial] = useState(m?.serial_number ?? "");
@@ -587,10 +621,11 @@ function MachineDialog({
   useMemo(() => {
     if (state.open) {
       setName(m?.name ?? "");
-      const t0 = m?.machine_type ?? "respiratory";
-      const ip = isPreset(t0);
-      setTypeSel(ip ? (t0 as MachineTypePreset) : "other");
-      setCustomType(ip ? "" : t0);
+      const s = computeInitialSubState(m);
+      setTypeSel(s.typeSel);
+      setCustomType(s.customType);
+      setSubSel(s.subSel);
+      setCustomSub(s.customSub);
       setManufacturer(m?.manufacturer ?? "");
       setModel(m?.model ?? "");
       setSerial(m?.serial_number ?? "");
@@ -600,6 +635,23 @@ function MachineDialog({
 
   const machineType =
     typeSel === "other" ? customType.trim() || "other" : typeSel;
+
+  const subPresets = MACHINE_SUBTYPE_PRESETS[typeSel] ?? [];
+  const hasSubPresets = subPresets.length > 0;
+
+  const machineSubtype: string | null = (() => {
+    if (typeSel === "other") {
+      // Only free-text subtype available when main is "other"
+      const v = customSub.trim();
+      return v || null;
+    }
+    if (!subSel) return null;
+    if (subSel === SUBTYPE_OTHER) {
+      const v = customSub.trim();
+      return v || null;
+    }
+    return subSel;
+  })();
 
   return (
     <Dialog open={state.open} onOpenChange={(o) => !o && onClose()}>
@@ -615,31 +667,84 @@ function MachineDialog({
             <Label>{t("maintenance.machineName")}</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div>
-            <Label>{t("maintenance.machineType")}</Label>
-            <Select
-              value={typeSel}
-              onValueChange={(v) => setTypeSel(v as MachineTypePreset)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {MACHINE_TYPE_PRESETS.map((p) => (
-                  <SelectItem key={p} value={p}>
-                    {t(`maintenance.type.${p}` as const)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {typeSel === "other" && (
-              <Input
-                className="mt-2"
-                placeholder={t("maintenance.machineTypeCustom")}
-                value={customType}
-                onChange={(e) => setCustomType(e.target.value)}
-              />
-            )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label>{t("maintenance.machineType")}</Label>
+              <Select
+                value={typeSel}
+                onValueChange={(v) => {
+                  setTypeSel(v as MachineTypePreset);
+                  // Reset subtype when main category changes
+                  setSubSel("");
+                  setCustomSub("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {MACHINE_TYPE_PRESETS.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {t(`maintenance.type.${p}` as const)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {typeSel === "other" && (
+                <Input
+                  className="mt-2"
+                  placeholder={t("maintenance.machineTypeCustom")}
+                  value={customType}
+                  onChange={(e) => setCustomType(e.target.value)}
+                />
+              )}
+            </div>
+            <div>
+              <Label>{t("maintenance.machineSubtype")}</Label>
+              {hasSubPresets ? (
+                <>
+                  <Select
+                    value={subSel || "__none__"}
+                    onValueChange={(v) =>
+                      setSubSel(v === "__none__" ? "" : v)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("maintenance.subtypeNone")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">
+                        {t("maintenance.subtypeNone")}
+                      </SelectItem>
+                      {subPresets.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {t(`maintenance.subtype.${s}` as const)}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value={SUBTYPE_OTHER}>
+                        {t("maintenance.subtypeOther")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {subSel === SUBTYPE_OTHER && (
+                    <Input
+                      className="mt-2"
+                      placeholder={t("maintenance.subtypeCustom")}
+                      value={customSub}
+                      onChange={(e) => setCustomSub(e.target.value)}
+                    />
+                  )}
+                </>
+              ) : (
+                <Input
+                  placeholder={t("maintenance.subtypeCustom")}
+                  value={customSub}
+                  onChange={(e) => setCustomSub(e.target.value)}
+                />
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -682,6 +787,7 @@ function MachineDialog({
                 patch: {
                   name: name.trim(),
                   machine_type: machineType,
+                  machine_subtype: machineSubtype,
                   manufacturer: manufacturer.trim() || null,
                   model: model.trim() || null,
                   serial_number: serial.trim() || null,

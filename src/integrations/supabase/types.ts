@@ -1182,6 +1182,7 @@ export type Database = {
           created_by: string
           family_id: string
           id: string
+          machine_subtype: string | null
           machine_type: string
           manufacturer: string | null
           model: string | null
@@ -1196,6 +1197,7 @@ export type Database = {
           created_by: string
           family_id: string
           id?: string
+          machine_subtype?: string | null
           machine_type: string
           manufacturer?: string | null
           model?: string | null
@@ -1210,6 +1212,7 @@ export type Database = {
           created_by?: string
           family_id?: string
           id?: string
+          machine_subtype?: string | null
           machine_type?: string
           manufacturer?: string | null
           model?: string | null

@@ -2,9 +2,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-export type Machine = Database["public"]["Tables"]["machines"]["Row"];
-export type MachineInsert = Database["public"]["Tables"]["machines"]["Insert"];
-export type MachineUpdate = Database["public"]["Tables"]["machines"]["Update"];
+// The generated types may not yet include the new `machine_subtype` column.
+// We augment locally so the app compiles regardless of regeneration timing.
+type MachineRow = Database["public"]["Tables"]["machines"]["Row"] & {
+  machine_subtype: string | null;
+};
+type MachineInsertRow = Database["public"]["Tables"]["machines"]["Insert"] & {
+  machine_subtype?: string | null;
+};
+type MachineUpdateRow = Database["public"]["Tables"]["machines"]["Update"] & {
+  machine_subtype?: string | null;
+};
+
+export type Machine = MachineRow;
+export type MachineInsert = MachineInsertRow;
+export type MachineUpdate = MachineUpdateRow;
 export type MaintenanceItem =
   Database["public"]["Tables"]["maintenance_items"]["Row"];
 export type MaintenanceItemInsert =
@@ -15,16 +27,78 @@ export type MaintenanceLog =
   Database["public"]["Tables"]["maintenance_logs"]["Row"];
 export type MaintenanceScope = Database["public"]["Enums"]["maintenance_scope"];
 
-/** Preset machine-type slugs shown in the UI; DB stores free text. */
+/** Preset main-category slugs shown in the UI; DB stores free text. */
 export const MACHINE_TYPE_PRESETS = [
   "respiratory",
   "feeding",
   "suction",
   "oxygen",
   "monitoring",
+  "mobility",
+  "therapy",
   "other",
 ] as const;
 export type MachineTypePreset = (typeof MACHINE_TYPE_PRESETS)[number];
+
+/** Preset subcategory slugs per main category. DB stores free text. */
+export const MACHINE_SUBTYPE_PRESETS: Record<
+  MachineTypePreset,
+  readonly string[]
+> = {
+  respiratory: [
+    "ventilator_invasive",
+    "ventilator_niv_bipap",
+    "cpap",
+    "oxygen_concentrator",
+    "cough_assist",
+    "nebulizer",
+    "humidifier",
+    "pulse_oximeter",
+  ],
+  feeding: ["feeding_pump", "syringe_pump"],
+  suction: ["suction_stationary", "suction_portable"],
+  oxygen: [
+    "oxygen_concentrator_stationary",
+    "oxygen_concentrator_portable",
+    "oxygen_cylinder",
+    "liquid_oxygen",
+  ],
+  monitoring: [
+    "saturation_monitor",
+    "apnea_monitor",
+    "heart_rate_monitor",
+    "seizure_alarm",
+    "baby_monitor",
+    "glucose_monitor_cgm",
+  ],
+  mobility: [
+    "wheelchair_electric",
+    "wheelchair_manual",
+    "patient_lift",
+    "hospital_bed",
+    "standing_frame",
+    "pressure_mattress",
+  ],
+  therapy: [
+    "infusion_pump",
+    "tens",
+    "vibration_vest",
+    "wound_npwt",
+    "dialysis",
+  ],
+  other: [],
+};
+
+export function isSubtypePreset(
+  main: string,
+  sub: string | null | undefined,
+): boolean {
+  if (!sub) return false;
+  const list = (MACHINE_SUBTYPE_PRESETS as Record<string, readonly string[]>)[
+    main
+  ];
+  return !!list && list.includes(sub);
+}
 
 export const DUE_SOON_DAYS = 7;
 
