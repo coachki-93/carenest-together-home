@@ -138,6 +138,12 @@ function MaintenancePage() {
     if (isPreset(mt)) return t(`maintenance.type.${mt}` as const);
     return mt;
   }
+  function subtypeLabel(main: string, sub: string | null | undefined) {
+    if (!sub) return null;
+    if (isSubtypePreset(main, sub))
+      return t(`maintenance.subtype.${sub}` as const);
+    return sub;
+  }
 
   return (
     <DashboardLayout
