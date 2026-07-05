@@ -68,6 +68,7 @@ import { toast } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import {
   useFamilyChild,
@@ -182,6 +183,7 @@ function SchedulePage() {
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
+  const actor = useCurrentActor(familyId);
 
   const [day, setDay] = useState<Date>(() => startOfDay(new Date()));
   const dayEnd = useMemo(() => addDays(day, 1), [day]);
@@ -262,6 +264,11 @@ function SchedulePage() {
 
   const submitConfirm = async () => {
     if (!confirm || !familyId || !child) return;
+    const guard = guardActingProfile(actor);
+    if (guard.blocked) {
+      toast.error(t("actor.selectProfilePrompt"));
+      return;
+    }
     try {
       await logDose.mutateAsync({
         family_id: familyId,
@@ -270,7 +277,7 @@ function SchedulePage() {
         scheduled_for: confirm.dose.scheduled_for.toISOString(),
         status: confirm.status,
         given_by: user?.id ?? null,
-        caregiver_profile_id: activeCaregiverId ?? null,
+        caregiver_profile_id: guard.caregiverProfileId,
       });
       toast.success(
         confirm.status === "given" ? t("schedule.doseLogged") : t("schedule.doseSkipped"),

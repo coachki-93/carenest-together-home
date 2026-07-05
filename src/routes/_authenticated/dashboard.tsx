@@ -72,6 +72,7 @@ import {
   type CaregiverProfile,
 } from "@/lib/data/caregiver-profiles";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
 import {
   useHandoverDueItem,
@@ -413,6 +414,7 @@ function DashboardPage() {
   const caregiverProfilesForActions = caregiverProfiles;
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
+  const actor = useCurrentActor(familyId);
   const navigate = useNavigate();
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
     useDismissedHandovers(user?.id);
@@ -689,8 +691,18 @@ function DashboardPage() {
   async function handleTaskAction(result: TaskActionResult) {
     if (!pendingAction || !familyId) return;
     const { task, action } = pendingAction;
-    const profileId =
-      result.caregiverProfileId ?? suggestedCaregiverId ?? activeCaregiverId ?? null;
+    // Picker in TaskActionSheet is authoritative. Fall back to suggestion,
+    // then the current-actor guard so shared multi-profile accounts are
+    // prompted instead of silently writing null.
+    let profileId: string | null = result.caregiverProfileId ?? suggestedCaregiverId ?? null;
+    if (!profileId) {
+      const guard = guardActingProfile(actor);
+      if (guard.blocked) {
+        toast.error(t("actor.selectProfilePrompt"));
+        return;
+      }
+      profileId = guard.caregiverProfileId;
+    }
     try {
       if (task.source.kind === "dose") {
         if (!child) return;
@@ -759,7 +771,12 @@ function DashboardPage() {
 
   async function markOngoing(task: TaskItem) {
     if (!familyId) return;
-    const profileId = activeCaregiverId ?? null;
+    const guard = guardActingProfile(actor);
+    if (guard.blocked) {
+      toast.error(t("actor.selectProfilePrompt"));
+      return;
+    }
+    const profileId = guard.caregiverProfileId;
     const nowIso = new Date().toISOString();
     try {
       if (task.source.kind === "dose") {
