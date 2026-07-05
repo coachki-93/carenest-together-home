@@ -691,8 +691,18 @@ function DashboardPage() {
   async function handleTaskAction(result: TaskActionResult) {
     if (!pendingAction || !familyId) return;
     const { task, action } = pendingAction;
-    const profileId =
-      result.caregiverProfileId ?? suggestedCaregiverId ?? activeCaregiverId ?? null;
+    // Picker in TaskActionSheet is authoritative. Fall back to suggestion,
+    // then the current-actor guard so shared multi-profile accounts are
+    // prompted instead of silently writing null.
+    let profileId: string | null = result.caregiverProfileId ?? suggestedCaregiverId ?? null;
+    if (!profileId) {
+      const guard = guardActingProfile(actor);
+      if (guard.blocked) {
+        toast.error(t("actor.selectProfilePrompt"));
+        return;
+      }
+      profileId = guard.caregiverProfileId;
+    }
     try {
       if (task.source.kind === "dose") {
         if (!child) return;
