@@ -264,6 +264,11 @@ function SchedulePage() {
 
   const submitConfirm = async () => {
     if (!confirm || !familyId || !child) return;
+    const guard = guardActingProfile(actor);
+    if (guard.blocked) {
+      toast.error(t("actor.selectProfilePrompt"));
+      return;
+    }
     try {
       await logDose.mutateAsync({
         family_id: familyId,
@@ -272,7 +277,7 @@ function SchedulePage() {
         scheduled_for: confirm.dose.scheduled_for.toISOString(),
         status: confirm.status,
         given_by: user?.id ?? null,
-        caregiver_profile_id: activeCaregiverId ?? null,
+        caregiver_profile_id: guard.caregiverProfileId,
       });
       toast.success(
         confirm.status === "given" ? t("schedule.doseLogged") : t("schedule.doseSkipped"),
