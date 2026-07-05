@@ -72,6 +72,7 @@ import {
   type CaregiverProfile,
 } from "@/lib/data/caregiver-profiles";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
 import {
   useHandoverDueItem,
