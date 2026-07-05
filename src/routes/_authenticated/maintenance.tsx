@@ -1037,6 +1037,18 @@ function ItemDialog({
                 ? null
                 : Math.max(1, parseInt(interval, 10) || 0);
               if (!asNeeded && !parsed) return;
+              let actionValue: string | null;
+              if (actionSel === ACTION_NONE) {
+                actionValue = null;
+              } else if (actionSel === "other") {
+                const v = customAction.trim();
+                if (!v) return; // require custom text when "Other" chosen
+                actionValue = v;
+              } else if (!actionSel) {
+                return; // required for new items
+              } else {
+                actionValue = actionSel;
+              }
               let lastDoneIso: string | null = null;
               if (lastDone && lastDone <= today) {
                 const d = new Date(`${lastDone}T12:00:00`);
@@ -1049,6 +1061,7 @@ function ItemDialog({
                 patch: {
                   name: name.trim(),
                   scope,
+                  action_type: actionValue,
                   interval_days: parsed,
                   last_done_at: lastDoneIso,
                   notes: notes.trim() || null,
