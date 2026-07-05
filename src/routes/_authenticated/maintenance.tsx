@@ -56,7 +56,6 @@ import {
   type Machine,
   type MaintenanceItem,
   type MachineTypePreset,
-  type MaintenanceActionPreset,
   type MaintenanceScope,
 } from "@/lib/data/maintenance";
 
