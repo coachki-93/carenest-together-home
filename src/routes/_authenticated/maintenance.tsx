@@ -1144,12 +1144,14 @@ function MarkDoneDialog({
 function HistoryDialog({
   state,
   onClose,
-  memberName,
+  familyId,
+  viewerUserId,
   fmtDateTime,
 }: {
   state: { open: boolean; item: MaintenanceItem | null };
   onClose: () => void;
-  memberName: (uid: string | null | undefined) => string;
+  familyId: string | null;
+  viewerUserId: string | null;
   fmtDateTime: (d: Date) => string;
 }) {
   const { t } = useTranslation();
@@ -1177,9 +1179,13 @@ function HistoryDialog({
                   <span className="font-semibold">
                     {fmtDateTime(new Date(log.performed_at))}
                   </span>
-                  <span className="text-muted-foreground">
-                    {memberName(log.performed_by)}
-                  </span>
+                  <ByProfile
+                    familyId={familyId}
+                    caregiverProfileId={log.caregiver_profile_id}
+                    authorUserId={log.performed_by}
+                    viewerUserId={viewerUserId}
+                    className="text-muted-foreground inline-flex items-center gap-1.5"
+                  />
                 </div>
                 {log.note && (
                   <p className="text-sm text-muted-foreground mt-1">
