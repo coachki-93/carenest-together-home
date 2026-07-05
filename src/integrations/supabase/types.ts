@@ -1284,6 +1284,7 @@ export type Database = {
           interval_days: number | null
           last_done_at: string | null
           last_done_by: string | null
+          last_done_by_profile_id: string | null
           machine_id: string
           name: string
           notes: string | null
@@ -1300,6 +1301,7 @@ export type Database = {
           interval_days?: number | null
           last_done_at?: string | null
           last_done_by?: string | null
+          last_done_by_profile_id?: string | null
           machine_id: string
           name: string
           notes?: string | null
@@ -1316,6 +1318,7 @@ export type Database = {
           interval_days?: number | null
           last_done_at?: string | null
           last_done_by?: string | null
+          last_done_by_profile_id?: string | null
           machine_id?: string
           name?: string
           notes?: string | null
@@ -1331,6 +1334,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "maintenance_items_last_done_by_profile_id_fkey"
+            columns: ["last_done_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "maintenance_items_machine_id_fkey"
             columns: ["machine_id"]
             isOneToOne: false
@@ -1341,6 +1351,7 @@ export type Database = {
       }
       maintenance_logs: {
         Row: {
+          caregiver_profile_id: string | null
           created_at: string
           family_id: string
           id: string
@@ -1350,6 +1361,7 @@ export type Database = {
           performed_by: string
         }
         Insert: {
+          caregiver_profile_id?: string | null
           created_at?: string
           family_id: string
           id?: string
@@ -1359,6 +1371,7 @@ export type Database = {
           performed_by: string
         }
         Update: {
+          caregiver_profile_id?: string | null
           created_at?: string
           family_id?: string
           id?: string
@@ -1368,6 +1381,13 @@ export type Database = {
           performed_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "maintenance_logs_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "maintenance_logs_family_id_fkey"
             columns: ["family_id"]
@@ -2034,6 +2054,10 @@ export type Database = {
         Args: { _code: string; _display_color?: string }
         Returns: string
       }
+      caregiver_profile_in_family: {
+        Args: { _family_id: string; _profile_id: string }
+        Returns: boolean
+      }
       is_family_member: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
@@ -2057,7 +2081,11 @@ export type Database = {
         }[]
       }
       mark_maintenance_done: {
-        Args: { _item_id: string; _note?: string }
+        Args: {
+          _caregiver_profile_id?: string
+          _item_id: string
+          _note?: string
+        }
         Returns: string
       }
       set_family_hospital_mode: {
