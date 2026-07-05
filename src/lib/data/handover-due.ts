@@ -65,29 +65,51 @@ export function useHandoverDueItem(
   }, [times, dismissed, rangeStart, rangeEnd]);
 }
 
-export function useDismissedHandovers(userId: string | undefined) {
+/**
+ * Persist per-caregiver handover-reminder dismissals.
+ *
+ * Keyed by (familyId, caregiverProfileId ?? userId) so that on a shared
+ * account (e.g. municipal staff signed in as "Kommun" with multiple
+ * caregiver profiles) one caregiver dismissing the banner does not hide it
+ * for the next caregiver on the same account. When no profile is selected
+ * or the account only has one profile, we fall back to userId — behaves
+ * identically to the previous single-key implementation.
+ *
+ * A previously-stored dismissal under the old `carenest.handover-skipped.{userId}`
+ * key is intentionally not migrated; a reminder re-appearing once after this
+ * change is acceptable.
+ */
+export function useDismissedHandovers(
+  userId: string | undefined,
+  familyId?: string | null,
+  caregiverProfileId?: string | null,
+) {
   const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
+  const storageKey =
+    userId && familyId
+      ? `carenest.handover-skipped.${familyId}.${caregiverProfileId ?? userId}`
+      : userId
+        ? `carenest.handover-skipped.${userId}`
+        : null;
   useEffect(() => {
-    if (typeof window === "undefined" || !userId) return;
-    try {
-      const raw = window.localStorage.getItem(
-        `carenest.handover-skipped.${userId}`,
-      );
-      if (raw) setDismissed(new Set(JSON.parse(raw) as string[]));
-    } catch {
-      /* ignore */
+    if (typeof window === "undefined" || !storageKey) {
+      setDismissed(new Set());
+      return;
     }
-  }, [userId]);
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      setDismissed(raw ? new Set(JSON.parse(raw) as string[]) : new Set());
+    } catch {
+      setDismissed(new Set());
+    }
+  }, [storageKey]);
   function dismiss(id: string) {
     setDismissed((prev) => {
       const next = new Set(prev);
       next.add(id);
-      if (typeof window !== "undefined" && userId) {
+      if (typeof window !== "undefined" && storageKey) {
         try {
-          window.localStorage.setItem(
-            `carenest.handover-skipped.${userId}`,
-            JSON.stringify([...next]),
-          );
+          window.localStorage.setItem(storageKey, JSON.stringify([...next]));
         } catch {
           /* ignore */
         }
