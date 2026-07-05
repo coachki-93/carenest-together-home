@@ -197,6 +197,14 @@ function HandoverPage() {
       }),
     [i18n.language],
   );
+  const timeFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    [i18n.language],
+  );
 
   function resetForm() {
     setForm({
