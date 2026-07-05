@@ -122,6 +122,7 @@ function MaintenancePage() {
   const upsertItem = useUpsertMaintenanceItem();
   const deleteItem = useDeleteMaintenanceItem();
   const markDone = useMarkMaintenanceDone();
+  const actor = useCurrentActor(familyId);
 
   const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
   const fmtDate = (d: Date) =>
