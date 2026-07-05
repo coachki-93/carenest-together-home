@@ -51,6 +51,8 @@ import {
   MACHINE_TYPE_PRESETS,
   MACHINE_SUBTYPE_PRESETS,
   isSubtypePreset,
+  MAINTENANCE_ACTION_PRESETS,
+  isActionPreset,
   type Machine,
   type MaintenanceItem,
   type MachineTypePreset,
@@ -143,6 +145,11 @@ function MaintenancePage() {
     if (isSubtypePreset(main, sub))
       return t(`maintenance.subtype.${sub}` as const);
     return sub;
+  }
+  function actionLabel(a: string | null | undefined) {
+    if (!a) return null;
+    if (isActionPreset(a)) return t(`maintenance.action.${a}` as const);
+    return a;
   }
 
   return (
@@ -361,6 +368,11 @@ function MaintenancePage() {
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
+                              {item.action_type && (
+                                <span className="text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5 bg-primary/10 text-primary">
+                                  {actionLabel(item.action_type)}
+                                </span>
+                              )}
                               <span className="font-semibold">{item.name}</span>
                               <span
                                 className={cn(
@@ -526,6 +538,7 @@ function MaintenancePage() {
                 created_by: user.id,
                 name: payload.patch.name!,
                 scope: payload.patch.scope!,
+                action_type: payload.patch.action_type ?? "replace",
                 interval_days: payload.patch.interval_days ?? null,
                 last_done_at: payload.patch.last_done_at ?? null,
                 notes: payload.patch.notes ?? null,
@@ -822,6 +835,7 @@ function ItemDialog({
       scope?: MaintenanceScope;
       interval_days?: number | null;
       last_done_at?: string | null;
+      action_type?: string | null;
     };
   }) => Promise<void>;
 }) {
@@ -845,8 +859,22 @@ function ItemDialog({
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  const ACTION_NONE = "__none__";
+  const initialActionSel = (() => {
+    if (!it) return "replace"; // new items default to Replace
+    if (!it.action_type) return ACTION_NONE; // legacy item with no action
+    if (isActionPreset(it.action_type)) return it.action_type;
+    return "other";
+  })();
+  const initialCustomAction =
+    it && it.action_type && !isActionPreset(it.action_type)
+      ? it.action_type
+      : "";
+
   const [name, setName] = useState(it?.name ?? "");
   const [scope, setScope] = useState<MaintenanceScope>(it?.scope ?? "part");
+  const [actionSel, setActionSel] = useState<string>(initialActionSel);
+  const [customAction, setCustomAction] = useState<string>(initialCustomAction);
   const [asNeeded, setAsNeeded] = useState<boolean>(it?.interval_days == null);
   const [interval, setInterval] = useState<string>(
     it?.interval_days ? String(it.interval_days) : "",
@@ -860,6 +888,19 @@ function ItemDialog({
     if (state.open) {
       setName(it?.name ?? "");
       setScope(it?.scope ?? "part");
+      if (!it) {
+        setActionSel("replace");
+        setCustomAction("");
+      } else if (!it.action_type) {
+        setActionSel(ACTION_NONE);
+        setCustomAction("");
+      } else if (isActionPreset(it.action_type)) {
+        setActionSel(it.action_type);
+        setCustomAction("");
+      } else {
+        setActionSel("other");
+        setCustomAction(it.action_type);
+      }
       setAsNeeded(it?.interval_days == null);
       setInterval(it?.interval_days ? String(it.interval_days) : "");
       setLastDone(it ? toDateInput(it.last_done_at) : todayStr());
@@ -868,6 +909,8 @@ function ItemDialog({
   }, [state.open, it]);
 
   const today = todayStr();
+  // Only show the "no action" option when editing a legacy item that never had one.
+  const allowNoAction = !!it && !it.action_type;
 
   return (
     <Dialog open={state.open} onOpenChange={(o) => !o && onClose()}>
@@ -900,6 +943,34 @@ function ItemDialog({
                 </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Label>{t("maintenance.actionLabel")}</Label>
+            <Select value={actionSel} onValueChange={(v) => setActionSel(v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {allowNoAction && (
+                  <SelectItem value={ACTION_NONE}>
+                    {t("maintenance.actionNone")}
+                  </SelectItem>
+                )}
+                {MAINTENANCE_ACTION_PRESETS.map((a) => (
+                  <SelectItem key={a} value={a}>
+                    {t(`maintenance.action.${a}` as const)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {actionSel === "other" && (
+              <Input
+                className="mt-2"
+                placeholder={t("maintenance.actionCustom")}
+                value={customAction}
+                onChange={(e) => setCustomAction(e.target.value)}
+              />
+            )}
           </div>
           <div>
             <Label className="flex items-center gap-2 font-normal">
@@ -965,6 +1036,18 @@ function ItemDialog({
                 ? null
                 : Math.max(1, parseInt(interval, 10) || 0);
               if (!asNeeded && !parsed) return;
+              let actionValue: string | null;
+              if (actionSel === ACTION_NONE) {
+                actionValue = null;
+              } else if (actionSel === "other") {
+                const v = customAction.trim();
+                if (!v) return; // require custom text when "Other" chosen
+                actionValue = v;
+              } else if (!actionSel) {
+                return; // required for new items
+              } else {
+                actionValue = actionSel;
+              }
               let lastDoneIso: string | null = null;
               if (lastDone && lastDone <= today) {
                 const d = new Date(`${lastDone}T12:00:00`);
@@ -977,6 +1060,7 @@ function ItemDialog({
                 patch: {
                   name: name.trim(),
                   scope,
+                  action_type: actionValue,
                   interval_days: parsed,
                   last_done_at: lastDoneIso,
                   notes: notes.trim() || null,

@@ -18,6 +18,7 @@ import {
   useDueMaintenanceItems,
   useMarkMaintenanceDone,
   maintenanceStatus,
+  isActionPreset,
   type DueMaintenanceRow,
 } from "@/lib/data/maintenance";
 import { cn } from "@/lib/utils";
@@ -32,6 +33,17 @@ export function MaintenanceDueCard({
   const [pending, setPending] = useState<DueMaintenanceRow | null>(null);
   const [note, setNote] = useState("");
   const markDone = useMarkMaintenanceDone();
+
+  const actionText = (a: string | null | undefined) => {
+    if (!a) return null;
+    if (isActionPreset(a)) return t(`maintenance.action.${a}` as const);
+    return a;
+  };
+  const taskTitle = (r: DueMaintenanceRow) => {
+    const action = actionText(r.item.action_type);
+    if (action) return `${action} ${r.item.name} — ${r.machine.name}`;
+    return `${r.machine.name} — ${r.item.name}`;
+  };
 
   if (rows.length === 0) return null;
 
@@ -74,7 +86,7 @@ export function MaintenanceDueCard({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold">
-                    {r.machine.name} — {r.item.name}
+                    {taskTitle(r)}
                   </span>
                   <span
                     className={cn(
@@ -120,8 +132,7 @@ export function MaintenanceDueCard({
           <DialogHeader>
             <DialogTitle>{t("maintenance.markDoneTitle")}</DialogTitle>
             <DialogDescription>
-              {pending && `${pending.machine.name} — ${pending.item.name}`} —{" "}
-              {t("maintenance.markDoneSub")}
+              {pending && taskTitle(pending)} — {t("maintenance.markDoneSub")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
