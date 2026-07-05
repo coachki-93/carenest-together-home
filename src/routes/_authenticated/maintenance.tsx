@@ -147,6 +147,11 @@ function MaintenancePage() {
       return t(`maintenance.subtype.${sub}` as const);
     return sub;
   }
+  function actionLabel(a: string | null | undefined) {
+    if (!a) return null;
+    if (isActionPreset(a)) return t(`maintenance.action.${a}` as const);
+    return a;
+  }
 
   return (
     <DashboardLayout
