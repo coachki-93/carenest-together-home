@@ -35,6 +35,7 @@ import {
 import { toast } from "@/lib/notify";
 import { useMyMembership, useProfile, useSession } from "@/lib/auth/use-profile";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import {
   SHIFT_LABELS,
