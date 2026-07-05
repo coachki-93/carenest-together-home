@@ -409,6 +409,12 @@ export const sv = {
     seizures: "Anfall",
     notes: "Anteckningar",
     openHandover: "Öppna överlämning",
+    handoverUnread: {
+      title: "Ny överlämning från {{name}}",
+      body: "Läs den innan ditt pass.",
+      editedBody: "Den uppdaterades efter att du senast läste den — kika igen.",
+      action: "Läs den",
+    },
     onShift: "På pass nu",
     nextShift: "Nästa pass",
     noOneOnShift: "Ingen är på pass just nu",
