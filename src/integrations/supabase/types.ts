@@ -866,21 +866,34 @@ export type Database = {
       }
       handover_reads: {
         Row: {
+          caregiver_profile_id: string | null
           handover_id: string
+          id: string
           read_at: string
           user_id: string
         }
         Insert: {
+          caregiver_profile_id?: string | null
           handover_id: string
+          id?: string
           read_at?: string
           user_id: string
         }
         Update: {
+          caregiver_profile_id?: string | null
           handover_id?: string
+          id?: string
           read_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "handover_reads_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "handover_reads_handover_id_fkey"
             columns: ["handover_id"]
