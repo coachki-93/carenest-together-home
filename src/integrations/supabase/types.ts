@@ -1175,6 +1175,167 @@ export type Database = {
           },
         ]
       }
+      machines: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          family_id: string
+          id: string
+          machine_type: string
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          serial_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          family_id: string
+          id?: string
+          machine_type: string
+          manufacturer?: string | null
+          model?: string | null
+          name: string
+          notes?: string | null
+          serial_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          id?: string
+          machine_type?: string
+          manufacturer?: string | null
+          model?: string | null
+          name?: string
+          notes?: string | null
+          serial_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machines_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          family_id: string
+          id: string
+          interval_days: number | null
+          last_done_at: string | null
+          last_done_by: string | null
+          machine_id: string
+          name: string
+          notes: string | null
+          scope: Database["public"]["Enums"]["maintenance_scope"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          family_id: string
+          id?: string
+          interval_days?: number | null
+          last_done_at?: string | null
+          last_done_by?: string | null
+          machine_id: string
+          name: string
+          notes?: string | null
+          scope?: Database["public"]["Enums"]["maintenance_scope"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          id?: string
+          interval_days?: number | null
+          last_done_at?: string | null
+          last_done_by?: string | null
+          machine_id?: string
+          name?: string
+          notes?: string | null
+          scope?: Database["public"]["Enums"]["maintenance_scope"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_items_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_items_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_logs: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          maintenance_item_id: string
+          note: string | null
+          performed_at: string
+          performed_by: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          maintenance_item_id: string
+          note?: string | null
+          performed_at?: string
+          performed_by: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          maintenance_item_id?: string
+          note?: string | null
+          performed_at?: string
+          performed_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_logs_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_logs_maintenance_item_id_fkey"
+            columns: ["maintenance_item_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       med_dose_events: {
         Row: {
           created_at: string
@@ -1847,6 +2008,10 @@ export type Database = {
           status: Database["public"]["Enums"]["invite_status"]
         }[]
       }
+      mark_maintenance_done: {
+        Args: { _item_id: string; _note?: string }
+        Returns: string
+      }
       set_family_hospital_mode: {
         Args: { _family_id: string; _on: boolean }
         Returns: string
@@ -1899,6 +2064,7 @@ export type Database = {
         | "received"
         | "days_left_update"
       invite_status: "pending" | "accepted" | "revoked"
+      maintenance_scope: "machine" | "part"
       med_log_status: "given" | "skipped" | "missed" | "postponed" | "ongoing"
       med_route:
         | "oral"
@@ -2088,6 +2254,7 @@ export const Constants = {
         "days_left_update",
       ],
       invite_status: ["pending", "accepted", "revoked"],
+      maintenance_scope: ["machine", "part"],
       med_log_status: ["given", "skipped", "missed", "postponed", "ongoing"],
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
