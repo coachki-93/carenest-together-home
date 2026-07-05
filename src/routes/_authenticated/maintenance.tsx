@@ -51,9 +51,12 @@ import {
   MACHINE_TYPE_PRESETS,
   MACHINE_SUBTYPE_PRESETS,
   isSubtypePreset,
+  MAINTENANCE_ACTION_PRESETS,
+  isActionPreset,
   type Machine,
   type MaintenanceItem,
   type MachineTypePreset,
+  type MaintenanceActionPreset,
   type MaintenanceScope,
 } from "@/lib/data/maintenance";
 
