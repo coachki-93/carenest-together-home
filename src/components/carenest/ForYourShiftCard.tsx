@@ -56,8 +56,8 @@ export function ForYourShiftCard({ familyId }: Props) {
       .filter((d) => {
         if (d.scheduled_for < window.start) return false;
         if (d.scheduled_for >= window.end) return false;
-        // Skip already-documented outcomes; still show pending / no log.
-        if (d.log && d.log.status !== "pending") return false;
+        // Skip already-documented outcomes; only show doses with no log yet.
+        if (d.log) return false;
         return true;
       })
       .slice(0, 8);
