@@ -704,8 +704,16 @@ export const sv = {
       carePlaceIssue: "Vårdplats-kontroll flaggad",
       taskNote: "Anteckning",
       tidySkipped: "Städning hoppad",
+      maintenanceDone: "Underhåll utfört",
+      maintenanceOverdue: "Försenat underhåll",
     },
-
+    reads: {
+      readBy: "Läst av",
+      readBefore: "läst före redigering",
+      markRead: "Markera som läst",
+      markedRead: "Markerad som läst",
+      edited: "Redigerad {{time}}",
+    },
   },
   childPage: {
     subtitle: "Visa och uppdatera barnets profil.",

@@ -704,8 +704,16 @@ export const en = {
       carePlaceIssue: "Care-place check flagged",
       taskNote: "Note",
       tidySkipped: "Tidy skipped",
+      maintenanceDone: "Maintenance done",
+      maintenanceOverdue: "Overdue maintenance",
     },
-
+    reads: {
+      readBy: "Read by",
+      readBefore: "read before edit",
+      markRead: "Mark as read",
+      markedRead: "Marked as read",
+      edited: "Edited {{time}}",
+    },
   },
   childPage: {
     subtitle: "View and update your child's profile.",
