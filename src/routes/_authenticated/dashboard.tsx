@@ -771,7 +771,12 @@ function DashboardPage() {
 
   async function markOngoing(task: TaskItem) {
     if (!familyId) return;
-    const profileId = activeCaregiverId ?? null;
+    const guard = guardActingProfile(actor);
+    if (guard.blocked) {
+      toast.error(t("actor.selectProfilePrompt"));
+      return;
+    }
+    const profileId = guard.caregiverProfileId;
     const nowIso = new Date().toISOString();
     try {
       if (task.source.kind === "dose") {
