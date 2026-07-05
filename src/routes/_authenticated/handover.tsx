@@ -51,7 +51,18 @@ import { z } from "zod";
 const handoverSearchSchema = z.object({
   shiftStart: z.string().optional(),
   shiftEnd: z.string().optional(),
+  compose: z.union([z.literal("1"), z.literal(1), z.boolean()]).optional(),
 });
+
+function inferredShiftStart(now: Date): Date {
+  const h = now.getHours();
+  const d = new Date(now);
+  d.setMinutes(0, 0, 0);
+  if (h < 12) d.setHours(0);
+  else if (h < 18) d.setHours(12);
+  else d.setHours(18);
+  return d;
+}
 
 export const Route = createFileRoute("/_authenticated/handover")({
   head: () => ({ meta: [{ title: "Handover — CareNest" }] }),
