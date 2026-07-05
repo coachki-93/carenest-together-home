@@ -409,6 +409,12 @@ export const en = {
     seizures: "Seizures",
     notes: "Notes",
     openHandover: "Open handover",
+    handoverUnread: {
+      title: "New handover from {{name}}",
+      body: "Read it before your shift.",
+      editedBody: "It was updated after you last read it — take another look.",
+      action: "Read it",
+    },
     onShift: "On shift now",
     nextShift: "Next shift",
     noOneOnShift: "No one is on shift right now",
