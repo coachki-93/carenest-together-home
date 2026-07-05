@@ -153,6 +153,17 @@ export function useHandoverPrefill(
             .eq("status", "skipped")
             .gte("created_at", startIso)
             .lt("created_at", endIso),
+          supabase
+            .from("maintenance_logs")
+            .select("maintenance_item_id, performed_at, note, item:maintenance_items!inner(name, action_type, machine:machines(name))")
+            .eq("family_id", familyId)
+            .gte("performed_at", startIso)
+            .lt("performed_at", endIso),
+          supabase
+            .from("maintenance_items")
+            .select("id, name, action_type, interval_days, last_done_at, active, machine:machines(name)")
+            .eq("family_id", familyId)
+            .eq("active", true),
         ]);
 
       const meds = (medsRes.data ?? []) as Medication[];
