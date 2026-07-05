@@ -721,14 +721,9 @@ export const en = {
       edited: "Edited {{time}}",
     },
     forYourShift: {
-      title: "For your shift",
-      window: "Coming up until {{end}}",
-      empty: "Nothing scheduled in the next few hours.",
+      title: "Critical upcoming",
+      window: "Due before {{end}}",
       meds: "Medications",
-      appointments: "Appointments",
-      maintenance: "Maintenance",
-      overdue: "Overdue",
-      maintenanceItem: "Maintenance task",
     },
   },
   childPage: {

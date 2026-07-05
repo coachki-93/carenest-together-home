@@ -1,13 +1,11 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { CalendarClock, Pill, Wrench, Sparkles } from "lucide-react";
+import { AlertCircle, Pill } from "lucide-react";
 import {
   buildTodaysDoses,
   useMedications,
   useMedLogs,
 } from "@/lib/data/medications";
-import { useAppointments } from "@/lib/data/appointments";
-import { useMaintenanceItems, nextDueAt } from "@/lib/data/maintenance";
 import { getForwardShiftWindow } from "@/lib/data/handover-shift";
 
 interface Props {
@@ -15,9 +13,16 @@ interface Props {
 }
 
 /**
- * Live "For your shift" card. Shows meds, appointments, and maintenance
- * due in the forward shift window (now → next shift boundary + 4h, capped 8h).
- * Not persisted — always recomputed from the underlying data.
+ * "Critical upcoming" card.
+ *
+ * Shows only can't-miss items due in the forward shift window
+ * (now → next shift boundary + 4h, capped at 8h).
+ *
+ * Currently: medications only — every scheduled dose is implicitly critical.
+ *
+ * Future extension: appointments and maintenance items marked with an
+ * `is_critical` (or similar) flag by the user will also render here.
+ * Non-critical schedule items live on their own pages by design.
  */
 export function ForYourShiftCard({ familyId }: Props) {
   const { t, i18n } = useTranslation();
@@ -38,8 +43,6 @@ export function ForYourShiftCard({ familyId }: Props) {
 
   const { data: meds } = useMedications(familyId);
   const { data: medLogs } = useMedLogs(familyId, dayStart, dayEnd);
-  const { data: appts } = useAppointments(familyId, window.start, window.end);
-  const { data: maintItems } = useMaintenanceItems(familyId);
 
   const timeFmt = useMemo(
     () =>
@@ -63,26 +66,16 @@ export function ForYourShiftCard({ familyId }: Props) {
       .slice(0, 8);
   }, [meds, medLogs, now, window.start, window.end]);
 
-  const dueAppts = useMemo(() => (appts ?? []).slice(0, 8), [appts]);
+  // TODO: when appointments / maintenance gain an `is_critical` flag,
+  // fetch and merge them here alongside meds.
 
-  const dueMaintenance = useMemo(() => {
-    if (!maintItems) return [];
-    return maintItems
-      .filter((item) => item.active !== false)
-      .map((item) => ({ item, due: nextDueAt(item) }))
-      .filter(({ due }) => due !== null && due.getTime() <= window.end.getTime())
-      .sort((a, b) => (a.due!.getTime() - b.due!.getTime()))
-      .slice(0, 8);
-  }, [maintItems, window.end]);
-
-  const hasAny =
-    dueMeds.length > 0 || dueAppts.length > 0 || dueMaintenance.length > 0;
+  if (dueMeds.length === 0) return null;
 
   return (
-    <div className="card-soft p-5 mb-6 max-w-3xl mx-auto">
+    <div className="card-soft p-5 mb-6 max-w-3xl mx-auto border border-amber-200 bg-amber-50/40">
       <div className="flex items-center gap-2 mb-3">
-        <div className="size-8 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
-          <Sparkles className="size-4" />
+        <div className="size-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+          <AlertCircle className="size-4" />
         </div>
         <div>
           <div className="text-sm font-extrabold">
@@ -96,100 +89,27 @@ export function ForYourShiftCard({ familyId }: Props) {
         </div>
       </div>
 
-      {!hasAny ? (
-        <p className="text-sm text-muted-foreground">
-          {t("handoverPage.forYourShift.empty")}
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {dueMeds.length > 0 && (
-            <Section
-              icon={<Pill className="size-3.5" />}
-              label={t("handoverPage.forYourShift.meds")}
-            >
-              {dueMeds.map((d) => (
-                <li key={d.key} className="flex items-baseline gap-2">
-                  <span className="font-mono text-xs text-muted-foreground w-12">
-                    {timeFmt.format(d.scheduled_for)}
-                  </span>
-                  <span className="text-sm">
-                    {d.medication.name}
-                    {d.medication.dose_amount != null
-                      ? ` — ${d.medication.dose_amount}${d.medication.dose_unit ? ` ${d.medication.dose_unit}` : ""}`
-                      : ""}
-                  </span>
-                </li>
-              ))}
-            </Section>
-          )}
-
-          {dueAppts.length > 0 && (
-            <Section
-              icon={<CalendarClock className="size-3.5" />}
-              label={t("handoverPage.forYourShift.appointments")}
-            >
-              {dueAppts.map((a) => (
-                <li key={a.id} className="flex items-baseline gap-2">
-                  <span className="font-mono text-xs text-muted-foreground w-12">
-                    {timeFmt.format(new Date(a.starts_at))}
-                  </span>
-                  <span className="text-sm">{a.title}</span>
-                </li>
-              ))}
-            </Section>
-          )}
-
-          {dueMaintenance.length > 0 && (
-            <Section
-              icon={<Wrench className="size-3.5" />}
-              label={t("handoverPage.forYourShift.maintenance")}
-            >
-              {dueMaintenance.map(({ item, due }) => {
-                const overdue = due! < now;
-                return (
-                  <li key={item.id} className="flex items-baseline gap-2">
-                    <span
-                      className={
-                        "font-mono text-xs w-16 " +
-                        (overdue
-                          ? "text-destructive font-semibold"
-                          : "text-muted-foreground")
-                      }
-                    >
-                      {overdue
-                        ? t("handoverPage.forYourShift.overdue")
-                        : timeFmt.format(due!)}
-                    </span>
-                    <span className="text-sm">
-                      {item.name || t("handoverPage.forYourShift.maintenanceItem")}
-                    </span>
-                  </li>
-                );
-              })}
-            </Section>
-          )}
+      <div>
+        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1.5">
+          <Pill className="size-3.5" />
+          {t("handoverPage.forYourShift.meds")}
         </div>
-      )}
-    </div>
-  );
-}
-
-function Section({
-  icon,
-  label,
-  children,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1.5">
-        {icon}
-        {label}
+        <ul className="space-y-1">
+          {dueMeds.map((d) => (
+            <li key={d.key} className="flex items-baseline gap-2">
+              <span className="font-mono text-xs text-muted-foreground w-12">
+                {timeFmt.format(d.scheduled_for)}
+              </span>
+              <span className="text-sm">
+                {d.medication.name}
+                {d.medication.dose_amount != null
+                  ? ` — ${d.medication.dose_amount}${d.medication.dose_unit ? ` ${d.medication.dose_unit}` : ""}`
+                  : ""}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="space-y-1">{children}</ul>
     </div>
   );
 }
