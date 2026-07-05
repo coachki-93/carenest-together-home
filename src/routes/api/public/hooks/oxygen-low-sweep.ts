@@ -42,13 +42,19 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
 
         const { data: families } = await supabaseAdmin
           .from("families")
-          .select("id, oxygen_warn_minutes, oxygen_critical_minutes, at_hospital_since");
-        const famSettings = new Map<string, { warn: number; crit: number }>(
+          .select(
+            "id, oxygen_warn_minutes, oxygen_critical_minutes, at_hospital_since, notification_language",
+          );
+        const famSettings = new Map<
+          string,
+          { warn: number; crit: number; lang: "sv" | "en" }
+        >(
           (families ?? []).map((f) => [
             f.id,
             {
               warn: f.oxygen_warn_minutes ?? 60,
               crit: f.oxygen_critical_minutes ?? 20,
+              lang: (f.notification_language === "en" ? "en" : "sv") as "sv" | "en",
             },
           ]),
         );
@@ -57,6 +63,24 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
         const hospitalFamilyIds = new Set<string>(
           (families ?? []).filter((f) => f.at_hospital_since).map((f) => f.id),
         );
+
+        const OX_COPY = {
+          sv: {
+            criticalTitle: "🟥 Syrgastub nästan tom",
+            lowTitle: "🟧 Syrgastub låg",
+            criticalBody: (m: number) =>
+              `Endast ~${m} min kvar i aktuell tub. Byt snart.`,
+            lowBody: (m: number) => `~${m} min kvar i aktuell tub. Förbered byte.`,
+          },
+          en: {
+            criticalTitle: "🟥 Oxygen tank nearly empty",
+            lowTitle: "🟧 Oxygen tank low",
+            criticalBody: (m: number) =>
+              `Only ~${m} min left in the current tank. Change soon.`,
+            lowBody: (m: number) =>
+              `~${m} min left in the current tank. Prepare a change.`,
+          },
+        } as const;
 
         let pushes = 0;
         const stale: string[] = [];
