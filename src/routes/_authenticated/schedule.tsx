@@ -207,7 +207,7 @@ function SchedulePage() {
   );
 
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
-    useDismissedHandovers(user?.id);
+    useDismissedHandovers(user?.id, familyId, actor.activeProfileId);
   const { data: handoverTimes = [] } = useHandoverTimes(familyId);
   const handoverDue = useHandoverDueItem(
     handoverTimes,
