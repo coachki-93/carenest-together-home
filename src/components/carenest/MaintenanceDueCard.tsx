@@ -21,6 +21,7 @@ import {
   isActionPreset,
   type DueMaintenanceRow,
 } from "@/lib/data/maintenance";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { cn } from "@/lib/utils";
 
 export function MaintenanceDueCard({
@@ -33,6 +34,7 @@ export function MaintenanceDueCard({
   const [pending, setPending] = useState<DueMaintenanceRow | null>(null);
   const [note, setNote] = useState("");
   const markDone = useMarkMaintenanceDone();
+  const actor = useCurrentActor(familyId);
 
   const actionText = (a: string | null | undefined) => {
     if (!a) return null;
@@ -150,10 +152,16 @@ export function MaintenanceDueCard({
             <Button
               onClick={async () => {
                 if (!pending) return;
+                const guard = guardActingProfile(actor);
+                if (guard.blocked) {
+                  toast.error(t("actor.selectProfilePrompt"));
+                  return;
+                }
                 try {
                   await markDone.mutateAsync({
                     itemId: pending.item.id,
                     note: note.trim() || null,
+                    caregiverProfileId: guard.caregiverProfileId,
                   });
                   toast.success(t("maintenance.markDoneSuccess"));
                   setPending(null);

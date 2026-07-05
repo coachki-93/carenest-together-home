@@ -306,10 +306,15 @@ export function useDeleteMaintenanceItem() {
 export function useMarkMaintenanceDone() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { itemId: string; note?: string | null }) => {
+    mutationFn: async (input: {
+      itemId: string;
+      note?: string | null;
+      caregiverProfileId?: string | null;
+    }) => {
       const { data, error } = await supabase.rpc("mark_maintenance_done", {
         _item_id: input.itemId,
         _note: input.note ?? undefined,
+        _caregiver_profile_id: input.caregiverProfileId ?? undefined,
       });
       if (error) throw error;
       return data as string;

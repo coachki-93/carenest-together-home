@@ -36,7 +36,7 @@ import {
 import { toast } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
-import { useFamilyMembers } from "@/lib/data/family";
+
 import {
   useMachines,
   useMaintenanceItems,
@@ -59,6 +59,9 @@ import {
   type MaintenanceScope,
 } from "@/lib/data/maintenance";
 
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
+import { ByProfile } from "@/components/carenest/ByProfile";
+
 export const Route = createFileRoute("/_authenticated/maintenance")({
   head: () => ({ meta: [{ title: "Underhåll — CareNest" }] }),
   component: MaintenancePage,
@@ -78,13 +81,9 @@ function MaintenancePage() {
 
   const { data: machines = [] } = useMachines(familyId);
   const { data: items = [] } = useMaintenanceItems(familyId);
-  const { data: members = [] } = useFamilyMembers(familyId);
+  
 
-  const memberName = (uid: string | null | undefined) => {
-    if (!uid) return "—";
-    const m = members.find((x) => x.user_id === uid);
-    return m?.profile?.full_name ?? "—";
-  };
+
 
   const itemsByMachine = useMemo(() => {
     const map = new Map<string, MaintenanceItem[]>();
@@ -119,6 +118,7 @@ function MaintenancePage() {
   const upsertItem = useUpsertMaintenanceItem();
   const deleteItem = useDeleteMaintenanceItem();
   const markDone = useMarkMaintenanceDone();
+  const actor = useCurrentActor(familyId);
 
   const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
   const fmtDate = (d: Date) =>
@@ -402,6 +402,14 @@ function MaintenancePage() {
                                   ? fmtDate(new Date(item.last_done_at))
                                   : t("maintenance.lastDoneNever")}
                               </span>
+                              {item.last_done_at && (item.last_done_by_profile_id || item.last_done_by) && (
+                                <ByProfile
+                                  familyId={familyId}
+                                  caregiverProfileId={item.last_done_by_profile_id}
+                                  authorUserId={item.last_done_by}
+                                  viewerUserId={user?.id ?? null}
+                                />
+                              )}
                               {due && item.interval_days != null && (
                                 <span>
                                   {t("maintenance.nextDue")}: {fmtDate(due)}
@@ -557,10 +565,16 @@ function MaintenancePage() {
         onClose={() => setMarkDialog({ open: false, item: null })}
         onConfirm={async (note) => {
           if (!markDialog.item) return;
+          const guard = guardActingProfile(actor);
+          if (guard.blocked) {
+            toast.error(t("actor.selectProfilePrompt"));
+            return;
+          }
           try {
             await markDone.mutateAsync({
               itemId: markDialog.item.id,
               note,
+              caregiverProfileId: guard.caregiverProfileId,
             });
             toast.success(t("maintenance.markDoneSuccess"));
             setMarkDialog({ open: false, item: null });
@@ -573,7 +587,8 @@ function MaintenancePage() {
       <HistoryDialog
         state={historyDialog}
         onClose={() => setHistoryDialog({ open: false, item: null })}
-        memberName={memberName}
+        familyId={familyId}
+        viewerUserId={user?.id ?? null}
         fmtDateTime={fmtDateTime}
       />
     </DashboardLayout>
@@ -1125,12 +1140,14 @@ function MarkDoneDialog({
 function HistoryDialog({
   state,
   onClose,
-  memberName,
+  familyId,
+  viewerUserId,
   fmtDateTime,
 }: {
   state: { open: boolean; item: MaintenanceItem | null };
   onClose: () => void;
-  memberName: (uid: string | null | undefined) => string;
+  familyId: string | null;
+  viewerUserId: string | null;
   fmtDateTime: (d: Date) => string;
 }) {
   const { t } = useTranslation();
@@ -1158,9 +1175,13 @@ function HistoryDialog({
                   <span className="font-semibold">
                     {fmtDateTime(new Date(log.performed_at))}
                   </span>
-                  <span className="text-muted-foreground">
-                    {memberName(log.performed_by)}
-                  </span>
+                  <ByProfile
+                    familyId={familyId}
+                    caregiverProfileId={log.caregiver_profile_id}
+                    authorUserId={log.performed_by}
+                    viewerUserId={viewerUserId}
+                    className="text-muted-foreground inline-flex items-center gap-1.5"
+                  />
                 </div>
                 {log.note && (
                   <p className="text-sm text-muted-foreground mt-1">
