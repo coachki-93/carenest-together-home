@@ -795,9 +795,11 @@ export type Database = {
           handover_reminder_minutes: number
           id: string
           name: string
+          notification_language: string
           owner_id: string
           oxygen_critical_minutes: number
           oxygen_warn_minutes: number
+          timezone: string
           updated_at: string
         }
         Insert: {
@@ -807,9 +809,11 @@ export type Database = {
           handover_reminder_minutes?: number
           id?: string
           name?: string
+          notification_language?: string
           owner_id: string
           oxygen_critical_minutes?: number
           oxygen_warn_minutes?: number
+          timezone?: string
           updated_at?: string
         }
         Update: {
@@ -819,9 +823,11 @@ export type Database = {
           handover_reminder_minutes?: number
           id?: string
           name?: string
+          notification_language?: string
           owner_id?: string
           oxygen_critical_minutes?: number
           oxygen_warn_minutes?: number
+          timezone?: string
           updated_at?: string
         }
         Relationships: []
