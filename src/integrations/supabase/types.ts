@@ -1233,6 +1233,7 @@ export type Database = {
       }
       maintenance_items: {
         Row: {
+          action_type: string | null
           active: boolean
           created_at: string
           created_by: string
@@ -1248,6 +1249,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          action_type?: string | null
           active?: boolean
           created_at?: string
           created_by: string
@@ -1263,6 +1265,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          action_type?: string | null
           active?: boolean
           created_at?: string
           created_by?: string
