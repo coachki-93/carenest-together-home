@@ -576,3 +576,93 @@ function FieldInput({
     </div>
   );
 }
+
+interface HandoverReadsRowProps {
+  reads: HandoverRead[];
+  editedAt: string | null;
+  familyMembers: Array<{ user_id: string; profile?: { full_name?: string | null } | null }>;
+  caregiverProfiles: Array<{ id: string; account_user_id: string | null; name: string; color: string }>;
+  viewerUserId: string | null;
+  isAuthor: boolean;
+  onMarkRead: () => void;
+  timeFmt: Intl.DateTimeFormat;
+}
+
+function HandoverReadsRow({
+  reads,
+  editedAt,
+  familyMembers,
+  caregiverProfiles,
+  viewerUserId,
+  isAuthor,
+  onMarkRead,
+  timeFmt,
+}: HandoverReadsRowProps) {
+  const { t } = useTranslation();
+  const viewerUnread = isUnreadForViewer(reads, viewerUserId, editedAt);
+  const editedTs = editedAt ? new Date(editedAt).getTime() : null;
+
+  return (
+    <div className="flex items-center gap-3 flex-wrap justify-end ml-auto">
+      {reads.length > 0 && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-semibold text-muted-foreground">
+            {t("handoverPage.reads.readBy")}
+          </span>
+          {reads.map((r) => {
+            // Prefer a caregiver profile matching the reader; fall back to member.
+            const profile = caregiverProfiles.find(
+              (p) => p.account_user_id === r.user_id,
+            );
+            const memberName = familyMembers.find(
+              (m) => m.user_id === r.user_id,
+            )?.profile?.full_name?.trim();
+            const name = profile?.name || memberName || "—";
+            const before =
+              editedTs !== null &&
+              new Date(r.read_at).getTime() < editedTs;
+            return (
+              <span
+                key={r.user_id}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5",
+                  before
+                    ? "bg-amber-50 text-amber-800"
+                    : "bg-muted text-foreground",
+                )}
+                title={new Date(r.read_at).toLocaleString()}
+              >
+                {profile?.color && (
+                  <span
+                    className="inline-block size-2 rounded-full"
+                    style={{ background: profile.color }}
+                  />
+                )}
+                <span className="font-semibold">{name}</span>
+                <span className="text-muted-foreground">
+                  · {timeFmt.format(new Date(r.read_at))}
+                </span>
+                {before && (
+                  <span className="text-[10px] font-bold uppercase ml-1">
+                    · {t("handoverPage.reads.readBefore")}
+                  </span>
+                )}
+              </span>
+            );
+          })}
+        </div>
+      )}
+      {!isAuthor && viewerUnread && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full h-7 gap-1.5"
+          onClick={onMarkRead}
+        >
+          <Check className="size-3.5" />
+          {t("handoverPage.reads.markRead")}
+        </Button>
+      )}
+    </div>
+  );
+}
