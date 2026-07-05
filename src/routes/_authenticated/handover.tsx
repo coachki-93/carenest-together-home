@@ -364,10 +364,23 @@ function HandoverPage() {
                   familyMembers={familyMembers ?? []}
                   caregiverProfiles={caregiverProfiles ?? []}
                   viewerUserId={user?.id ?? null}
-                  isAuthor={h.author_id === profile?.id}
+                  viewerProfileId={activeCaregiverId}
+                  isAuthor={
+                    h.caregiver_profile_id
+                      ? h.caregiver_profile_id === activeCaregiverId
+                      : h.author_id === profile?.id
+                  }
                   onMarkRead={() => {
+                    const guard = guardActingProfile(actor);
+                    if (guard.blocked) {
+                      toast.error(t("actor.selectProfilePrompt"));
+                      return;
+                    }
                     markRead
-                      .mutateAsync(h.id)
+                      .mutateAsync({
+                        handoverId: h.id,
+                        caregiverProfileId: guard.caregiverProfileId,
+                      })
                       .then(() => toast.success(t("handoverPage.reads.markedRead")))
                       .catch(() => { /* ignore */ });
                   }}
