@@ -132,8 +132,7 @@ export function MaintenanceDueCard({
           <DialogHeader>
             <DialogTitle>{t("maintenance.markDoneTitle")}</DialogTitle>
             <DialogDescription>
-              {pending && `${pending.machine.name} — ${pending.item.name}`} —{" "}
-              {t("maintenance.markDoneSub")}
+              {pending && taskTitle(pending)} — {t("maintenance.markDoneSub")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
