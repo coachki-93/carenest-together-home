@@ -494,6 +494,7 @@ function MaintenancePage() {
                 created_by: user.id,
                 name: payload.patch.name!,
                 machine_type: payload.patch.machine_type!,
+                machine_subtype: payload.patch.machine_subtype ?? null,
                 manufacturer: payload.patch.manufacturer ?? null,
                 model: payload.patch.model ?? null,
                 serial_number: payload.patch.serial_number ?? null,
