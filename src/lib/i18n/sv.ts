@@ -720,6 +720,16 @@ export const sv = {
       markedRead: "Markerad som läst",
       edited: "Redigerad {{time}}",
     },
+    forYourShift: {
+      title: "För ditt pass",
+      window: "På gång fram till {{end}}",
+      empty: "Inget schemalagt de närmaste timmarna.",
+      meds: "Mediciner",
+      appointments: "Bokningar",
+      maintenance: "Underhåll",
+      overdue: "Försenat",
+      maintenanceItem: "Underhållsuppgift",
+    },
   },
   childPage: {
     subtitle: "Visa och uppdatera barnets profil.",
