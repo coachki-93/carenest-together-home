@@ -34,6 +34,17 @@ export function MaintenanceDueCard({
   const [note, setNote] = useState("");
   const markDone = useMarkMaintenanceDone();
 
+  const actionText = (a: string | null | undefined) => {
+    if (!a) return null;
+    if (isActionPreset(a)) return t(`maintenance.action.${a}` as const);
+    return a;
+  };
+  const taskTitle = (r: DueMaintenanceRow) => {
+    const action = actionText(r.item.action_type);
+    if (action) return `${action} ${r.item.name} — ${r.machine.name}`;
+    return `${r.machine.name} — ${r.item.name}`;
+  };
+
   if (rows.length === 0) return null;
 
   return (
