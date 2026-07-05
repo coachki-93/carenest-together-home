@@ -1,13 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { wallClockIn, yesterdayStrIn } from "@/lib/time/family-tz";
 
 /**
  * Sweeps for Care Place Control slots whose grace window has expired today
- * with no completed check, writes a marker row in `care_place_missed_checks`,
- * and dispatches one push per family. Idempotent via UNIQUE
- * (family_id, time_id, scheduled_date).
+ * (in the family's local timezone) with no completed check, writes a marker
+ * row in `care_place_missed_checks`, and dispatches one push per family.
+ * Idempotent via UNIQUE (family_id, time_id, scheduled_date).
  *
  * Triggered every ~5 minutes by pg_cron with the project's `apikey` header.
+ *
+ * BACKLOG: slots whose (time_of_day + grace_minutes) crosses local midnight
+ * can never satisfy `nowMin >= closedAt` under a single-day comparison and
+ * will never be marked missed. Pre-existing bug; not addressed here.
  */
+
+// Push message copy per language. Kept inline to avoid pulling i18next into
+// the server bundle for four strings.
+const MESSAGES = {
+  sv: {
+    title: "⚠️ Missad kontroll",
+    body: (slot: string, label: string | null) =>
+      `${slot}-kontrollen missades idag${label ? ` (${label})` : ""}.`,
+  },
+  en: {
+    title: "⚠️ Missed check",
+    body: (slot: string, label: string | null) =>
+      `The ${slot} check was missed today${label ? ` (${label})` : ""}.`,
+  },
+} as const;
+
+type Lang = keyof typeof MESSAGES;
+
 export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep")({
   server: {
     handlers: {
@@ -33,8 +56,6 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         }
 
         const now = new Date();
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-        const nowMin = now.getHours() * 60 + now.getMinutes();
 
         const { data: times, error: tErr } = await supabaseAdmin
           .from("care_place_check_times")
@@ -43,20 +64,50 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         if (tErr) return Response.json({ ok: false, error: tErr.message }, { status: 500 });
         if (!times?.length) return Response.json({ ok: true, missed: 0 });
 
-        // Skip families currently in "at hospital" mode.
-        const { data: hospFams } = await supabaseAdmin
+        // Load per-family settings once: hospital mode, timezone, language.
+        const familyIds = Array.from(new Set(times.map((t) => t.family_id)));
+        const { data: fams } = await supabaseAdmin
           .from("families")
-          .select("id")
-          .not("at_hospital_since", "is", null);
-        const hospitalFamilyIds = new Set((hospFams ?? []).map((f) => f.id));
+          .select("id, at_hospital_since, timezone, notification_language")
+          .in("id", familyIds);
+        const famInfo = new Map<
+          string,
+          { tz: string; lang: Lang; hospital: boolean }
+        >(
+          (fams ?? []).map((f) => [
+            f.id,
+            {
+              tz: f.timezone ?? "Europe/Stockholm",
+              lang: (f.notification_language === "en" ? "en" : "sv") as Lang,
+              hospital: !!f.at_hospital_since,
+            },
+          ]),
+        );
 
-        const { data: todaysChecks } = await supabaseAdmin
+        // Because todayStr is now per-family, midnight-adjacent families
+        // could roll into a new local date while the completions table still
+        // holds yesterday's rows. Fetch a two-day window and key by
+        // (family_id, scheduled_date, HH:mm).
+        const utcToday = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+        const utcYesterday = (() => {
+          const d = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+        })();
+        const utcTomorrow = (() => {
+          const d = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+          return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+        })();
+
+        const { data: recentChecks } = await supabaseAdmin
           .from("care_place_checks")
-          .select("family_id, scheduled_time")
-          .eq("scheduled_date", todayStr);
+          .select("family_id, scheduled_date, scheduled_time")
+          .in("scheduled_date", [utcYesterday, utcToday, utcTomorrow]);
 
         const completed = new Set(
-          (todaysChecks ?? []).map((c) => `${c.family_id}|${String(c.scheduled_time).slice(0, 5)}`),
+          (recentChecks ?? []).map(
+            (c) =>
+              `${c.family_id}|${c.scheduled_date}|${String(c.scheduled_time).slice(0, 5)}`,
+          ),
         );
 
         let recorded = 0;
@@ -64,17 +115,21 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         const stale: string[] = [];
 
         for (const tm of times) {
-          if (hospitalFamilyIds.has(tm.family_id)) continue;
+          const info = famInfo.get(tm.family_id);
+          if (info?.hospital) continue;
+          const tz = info?.tz ?? "Europe/Stockholm";
+          const lang: Lang = info?.lang ?? "sv";
+
+          const { todayStr, nowMin } = wallClockIn(now, tz);
+
           const [h, m] = tm.time_of_day.split(":").map(Number);
           const slotMin = h * 60 + m;
-          // `grace_minutes` is the total post-slot grace window before we
-          // consider the check missed.
           const closedAt = slotMin + (tm.grace_minutes ?? 30);
-          if (nowMin < closedAt) continue; // still inside window or grace
-          const key = `${tm.family_id}|${tm.time_of_day.slice(0, 5)}`;
-          if (completed.has(key)) continue;
+          if (nowMin < closedAt) continue;
 
-          // Idempotent insert.
+          const slot = tm.time_of_day.slice(0, 5);
+          if (completed.has(`${tm.family_id}|${todayStr}|${slot}`)) continue;
+
           const { data: inserted, error: iErr } = await supabaseAdmin
             .from("care_place_missed_checks")
             .insert({
@@ -85,10 +140,7 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
             })
             .select("id")
             .maybeSingle();
-          if (iErr) {
-            // Likely duplicate from a previous sweep — skip silently.
-            continue;
-          }
+          if (iErr) continue;
           if (!inserted) continue;
           recorded++;
 
@@ -100,10 +152,10 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
             .eq("family_id", tm.family_id);
           if (!subs?.length) continue;
 
-          const slot = tm.time_of_day.slice(0, 5);
+          const msg = MESSAGES[lang];
           const payload = JSON.stringify({
-            title: "⚠️ Missad kontroll",
-            body: `${slot}-kontrollen missades idag${tm.label ? ` (${tm.label})` : ""}.`,
+            title: msg.title,
+            body: msg.body(slot, tm.label ?? null),
             tag: `missed-${tm.family_id}-${todayStr}-${slot}`,
             url: "/dashboard",
           });
