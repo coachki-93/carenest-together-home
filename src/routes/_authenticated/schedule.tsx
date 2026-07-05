@@ -68,6 +68,7 @@ import { toast } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import {
   useFamilyChild,
