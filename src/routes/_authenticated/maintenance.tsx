@@ -946,6 +946,34 @@ function ItemDialog({
             </Select>
           </div>
           <div>
+            <Label>{t("maintenance.actionLabel")}</Label>
+            <Select value={actionSel} onValueChange={(v) => setActionSel(v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {allowNoAction && (
+                  <SelectItem value={ACTION_NONE}>
+                    {t("maintenance.actionNone")}
+                  </SelectItem>
+                )}
+                {MAINTENANCE_ACTION_PRESETS.map((a) => (
+                  <SelectItem key={a} value={a}>
+                    {t(`maintenance.action.${a}` as const)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {actionSel === "other" && (
+              <Input
+                className="mt-2"
+                placeholder={t("maintenance.actionCustom")}
+                value={customAction}
+                onChange={(e) => setCustomAction(e.target.value)}
+              />
+            )}
+          </div>
+          <div>
             <Label className="flex items-center gap-2 font-normal">
               <input
                 type="checkbox"
