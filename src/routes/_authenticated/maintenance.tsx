@@ -49,6 +49,8 @@ import {
   maintenanceStatus,
   nextDueAt,
   MACHINE_TYPE_PRESETS,
+  MACHINE_SUBTYPE_PRESETS,
+  isSubtypePreset,
   type Machine,
   type MaintenanceItem,
   type MachineTypePreset,
