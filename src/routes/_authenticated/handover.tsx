@@ -92,6 +92,7 @@ function HandoverPage() {
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: membership } = useMyMembership();
+  const actor = useCurrentActor(membership?.family_id);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(
     membership?.family_id,
     user?.id,
