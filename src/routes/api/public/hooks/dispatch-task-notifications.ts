@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { formatTimeIn } from "@/lib/time/family-tz";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
 // anon `apikey` header. Runs three passes per call:
 //
-//   1. START   — appointments whose start time just arrived (existing flow)
+//   1. START   — appointments whose start time just arrived
 //   2. LATE    — appointments still pending past `late_after_minutes`
 //   3. MISSED  — appointments still pending past `missed_after_minutes`
 //
@@ -11,9 +12,8 @@ import { createFileRoute } from "@tanstack/react-router";
 // for the same transition, and skips any appointment that already has a
 // completion (done/skipped/postponed) recorded for that occurrence.
 //
-// Auth model: /api/public/* bypasses Lovable's edge auth. We additionally
-// verify the `apikey` header matches the project's anon publishable key so
-// random callers can't trigger fan-out.
+// Times are rendered in the family's timezone; body copy in the family's
+// notification_language (sv | en). Both live on `public.families`.
 
 type Appt = {
   id: string;
@@ -35,6 +35,62 @@ type WebPushModule = {
     opts?: { TTL?: number },
   ) => Promise<unknown>;
 };
+
+const KIND_LABELS = {
+  sv: {
+    temperature: "Temperatur",
+    heart_rate: "Puls",
+    spo2: "Syrgas",
+    breathing: "Andning",
+    fluids: "Vätska",
+    diaper: "Blöja",
+    seizure: "Anfall",
+    meal: "Måltid",
+    sleep: "Sömn",
+    therapy: "Terapi",
+    appointment: "Möte",
+    note: "Anteckning",
+    task: "Uppgift",
+  },
+  en: {
+    temperature: "Temperature",
+    heart_rate: "Heart rate",
+    spo2: "Oxygen",
+    breathing: "Breathing",
+    fluids: "Fluids",
+    diaper: "Diaper",
+    seizure: "Seizure",
+    meal: "Meal",
+    sleep: "Sleep",
+    therapy: "Therapy",
+    appointment: "Appointment",
+    note: "Note",
+    task: "Task",
+  },
+} as const;
+
+const COPY = {
+  sv: {
+    lateTitle: (t: string) => `⏰ ${t}`,
+    lateBody: (time: string) => `Försenad sedan ${time}`,
+    missedTitle: (t: string) => `❗ ${t}`,
+    missedBody: (time: string) => `Missad — planerad ${time}`,
+  },
+  en: {
+    lateTitle: (t: string) => `⏰ ${t}`,
+    lateBody: (time: string) => `Late since ${time}`,
+    missedTitle: (t: string) => `❗ ${t}`,
+    missedBody: (time: string) => `Missed — scheduled ${time}`,
+  },
+} as const;
+
+type Lang = keyof typeof COPY;
+
+function humanKind(kind: string | null, lang: Lang): string {
+  const table = KIND_LABELS[lang];
+  const key = (kind ?? "task") as keyof typeof table;
+  return table[key] ?? table.task;
+}
 
 export const Route = createFileRoute("/api/public/hooks/dispatch-task-notifications")({
   server: {
@@ -66,7 +122,22 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         const staleEndpoints: string[] = [];
         let dispatched = 0;
 
-        // Helper: fetch subs for a family
+        // Preload per-family timezone + language once.
+        const { data: allFams } = await supabaseAdmin
+          .from("families")
+          .select("id, timezone, notification_language");
+        const famInfo = new Map<string, { tz: string; lang: Lang }>(
+          (allFams ?? []).map((f) => [
+            f.id,
+            {
+              tz: f.timezone ?? "Europe/Stockholm",
+              lang: (f.notification_language === "en" ? "en" : "sv") as Lang,
+            },
+          ]),
+        );
+        const infoFor = (familyId: string) =>
+          famInfo.get(familyId) ?? { tz: "Europe/Stockholm", lang: "sv" as Lang };
+
         const getSubs = async (familyId: string): Promise<Sub[]> => {
           const { data } = await supabaseAdmin
             .from("push_subscriptions")
@@ -75,7 +146,6 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           return (data ?? []) as Sub[];
         };
 
-        // Helper: push to all subs
         const fanout = async (
           familyId: string,
           payload: { title: string; body: string; tag: string; url: string },
@@ -104,15 +174,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           );
         };
 
-        const fmtTime = (iso: string) =>
-          new Date(iso).toLocaleTimeString(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
         // -------- PASS 1: start-time --------
-        // Anything that should have fired in the last 2 minutes and is still
-        // unnotified. 2 min gives slack for cron drift.
         const startWindow = new Date(now.getTime() - 2 * 60 * 1000).toISOString();
         const { data: startAppts } = await supabaseAdmin
           .from("appointments")
@@ -123,9 +185,10 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           .limit(200);
 
         for (const a of (startAppts ?? []) as Appt[]) {
+          const { tz, lang } = infoFor(a.family_id);
           await fanout(a.family_id, {
             title: a.title || "CareNest",
-            body: `${humanKind(a.kind)} • ${fmtTime(a.starts_at)}`,
+            body: `${humanKind(a.kind, lang)} • ${formatTimeIn(a.starts_at, tz)}`,
             tag: `appt-${a.id}-start`,
             url: "/dashboard",
           });
@@ -135,14 +198,9 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             .eq("id", a.id);
         }
 
-        // Only look at appointments from the last 7 days — anything older
-        // won't get late/missed notifications retroactively and we don't want
-        // to fan out hundreds of Supabase round-trips per cron tick.
         const recentWindow = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
         // -------- PASS 2: late --------
-        // starts_at + late_after_minutes <= now, no late_notified_at, no
-        // completion logged for this occurrence yet.
         const { data: lateCandidates } = await supabaseAdmin
           .from("appointments")
           .select(
@@ -158,12 +216,13 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           const lateMin = a.late_after_minutes ?? 0;
           const dueAt = new Date(new Date(a.starts_at).getTime() + lateMin * 60_000);
           if (dueAt > now) continue;
-
           if (await hasCompletion(supabaseAdmin, a.id, a.starts_at)) continue;
 
+          const { tz, lang } = infoFor(a.family_id);
+          const title = a.title || "CareNest";
           await fanout(a.family_id, {
-            title: `⏰ ${a.title || "CareNest"}`,
-            body: `Late since ${fmtTime(a.starts_at)}`,
+            title: COPY[lang].lateTitle(title),
+            body: COPY[lang].lateBody(formatTimeIn(a.starts_at, tz)),
             tag: `appt-${a.id}-late`,
             url: "/dashboard",
           });
@@ -189,12 +248,13 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           const missedMin = a.missed_after_minutes ?? 15;
           const dueAt = new Date(new Date(a.starts_at).getTime() + missedMin * 60_000);
           if (dueAt > now) continue;
-
           if (await hasCompletion(supabaseAdmin, a.id, a.starts_at)) continue;
 
+          const { tz, lang } = infoFor(a.family_id);
+          const title = a.title || "CareNest";
           await fanout(a.family_id, {
-            title: `❗ ${a.title || "CareNest"}`,
-            body: `Missed — scheduled ${fmtTime(a.starts_at)}`,
+            title: COPY[lang].missedTitle(title),
+            body: COPY[lang].missedBody(formatTimeIn(a.starts_at, tz)),
             tag: `appt-${a.id}-missed`,
             url: "/dashboard",
           });
@@ -237,22 +297,4 @@ async function hasCompletion(
     .eq("occurrence_at", occurrenceAt)
     .limit(1);
   return Array.isArray(data) && data.length > 0;
-}
-
-function humanKind(kind: string | null): string {
-  switch (kind) {
-    case "temperature": return "Temperature";
-    case "heart_rate": return "Heart rate";
-    case "spo2": return "Oxygen";
-    case "breathing": return "Breathing";
-    case "fluids": return "Fluids";
-    case "diaper": return "Diaper";
-    case "seizure": return "Seizure";
-    case "meal": return "Meal";
-    case "sleep": return "Sleep";
-    case "therapy": return "Therapy";
-    case "appointment": return "Appointment";
-    case "note": return "Note";
-    default: return "Task";
-  }
 }
