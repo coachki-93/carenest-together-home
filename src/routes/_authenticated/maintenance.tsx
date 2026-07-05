@@ -561,10 +561,16 @@ function MaintenancePage() {
         onClose={() => setMarkDialog({ open: false, item: null })}
         onConfirm={async (note) => {
           if (!markDialog.item) return;
+          const guard = guardActingProfile(actor);
+          if (guard.blocked) {
+            toast.error(t("actor.selectProfilePrompt"));
+            return;
+          }
           try {
             await markDone.mutateAsync({
               itemId: markDialog.item.id,
               note,
+              caregiverProfileId: guard.caregiverProfileId,
             });
             toast.success(t("maintenance.markDoneSuccess"));
             setMarkDialog({ open: false, item: null });
