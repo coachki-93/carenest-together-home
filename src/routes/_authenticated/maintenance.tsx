@@ -83,11 +83,7 @@ function MaintenancePage() {
   const { data: items = [] } = useMaintenanceItems(familyId);
   const { data: members = [] } = useFamilyMembers(familyId);
 
-  const memberName = (uid: string | null | undefined) => {
-    if (!uid) return "—";
-    const m = members.find((x) => x.user_id === uid);
-    return m?.profile?.full_name ?? "—";
-  };
+
 
   const itemsByMachine = useMemo(() => {
     const map = new Map<string, MaintenanceItem[]>();
