@@ -836,6 +836,7 @@ function ItemDialog({
       scope?: MaintenanceScope;
       interval_days?: number | null;
       last_done_at?: string | null;
+      action_type?: string | null;
     };
   }) => Promise<void>;
 }) {
