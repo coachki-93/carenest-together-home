@@ -860,8 +860,22 @@ function ItemDialog({
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  const ACTION_NONE = "__none__";
+  const initialActionSel = (() => {
+    if (!it) return "replace"; // new items default to Replace
+    if (!it.action_type) return ACTION_NONE; // legacy item with no action
+    if (isActionPreset(it.action_type)) return it.action_type;
+    return "other";
+  })();
+  const initialCustomAction =
+    it && it.action_type && !isActionPreset(it.action_type)
+      ? it.action_type
+      : "";
+
   const [name, setName] = useState(it?.name ?? "");
   const [scope, setScope] = useState<MaintenanceScope>(it?.scope ?? "part");
+  const [actionSel, setActionSel] = useState<string>(initialActionSel);
+  const [customAction, setCustomAction] = useState<string>(initialCustomAction);
   const [asNeeded, setAsNeeded] = useState<boolean>(it?.interval_days == null);
   const [interval, setInterval] = useState<string>(
     it?.interval_days ? String(it.interval_days) : "",
@@ -875,6 +889,19 @@ function ItemDialog({
     if (state.open) {
       setName(it?.name ?? "");
       setScope(it?.scope ?? "part");
+      if (!it) {
+        setActionSel("replace");
+        setCustomAction("");
+      } else if (!it.action_type) {
+        setActionSel(ACTION_NONE);
+        setCustomAction("");
+      } else if (isActionPreset(it.action_type)) {
+        setActionSel(it.action_type);
+        setCustomAction("");
+      } else {
+        setActionSel("other");
+        setCustomAction(it.action_type);
+      }
       setAsNeeded(it?.interval_days == null);
       setInterval(it?.interval_days ? String(it.interval_days) : "");
       setLastDone(it ? toDateInput(it.last_done_at) : todayStr());
@@ -883,6 +910,8 @@ function ItemDialog({
   }, [state.open, it]);
 
   const today = todayStr();
+  // Only show the "no action" option when editing a legacy item that never had one.
+  const allowNoAction = !!it && !it.action_type;
 
   return (
     <Dialog open={state.open} onOpenChange={(o) => !o && onClose()}>
