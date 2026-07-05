@@ -296,6 +296,17 @@ function HandoverPage() {
                     <Clock className="size-3.5" />
                     {dateFmt.format(new Date(h.created_at))}
                   </div>
+                  {h.edited_at && (
+                    <span
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800"
+                      title={dateFmt.format(new Date(h.edited_at))}
+                    >
+                      <Pencil className="size-3" />
+                      {t("handoverPage.reads.edited", {
+                        time: timeFmt.format(new Date(h.edited_at)),
+                      })}
+                    </span>
+                  )}
                 </div>
                 {h.author_id === profile?.id && (
                   <Button
@@ -323,13 +334,30 @@ function HandoverPage() {
                 <Field label={t("handoverPage.fields.notes")} value={h.notes} />
               </dl>
 
-              <div className="mt-4 pt-4 border-t border-border/60 flex items-center gap-2 text-xs text-muted-foreground">
-                <User className="size-3.5" />
-                <ByProfile
-                  familyId={membership?.family_id}
-                  caregiverProfileId={h.caregiver_profile_id}
-                  authorUserId={h.author_id}
-                  viewerUserId={user?.id}
+              <div className="mt-4 pt-4 border-t border-border/60 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <User className="size-3.5" />
+                  <ByProfile
+                    familyId={membership?.family_id}
+                    caregiverProfileId={h.caregiver_profile_id}
+                    authorUserId={h.author_id}
+                    viewerUserId={user?.id}
+                  />
+                </div>
+                <HandoverReadsRow
+                  reads={readsMap?.get(h.id) ?? []}
+                  editedAt={h.edited_at}
+                  familyMembers={familyMembers ?? []}
+                  caregiverProfiles={caregiverProfiles ?? []}
+                  viewerUserId={user?.id ?? null}
+                  isAuthor={h.author_id === profile?.id}
+                  onMarkRead={() => {
+                    markRead
+                      .mutateAsync(h.id)
+                      .then(() => toast.success(t("handoverPage.reads.markedRead")))
+                      .catch(() => { /* ignore */ });
+                  }}
+                  timeFmt={timeFmt}
                 />
               </div>
             </li>
