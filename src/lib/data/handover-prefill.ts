@@ -37,6 +37,8 @@ interface Labels {
   carePlaceIssue: string;
   taskNote: string;
   tidySkipped: string;
+  maintenanceDone: string;
+  maintenanceOverdue: string;
 }
 
 
