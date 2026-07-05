@@ -214,7 +214,7 @@ function HandoverPage() {
       toast.success(t("handoverPage.saved"));
       setOpen(false);
       resetForm();
-      if (shiftStartIso || shiftEndIso) {
+      if (shiftStartIso || shiftEndIso || compose) {
         navigate({ search: {}, replace: true });
       }
     } catch (e) {
@@ -329,7 +329,7 @@ function HandoverPage() {
           } else {
             setOpen(false);
             resetForm();
-            if (shiftStartIso || shiftEndIso) {
+            if (shiftStartIso || shiftEndIso || compose) {
               navigate({ search: {}, replace: true });
             }
           }
