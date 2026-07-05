@@ -369,6 +369,11 @@ function MaintenancePage() {
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
+                              {item.action_type && (
+                                <span className="text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5 bg-primary/10 text-primary">
+                                  {actionLabel(item.action_type)}
+                                </span>
+                              )}
                               <span className="font-semibold">{item.name}</span>
                               <span
                                 className={cn(
