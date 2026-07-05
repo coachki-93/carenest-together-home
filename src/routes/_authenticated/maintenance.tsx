@@ -591,7 +591,8 @@ function MaintenancePage() {
       <HistoryDialog
         state={historyDialog}
         onClose={() => setHistoryDialog({ open: false, item: null })}
-        memberName={memberName}
+        familyId={familyId}
+        viewerUserId={user?.id ?? null}
         fmtDateTime={fmtDateTime}
       />
     </DashboardLayout>
