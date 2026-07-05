@@ -203,6 +203,14 @@ function MaintenancePage() {
                       <span className="text-xs font-semibold uppercase tracking-wide rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
                         {typeLabel(machine.machine_type)}
                       </span>
+                      {machine.machine_subtype && (
+                        <span className="text-xs font-semibold uppercase tracking-wide rounded-full bg-muted/60 px-2 py-0.5 text-muted-foreground">
+                          {subtypeLabel(
+                            machine.machine_type,
+                            machine.machine_subtype,
+                          )}
+                        </span>
+                      )}
                       {!machine.active && (
                         <span className="text-xs font-semibold uppercase tracking-wide rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
                           <Archive className="inline size-3 mr-1" />
