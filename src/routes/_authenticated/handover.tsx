@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Plus, Trash2, User, Clock, Sparkles } from "lucide-react";
+import { ClipboardList, Plus, Trash2, User, Clock, Sparkles, Check, Pencil } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +45,14 @@ import {
   type ShiftLabel,
 } from "@/lib/data/handovers";
 import { useHandoverPrefill } from "@/lib/data/handover-prefill";
+import {
+  isUnreadForViewer,
+  useHandoverReadsBulk,
+  useMarkHandoverRead,
+  type HandoverRead,
+} from "@/lib/data/handover-reads";
+import { useCaregiverProfiles } from "@/lib/data/caregiver-profiles";
+import { useFamilyMembers } from "@/lib/data/family";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
@@ -89,6 +97,14 @@ function HandoverPage() {
   const { data: handovers, isLoading } = useHandovers(membership?.family_id);
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
+  const markRead = useMarkHandoverRead();
+  const handoverIds = useMemo(
+    () => (handovers ?? []).map((h) => h.id),
+    [handovers],
+  );
+  const { data: readsMap } = useHandoverReadsBulk(handoverIds);
+  const { data: caregiverProfiles } = useCaregiverProfiles(membership?.family_id);
+  const { data: familyMembers } = useFamilyMembers(membership?.family_id);
   const navigate = Route.useNavigate();
   const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso, compose } = Route.useSearch();
 
@@ -124,6 +140,8 @@ function HandoverPage() {
       carePlaceIssue: t("handoverPage.prefill.carePlaceIssue"),
       taskNote: t("handoverPage.prefill.taskNote"),
       tidySkipped: t("handoverPage.prefill.tidySkipped"),
+      maintenanceDone: t("handoverPage.prefill.maintenanceDone"),
+      maintenanceOverdue: t("handoverPage.prefill.maintenanceOverdue"),
     }),
     [t],
   );
@@ -176,6 +194,14 @@ function HandoverPage() {
         weekday: "short",
         month: "short",
         day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    [i18n.language],
+  );
+  const timeFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -280,6 +306,17 @@ function HandoverPage() {
                     <Clock className="size-3.5" />
                     {dateFmt.format(new Date(h.created_at))}
                   </div>
+                  {h.edited_at && (
+                    <span
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800"
+                      title={dateFmt.format(new Date(h.edited_at))}
+                    >
+                      <Pencil className="size-3" />
+                      {t("handoverPage.reads.edited", {
+                        time: timeFmt.format(new Date(h.edited_at)),
+                      })}
+                    </span>
+                  )}
                 </div>
                 {h.author_id === profile?.id && (
                   <Button
@@ -307,13 +344,30 @@ function HandoverPage() {
                 <Field label={t("handoverPage.fields.notes")} value={h.notes} />
               </dl>
 
-              <div className="mt-4 pt-4 border-t border-border/60 flex items-center gap-2 text-xs text-muted-foreground">
-                <User className="size-3.5" />
-                <ByProfile
-                  familyId={membership?.family_id}
-                  caregiverProfileId={h.caregiver_profile_id}
-                  authorUserId={h.author_id}
-                  viewerUserId={user?.id}
+              <div className="mt-4 pt-4 border-t border-border/60 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <User className="size-3.5" />
+                  <ByProfile
+                    familyId={membership?.family_id}
+                    caregiverProfileId={h.caregiver_profile_id}
+                    authorUserId={h.author_id}
+                    viewerUserId={user?.id}
+                  />
+                </div>
+                <HandoverReadsRow
+                  reads={readsMap?.get(h.id) ?? []}
+                  editedAt={h.edited_at}
+                  familyMembers={familyMembers ?? []}
+                  caregiverProfiles={caregiverProfiles ?? []}
+                  viewerUserId={user?.id ?? null}
+                  isAuthor={h.author_id === profile?.id}
+                  onMarkRead={() => {
+                    markRead
+                      .mutateAsync(h.id)
+                      .then(() => toast.success(t("handoverPage.reads.markedRead")))
+                      .catch(() => { /* ignore */ });
+                  }}
+                  timeFmt={timeFmt}
                 />
               </div>
             </li>
@@ -521,6 +575,96 @@ function FieldInput({
         placeholder={placeholder}
         className="rounded-xl mt-1.5"
       />
+    </div>
+  );
+}
+
+interface HandoverReadsRowProps {
+  reads: HandoverRead[];
+  editedAt: string | null;
+  familyMembers: Array<{ user_id: string; profile?: { full_name?: string | null } | null }>;
+  caregiverProfiles: Array<{ id: string; account_user_id: string | null; name: string; color: string }>;
+  viewerUserId: string | null;
+  isAuthor: boolean;
+  onMarkRead: () => void;
+  timeFmt: Intl.DateTimeFormat;
+}
+
+function HandoverReadsRow({
+  reads,
+  editedAt,
+  familyMembers,
+  caregiverProfiles,
+  viewerUserId,
+  isAuthor,
+  onMarkRead,
+  timeFmt,
+}: HandoverReadsRowProps) {
+  const { t } = useTranslation();
+  const viewerUnread = isUnreadForViewer(reads, viewerUserId, editedAt);
+  const editedTs = editedAt ? new Date(editedAt).getTime() : null;
+
+  return (
+    <div className="flex items-center gap-3 flex-wrap justify-end ml-auto">
+      {reads.length > 0 && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-semibold text-muted-foreground">
+            {t("handoverPage.reads.readBy")}
+          </span>
+          {reads.map((r) => {
+            // Prefer a caregiver profile matching the reader; fall back to member.
+            const profile = caregiverProfiles.find(
+              (p) => p.account_user_id === r.user_id,
+            );
+            const memberName = familyMembers.find(
+              (m) => m.user_id === r.user_id,
+            )?.profile?.full_name?.trim();
+            const name = profile?.name || memberName || "—";
+            const before =
+              editedTs !== null &&
+              new Date(r.read_at).getTime() < editedTs;
+            return (
+              <span
+                key={r.user_id}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5",
+                  before
+                    ? "bg-amber-50 text-amber-800"
+                    : "bg-muted text-foreground",
+                )}
+                title={new Date(r.read_at).toLocaleString()}
+              >
+                {profile?.color && (
+                  <span
+                    className="inline-block size-2 rounded-full"
+                    style={{ background: profile.color }}
+                  />
+                )}
+                <span className="font-semibold">{name}</span>
+                <span className="text-muted-foreground">
+                  · {timeFmt.format(new Date(r.read_at))}
+                </span>
+                {before && (
+                  <span className="text-[10px] font-bold uppercase ml-1">
+                    · {t("handoverPage.reads.readBefore")}
+                  </span>
+                )}
+              </span>
+            );
+          })}
+        </div>
+      )}
+      {!isAuthor && viewerUnread && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full h-7 gap-1.5"
+          onClick={onMarkRead}
+        >
+          <Check className="size-3.5" />
+          {t("handoverPage.reads.markRead")}
+        </Button>
+      )}
     </div>
   );
 }

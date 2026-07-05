@@ -37,6 +37,8 @@ interface Labels {
   carePlaceIssue: string;
   taskNote: string;
   tidySkipped: string;
+  maintenanceDone: string;
+  maintenanceOverdue: string;
 }
 
 
@@ -89,7 +91,7 @@ export function useHandoverPrefill(
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
-      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes] =
+      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes, maintLogsRes, maintItemsRes] =
         await Promise.all([
           supabase
             .from("medications")
@@ -151,6 +153,17 @@ export function useHandoverPrefill(
             .eq("status", "skipped")
             .gte("created_at", startIso)
             .lt("created_at", endIso),
+          supabase
+            .from("maintenance_logs")
+            .select("maintenance_item_id, performed_at, note, item:maintenance_items!inner(name, action_type, machine:machines(name))")
+            .eq("family_id", familyId)
+            .gte("performed_at", startIso)
+            .lt("performed_at", endIso),
+          supabase
+            .from("maintenance_items")
+            .select("id, name, action_type, interval_days, last_done_at, active, machine:machines(name)")
+            .eq("family_id", familyId)
+            .eq("active", true),
         ]);
 
       const meds = (medsRes.data ?? []) as Medication[];
@@ -333,6 +346,59 @@ export function useHandoverPrefill(
           `• ${t} ${labels.tidySkipped}: ${s.item_label_snapshot}${suffix}`,
         );
       }
+
+      // Maintenance performed during the shift
+      type MaintLogRow = {
+        maintenance_item_id: string;
+        performed_at: string;
+        note: string | null;
+        item: {
+          name: string;
+          action_type: string | null;
+          machine: { name: string } | null;
+        } | null;
+      };
+      const maintLogs = (maintLogsRes.data ?? []) as unknown as MaintLogRow[];
+      const performedItemIds = new Set<string>();
+      for (const ml of maintLogs) {
+        performedItemIds.add(ml.maintenance_item_id);
+        const time = fmtTime(new Date(ml.performed_at));
+        const itemName = ml.item?.name ?? "";
+        const machineName = ml.item?.machine?.name;
+        const suffix = machineName ? ` — ${machineName}` : "";
+        const noteSuffix = ml.note ? ` (${ml.note})` : "";
+        noteLines.push(
+          `• ${time} ${labels.maintenanceDone}: ${itemName}${suffix}${noteSuffix}`,
+        );
+      }
+
+      // Overdue maintenance at end-of-shift (excluding items already performed
+      // inside the window — those already appear above as "done").
+      type MaintItemRow = {
+        id: string;
+        name: string;
+        action_type: string | null;
+        interval_days: number | null;
+        last_done_at: string | null;
+        active: boolean;
+        machine: { name: string } | null;
+      };
+      const maintItems = (maintItemsRes.data ?? []) as unknown as MaintItemRow[];
+      for (const it of maintItems) {
+        if (performedItemIds.has(it.id)) continue;
+        if (it.interval_days == null) continue;
+        // "Overdue at shiftEnd": next due ≤ shiftEnd.
+        const dueAt = it.last_done_at
+          ? new Date(new Date(it.last_done_at).getTime() + it.interval_days * 86_400_000)
+          : new Date(0);
+        if (dueAt.getTime() > shiftEnd.getTime()) continue;
+        const machineName = it.machine?.name;
+        const suffix = machineName ? ` — ${machineName}` : "";
+        noteLines.push(
+          `• ${labels.maintenanceOverdue}: ${it.name}${suffix}`,
+        );
+      }
+
 
       const medsStr = medLines.length ? medLines.join("\n") : "";
       const notesStr = noteLines.length ? noteLines.join("\n") : "";

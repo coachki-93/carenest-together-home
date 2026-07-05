@@ -409,6 +409,12 @@ export const sv = {
     seizures: "Anfall",
     notes: "Anteckningar",
     openHandover: "Öppna överlämning",
+    handoverUnread: {
+      title: "Ny överlämning från {{name}}",
+      body: "Läs den innan ditt pass.",
+      editedBody: "Den uppdaterades efter att du senast läste den — kika igen.",
+      action: "Läs den",
+    },
     onShift: "På pass nu",
     nextShift: "Nästa pass",
     noOneOnShift: "Ingen är på pass just nu",
@@ -704,8 +710,16 @@ export const sv = {
       carePlaceIssue: "Vårdplats-kontroll flaggad",
       taskNote: "Anteckning",
       tidySkipped: "Städning hoppad",
+      maintenanceDone: "Underhåll utfört",
+      maintenanceOverdue: "Försenat underhåll",
     },
-
+    reads: {
+      readBy: "Läst av",
+      readBefore: "läst före redigering",
+      markRead: "Markera som läst",
+      markedRead: "Markerad som läst",
+      edited: "Redigerad {{time}}",
+    },
   },
   childPage: {
     subtitle: "Visa och uppdatera barnets profil.",

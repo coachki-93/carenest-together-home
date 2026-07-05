@@ -864,6 +864,32 @@ export type Database = {
           },
         ]
       }
+      handover_reads: {
+        Row: {
+          handover_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          handover_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          handover_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handover_reads_handover_id_fkey"
+            columns: ["handover_id"]
+            isOneToOne: false
+            referencedRelation: "handovers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       handover_times: {
         Row: {
           active: boolean
@@ -914,6 +940,7 @@ export type Database = {
           caregiver_profile_id: string | null
           child_id: string | null
           created_at: string
+          edited_at: string | null
           family_id: string
           fluids: string | null
           id: string
@@ -933,6 +960,7 @@ export type Database = {
           caregiver_profile_id?: string | null
           child_id?: string | null
           created_at?: string
+          edited_at?: string | null
           family_id: string
           fluids?: string | null
           id?: string
@@ -952,6 +980,7 @@ export type Database = {
           caregiver_profile_id?: string | null
           child_id?: string | null
           created_at?: string
+          edited_at?: string | null
           family_id?: string
           fluids?: string | null
           id?: string

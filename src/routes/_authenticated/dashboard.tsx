@@ -78,6 +78,7 @@ import {
   useDismissedHandovers,
 } from "@/lib/data/handover-due";
 import { useHandoverTimes } from "@/lib/data/handover-times";
+import { HandoverUnreadBanner } from "@/components/carenest/HandoverUnreadBanner";
 import { ClipboardCheck } from "lucide-react";
 import {
   TaskActionDialog,
@@ -993,6 +994,7 @@ function DashboardPage() {
               <ChevronRight className="size-5 text-amber-700" />
             </Link>
           )}
+          <HandoverUnreadBanner familyId={familyId} viewerUserId={user?.id} />
           {handoverDue && (
             <HandoverDueBanner
               at={handoverDue.at}
