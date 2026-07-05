@@ -21,6 +21,7 @@ import {
   isActionPreset,
   type DueMaintenanceRow,
 } from "@/lib/data/maintenance";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import { cn } from "@/lib/utils";
 
 export function MaintenanceDueCard({
