@@ -161,7 +161,7 @@ export function ForYourShiftCard({ familyId }: Props) {
                         : timeFmt.format(due!)}
                     </span>
                     <span className="text-sm">
-                      {item.title ?? item.action ?? t("handoverPage.forYourShift.maintenanceItem")}
+                      {item.name || t("handoverPage.forYourShift.maintenanceItem")}
                     </span>
                   </li>
                 );
