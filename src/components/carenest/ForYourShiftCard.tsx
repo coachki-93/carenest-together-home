@@ -114,7 +114,9 @@ export function ForYourShiftCard({ familyId }: Props) {
                   </span>
                   <span className="text-sm">
                     {d.medication.name}
-                    {d.medication.dose ? ` — ${d.medication.dose}` : ""}
+                    {d.medication.dose_amount != null
+                      ? ` — ${d.medication.dose_amount}${d.medication.dose_unit ? ` ${d.medication.dose_unit}` : ""}`
+                      : ""}
                   </span>
                 </li>
               ))}
