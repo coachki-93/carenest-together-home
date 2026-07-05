@@ -1624,6 +1624,8 @@ export const en = {
     },
     lastDone: "Last done",
     lastDoneNever: "Never done",
+    lastDoneOn: "Last done on",
+    lastDoneOnHelp: "Anchors the schedule to when it was actually last done. Defaults to today.",
     nextDue: "Next due",
     dueToday: "Due today",
     markDone: "Mark done",

@@ -510,6 +510,7 @@ function MaintenancePage() {
                 name: payload.patch.name!,
                 scope: payload.patch.scope!,
                 interval_days: payload.patch.interval_days ?? null,
+                last_done_at: payload.patch.last_done_at ?? null,
                 notes: payload.patch.notes ?? null,
               });
             }
@@ -714,16 +715,38 @@ function ItemDialog({
       name?: string;
       scope?: MaintenanceScope;
       interval_days?: number | null;
+      last_done_at?: string | null;
     };
   }) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const it = state.item;
+
+  const todayStr = () => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  const toDateInput = (iso: string | null | undefined) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   const [name, setName] = useState(it?.name ?? "");
   const [scope, setScope] = useState<MaintenanceScope>(it?.scope ?? "part");
   const [asNeeded, setAsNeeded] = useState<boolean>(it?.interval_days == null);
   const [interval, setInterval] = useState<string>(
     it?.interval_days ? String(it.interval_days) : "",
+  );
+  const [lastDone, setLastDone] = useState<string>(
+    it ? toDateInput(it.last_done_at) : todayStr(),
   );
   const [notes, setNotes] = useState(it?.notes ?? "");
 
@@ -733,9 +756,12 @@ function ItemDialog({
       setScope(it?.scope ?? "part");
       setAsNeeded(it?.interval_days == null);
       setInterval(it?.interval_days ? String(it.interval_days) : "");
+      setLastDone(it ? toDateInput(it.last_done_at) : todayStr());
       setNotes(it?.notes ?? "");
     }
   }, [state.open, it]);
+
+  const today = todayStr();
 
   return (
     <Dialog open={state.open} onOpenChange={(o) => !o && onClose()}>
@@ -795,6 +821,25 @@ function ItemDialog({
             </div>
           )}
           <div>
+            <Label>{t("maintenance.lastDoneOn")}</Label>
+            <Input
+              type="date"
+              max={today}
+              value={lastDone}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v && v > today) {
+                  setLastDone(today);
+                } else {
+                  setLastDone(v);
+                }
+              }}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              {t("maintenance.lastDoneOnHelp")}
+            </p>
+          </div>
+          <div>
             <Label>{t("maintenance.notes")}</Label>
             <Textarea
               rows={2}
@@ -814,12 +859,20 @@ function ItemDialog({
                 ? null
                 : Math.max(1, parseInt(interval, 10) || 0);
               if (!asNeeded && !parsed) return;
+              let lastDoneIso: string | null = null;
+              if (lastDone && lastDone <= today) {
+                const d = new Date(`${lastDone}T12:00:00`);
+                if (!Number.isNaN(d.getTime())) {
+                  lastDoneIso = d.toISOString();
+                }
+              }
               onSave({
                 id: it?.id,
                 patch: {
                   name: name.trim(),
                   scope,
                   interval_days: parsed,
+                  last_done_at: lastDoneIso,
                   notes: notes.trim() || null,
                 },
               });
