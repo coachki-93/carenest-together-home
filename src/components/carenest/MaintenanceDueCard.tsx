@@ -152,10 +152,16 @@ export function MaintenanceDueCard({
             <Button
               onClick={async () => {
                 if (!pending) return;
+                const guard = guardActingProfile(actor);
+                if (guard.blocked) {
+                  toast.error(t("actor.selectProfilePrompt"));
+                  return;
+                }
                 try {
                   await markDone.mutateAsync({
                     itemId: pending.item.id,
                     note: note.trim() || null,
+                    caregiverProfileId: guard.caregiverProfileId,
                   });
                   toast.success(t("maintenance.markDoneSuccess"));
                   setPending(null);
