@@ -17,15 +17,46 @@ type MachineUpdateRow = Database["public"]["Tables"]["machines"]["Update"] & {
 export type Machine = MachineRow;
 export type MachineInsert = MachineInsertRow;
 export type MachineUpdate = MachineUpdateRow;
-export type MaintenanceItem =
-  Database["public"]["Tables"]["maintenance_items"]["Row"];
-export type MaintenanceItemInsert =
-  Database["public"]["Tables"]["maintenance_items"]["Insert"];
-export type MaintenanceItemUpdate =
-  Database["public"]["Tables"]["maintenance_items"]["Update"];
+// Augment MaintenanceItem locally for the new `action_type` column so app code
+// compiles regardless of when the generated Supabase types refresh.
+type MaintenanceItemRow =
+  Database["public"]["Tables"]["maintenance_items"]["Row"] & {
+    action_type: string | null;
+  };
+type MaintenanceItemInsertRow =
+  Database["public"]["Tables"]["maintenance_items"]["Insert"] & {
+    action_type?: string | null;
+  };
+type MaintenanceItemUpdateRow =
+  Database["public"]["Tables"]["maintenance_items"]["Update"] & {
+    action_type?: string | null;
+  };
+
+export type MaintenanceItem = MaintenanceItemRow;
+export type MaintenanceItemInsert = MaintenanceItemInsertRow;
+export type MaintenanceItemUpdate = MaintenanceItemUpdateRow;
 export type MaintenanceLog =
   Database["public"]["Tables"]["maintenance_logs"]["Row"];
 export type MaintenanceScope = Database["public"]["Enums"]["maintenance_scope"];
+
+/** Preset action slugs shown in the UI; DB stores free text. */
+export const MAINTENANCE_ACTION_PRESETS = [
+  "replace",
+  "clean",
+  "refill",
+  "empty",
+  "inspect",
+  "charge",
+  "calibrate_test",
+  "professional_service",
+  "other",
+] as const;
+export type MaintenanceActionPreset =
+  (typeof MAINTENANCE_ACTION_PRESETS)[number];
+
+export function isActionPreset(v: string): v is MaintenanceActionPreset {
+  return (MAINTENANCE_ACTION_PRESETS as readonly string[]).includes(v);
+}
 
 /** Preset main-category slugs shown in the UI; DB stores free text. */
 export const MACHINE_TYPE_PRESETS = [
