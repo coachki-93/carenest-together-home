@@ -414,6 +414,7 @@ function DashboardPage() {
   const caregiverProfilesForActions = caregiverProfiles;
   const { data: suggestedCaregiverId } = useSuggestedCaregiverProfile(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
+  const actor = useCurrentActor(familyId);
   const navigate = useNavigate();
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
     useDismissedHandovers(user?.id);
