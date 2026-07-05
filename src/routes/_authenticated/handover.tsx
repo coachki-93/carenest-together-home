@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Plus, Trash2, User, Clock, Sparkles } from "lucide-react";
+import { ClipboardList, Plus, Trash2, User, Clock, Sparkles, Check, Pencil } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +45,14 @@ import {
   type ShiftLabel,
 } from "@/lib/data/handovers";
 import { useHandoverPrefill } from "@/lib/data/handover-prefill";
+import {
+  isUnreadForViewer,
+  useHandoverReadsBulk,
+  useMarkHandoverRead,
+  type HandoverRead,
+} from "@/lib/data/handover-reads";
+import { useCaregiverProfiles } from "@/lib/data/caregiver-profiles";
+import { useFamilyMembers } from "@/lib/data/family";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
