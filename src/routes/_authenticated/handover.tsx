@@ -53,6 +53,7 @@ import {
 } from "@/lib/data/handover-reads";
 import { useCaregiverProfiles } from "@/lib/data/caregiver-profiles";
 import { useFamilyMembers } from "@/lib/data/family";
+import { ForYourShiftCard } from "@/components/carenest/ForYourShiftCard";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 
@@ -273,6 +274,7 @@ function HandoverPage() {
         </Button>
       }
     >
+      <ForYourShiftCard familyId={membership?.family_id} />
       {isLoading ? (
         <div className="card-soft p-10 text-center text-muted-foreground">
           {t("common.loading")}

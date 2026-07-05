@@ -720,6 +720,16 @@ export const en = {
       markedRead: "Marked as read",
       edited: "Edited {{time}}",
     },
+    forYourShift: {
+      title: "For your shift",
+      window: "Coming up until {{end}}",
+      empty: "Nothing scheduled in the next few hours.",
+      meds: "Medications",
+      appointments: "Appointments",
+      maintenance: "Maintenance",
+      overdue: "Overdue",
+      maintenanceItem: "Maintenance task",
+    },
   },
   childPage: {
     subtitle: "View and update your child's profile.",
