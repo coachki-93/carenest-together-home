@@ -140,6 +140,8 @@ function HandoverPage() {
       carePlaceIssue: t("handoverPage.prefill.carePlaceIssue"),
       taskNote: t("handoverPage.prefill.taskNote"),
       tidySkipped: t("handoverPage.prefill.tidySkipped"),
+      maintenanceDone: t("handoverPage.prefill.maintenanceDone"),
+      maintenanceOverdue: t("handoverPage.prefill.maintenanceOverdue"),
     }),
     [t],
   );
