@@ -183,6 +183,7 @@ function SchedulePage() {
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
+  const actor = useCurrentActor(familyId);
 
   const [day, setDay] = useState<Date>(() => startOfDay(new Date()));
   const dayEnd = useMemo(() => addDays(day, 1), [day]);
