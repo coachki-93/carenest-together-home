@@ -539,6 +539,7 @@ function MaintenancePage() {
                 created_by: user.id,
                 name: payload.patch.name!,
                 scope: payload.patch.scope!,
+                action_type: payload.patch.action_type ?? "replace",
                 interval_days: payload.patch.interval_days ?? null,
                 last_done_at: payload.patch.last_done_at ?? null,
                 notes: payload.patch.notes ?? null,
