@@ -34,6 +34,7 @@ export function MaintenanceDueCard({
   const [pending, setPending] = useState<DueMaintenanceRow | null>(null);
   const [note, setNote] = useState("");
   const markDone = useMarkMaintenanceDone();
+  const actor = useCurrentActor(familyId);
 
   const actionText = (a: string | null | undefined) => {
     if (!a) return null;
