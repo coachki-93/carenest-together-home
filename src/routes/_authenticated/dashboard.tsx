@@ -91,6 +91,7 @@ import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
 import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
 import { EndOfShiftTidyBanner } from "@/components/carenest/EndOfShiftTidyBanner";
+import { MaintenanceDueCard } from "@/components/carenest/MaintenanceDueCard";
 import { useTodayMissedChecks } from "@/lib/data/missed-checks";
 import { useLowStockSummary } from "@/lib/data/inventory";
 import { Boxes } from "lucide-react";
@@ -1001,7 +1002,10 @@ function DashboardPage() {
             />
           )}
 
+          <MaintenanceDueCard familyId={familyId} />
+
           <section className="card-soft p-6" data-tour="today-schedule">
+
 
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-extrabold">{t("dashboard.todaysSchedule")}</h3>

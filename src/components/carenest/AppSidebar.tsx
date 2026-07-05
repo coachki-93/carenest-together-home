@@ -15,6 +15,7 @@ import {
   Boxes,
   ShoppingCart,
   AlertTriangle,
+  Wrench,
 
 
   
@@ -54,6 +55,7 @@ export function AppSidebar() {
     { title: t("nav.handover"), url: "/handover", icon: ClipboardList },
     { title: t("nav.instructions"), url: "/instructions", icon: BookOpen },
     { title: t("nav.inventory"), url: "/inventory", icon: Boxes },
+    { title: t("nav.maintenance"), url: "/maintenance", icon: Wrench },
     { title: t("nav.shopping"), url: "/shopping", icon: ShoppingCart },
     { title: t("nav.emergency"), url: "/emergency", icon: AlertTriangle },
 
