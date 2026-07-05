@@ -406,6 +406,14 @@ function MaintenancePage() {
                                   ? fmtDate(new Date(item.last_done_at))
                                   : t("maintenance.lastDoneNever")}
                               </span>
+                              {item.last_done_at && (item.last_done_by_profile_id || item.last_done_by) && (
+                                <ByProfile
+                                  familyId={familyId}
+                                  caregiverProfileId={item.last_done_by_profile_id}
+                                  authorUserId={item.last_done_by}
+                                  viewerUserId={user?.id ?? null}
+                                />
+                              )}
                               {due && item.interval_days != null && (
                                 <span>
                                   {t("maintenance.nextDue")}: {fmtDate(due)}
