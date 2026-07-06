@@ -92,12 +92,12 @@ function Landing() {
         <Reveal className="max-w-3xl mx-auto text-center space-y-5">
           <Kicker>{t("marketing.forWhom.kicker")}</Kicker>
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...display, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            className="text-display-md text-marketing-ink"
+            style={display}
           >
             {t("marketing.forWhom.title")}
           </h2>
-          <p className="text-marketing-muted leading-[1.75] text-[1.05rem]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.forWhom.body")}
           </p>
           <div className="flex flex-wrap gap-2 justify-center pt-2">
@@ -115,12 +115,12 @@ function Landing() {
         <Reveal className="max-w-2xl mx-auto mt-10">
           <div className="rounded-2xl border border-marketing-line bg-marketing-surface p-6 md:p-7 text-center">
             <h3
-              className="text-marketing-ink mb-2"
-              style={{ ...display, fontSize: "clamp(1.15rem, 1.6vw, 1.35rem)" }}
+              className="text-display-xs text-marketing-ink mb-2"
+              style={display}
             >
               {t("marketing.forWhom.caregiverTitle")}
             </h3>
-            <p className="text-marketing-muted leading-relaxed text-[0.98rem]">
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
               {t("marketing.forWhom.caregiverBody")}
             </p>
           </div>
