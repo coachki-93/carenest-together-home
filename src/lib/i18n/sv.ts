@@ -1391,6 +1391,16 @@ export const sv = {
       body2:
         "Varje ny vårdgivare betyder att lära ut allt igen. Varje skiftbyte är ett telefonsamtal, en lapp på kylskåpet, eller en förhoppning att inget missats.",
     },
+    forWhom: {
+      kicker: "För vem",
+      title: "För dem som gör det tuffaste, tystaste arbetet",
+      body: "Föräldrar som bär allt i huvudet. Mor- och farföräldrar som rycker in. Personliga assistenter och sjuksköterskor i skift. CareNest ger er alla samma lugna, delade bild av dagen.",
+      chip1: "Föräldrar",
+      chip2: "Familjemedlemmar",
+      chip3: "Vårdgivare & PA",
+      caregiverTitle: "Jobbar du i skift?",
+      caregiverBody: "CareNest ger varje vårdgivare samma delade bild av dagen — med överlämningsanteckningar redan förifyllda från det som hänt hittills.",
+    },
     bridge: {
       line: "Tänk om allt fanns på ett ställe som alla kunde se?",
     },
