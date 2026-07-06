@@ -1391,6 +1391,16 @@ export const en = {
       body2:
         "Every new caregiver means teaching everything again. Every shift change is a phone call, a note on the fridge, or a hope that nothing was missed.",
     },
+    forWhom: {
+      kicker: "Who it's for",
+      title: "For the people doing the hardest, quietest work",
+      body: "Parents who carry everything in their head. Grandparents and family members who step in. Personal assistants and nurses on rotating shifts. CareNest gives all of you the same calm, shared picture of the day.",
+      chip1: "Parents",
+      chip2: "Family members",
+      chip3: "Caregivers & PAs",
+      caregiverTitle: "On rotating shifts?",
+      caregiverBody: "CareNest gives every caregiver the same shared picture of the day — with handover notes already pre-filled from what's happened so far.",
+    },
     bridge: {
       line: "What if it all lived somewhere everyone could see?",
     },
