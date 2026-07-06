@@ -706,8 +706,13 @@ function DaySection() {
                   <div className="flex items-center gap-3 mb-3 md:mb-0">
                     <span
                       aria-hidden
-                      className="hidden md:block absolute left-0 -translate-x-[3px] size-3 rounded-full ring-4 ring-marketing-surface"
-                      style={{ top: "0.65rem", background: "var(--primary)" }}
+                      className="hidden md:block absolute size-3 rounded-full ring-4 ring-marketing-surface"
+                      style={{
+                        left: "-1.5rem",
+                        transform: "translateX(-50%)",
+                        top: "0.5rem",
+                        background: "var(--primary)",
+                      }}
                     />
                     <span
                       className="rounded-full bg-marketing-bg border border-marketing-sage-line text-marketing-sage px-3 py-1 text-xs font-semibold tabular-nums"
