@@ -493,6 +493,7 @@ export type Database = {
       }
       care_place_checks: {
         Row: {
+          caregiver_profile_id: string | null
           created_at: string
           family_id: string
           id: string
@@ -503,6 +504,7 @@ export type Database = {
           scheduled_time: string
         }
         Insert: {
+          caregiver_profile_id?: string | null
           created_at?: string
           family_id: string
           id?: string
@@ -513,6 +515,7 @@ export type Database = {
           scheduled_time: string
         }
         Update: {
+          caregiver_profile_id?: string | null
           created_at?: string
           family_id?: string
           id?: string
@@ -523,6 +526,13 @@ export type Database = {
           scheduled_time?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "care_place_checks_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "care_place_checks_family_id_fkey"
             columns: ["family_id"]
