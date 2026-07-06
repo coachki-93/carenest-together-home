@@ -32,6 +32,7 @@ import {
 } from "@/lib/data/adhoc-items";
 import { useInventoryItems, isLowStock, type InventoryItem } from "@/lib/data/inventory";
 import { useFamily } from "@/lib/data/family";
+import { useCurrentActor, guardActingProfile } from "@/lib/data/current-actor";
 
 interface Props {
   familyId: string | undefined | null;
@@ -65,6 +66,10 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: family } = useFamily(familyId);
   const submit = useSubmitCarePlaceCheck();
   const resolveAdhoc = useResolveAdhocItem();
+  const actor = useCurrentActor(familyId ?? null);
+  const { profiles: myProfiles, activeProfile, setActive } = actor;
+  const multiProfileNoActive =
+    myProfiles.length > 1 && !actor.activeProfileId;
 
   const inventoryById = useMemo(() => {
     const map = new Map<string, InventoryItem>();
