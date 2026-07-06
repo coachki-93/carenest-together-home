@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/carenest/Logo";
 
+const CONTACT_EMAIL = "hello@carenest.app";
+
 export function MarketingFooter() {
   const { t } = useTranslation();
   return (
@@ -23,6 +25,9 @@ export function MarketingFooter() {
           <p className="text-xs text-marketing-muted italic">
             {t("marketing.footer.trustLine")}
           </p>
+          <p className="text-xs text-marketing-sage font-medium">
+            {t("marketing.footer.dataPrivacy")}
+          </p>
         </div>
 
         <div className="text-sm">
@@ -31,8 +36,9 @@ export function MarketingFooter() {
           </h4>
           <ul className="space-y-2.5 text-marketing-ink">
             <li><Link to="/features" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.features")}</Link></li>
-            <li><a href="#pricing" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.pricing")}</a></li>
-            <li><a href="#faq" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.faq")}</a></li>
+            <li><a href="/#pricing" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.pricing")}</a></li>
+            <li><a href="/#faq" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.faq")}</a></li>
+            <li><Link to="/install" className="hover:text-marketing-sage transition-colors">{t("marketing.footer.install")}</Link></li>
           </ul>
         </div>
 
@@ -51,7 +57,18 @@ export function MarketingFooter() {
           <h4 className="text-xs uppercase tracking-[0.18em] text-marketing-muted/80 mb-4">
             {t("marketing.footer.about")}
           </h4>
-          <p className="text-marketing-muted leading-relaxed text-xs">
+          <ul className="space-y-2.5 text-marketing-ink">
+            <li><Link to="/about" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.about")}</Link></li>
+            <li>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="hover:text-marketing-sage transition-colors"
+              >
+                {t("marketing.footer.contact")}
+              </a>
+            </li>
+          </ul>
+          <p className="mt-4 text-marketing-muted leading-relaxed text-xs">
             {t("marketing.footer.disclaimer")}
           </p>
         </div>

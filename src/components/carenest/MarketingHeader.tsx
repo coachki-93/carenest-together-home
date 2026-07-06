@@ -81,17 +81,23 @@ export function MarketingHeader() {
                 {t("marketing.nav.features")}
               </Link>
               <a
-                href="#pricing"
+                href="/#pricing"
                 className="px-3 py-1.5 text-sm font-medium text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 rounded-full transition-all"
               >
                 {t("marketing.nav.pricing")}
               </a>
               <a
-                href="#faq"
+                href="/#faq"
                 className="px-3 py-1.5 text-sm font-medium text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 rounded-full transition-all"
               >
                 {t("marketing.nav.faq")}
               </a>
+              <Link
+                to="/about"
+                className="px-3 py-1.5 text-sm font-medium text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 rounded-full transition-all"
+              >
+                {t("marketing.nav.about")}
+              </Link>
             </nav>
 
             {/* Divider */}
@@ -144,19 +150,33 @@ export function MarketingHeader() {
                       {t("marketing.nav.features")}
                     </Link>
                     <a
-                      href="#pricing"
+                      href="/#pricing"
                       onClick={() => setMobileOpen(false)}
                       className="text-base font-medium text-marketing-ink hover:text-primary transition-colors"
                     >
                       {t("marketing.nav.pricing")}
                     </a>
                     <a
-                      href="#faq"
+                      href="/#faq"
                       onClick={() => setMobileOpen(false)}
                       className="text-base font-medium text-marketing-ink hover:text-primary transition-colors"
                     >
                       {t("marketing.nav.faq")}
                     </a>
+                    <Link
+                      to="/about"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-base font-medium text-marketing-ink hover:text-primary transition-colors"
+                    >
+                      {t("marketing.nav.about")}
+                    </Link>
+                    <Link
+                      to="/install"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-base font-medium text-marketing-ink hover:text-primary transition-colors"
+                    >
+                      {t("marketing.nav.install")}
+                    </Link>
                     <div className="border-t border-marketing-line my-3" />
                     <Link
                       to="/auth/login"
