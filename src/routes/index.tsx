@@ -133,7 +133,7 @@ function Landing() {
       <section className="px-6 md:px-8 py-24 md:py-36">
         <Reveal className="max-w-4xl mx-auto text-center">
           <h2
-            className="text-display-lg text-marketing-ink italic"
+            className="mk-headline-gradient text-display-lg italic"
             style={display}
           >
             {t("marketing.bridge.line")}
