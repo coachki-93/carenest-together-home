@@ -4,83 +4,139 @@ import { Logo } from "@/components/carenest/Logo";
 
 const CONTACT_EMAIL = "hello@carenest.app";
 
+const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
+
 export function MarketingFooter() {
   const { t } = useTranslation();
   return (
-    <footer className="border-t border-marketing-line bg-marketing-bg">
-      <div className="max-w-6xl mx-auto px-6 md:px-8 py-14 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr] items-start">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2.5">
-            <Logo size={32} />
-            <span
-              className="text-xl tracking-tight text-marketing-ink"
-              style={{ fontFamily: "var(--font-display)", fontWeight: 700, letterSpacing: "-0.025em" }}
-            >
-              CareNest
-            </span>
-          </div>
-          <p className="text-sm text-marketing-muted max-w-sm leading-relaxed">
-            {t("marketing.footer.tagline")}
-          </p>
-          <p className="text-xs text-marketing-muted italic">
-            {t("marketing.footer.trustLine")}
-          </p>
-          <p className="text-xs text-marketing-sage font-medium">
-            {t("marketing.footer.dataPrivacy")}
-          </p>
-        </div>
+    <footer
+      className="mk-footer-panel relative overflow-hidden"
+      role="contentinfo"
+    >
+      {/* Soft violet aurora behind the columns */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-0"
+        style={{
+          background:
+            "radial-gradient(50rem 20rem at 15% 0%, color-mix(in oklab, var(--primary) 12%, transparent), transparent 65%), radial-gradient(45rem 18rem at 85% 100%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 70%)",
+        }}
+      />
 
-        <div className="text-sm">
-          <h4 className="text-xs uppercase tracking-[0.18em] text-marketing-muted/80 mb-4">
-            {t("marketing.footer.product")}
-          </h4>
-          <ul className="space-y-2.5 text-marketing-ink">
-            <li><Link to="/features" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.features")}</Link></li>
-            <li><a href="/#pricing" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.pricing")}</a></li>
-            <li><a href="/#faq" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.faq")}</a></li>
-            <li><Link to="/install" className="hover:text-marketing-sage transition-colors">{t("marketing.footer.install")}</Link></li>
-          </ul>
-        </div>
-
-        <div className="text-sm">
-          <h4 className="text-xs uppercase tracking-[0.18em] text-marketing-muted/80 mb-4">
-            {t("marketing.footer.families")}
-          </h4>
-          <ul className="space-y-2.5 text-marketing-ink">
-            <li><Link to="/auth/signup" className="hover:text-marketing-sage transition-colors">{t("splash.ctaCreate")}</Link></li>
-            <li><Link to="/invite" className="hover:text-marketing-sage transition-colors">{t("splash.ctaInvite")}</Link></li>
-            <li><Link to="/auth/login" className="hover:text-marketing-sage transition-colors">{t("splash.login")}</Link></li>
-          </ul>
-        </div>
-
-        <div className="text-sm">
-          <h4 className="text-xs uppercase tracking-[0.18em] text-marketing-muted/80 mb-4">
-            {t("marketing.footer.about")}
-          </h4>
-          <ul className="space-y-2.5 text-marketing-ink">
-            <li><Link to="/about" className="hover:text-marketing-sage transition-colors">{t("marketing.nav.about")}</Link></li>
-            <li>
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="hover:text-marketing-sage transition-colors"
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 pt-16 pb-10">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          {/* Brand column */}
+          <div className="space-y-5">
+            <div className="flex items-center gap-2.5">
+              <Logo size={32} />
+              <span
+                className="text-xl tracking-tight text-marketing-ink"
+                style={{ ...display, letterSpacing: "-0.02em" }}
               >
-                {t("marketing.footer.contact")}
-              </a>
-            </li>
-          </ul>
-          <p className="mt-4 text-marketing-muted leading-relaxed text-xs">
-            {t("marketing.footer.disclaimer")}
-          </p>
+                CareNest
+              </span>
+            </div>
+            <p className="text-sm text-marketing-muted max-w-sm leading-relaxed">
+              {t("marketing.footer.tagline")}
+            </p>
+            <p className="text-xs text-marketing-muted italic">
+              {t("marketing.footer.trustLine")}
+            </p>
+            <div className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1.5">
+              <span className="size-1.5 rounded-full bg-marketing-sage" />
+              <p className="text-xs text-marketing-sage font-medium">
+                {t("marketing.footer.dataPrivacy")}
+              </p>
+            </div>
+          </div>
+
+          {/* Product */}
+          <FooterCol title={t("marketing.footer.product")}>
+            <FooterLink to="/features">{t("marketing.nav.features")}</FooterLink>
+            <FooterHash href="/#pricing">{t("marketing.nav.pricing")}</FooterHash>
+            <FooterHash href="/#faq">{t("marketing.nav.faq")}</FooterHash>
+            <FooterLink to="/install">{t("marketing.footer.install")}</FooterLink>
+          </FooterCol>
+
+          {/* Families */}
+          <FooterCol title={t("marketing.footer.families")}>
+            <FooterLink to="/auth/signup">{t("splash.ctaCreate")}</FooterLink>
+            <FooterLink to="/invite">{t("splash.ctaInvite")}</FooterLink>
+            <FooterLink to="/auth/login">{t("splash.login")}</FooterLink>
+          </FooterCol>
+
+          {/* About */}
+          <FooterCol title={t("marketing.footer.about")}>
+            <FooterLink to="/about">{t("marketing.nav.about")}</FooterLink>
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="block text-sm text-marketing-ink/85 hover:text-marketing-sage transition-colors"
+            >
+              {t("marketing.footer.contact")}
+            </a>
+            <p className="mt-3 text-xs text-marketing-muted leading-relaxed">
+              {t("marketing.footer.disclaimer")}
+            </p>
+          </FooterCol>
         </div>
-      </div>
-      <div className="border-t border-marketing-line">
-        <div className="max-w-6xl mx-auto px-6 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-marketing-muted">
+
+        {/* Legal bar */}
+        <div className="mt-14 pt-6 border-t border-marketing-line/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-marketing-muted">
           <p>© {new Date().getFullYear()} CareNest</p>
-          <p className="italic">
-            {t("marketing.footer.tagline")}
-          </p>
+          <p className="italic">{t("marketing.footer.tagline")}</p>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterCol({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <h4 className="mb-4 text-xs uppercase tracking-[0.2em] text-marketing-sage/85 font-semibold">
+        {title}
+      </h4>
+      <nav className="space-y-2.5 text-sm">{children}</nav>
+    </div>
+  );
+}
+
+function FooterLink({
+  to,
+  children,
+}: {
+  to: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      to={to}
+      className="block text-marketing-ink/85 hover:text-marketing-sage transition-colors"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function FooterHash({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      className="block text-marketing-ink/85 hover:text-marketing-sage transition-colors"
+    >
+      {children}
+    </a>
   );
 }

@@ -133,7 +133,7 @@ function Landing() {
       <section className="px-6 md:px-8 py-24 md:py-36">
         <Reveal className="max-w-4xl mx-auto text-center">
           <h2
-            className="text-display-lg text-marketing-ink italic"
+            className="mk-headline-gradient text-display-lg italic"
             style={display}
           >
             {t("marketing.bridge.line")}
@@ -421,7 +421,7 @@ function Landing() {
             type="single"
             collapsible
             defaultValue="q1"
-            className="divide-y divide-marketing-line border-y border-marketing-line"
+            className="mk-glass rounded-3xl px-5 md:px-7 divide-y divide-marketing-line/60"
           >
             {["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"].map((k) => (
               <AccordionItem key={k} value={k} className="border-0">
@@ -481,20 +481,53 @@ function Landing() {
 
 function Kicker({ children }: { children: ReactNode }) {
   return (
-    <p className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
+    <span className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
       <Sparkles className="size-3" />
       <span>{children}</span>
-    </p>
+    </span>
   );
 }
 
 function PillTag({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full bg-marketing-bg border border-marketing-line px-3.5 py-1.5 text-xs font-medium text-marketing-ink">
+    <span className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium text-marketing-ink">
       <span className="text-marketing-sage">{icon}</span>
       {children}
     </span>
   );
+}
+
+/* Mouse-following radial highlight on cards. Desktop-hover only. */
+function useFlashlight<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const el = ref.current;
+    if (!el) return;
+    const hoverMq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const reducedMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!hoverMq.matches || reducedMq.matches) return;
+    let raf = 0;
+    let lastX = 0;
+    let lastY = 0;
+    const onMove = (e: MouseEvent) => {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty("--mx", `${lastX - rect.left}px`);
+        el.style.setProperty("--my", `${lastY - rect.top}px`);
+      });
+    };
+    el.addEventListener("mousemove", onMove);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
+  return ref;
 }
 
 function OutcomeCard({
@@ -508,27 +541,33 @@ function OutcomeCard({
   body: string;
   chips: string[];
 }) {
+  const flashRef = useFlashlight<HTMLDivElement>();
   return (
-    <Reveal className="group rounded-3xl border border-marketing-line bg-marketing-bg p-7 md:p-8 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:border-marketing-sage-line">
-      <div className="size-11 rounded-2xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-5">
-        {icon}
-      </div>
-      <h3
-        className="text-display-xs italic text-marketing-ink mb-3"
-        style={display}
+    <Reveal>
+      <div
+        ref={flashRef}
+        className="mk-glass mk-flashlight group rounded-3xl p-7 md:p-8 transition-all hover:-translate-y-0.5"
       >
-        {title}
-      </h3>
-      <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-5">{body}</p>
-      <div className="flex flex-wrap gap-2">
-        {chips.map((c) => (
-          <span
-            key={c}
-            className="rounded-full bg-marketing-surface border border-marketing-line px-3 py-1 text-xs text-marketing-muted"
-          >
-            {c}
-          </span>
-        ))}
+        <div className="size-11 rounded-2xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-5">
+          {icon}
+        </div>
+        <h3
+          className="text-display-xs italic text-marketing-ink mb-3"
+          style={display}
+        >
+          {title}
+        </h3>
+        <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-5">{body}</p>
+        <div className="flex flex-wrap gap-2">
+          {chips.map((c) => (
+            <span
+              key={c}
+              className="mk-glass-pill rounded-full px-3 py-1 text-xs text-marketing-muted"
+            >
+              {c}
+            </span>
+          ))}
+        </div>
       </div>
     </Reveal>
   );
@@ -545,24 +584,28 @@ function ComparisonCard({
   items: string[];
   accent?: boolean;
 }) {
+  const flashRef = useFlashlight<HTMLDivElement>();
   return (
-    <Reveal
-      className={`rounded-3xl bg-marketing-bg p-7 md:p-9 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
-        accent ? "border-2 border-marketing-sage" : "border border-marketing-line"
-      }`}
-    >
-      <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-      <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
-        {title}
-      </h3>
-      <ul className="space-y-3.5">
-        {items.map((it) => (
-          <li key={it} className="flex items-start gap-3 text-[0.95rem] text-marketing-ink leading-[1.6]">
-            <Check className={`size-4 shrink-0 mt-1 ${accent ? "text-marketing-sage" : "text-marketing-sage"}`} />
-            <span>{it}</span>
-          </li>
-        ))}
-      </ul>
+    <Reveal>
+      <div
+        ref={flashRef}
+        className={`mk-glass mk-flashlight rounded-3xl p-7 md:p-9 transition-all hover:-translate-y-0.5 ${
+          accent ? "ring-2 ring-marketing-sage" : ""
+        }`}
+      >
+        <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
+        <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
+          {title}
+        </h3>
+        <ul className="space-y-3.5">
+          {items.map((it) => (
+            <li key={it} className="flex items-start gap-3 text-[0.95rem] text-marketing-ink leading-[1.6]">
+              <Check className={`size-4 shrink-0 mt-1 ${accent ? "text-marketing-sage" : "text-marketing-sage"}`} />
+              <span>{it}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Reveal>
   );
 }
@@ -587,8 +630,10 @@ function PriceCard({
   const { t } = useTranslation();
   return (
     <div
-      className={`relative rounded-3xl bg-marketing-bg p-7 md:p-8 flex flex-col items-start shadow-sm ${
-        accent ? "border-2 border-marketing-sage" : "border border-marketing-line"
+      className={`relative rounded-3xl bg-marketing-bg p-7 md:p-8 flex flex-col items-start ${
+        accent
+          ? "mk-price-glow border-2 border-marketing-sage"
+          : "border border-marketing-line shadow-sm"
       }`}
     >
       {badge && (
@@ -752,6 +797,48 @@ function Reveal({
   );
 }
 
+/* Hero H1: word-by-word fade-up on mount, violet gradient text. */
+function HeroHeadline({ text }: { text: string }) {
+  const [visible, setVisible] = useState(false);
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    if (mq.matches) {
+      setVisible(true);
+      return;
+    }
+    const raf = window.requestAnimationFrame(() => setVisible(true));
+    return () => window.cancelAnimationFrame(raf);
+  }, []);
+  const words = text.split(" ");
+  return (
+    <h1
+      className="text-display-xl mx-auto text-primary"
+      style={{ ...display, maxWidth: "18ch" }}
+    >
+      {words.map((w, i) => (
+        <span
+          key={i}
+          className="mk-headline-gradient inline-block"
+          style={{
+            opacity: visible || reduced ? 1 : 0,
+            transform: visible || reduced ? "translateY(0)" : "translateY(10px)",
+            transition: reduced
+              ? "none"
+              : `opacity 0.55s ease-out ${90 + i * 40}ms, transform 0.55s ease-out ${90 + i * 40}ms`,
+            willChange: "opacity, transform",
+          }}
+        >
+          {w}
+          {i < words.length - 1 ? "\u00A0" : ""}
+        </span>
+      ))}
+    </h1>
+  );
+}
+
 /* ─────────── Hero (Aave-style centered) ─────────── */
 function Hero() {
   const { t } = useTranslation();
@@ -787,20 +874,13 @@ function Hero() {
       {/* Text — centered */}
       <div className="max-w-3xl mx-auto text-center relative z-10">
         <Reveal immediate delayMs={0}>
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-7">
+          <span className="mk-glass-pill inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-7">
             <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
             {t("marketing.hero.kicker")}
           </span>
         </Reveal>
 
-        <Reveal immediate delayMs={90}>
-          <h1
-            className="text-display-xl text-primary mx-auto"
-            style={{ ...display, maxWidth: "18ch" }}
-          >
-            {t("marketing.hero.headline")}
-          </h1>
-        </Reveal>
+        <HeroHeadline text={t("marketing.hero.headline")} />
 
         <Reveal immediate delayMs={180}>
           <p className="text-marketing-muted mt-6 mx-auto max-w-xl text-base md:text-lg leading-[1.7]">
