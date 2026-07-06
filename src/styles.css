@@ -329,4 +329,119 @@
   font-weight: 600;
 }
 
+/* ─────────── Marketing-only visual effects (mk-*) ───────────
+ * Scoped to marketing surfaces. Do NOT reference these classes
+ * from any authenticated / app route. Names prefixed mk- so
+ * they cannot collide with shared component styles.
+ * -----------------------------------------------------------*/
+
+/* Gradient headline text — violet clip. Fallback stays primary. */
+.mk-headline-gradient {
+  color: var(--primary);
+  background-image: linear-gradient(
+    120deg,
+    var(--primary) 0%,
+    color-mix(in oklab, var(--primary) 75%, black) 100%
+  );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Inline gradient span for "one key phrase" in section titles. */
+.mk-word-gradient {
+  color: var(--primary);
+  background-image: linear-gradient(
+    120deg,
+    var(--primary) 0%,
+    color-mix(in oklab, var(--primary) 70%, black) 100%
+  );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Liquid glass card — cards over the aurora / lavender surfaces. */
+.mk-glass {
+  background-color: color-mix(in oklab, white 55%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid color-mix(in oklab, white 60%, transparent);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 70%, transparent) inset,
+    0 10px 40px -18px color-mix(in oklab, var(--primary) 30%, transparent);
+}
+
+.dark .mk-glass {
+  background-color: color-mix(in oklab, var(--card) 60%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
+}
+
+/* Liquid glass pill — for kickers, small labels. */
+.mk-glass-pill {
+  background-color: color-mix(in oklab, white 60%, transparent);
+  backdrop-filter: blur(12px) saturate(1.3);
+  border: 1px solid color-mix(in oklab, white 65%, transparent);
+  box-shadow: 0 1px 0 0 color-mix(in oklab, white 80%, transparent) inset;
+}
+
+/* Flashlight — mouse-following radial highlight. Desktop-only. */
+.mk-flashlight {
+  position: relative;
+  isolation: isolate;
+}
+.mk-flashlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 320ms ease;
+  background: radial-gradient(
+    300px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in oklab, var(--primary) 8%, transparent),
+    transparent 70%
+  );
+  z-index: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .mk-flashlight:hover::before {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-flashlight::before {
+    display: none;
+  }
+}
+/* Keep content above the ::before overlay. */
+.mk-flashlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Featured pricing card — soft ambient violet glow. */
+.mk-price-glow {
+  box-shadow:
+    0 0 60px -15px color-mix(in oklab, var(--primary) 45%, transparent),
+    0 12px 30px -14px color-mix(in oklab, var(--primary) 22%, transparent);
+  transition: box-shadow 400ms ease, transform 300ms ease;
+}
+.mk-price-glow:hover {
+  box-shadow:
+    0 0 80px -12px color-mix(in oklab, var(--primary) 60%, transparent),
+    0 16px 36px -12px color-mix(in oklab, var(--primary) 32%, transparent);
+}
+
+/* Marketing footer — soft violet gradient band. */
+.mk-footer-panel {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--primary) 4%, transparent) 0%,
+      color-mix(in oklab, var(--primary) 10%, transparent) 100%
+    ),
+    var(--background);
+  border-top: 1px solid color-mix(in oklab, var(--primary) 18%, transparent);
+}
+
+
 
