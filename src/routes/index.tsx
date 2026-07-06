@@ -640,12 +640,12 @@ function DaySection() {
         <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-16">
           <Kicker>{t("marketing.day.kicker")}</Kicker>
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...display, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            className="text-display-md text-marketing-ink"
+            style={display}
           >
             {t("marketing.day.title")}
           </h2>
-          <p className="text-marketing-muted text-[1.05rem]">{t("marketing.day.sub")}</p>
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{t("marketing.day.sub")}</p>
         </Reveal>
 
         <ol className="relative md:pl-8">
