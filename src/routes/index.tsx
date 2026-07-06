@@ -544,23 +544,23 @@ function OutcomeCard({
     <Reveal>
       <div
         ref={flashRef}
-        className="mk-glass mk-flashlight group rounded-3xl p-7 md:p-8 transition-all hover:-translate-y-0.5"
+        className="mk-glass mk-flashlight group rounded-3xl p-5 transition-all hover:-translate-y-0.5 h-full"
       >
-        <div className="size-11 rounded-2xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-5">
+        <div className="size-9 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-4">
           {icon}
         </div>
         <h3
-          className="text-display-xs italic text-marketing-ink mb-3"
+          className="text-display-xs italic text-marketing-ink mb-2"
           style={display}
         >
           {title}
         </h3>
-        <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-5">{body}</p>
-        <div className="flex flex-wrap gap-2">
+        <p className="text-marketing-muted text-sm leading-relaxed mb-4">{body}</p>
+        <div className="flex flex-wrap gap-1.5">
           {chips.map((c) => (
             <span
               key={c}
-              className="mk-glass-pill rounded-full px-3 py-1 text-xs text-marketing-muted"
+              className="mk-glass-pill rounded-full px-2.5 py-1 text-xs text-marketing-muted"
             >
               {c}
             </span>
@@ -568,6 +568,7 @@ function OutcomeCard({
         </div>
       </div>
     </Reveal>
+
   );
 }
 
