@@ -59,7 +59,7 @@ export function MarketingFooter() {
       <div className="border-t border-marketing-line">
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-marketing-muted">
           <p>© {new Date().getFullYear()} CareNest</p>
-          <p className="italic" style={{ fontFamily: "var(--font-serif)" }}>
+          <p className="italic">
             {t("marketing.footer.tagline")}
           </p>
         </div>
