@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { cn } from "@/lib/utils";
 
-
 export function MarketingHeader() {
   const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
@@ -21,6 +20,14 @@ export function MarketingHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Deep violet ink — CareNest primary hue, very low lightness
+  const pillBg = scrolled
+    ? "color-mix(in oklab, var(--primary) 22%, #0a0612 90%)"
+    : "color-mix(in oklab, var(--primary) 22%, #0a0612 75%)";
+
+  const linkBase =
+    "px-3 py-1.5 text-sm font-medium text-white/85 hover:text-white hover:bg-white/10 rounded-full transition-all";
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
@@ -33,7 +40,7 @@ export function MarketingHeader() {
         )}
       >
         <div className="flex items-center justify-center w-full">
-          {/* Liquid glass pill */}
+          {/* Dark liquid glass pill */}
           <div
             className={cn(
               "flex items-center justify-between gap-3 md:gap-5 w-full md:w-auto rounded-full overflow-visible",
@@ -43,21 +50,19 @@ export function MarketingHeader() {
                 : "px-4 py-2 md:px-5 md:py-2.5",
             )}
             style={{
-              backgroundColor: scrolled
-                ? "rgba(255,255,255,0.70)"
-                : "rgba(255,255,255,0.50)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.5)",
-              backdropFilter: "blur(20px) saturate(1.5)",
-              border: "1px solid rgba(255,255,255,0.6)",
+              backgroundColor: pillBg,
+              WebkitBackdropFilter: "blur(16px) saturate(1.3)",
+              backdropFilter: "blur(16px) saturate(1.3)",
+              border: "1px solid rgba(255,255,255,0.10)",
               boxShadow: scrolled
-                ? "0 12px 40px -18px color-mix(in oklab, var(--primary) 40%, transparent), 0 2px 8px -4px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)"
-                : "0 8px 30px -20px color-mix(in oklab, var(--primary) 30%, transparent), inset 0 1px 0 rgba(255,255,255,0.6)",
+                ? "0 14px 44px -18px rgba(0,0,0,0.55), 0 2px 10px -4px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)"
+                : "0 10px 32px -20px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
             }}
           >
-            {/* Logo (left) */}
+            {/* Logo (left) — white via filter */}
             <Link
               to="/"
-              className="flex items-center hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full -my-1"
+              className="flex items-center hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-full -my-1"
               aria-label="CareNest"
             >
               <img
@@ -67,64 +72,49 @@ export function MarketingHeader() {
                 height={96}
                 className="h-9 w-auto select-none"
                 draggable={false}
+                style={{ filter: "brightness(0) invert(1)" }}
               />
             </Link>
 
-            {/* Divider */}
-            <div
-              className="hidden md:block h-5 w-px bg-marketing-line"
-              aria-hidden="true"
-            />
-
             {/* Middle nav */}
             <nav
-              className="hidden md:flex items-center gap-1"
+              className="hidden md:flex items-center gap-1 ml-2"
               aria-label="Main navigation"
             >
-              <Link
-                to="/features"
-                className="px-3 py-1.5 text-sm font-medium text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 rounded-full transition-all"
-              >
+              <Link to="/features" className={linkBase}>
                 {t("marketing.nav.features")}
               </Link>
-              <a
-                href="/#pricing"
-                className="px-3 py-1.5 text-sm font-medium text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 rounded-full transition-all"
-              >
+              <a href="/#pricing" className={linkBase}>
                 {t("marketing.nav.pricing")}
               </a>
-              <a
-                href="/#faq"
-                className="px-3 py-1.5 text-sm font-medium text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 rounded-full transition-all"
-              >
+              <a href="/#faq" className={linkBase}>
                 {t("marketing.nav.faq")}
               </a>
-              <Link
-                to="/about"
-                className="px-3 py-1.5 text-sm font-medium text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 rounded-full transition-all"
-              >
+              <Link to="/about" className={linkBase}>
                 {t("marketing.nav.about")}
               </Link>
             </nav>
 
             {/* Divider */}
             <div
-              className="hidden md:block h-5 w-px bg-marketing-line"
+              className="hidden md:block h-5 w-px bg-white/15"
               aria-hidden="true"
             />
 
             {/* Right actions */}
             <div className="hidden md:flex items-center gap-2">
-              <LanguageToggle compact />
+              <div className="[&_*]:!text-white/85 hover:[&_*]:!text-white">
+                <LanguageToggle compact />
+              </div>
               <Link
                 to="/auth/login"
-                className="text-sm rounded-full h-8 px-3 inline-flex items-center text-marketing-muted hover:text-marketing-ink hover:bg-primary/10 transition-colors"
+                className="text-sm rounded-full h-8 px-3 inline-flex items-center text-white/85 hover:text-white hover:bg-white/10 transition-colors"
               >
                 {t("splash.login")}
               </Link>
               <Link
                 to="/auth/signup"
-                className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary shadow-sm"
+                className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/40 shadow-sm"
               >
                 {t("splash.getStarted")}
               </Link>
@@ -132,13 +122,15 @@ export function MarketingHeader() {
 
             {/* Mobile */}
             <div className="md:hidden flex items-center gap-1">
-              <LanguageToggle compact />
+              <div className="[&_*]:!text-white/85 hover:[&_*]:!text-white">
+                <LanguageToggle compact />
+              </div>
               <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                 <SheetTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-marketing-ink hover:bg-primary/10 rounded-full h-9 w-9"
+                    className="text-white hover:text-white hover:bg-white/10 rounded-full h-9 w-9"
                     aria-label="Open menu"
                   >
                     <Menu className="h-5 w-5" />
