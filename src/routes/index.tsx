@@ -55,7 +55,6 @@ export const Route = createFileRoute("/")({
 });
 
 const serif = { fontFamily: "var(--font-display)", fontWeight: 800, letterSpacing: "-0.02em" } as const;
-const serifItalic = { fontFamily: "var(--font-display)", fontWeight: 400, letterSpacing: "-0.01em" } as const;
 const sansMk = { fontFamily: "var(--font-sans-marketing)" } as const;
 
 function Landing() {
