@@ -296,7 +296,7 @@ function Landing() {
                       <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
                         {t("marketing.team.mockCheckedBy")}
                       </p>
-                      <p className="text-lg italic text-marketing-ink" style={display}>
+                      <p className="text-lg text-marketing-ink" style={display}>
                         {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
                       </p>
                     </div>
@@ -319,7 +319,7 @@ function Landing() {
           {[1, 2, 3, 4].map((n) => (
             <Reveal key={n} delayMs={n * 60}>
               <p
-                className="text-display-sm italic text-marketing-ink"
+                className="text-display-sm text-marketing-ink"
                 style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
@@ -550,7 +550,7 @@ function OutcomeCard({
           {icon}
         </div>
         <h3
-          className="text-display-xs italic text-marketing-ink mb-2"
+          className="text-display-xs text-marketing-ink mb-2"
           style={display}
         >
           {title}
@@ -593,7 +593,7 @@ function ComparisonCard({
         }`}
       >
         <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-        <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
+        <h3 className="text-display-xs text-marketing-ink mb-6" style={display}>
           {title}
         </h3>
         <ul className="space-y-3.5">
@@ -641,7 +641,7 @@ function PriceCard({
         </span>
       )}
       <p className="text-sm font-medium text-marketing-muted mb-4">{label}</p>
-      <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={display}>
+      <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
         {price}
       </p>
       <p className="text-sm text-marketing-muted mb-6">{sub}</p>
@@ -717,7 +717,7 @@ function DaySection() {
                   </div>
                   <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-6 md:p-7 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     <h3
-                      className="text-display-xs italic text-marketing-ink mb-2"
+                      className="text-display-xs text-marketing-ink mb-2"
                       style={display}
                     >
                       {s.title}
@@ -962,7 +962,7 @@ function HeroDevice({ platform: _platform }: { platform: "ios" | "android" | "de
               <span className="w-2 h-2 rounded-full bg-marketing-line" />
               <span className="w-2 h-2 rounded-full bg-marketing-line" />
             </div>
-            <div className="text-[11px] italic text-marketing-muted" style={display}>
+            <div className="text-[11px] text-marketing-muted" style={display}>
               {t("marketing.hero.mockShift")}
             </div>
             <div className="size-5 rounded-full bg-marketing-sage-soft border border-marketing-sage-line" />
@@ -993,7 +993,7 @@ function HeroDevice({ platform: _platform }: { platform: "ios" | "android" | "de
             {t("marketing.hero.satOxygenLabel")}
           </p>
         </div>
-        <p className="text-xl italic text-marketing-ink leading-tight" style={display}>
+        <p className="text-xl text-marketing-ink leading-tight" style={display}>
           {t("marketing.hero.satOxygenValue")}
         </p>
         <div className="mt-2 h-1.5 rounded-full bg-marketing-faint overflow-hidden">
