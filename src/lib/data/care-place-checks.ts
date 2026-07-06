@@ -135,6 +135,7 @@ export type QuantityEstimate = "mycket" | "lite" | "slut";
 export interface SubmitCheckInput {
   family_id: string;
   performed_by: string;
+  caregiver_profile_id?: string | null;
   scheduled_time: string; // HH:MM:SS
   scheduled_date: string; // YYYY-MM-DD
   notes?: string | null;
@@ -169,6 +170,7 @@ export function useSubmitCarePlaceCheck() {
         .insert({
           family_id: input.family_id,
           performed_by: input.performed_by,
+          caregiver_profile_id: input.caregiver_profile_id ?? null,
           scheduled_date: input.scheduled_date,
           scheduled_time: input.scheduled_time,
           notes: input.notes ?? null,
