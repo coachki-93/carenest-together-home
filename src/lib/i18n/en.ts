@@ -712,6 +712,7 @@ export const en = {
       tidySkipped: "Tidy skipped",
       maintenanceDone: "Maintenance done",
       maintenanceOverdue: "Overdue maintenance",
+      medAllGiven: "All scheduled meds given ({{given}}/{{total}})",
     },
     reads: {
       readBy: "Read by",
