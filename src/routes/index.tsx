@@ -68,52 +68,49 @@ function Landing() {
       <MarketingHeader />
       <Hero />
 
-      {/* ── 2. The problem, named kindly ── */}
+      {/* ── 2. Problem + For whom (two columns) ── */}
       <section className="px-6 md:px-8 py-20 md:py-28">
-        <Reveal className="max-w-2xl mx-auto text-center space-y-6">
-          <Kicker>{t("marketing.problem.kicker")}</Kicker>
-          <h2
-            className="text-display-md text-marketing-ink"
-            style={display}
-          >
-            {t("marketing.problem.title")}
-          </h2>
-          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-            {t("marketing.problem.body1")}
-          </p>
-          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-            {t("marketing.problem.body2")}
-          </p>
-        </Reveal>
-      </section>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+          {/* Left: The problem */}
+          <Reveal className="space-y-5 text-left">
+            <Kicker>{t("marketing.problem.kicker")}</Kicker>
+            <h2 className="text-display-sm text-marketing-ink" style={display}>
+              {t("marketing.problem.title")}
+            </h2>
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.65]">
+              {t("marketing.problem.body1")}
+            </p>
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.65]">
+              {t("marketing.problem.body2")}
+            </p>
+          </Reveal>
 
-      {/* ── 2b. For whom (supplements the problem) ── */}
-      <section className="px-6 md:px-8 pb-8 md:pb-12">
-        <Reveal className="max-w-3xl mx-auto text-center space-y-5">
-          <Kicker>{t("marketing.forWhom.kicker")}</Kicker>
-          <h2
-            className="text-display-md text-marketing-ink"
-            style={display}
-          >
-            {t("marketing.forWhom.title")}
-          </h2>
-          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-            {t("marketing.forWhom.body")}
-          </p>
-          <div className="flex flex-wrap gap-2 justify-center pt-2">
-            <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
-              {t("marketing.forWhom.chip1")}
-            </span>
-            <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
-              {t("marketing.forWhom.chip2")}
-            </span>
-            <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
-              {t("marketing.forWhom.chip3")}
-            </span>
-          </div>
-        </Reveal>
-        <Reveal className="max-w-2xl mx-auto mt-10">
-          <div className="rounded-2xl border border-marketing-line bg-marketing-surface p-6 md:p-7 text-center">
+          {/* Right: For whom */}
+          <Reveal className="space-y-5 text-left" delay={90}>
+            <Kicker>{t("marketing.forWhom.kicker")}</Kicker>
+            <h2 className="text-display-sm text-marketing-ink" style={display}>
+              {t("marketing.forWhom.title")}
+            </h2>
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.65]">
+              {t("marketing.forWhom.body")}
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
+                {t("marketing.forWhom.chip1")}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
+                {t("marketing.forWhom.chip2")}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
+                {t("marketing.forWhom.chip3")}
+              </span>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* Full-width caregiver card spanning both columns */}
+        <Reveal className="max-w-6xl mx-auto mt-10 md:mt-12">
+          <div className="rounded-2xl border border-marketing-line bg-marketing-surface p-6 md:p-8">
             <h3
               className="text-display-xs text-marketing-ink mb-2"
               style={display}
@@ -126,6 +123,7 @@ function Landing() {
           </div>
         </Reveal>
       </section>
+
 
 
 
