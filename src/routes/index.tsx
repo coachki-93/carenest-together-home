@@ -362,7 +362,7 @@ function Landing() {
       <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line">
         <Reveal className="max-w-2xl mx-auto text-center space-y-5">
           <Kicker>{t("marketing.not.kicker")}</Kicker>
-          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.not.body")}
           </p>
         </Reveal>
