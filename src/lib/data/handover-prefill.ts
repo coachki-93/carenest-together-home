@@ -27,6 +27,7 @@ interface Labels {
   medRefused: string;
   medPostponed: string;
   medMissed: string;
+  medAllGiven: string; // "... ({{given}}/{{total}})"
   apptMissed: string;
   apptCancelled: string;
   vitalAbnormal: string;
