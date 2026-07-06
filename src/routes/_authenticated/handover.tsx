@@ -127,6 +127,12 @@ function HandoverPage() {
     return null;
   }, [shiftStartIso, shiftEndIso, compose]);
 
+  // Window used when the dialog is opened via the plain "New handover"
+  // button (no URL params, no compose flag). Captured at click-time so it
+  // stays stable while the dialog is open.
+  const [manualWindow, setManualWindow] = useState<{ start: Date; end: Date } | null>(null);
+  const effectiveWindow = shiftWindow ?? manualWindow;
+
   const prefillLabels = useMemo(
     () => ({
       medSkipped: t("handoverPage.prefill.medSkipped"),
@@ -151,11 +157,11 @@ function HandoverPage() {
   );
 
   const prefillInput =
-    membership?.family_id && shiftWindow
+    membership?.family_id && effectiveWindow
       ? {
           familyId: membership.family_id,
-          shiftStart: shiftWindow.start,
-          shiftEnd: shiftWindow.end,
+          shiftStart: effectiveWindow.start,
+          shiftEnd: effectiveWindow.end,
         }
       : null;
   const { data: prefill } = useHandoverPrefill(prefillInput, prefillLabels);
@@ -180,17 +186,33 @@ function HandoverPage() {
     notes: "",
   });
 
-  // When arriving with shift query params, open dialog + seed from prefill
+  // Auto-open when arriving with shift query params or compose flag.
   useEffect(() => {
-    if (!shiftWindow || !prefill) return;
+    if (!shiftWindow) return;
+    setOpen(true);
+  }, [shiftWindow]);
+
+  // Seed the form from prefill once the window + data are ready. The
+  // "prev || prefill" merge protects anything the user has typed. Runs for
+  // all three entry points: URL params, compose flag, and plain button.
+  useEffect(() => {
+    if (!open || !effectiveWindow || !prefill) return;
     setForm((prev) => ({
       ...prev,
-      shift: shiftLabelFromDate(shiftWindow.start),
+      shift: shiftLabelFromDate(effectiveWindow.start),
       meds: prev.meds || prefill.meds,
       notes: prev.notes || prefill.notes,
     }));
+  }, [open, effectiveWindow, prefill]);
+
+  function openDialog() {
+    if (!shiftWindow) {
+      const end = new Date();
+      setManualWindow({ start: inferredShiftStart(end), end });
+    }
     setOpen(true);
-  }, [shiftWindow, prefill]);
+  }
+
 
   const dateFmt = useMemo(
     () =>
