@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const unauthorized = authorizeCronRequest(request);
+        const unauthorized = await authorizeCronRequest(request);
         if (unauthorized) return unauthorized;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
