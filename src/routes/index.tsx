@@ -552,7 +552,7 @@ function ComparisonCard({
       }`}
     >
       <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-      <h3 className="italic text-marketing-ink mb-6" style={{ ...display, fontSize: "clamp(1.35rem, 2.4vw, 1.75rem)" }}>
+      <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
         {title}
       </h3>
       <ul className="space-y-3.5">
