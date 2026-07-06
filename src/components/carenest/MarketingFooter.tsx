@@ -14,7 +14,7 @@ export function MarketingFooter() {
             <Logo size={32} />
             <span
               className="text-xl tracking-tight text-marketing-ink"
-              style={{ fontFamily: "var(--font-display)", fontWeight: 800, letterSpacing: "-0.02em" }}
+              style={{ fontFamily: "var(--font-display)", fontWeight: 700, letterSpacing: "-0.025em" }}
             >
               CareNest
             </span>
