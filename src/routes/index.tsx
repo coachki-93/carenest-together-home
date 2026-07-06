@@ -86,6 +86,48 @@ function Landing() {
         </Reveal>
       </section>
 
+      {/* ── 2b. For whom (supplements the problem) ── */}
+      <section className="px-6 md:px-8 pb-8 md:pb-12">
+        <Reveal className="max-w-3xl mx-auto text-center space-y-5">
+          <Kicker>{t("marketing.forWhom.kicker")}</Kicker>
+          <h2
+            className="tracking-tight text-marketing-ink"
+            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+          >
+            {t("marketing.forWhom.title")}
+          </h2>
+          <p className="text-marketing-muted leading-[1.75] text-[1.05rem]">
+            {t("marketing.forWhom.body")}
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center pt-2">
+            <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
+              {t("marketing.forWhom.chip1")}
+            </span>
+            <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
+              {t("marketing.forWhom.chip2")}
+            </span>
+            <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
+              {t("marketing.forWhom.chip3")}
+            </span>
+          </div>
+        </Reveal>
+        <Reveal className="max-w-2xl mx-auto mt-10">
+          <div className="rounded-2xl border border-marketing-line bg-marketing-surface p-6 md:p-7 text-center">
+            <h3
+              className="text-marketing-ink mb-2"
+              style={{ ...serif, fontSize: "clamp(1.15rem, 1.6vw, 1.35rem)" }}
+            >
+              {t("marketing.forWhom.caregiverTitle")}
+            </h3>
+            <p className="text-marketing-muted leading-relaxed text-[0.98rem]">
+              {t("marketing.forWhom.caregiverBody")}
+            </p>
+          </div>
+        </Reveal>
+      </section>
+
+
+
       {/* ── 3. The bridge line ── */}
       <section className="px-6 md:px-8 py-24 md:py-36">
         <Reveal className="max-w-4xl mx-auto text-center">
