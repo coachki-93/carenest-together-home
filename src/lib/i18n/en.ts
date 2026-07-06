@@ -1621,6 +1621,7 @@ export const en = {
       iosS3Title: "Name it and open it",
       iosS3Body: "Keep the name or edit it, then tap Add. Launch CareNest from the new icon and it opens full-screen, just like a native app.",
       androidBrowser: "Android · Chrome",
+      androidTitle: "Install on Android",
       andS1Title: "Open the menu",
       andS1Body: "In Chrome, tap the three-dot menu in the top-right corner.",
       andS2Title: "Tap \"Install app\"",
