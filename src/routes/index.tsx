@@ -710,7 +710,7 @@ function DaySection() {
                       style={{
                         left: "-1.5rem",
                         transform: "translateX(-50%)",
-                        top: "0.5rem",
+                        top: "0.375rem",
                         background: "var(--primary)",
                       }}
                     />
