@@ -213,6 +213,34 @@ export function useUpdateHandoverReminderMinutes() {
   });
 }
 
+export function useUpdateFamilyLocale() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      familyId,
+      timezone,
+      notificationLanguage,
+    }: {
+      familyId: string;
+      timezone?: string;
+      notificationLanguage?: "en" | "sv";
+    }) => {
+      const patch: Record<string, string> = {};
+      if (timezone !== undefined) patch.timezone = timezone;
+      if (notificationLanguage !== undefined)
+        patch.notification_language = notificationLanguage;
+      const { error } = await supabase
+        .from("families")
+        .update(patch)
+        .eq("id", familyId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+    },
+  });
+}
+
 export function useSetHospitalMode() {
   const qc = useQueryClient();
   return useMutation({
