@@ -311,7 +311,7 @@ function HandoverPage() {
           </div>
           <h2 className="text-2xl font-extrabold mb-2">{t("handoverPage.emptyTitle")}</h2>
           <p className="text-muted-foreground mb-6">{t("handoverPage.emptyBody")}</p>
-          <Button className="rounded-full gap-1.5 font-semibold" onClick={() => setOpen(true)}>
+          <Button className="rounded-full gap-1.5 font-semibold" onClick={openDialog}>
             <Plus className="size-4" /> {t("handoverPage.new")}
           </Button>
         </div>
