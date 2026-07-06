@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import {
   Heart,
   Users,
@@ -19,8 +20,10 @@ import {
   Moon,
   Plus,
   Check,
+  MessageSquareText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
 import {
   Accordion,
   AccordionContent,
@@ -68,63 +71,8 @@ function Landing() {
       <MarketingHeader />
 
       {/* ───────── Hero ───────── */}
-      <section className="relative px-6 md:px-8 pt-12 md:pt-20 pb-16 md:pb-24 overflow-hidden">
-        <div className="max-w-5xl mx-auto flex flex-col items-center text-center">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
-            {t("splash.badge")}
-          </span>
+      <Hero />
 
-          <h1
-            className="text-5xl md:text-7xl leading-[1.02] tracking-tight mb-7 max-w-4xl text-marketing-ink"
-            style={serif}
-          >
-            {t("marketing.hero.h1a")}{" "}
-            <span className="italic text-marketing-sage">
-              {t("marketing.hero.h1b")}
-            </span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-marketing-ink/90 max-w-2xl mb-4 leading-relaxed font-medium">
-            {t("marketing.hero.subhead")}
-          </p>
-
-          <p className="text-base md:text-lg text-marketing-muted max-w-2xl mb-6 leading-relaxed">
-            {t("marketing.hero.sub")}
-          </p>
-
-          <p className="text-sm text-marketing-muted/90 italic mb-10">
-            {t("marketing.hero.trust")}
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 mb-16 w-full justify-center">
-            <Link
-              to="/auth/signup"
-              className="px-8 py-4 rounded-xl bg-marketing-ink text-marketing-bg font-medium text-base hover:bg-black transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
-            >
-              {t("splash.ctaCreate")}
-            </Link>
-            <a
-              href="#day"
-              className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
-            >
-              {t("marketing.hero.ctaTour")}
-            </a>
-            <Link
-              to="/invite"
-              className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
-            >
-              {t("splash.ctaInvite")}
-            </Link>
-          </div>
-
-          {/* App preview surface */}
-          <HeroPreview />
-        </div>
-
-        {/* hairline rule under hero */}
-        <div className="max-w-6xl mx-auto mt-20 border-t border-marketing-line" />
-      </section>
 
       {/* ───────── Who it's for ───────── */}
       <section className="px-6 md:px-8 py-20 md:py-24">
@@ -453,62 +401,191 @@ function SafetyRow({ icon, title, body }: { icon: React.ReactNode; title: string
   );
 }
 
-/* ─────────── Hero "app surface" preview ─────────── */
-function HeroPreview() {
+/* ─────────── Hero ─────────── */
+function Hero() {
   const { t } = useTranslation();
+  const ref = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const el = ref.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        // 0 when hero top hits top of viewport; grows negative as page scrolls
+        const y = Math.max(-200, Math.min(200, -rect.top * 0.06));
+        setOffset(y);
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <div className="relative w-full max-w-5xl">
-      <div className="absolute -inset-6 bg-marketing-sage-soft/60 rounded-[2.5rem] blur-3xl -z-10" />
-      <div className="relative bg-marketing-bg rounded-[2rem] shadow-[0_32px_64px_-24px_rgba(45,41,38,0.18)] border border-marketing-line p-4 md:p-5 overflow-hidden">
-        <div className="bg-marketing-surface rounded-2xl w-full overflow-hidden">
-          {/* Top bar */}
-          <div className="h-12 border-b border-marketing-line px-5 flex items-center justify-between">
-            <div className="flex gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-marketing-line" />
-              <span className="w-2.5 h-2.5 rounded-full bg-marketing-line" />
-              <span className="w-2.5 h-2.5 rounded-full bg-marketing-line" />
-            </div>
-            <div
-              className="text-xs italic text-marketing-muted"
-              style={serif}
+    <section
+      ref={ref}
+      className="relative px-6 md:px-8 pt-10 md:pt-16 pb-20 md:pb-32 overflow-hidden"
+    >
+      {/* Aurora — two large radial gradients on the lavender base */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(60rem 40rem at 15% 20%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 70%), radial-gradient(45rem 35rem at 90% 80%, color-mix(in oklab, oklch(0.85 0.09 55) 12%, transparent), transparent 70%)",
+        }}
+      />
+
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-14 lg:gap-10 items-center">
+        {/* Left: copy */}
+        <div className="max-w-xl">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-7">
+            <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
+            {t("marketing.hero.kicker")}
+          </span>
+
+          <h1
+            className="tracking-tight text-marketing-ink mb-6"
+            style={{
+              ...serif,
+              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+              lineHeight: 1.05,
+            }}
+          >
+            {t("marketing.hero.headline")}
+          </h1>
+
+          <p
+            className="text-marketing-muted mb-10 max-w-lg"
+            style={{
+              fontSize: "clamp(1rem, 1.15vw, 1.125rem)",
+              lineHeight: 1.7,
+            }}
+          >
+            {t("marketing.hero.subline")}
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/auth/signup"
+              className="inline-flex items-center justify-center rounded-full bg-marketing-sage text-marketing-bg font-semibold px-7 py-3.5 text-base shadow-sm hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
             >
-              {t("marketing.day.s3Title")} · 14:00
-            </div>
-            <div className="size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line" />
+              {t("marketing.hero.ctaCreate")}
+            </Link>
+            <Link
+              to="/invite"
+              className="inline-flex items-center justify-center rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink font-semibold px-7 py-3.5 text-base hover:border-marketing-sage hover:text-marketing-sage transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
+            >
+              {t("marketing.hero.ctaInvite")}
+            </Link>
           </div>
+        </div>
 
-          {/* Body */}
-          <div className="p-5 md:p-6 grid grid-cols-12 gap-4 md:gap-5">
-            {/* Left column: tasks list */}
-            <div className="col-span-12 md:col-span-7 space-y-3">
-              <PreviewTask icon={<Pill className="size-4" />} title={t("marketing.inside.f3Title")} meta="08:00" done />
-              <PreviewTask icon={<Wind className="size-4" />} title={t("marketing.inside.f4Title")} meta="68 min" />
-              <PreviewTask icon={<Activity className="size-4" />} title={t("marketing.inside.f2Title")} meta="now" highlight />
-              <PreviewTask icon={<CalendarCheck className="size-4" />} title={t("marketing.day.s3Title")} meta="15:00" />
+        {/* Right: tablet on the wall + satellites */}
+        <div className="relative w-full">
+          <div
+            className="relative mx-auto max-w-[560px]"
+            style={{
+              transform: `rotate(-1.5deg) translateY(${offset}px)`,
+              transition: "transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)",
+            }}
+          >
+            {/* Tablet bezel */}
+            <div className="relative rounded-[2.25rem] bg-marketing-ink p-3 md:p-4 shadow-[0_40px_80px_-30px_rgba(45,41,38,0.35)] ring-1 ring-black/5">
+              {/* front camera dot */}
+              <span className="absolute top-2 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-marketing-line/40" />
+
+              {/* Screen */}
+              <div className="bg-marketing-surface rounded-[1.5rem] overflow-hidden">
+                {/* Top bar */}
+                <div className="h-11 border-b border-marketing-line px-5 flex items-center justify-between">
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-marketing-line" />
+                    <span className="w-2 h-2 rounded-full bg-marketing-line" />
+                    <span className="w-2 h-2 rounded-full bg-marketing-line" />
+                  </div>
+                  <div className="text-[11px] italic text-marketing-muted" style={serif}>
+                    {t("marketing.hero.mockShift")}
+                  </div>
+                  <div className="size-5 rounded-full bg-marketing-sage-soft border border-marketing-sage-line" />
+                </div>
+
+                {/* Body — task list, screenshot-quality */}
+                <div className="p-4 md:p-5 space-y-2.5">
+                  <PreviewTask icon={<Pill className="size-4" />} title={t("marketing.inside.f3Title")} meta="08:00" done />
+                  <PreviewTask icon={<Wind className="size-4" />} title={t("marketing.inside.f4Title")} meta="68 min" />
+                  <PreviewTask icon={<Activity className="size-4" />} title={t("marketing.inside.f2Title")} meta="now" highlight />
+                  <PreviewTask icon={<CalendarCheck className="size-4" />} title={t("marketing.day.s3Title")} meta="15:00" />
+                </div>
+              </div>
             </div>
 
-            {/* Right column: snapshot card */}
-            <div className="col-span-12 md:col-span-5 bg-marketing-bg rounded-xl border border-marketing-line p-5 space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted">
-                {t("nav.vitals") ?? "Vitals"}
+            {/* Satellite: Oxygen — top-left overlap. Hidden on mobile. */}
+            <div
+              className="hidden md:block absolute -left-14 top-10 w-[220px] rounded-2xl bg-marketing-bg border border-marketing-line shadow-lg p-4"
+              style={{
+                transform: `rotate(1.5deg) translateY(${offset * 0.6}px)`,
+                transition: "transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)",
+              }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="size-8 rounded-lg bg-marketing-sage-soft text-marketing-sage flex items-center justify-center">
+                  <Wind className="size-4" />
+                </span>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold">
+                  {t("marketing.hero.satOxygenLabel")}
+                </p>
+              </div>
+              <p className="text-xl italic text-marketing-ink leading-tight" style={serif}>
+                {t("marketing.hero.satOxygenValue")}
               </p>
-              <div className="grid grid-cols-2 gap-3">
-                <Stat label="SpO₂" value="98%" />
-                <Stat label="HR" value="112" />
-                <Stat label="Temp" value="37.0°" />
-                <Stat label="O₂" value="68m" />
+              <div className="mt-2 h-1.5 rounded-full bg-marketing-faint overflow-hidden">
+                <div className="h-full w-[67%] rounded-full bg-marketing-sage" />
               </div>
-              <div className="pt-2 border-t border-marketing-line flex items-center gap-2 text-xs text-marketing-muted">
-                <span className="size-2 rounded-full bg-marketing-sage" />
-                {t("marketing.safety.r2Title")}
+              <p className="mt-1.5 text-[11px] text-marketing-muted">
+                {t("marketing.hero.satOxygenSub")}
+              </p>
+            </div>
+
+            {/* Satellite: Handover — bottom-right overlap. Hidden on mobile. */}
+            <div
+              className="hidden md:block absolute -right-10 -bottom-6 w-[260px] rounded-2xl bg-marketing-bg border border-marketing-line shadow-lg p-4"
+              style={{
+                transform: `rotate(2deg) translateY(${offset * 0.4}px)`,
+                transition: "transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)",
+              }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="size-8 rounded-lg bg-marketing-sage text-marketing-bg flex items-center justify-center">
+                  <MessageSquareText className="size-4" />
+                </span>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold">
+                  {t("marketing.hero.satHandoverLabel")}
+                </p>
               </div>
+              <p className="text-sm text-marketing-ink leading-snug font-medium">
+                {t("marketing.hero.satHandoverTitle")}
+              </p>
+              <p className="mt-1 text-xs text-marketing-sage font-semibold">
+                {t("marketing.hero.satHandoverCta")} →
+              </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
+
+
 
 function PreviewTask({
   icon,

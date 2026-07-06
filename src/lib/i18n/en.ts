@@ -1367,6 +1367,18 @@ export const en = {
       faq: "FAQ",
     },
     hero: {
+      kicker: "Care, together",
+      headline: "Everything about your child's care — out of your head, into one calm place.",
+      subline: "CareNest is the shared home base for families of children with special needs. The schedule, the medications, the machines, the things every caregiver needs to know — visible to everyone you trust, so the whole day no longer depends on you remembering it.",
+      ctaCreate: "Create your family space",
+      ctaInvite: "I have an invite",
+      mockShift: "Shift change · 14:00",
+      satOxygenLabel: "Oxygen",
+      satOxygenValue: "2d 6h remaining",
+      satOxygenSub: "Tank at 67% · quiet",
+      satHandoverLabel: "New handover",
+      satHandoverTitle: "New handover from Rahma",
+      satHandoverCta: "Read it",
       h1a: "Care, calmly —",
       h1b: "together.",
       subhead: "The shared home base for your child's care team — meds, vitals, oxygen and handovers in one place.",
@@ -1374,6 +1386,7 @@ export const en = {
       trust: "Built with families of medically complex children.",
       ctaTour: "See a day with CareNest",
     },
+
     who: {
       kicker: "Who it's for",
       title: "For the people doing the hardest, quietest work",
