@@ -252,12 +252,12 @@ function Landing() {
                   {t("marketing.team.kicker")}
                 </p>
                 <h2
-                  className="tracking-tight mb-6"
-                  style={{ ...display, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+                  className="text-display-md mb-6"
+                  style={display}
                 >
                   {t("marketing.team.title")}
                 </h2>
-                <p className="text-[1rem] leading-[1.75] opacity-90 max-w-xl mb-8">
+                <p className="text-base md:text-lg leading-[1.7] opacity-90 max-w-xl mb-8">
                   {t("marketing.team.body")}
                 </p>
                 <ul className="space-y-4">
