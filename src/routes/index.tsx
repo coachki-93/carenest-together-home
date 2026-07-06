@@ -30,30 +30,52 @@ import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
 
 const SITE = "https://carenest-together-home.lovable.app";
+const OG_IMAGE = SITE + "/og-image.jpg";
+
+import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
+
+const LANDING_META = {
+  en: {
+    title: "CareNest — A calm home base for your child's care team",
+    description:
+      "CareNest is the shared home base for families of children with special needs. Meds, vitals, oxygen, schedules and handovers — visible to every caregiver you trust.",
+    ogTitle: "CareNest — Care, together",
+    ogDescription:
+      "Everything about your child's care — out of your head, into one calm place. Bilingual, tablet-friendly, built with families.",
+  },
+  sv: {
+    title: "CareNest — En lugn hemmabas för ditt barns vårdteam",
+    description:
+      "CareNest är den gemensamma hemmabasen för familjer med barn med särskilda behov. Mediciner, vitala värden, syrgas, scheman och överlämningar — synligt för varje assistent du litar på.",
+    ogTitle: "CareNest — Omsorg, tillsammans",
+    ogDescription:
+      "Allt om ditt barns vård — ut ur ditt huvud, in på ett lugnt ställe. Tvåspråkigt, surfplatte-vänligt, byggt med familjer.",
+  },
+} as const;
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "CareNest — A calm home base for your child's care team" },
-      {
-        name: "description",
-        content:
-          "CareNest is the shared home base for families of children with special needs. Meds, vitals, oxygen, schedules and handovers — visible to every caregiver you trust.",
-      },
-      { property: "og:title", content: "CareNest — Care, together" },
-      {
-        property: "og:description",
-        content:
-          "Everything about your child's care — out of your head, into one calm place. Bilingual, tablet-friendly, built with families.",
-      },
-      { property: "og:url", content: SITE + "/" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: SITE + "/" }],
-  }),
+  head: () => {
+    const lang = resolveHeadLanguage();
+    const m = LANDING_META[lang];
+    return {
+      meta: [
+        { title: m.title },
+        { name: "description", content: m.description },
+        { property: "og:title", content: m.ogTitle },
+        { property: "og:description", content: m.ogDescription },
+        { property: "og:url", content: SITE + "/" },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: OG_LOCALE[lang] },
+        { property: "og:image", content: OG_IMAGE },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: SITE + "/" }],
+    };
+  },
   component: Landing,
 });
+
 
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 const sansMk = { fontFamily: "var(--font-sans-marketing)" } as const;
