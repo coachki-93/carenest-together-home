@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { cn } from "@/lib/utils";
-import wordmark from "@/assets/carenest-wordmark.png.asset.json";
+import logoIcon from "@/assets/carenest-icon-only.png.asset.json";
 
 export function MarketingHeader() {
   const { t } = useTranslation();
@@ -56,9 +56,9 @@ export function MarketingHeader() {
               aria-label="CareNest"
             >
               <img
-                src={wordmark.url}
+                src={logoIcon.url}
                 alt="CareNest"
-                className="h-6 md:h-7 w-auto select-none"
+                className="h-9 md:h-10 w-auto select-none"
                 draggable={false}
               />
             </Link>
