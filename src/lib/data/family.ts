@@ -225,7 +225,7 @@ export function useUpdateFamilyLocale() {
       timezone?: string;
       notificationLanguage?: "en" | "sv";
     }) => {
-      const patch: Record<string, string> = {};
+      const patch: Database["public"]["Tables"]["families"]["Update"] = {};
       if (timezone !== undefined) patch.timezone = timezone;
       if (notificationLanguage !== undefined)
         patch.notification_language = notificationLanguage;
