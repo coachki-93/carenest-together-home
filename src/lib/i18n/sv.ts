@@ -1618,6 +1618,7 @@ export const sv = {
       iosS3Title: "Namnge och öppna",
       iosS3Body: "Behåll namnet eller ändra det, tryck sedan på Lägg till. Starta CareNest från den nya ikonen så öppnas den i helskärm, precis som en riktig app.",
       androidBrowser: "Android · Chrome",
+      androidTitle: "Installera på Android",
       andS1Title: "Öppna menyn",
       andS1Body: "I Chrome, tryck på trepunktsmenyn uppe i högra hörnet.",
       andS2Title: "Tryck på \"Installera app\"",
