@@ -1,26 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
-  Heart,
-  Users,
-  ShieldCheck,
   CalendarCheck,
   Activity,
   Pill,
   Wind,
   ClipboardList,
   Siren,
-  BellRing,
+  Bell,
+  Users,
+  ShieldCheck,
   Languages,
   Tablet,
-  ArrowRight,
-  Sunrise,
-  Sun,
-  Sunset,
-  Moon,
-  Plus,
+  Home,
+  Boxes,
+  Wrench,
+  BookOpen,
+  ShoppingBag,
   Check,
+  Plus,
   MessageSquareText,
+  Sparkles,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -42,16 +42,17 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "CareNest helps families of medically complex children coordinate medications, vitals, oxygen, schedules and handovers with every caregiver — warm, calm, bilingual, tablet-friendly.",
+          "CareNest is the shared home base for families of children with special needs. Meds, vitals, oxygen, schedules and handovers — visible to every caregiver you trust.",
       },
       { property: "og:title", content: "CareNest — Care, together" },
       {
         property: "og:description",
         content:
-          "Coordinate every part of your child's care with the people you trust — in one warm, tablet-friendly space.",
+          "Everything about your child's care — out of your head, into one calm place. Bilingual, tablet-friendly, built with families.",
       },
       { property: "og:url", content: SITE + "/" },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: SITE + "/" }],
   }),
@@ -69,221 +70,333 @@ function Landing() {
       style={sansMk}
     >
       <MarketingHeader />
-
-      {/* ───────── Hero ───────── */}
       <Hero />
 
-
-      {/* ───────── Who it's for ───────── */}
-      <section className="px-6 md:px-8 py-20 md:py-24">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <Kicker>{t("marketing.who.kicker")}</Kicker>
-          <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
-            {t("marketing.who.title")}
+      {/* ── 2. The problem, named kindly ── */}
+      <section className="px-6 md:px-8 py-20 md:py-28">
+        <Reveal className="max-w-2xl mx-auto text-center space-y-6">
+          <Kicker>{t("marketing.problem.kicker")}</Kicker>
+          <h2
+            className="tracking-tight text-marketing-ink"
+            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+          >
+            {t("marketing.problem.title")}
           </h2>
-          <p className="text-marketing-muted text-lg leading-relaxed max-w-2xl mx-auto">
-            {t("marketing.who.body")}
+          <p className="text-marketing-muted leading-[1.75] text-[1.05rem]">
+            {t("marketing.problem.body1")}
           </p>
-          <div className="flex flex-wrap gap-2 justify-center pt-3">
-            <Chip>{t("marketing.who.chip1")}</Chip>
-            <Chip>{t("marketing.who.chip2")}</Chip>
-            <Chip>{t("marketing.who.chip3")}</Chip>
-          </div>
-
-          <div className="mt-12 mx-auto max-w-2xl text-left rounded-2xl border border-marketing-line bg-marketing-surface px-6 py-5 flex gap-4 items-start">
-            <div className="size-10 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
-              <Users className="size-5" />
-            </div>
-            <div>
-              <h3 className="text-lg italic text-marketing-ink mb-1" style={serif}>
-                {t("marketing.who.caregiverTitle")}
-              </h3>
-              <p className="text-marketing-muted leading-relaxed text-sm">
-                {t("marketing.who.caregiverBody")}
-              </p>
-            </div>
-          </div>
-        </div>
+          <p className="text-marketing-muted leading-[1.75] text-[1.05rem]">
+            {t("marketing.problem.body2")}
+          </p>
+        </Reveal>
       </section>
 
-      {/* ───────── A day with CareNest ───────── */}
-      <section id="day" className="px-6 md:px-8 py-20 md:py-24 bg-marketing-surface border-y border-marketing-line">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14 space-y-4 max-w-2xl mx-auto">
-            <Kicker>{t("marketing.day.kicker")}</Kicker>
-            <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
-              {t("marketing.day.title")}
-            </h2>
-            <p className="text-marketing-muted text-lg">{t("marketing.day.sub")}</p>
-          </div>
-          <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-marketing-line rounded-2xl overflow-hidden border border-marketing-line">
-            <DayStep n="01" icon={<Sunrise className="size-4" />} title={t("marketing.day.s1Title")} body={t("marketing.day.s1Body")} />
-            <DayStep n="02" icon={<Sun className="size-4" />} title={t("marketing.day.s2Title")} body={t("marketing.day.s2Body")} />
-            <DayStep n="03" icon={<Sunset className="size-4" />} title={t("marketing.day.s3Title")} body={t("marketing.day.s3Body")} />
-            <DayStep n="04" icon={<Moon className="size-4" />} title={t("marketing.day.s4Title")} body={t("marketing.day.s4Body")} />
-          </ol>
-        </div>
+      {/* ── 3. The bridge line ── */}
+      <section className="px-6 md:px-8 py-24 md:py-36">
+        <Reveal className="max-w-4xl mx-auto text-center">
+          <h2
+            className="tracking-tight text-marketing-ink italic"
+            style={{ ...serif, fontSize: "clamp(2rem, 5vw, 3.75rem)", lineHeight: 1.1 }}
+          >
+            {t("marketing.bridge.line")}
+          </h2>
+        </Reveal>
       </section>
 
-      {/* ───────── Features ───────── */}
+      {/* ── 4. A day with CareNest — timeline ── */}
+      <DaySection />
+
+      {/* ── 5. Outcomes ── */}
       <section className="px-6 md:px-8 py-20 md:py-28">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-[1fr_1.4fr] gap-12 md:gap-16 items-end mb-14">
-            <div className="space-y-4">
-              <Kicker>{t("marketing.inside.kicker")}</Kicker>
-              <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
-                {t("marketing.inside.title")}
-              </h2>
-            </div>
-            <p className="text-marketing-muted text-lg leading-relaxed md:pb-2">
+          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
+            <Kicker>{t("marketing.outcomes.kicker")}</Kicker>
+            <h2
+              className="tracking-tight text-marketing-ink"
+              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            >
+              {t("marketing.outcomes.title")}
+            </h2>
+          </Reveal>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-7">
+            <OutcomeCard
+              icon={<Home className="size-5" />}
+              title={t("marketing.outcomes.c1Title")}
+              body={t("marketing.outcomes.c1Body")}
+              chips={[t("marketing.outcomes.c1Chip1"), t("marketing.outcomes.c1Chip2"), t("marketing.outcomes.c1Chip3")]}
+            />
+            <OutcomeCard
+              icon={<Users className="size-5" />}
+              title={t("marketing.outcomes.c2Title")}
+              body={t("marketing.outcomes.c2Body")}
+              chips={[t("marketing.outcomes.c2Chip1"), t("marketing.outcomes.c2Chip2"), t("marketing.outcomes.c2Chip3")]}
+            />
+            <OutcomeCard
+              icon={<Wrench className="size-5" />}
+              title={t("marketing.outcomes.c3Title")}
+              body={t("marketing.outcomes.c3Body")}
+              chips={[t("marketing.outcomes.c3Chip1"), t("marketing.outcomes.c3Chip2"), t("marketing.outcomes.c3Chip3")]}
+            />
+            <OutcomeCard
+              icon={<Bell className="size-5" />}
+              title={t("marketing.outcomes.c4Title")}
+              body={t("marketing.outcomes.c4Body")}
+              chips={[t("marketing.outcomes.c4Chip1"), t("marketing.outcomes.c4Chip2")]}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. Essentials vs complex care ── */}
+      <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
+        <div className="max-w-6xl mx-auto">
+          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
+            <Kicker>{t("marketing.inside.kicker")}</Kicker>
+            <h2
+              className="tracking-tight text-marketing-ink"
+              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            >
+              {t("marketing.inside.title")}
+            </h2>
+            <p className="text-marketing-muted text-[1.05rem] leading-[1.7]">
               {t("marketing.inside.sub")}
             </p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            <ComparisonCard
+              title={t("marketing.essentials.title")}
+              subtitle={t("marketing.essentials.subtitle")}
+              items={[1, 2, 3, 4, 5, 6, 7, 8].map((n) => t(`marketing.essentials.i${n}`))}
+            />
+            <ComparisonCard
+              accent
+              title={t("marketing.complex.title")}
+              subtitle={t("marketing.complex.subtitle")}
+              items={[1, 2, 3, 4, 5, 6].map((n) => t(`marketing.complex.i${n}`))}
+            />
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
-            <Feature icon={<CalendarCheck className="size-5" />} title={t("marketing.inside.f1Title")} body={t("marketing.inside.f1Body")} />
-            <Feature icon={<Activity className="size-5" />} title={t("marketing.inside.f2Title")} body={t("marketing.inside.f2Body")} />
-            <Feature icon={<Pill className="size-5" />} title={t("marketing.inside.f3Title")} body={t("marketing.inside.f3Body")} />
-            <Feature icon={<Wind className="size-5" />} title={t("marketing.inside.f4Title")} body={t("marketing.inside.f4Body")} />
-            <Feature icon={<ClipboardList className="size-5" />} title={t("marketing.inside.f5Title")} body={t("marketing.inside.f5Body")} />
-            <Feature icon={<Siren className="size-5" />} title={t("marketing.inside.f6Title")} body={t("marketing.inside.f6Body")} />
-          </div>
-
-          <div className="mt-14 flex justify-center">
+          <div className="mt-12 flex justify-center">
             <Link
               to="/features"
               className="inline-flex items-center gap-2 text-sm font-medium text-marketing-ink border-b border-marketing-ink/30 hover:border-marketing-sage hover:text-marketing-sage transition-colors py-1"
             >
-              {t("marketing.inside.seeAll")} <ArrowRight className="size-4" />
+              {t("marketing.inside.seeAll")}
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ───────── Safety nets ───────── */}
-      <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-20 items-start">
-          <div className="space-y-5 lg:sticky lg:top-10">
-            <Kicker>{t("marketing.safety.kicker")}</Kicker>
-            <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
-              {t("marketing.safety.title")}
-            </h2>
-            <p className="text-marketing-muted text-lg leading-relaxed max-w-md">
-              {t("marketing.safety.body")}
-            </p>
+      {/* ── 7. Every shift, accounted for — deep violet card ── */}
+      <section className="px-6 md:px-8 py-20 md:py-28">
+        <Reveal className="max-w-6xl mx-auto">
+          <div
+            className="rounded-3xl p-8 md:p-14 relative overflow-hidden"
+            style={{
+              background:
+                "linear-gradient(135deg, color-mix(in oklab, var(--primary) 92%, black) 0%, color-mix(in oklab, var(--primary) 78%, transparent) 100%)",
+              color: "var(--primary-foreground)",
+            }}
+          >
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-40"
+              style={{
+                background:
+                  "radial-gradient(30rem 20rem at 90% 10%, color-mix(in oklab, white 20%, transparent), transparent 70%)",
+              }}
+            />
+            <div className="relative grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-14 items-center">
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.22em] mb-5 opacity-80">
+                  {t("marketing.team.kicker")}
+                </p>
+                <h2
+                  className="tracking-tight mb-6"
+                  style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+                >
+                  {t("marketing.team.title")}
+                </h2>
+                <p className="text-[1rem] leading-[1.75] opacity-90 max-w-xl mb-8">
+                  {t("marketing.team.body")}
+                </p>
+                <ul className="space-y-4">
+                  {[1, 2, 3].map((n) => (
+                    <li key={n} className="flex gap-3 items-start">
+                      <span className="mt-1 size-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <Check className="size-3" />
+                      </span>
+                      <div>
+                        <p className="font-semibold text-[0.95rem]">
+                          {t(`marketing.team.b${n}Title`)}
+                        </p>
+                        <p className="text-sm opacity-85 leading-relaxed">
+                          {t(`marketing.team.b${n}Body`)}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Mock screenshot: "Checked by Rusan · Kommun" */}
+              <div className="relative">
+                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 space-y-4 rotate-[-1deg]">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold">
+                      {t("marketing.team.mockLabel")}
+                    </p>
+                    <span className="text-[10px] rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 font-semibold">
+                      ✓
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="size-11 rounded-full flex items-center justify-center font-bold text-marketing-bg" style={{ background: "var(--primary)" }}>
+                      R
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
+                        {t("marketing.team.mockCheckedBy")}
+                      </p>
+                      <p className="text-lg italic text-marketing-ink" style={serif}>
+                        {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="h-px bg-marketing-line" />
+                  <div className="flex items-center gap-2 text-sm text-marketing-muted">
+                    <Check className="size-4 text-marketing-sage" />
+                    <span>{t("marketing.team.mockAnswer")}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <ul className="divide-y divide-marketing-line border-y border-marketing-line">
-            <SafetyRow icon={<BellRing className="size-5" />} title={t("marketing.safety.r1Title")} body={t("marketing.safety.r1Body")} />
-            <SafetyRow icon={<Wind className="size-5" />} title={t("marketing.safety.r2Title")} body={t("marketing.safety.r2Body")} />
-            <SafetyRow icon={<Activity className="size-5" />} title={t("marketing.safety.r3Title")} body={t("marketing.safety.r3Body")} />
-            <SafetyRow icon={<Siren className="size-5" />} title={t("marketing.safety.r4Title")} body={t("marketing.safety.r4Body")} />
-          </ul>
+        </Reveal>
+      </section>
+
+      {/* ── 8. Trust strip ── */}
+      <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line bg-marketing-surface">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
+          {[1, 2, 3, 4].map((n) => (
+            <Reveal key={n} delayMs={n * 60}>
+              <p
+                className="italic text-marketing-ink leading-[1.15] tracking-tight"
+                style={{ ...serif, fontSize: "clamp(1.25rem, 2vw, 1.75rem)" }}
+              >
+                {t(`marketing.trust.s${n}Value`)}
+              </p>
+              <p className="mt-2 text-sm text-marketing-muted leading-snug">
+                {t(`marketing.trust.s${n}Label`)}
+              </p>
+            </Reveal>
+          ))}
         </div>
       </section>
 
-      {/* ───────── Tablet / bilingual band ───────── */}
+      {/* ── 9. Tablet / bilingual band ── */}
       <section className="px-6 md:px-8 py-20 md:py-28">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
+        <Reveal className="max-w-3xl mx-auto text-center space-y-6">
           <Kicker>{t("marketing.tablet.kicker")}</Kicker>
-          <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
+          <h2
+            className="tracking-tight text-marketing-ink"
+            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+          >
             {t("marketing.tablet.title")}
           </h2>
-          <p className="text-marketing-muted text-lg leading-relaxed">
+          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
             {t("marketing.tablet.body")}
+          </p>
+          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+            {t("marketing.tablet.bodyExtra")}
           </p>
           <div className="flex flex-wrap gap-2 justify-center pt-4">
             <PillTag icon={<Tablet className="size-3.5" />}>{t("marketing.tablet.t1")}</PillTag>
             <PillTag icon={<Languages className="size-3.5" />}>{t("marketing.tablet.t2")}</PillTag>
             <PillTag icon={<ShieldCheck className="size-3.5" />}>{t("marketing.tablet.t3")}</PillTag>
           </div>
-        </div>
+        </Reveal>
       </section>
 
-      {/* ───────── Pricing ───────── */}
-      <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
-        <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
-          <Kicker>{t("marketing.pricing.kicker")}</Kicker>
-          <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
-            {t("marketing.pricing.title")}
-          </h2>
-        </div>
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
-          {/* Monthly */}
-          <div className="rounded-2xl border border-marketing-line bg-marketing-bg p-6 md:p-8 flex flex-col items-start">
-            <p className="text-sm font-medium text-marketing-muted mb-4">{t("marketing.pricing.monthlyLabel")}</p>
-            <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
-              {t("marketing.pricing.monthlyPrice")}
-            </p>
-            <p className="text-sm text-marketing-muted mb-6">{t("marketing.pricing.monthlySub")}</p>
-            <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
-              {t("marketing.pricing.featuresLabel")}
-            </p>
-            <ul className="space-y-2.5 mb-8">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                <li key={n} className="flex items-start gap-2.5 text-sm text-marketing-ink">
-                  <Check className="size-4 text-marketing-sage shrink-0 mt-0.5" />
-                  <span>{t(`marketing.pricing.f${n}`)}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/auth/signup"
-              className="mt-auto w-full text-center px-6 py-3.5 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
-            >
-              {t("marketing.pricing.monthlyCta")}
-            </Link>
-          </div>
+      {/* ── 10. What CareNest is not ── */}
+      <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line">
+        <Reveal className="max-w-2xl mx-auto text-center space-y-5">
+          <Kicker>{t("marketing.not.kicker")}</Kicker>
+          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+            {t("marketing.not.body")}
+          </p>
+        </Reveal>
+      </section>
 
-          {/* Annual — highlighted */}
-          <div className="relative rounded-2xl border-2 border-marketing-sage bg-marketing-bg p-6 md:p-8 flex flex-col items-start">
-            <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-marketing-sage text-marketing-bg px-3 py-1 text-xs font-semibold tracking-wide">
-              {t("marketing.pricing.annualBadge")}
-            </span>
-            <p className="text-sm font-medium text-marketing-muted mb-4">{t("marketing.pricing.annualLabel")}</p>
-            <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
-              {t("marketing.pricing.annualPrice")}
-            </p>
-            <p className="text-sm text-marketing-muted mb-6">{t("marketing.pricing.annualSub")}</p>
-            <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
-              {t("marketing.pricing.featuresLabel")}
-            </p>
-            <ul className="space-y-2.5 mb-8">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                <li key={n} className="flex items-start gap-2.5 text-sm text-marketing-ink">
-                  <Check className="size-4 text-marketing-sage shrink-0 mt-0.5" />
-                  <span>{t(`marketing.pricing.f${n}`)}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/auth/signup"
-              className="mt-auto w-full text-center px-6 py-3.5 rounded-xl bg-marketing-ink text-marketing-bg font-medium hover:bg-black transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
+      {/* ── 11. Pricing ── */}
+      <section id="pricing" className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-b border-marketing-line">
+        <div className="max-w-4xl mx-auto">
+          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
+            <Kicker>{t("marketing.pricing.kicker")}</Kicker>
+            <h2
+              className="tracking-tight text-marketing-ink"
+              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
             >
-              {t("marketing.pricing.annualCta")}
-            </Link>
+              {t("marketing.pricing.title")}
+            </h2>
+            <p className="text-marketing-muted text-[1.05rem] leading-[1.7]">
+              {t("marketing.pricing.sub")}
+            </p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <PriceCard
+              label={t("marketing.pricing.monthlyLabel")}
+              price={t("marketing.pricing.monthlyPrice")}
+              sub={t("marketing.pricing.monthlySub")}
+              featuresLabel={t("marketing.pricing.featuresLabel")}
+              cta={t("marketing.pricing.monthlyCta")}
+            />
+            <PriceCard
+              accent
+              badge={t("marketing.pricing.annualBadge")}
+              label={t("marketing.pricing.annualLabel")}
+              price={t("marketing.pricing.annualPrice")}
+              sub={t("marketing.pricing.annualSub")}
+              featuresLabel={t("marketing.pricing.featuresLabel")}
+              cta={t("marketing.pricing.annualCta")}
+            />
           </div>
         </div>
       </section>
 
-      {/* ───────── FAQ ───────── */}
-      <section id="faq" className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
+      {/* ── 12. FAQ ── */}
+      <section id="faq" className="px-6 md:px-8 py-20 md:py-28">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12 space-y-3">
+          <Reveal className="text-center mb-12 space-y-3">
             <Kicker>{t("marketing.faq.kicker")}</Kicker>
-            <h2 className="text-3xl md:text-5xl leading-tight tracking-tight" style={serif}>
+            <h2
+              className="tracking-tight text-marketing-ink"
+              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            >
               {t("marketing.faq.title")}
             </h2>
-          </div>
-          <Accordion type="single" collapsible className="divide-y divide-marketing-line border-y border-marketing-line">
-            {["q1", "q2", "q3", "q4", "q5", "q6"].map((k) => (
+          </Reveal>
+          <Accordion
+            type="single"
+            collapsible
+            defaultValue="q1"
+            className="divide-y divide-marketing-line border-y border-marketing-line"
+          >
+            {["q1", "q2", "q3", "q4", "q5", "q6", "q7"].map((k) => (
               <AccordionItem key={k} value={k} className="border-0">
-                <AccordionTrigger className="text-left text-lg py-5 hover:no-underline [&[data-state=open]>svg]:hidden text-marketing-ink" style={serif}>
+                <AccordionTrigger
+                  className="text-left text-lg py-5 hover:no-underline [&[data-state=open]>svg]:hidden text-marketing-ink"
+                  style={serif}
+                >
                   <span className="flex-1 pr-4">{t(`marketing.faq.${k}Q`)}</span>
                   <span className="text-marketing-sage shrink-0">
                     <Plus className="size-5 transition-transform [[data-state=open]_&]:rotate-45" />
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-6 text-marketing-muted leading-relaxed text-base">
+                <AccordionContent className="pb-6 text-marketing-muted leading-[1.75] text-[1rem]">
                   {t(`marketing.faq.${k}A`)}
                 </AccordionContent>
               </AccordionItem>
@@ -292,36 +405,33 @@ function Landing() {
         </div>
       </section>
 
-      {/* ───────── Final CTA ───────── */}
-      <section className="px-6 md:px-8 py-24 md:py-32">
-        <div className="max-w-3xl mx-auto text-center space-y-7">
-          <h2 className="text-4xl md:text-6xl leading-[1.05] tracking-tight" style={serif}>
+      {/* ── 13. Closing CTA ── */}
+      <section className="px-6 md:px-8 py-24 md:py-32 bg-marketing-surface border-t border-marketing-line">
+        <Reveal className="max-w-3xl mx-auto text-center space-y-7">
+          <h2
+            className="tracking-tight text-marketing-ink"
+            style={{ ...serif, fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.05 }}
+          >
             {t("marketing.cta.title")}
           </h2>
-          <p className="text-marketing-muted text-lg max-w-xl mx-auto leading-relaxed">
+          <p className="text-marketing-muted text-[1.05rem] max-w-xl mx-auto leading-[1.75]">
             {t("marketing.cta.body")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Link
               to="/auth/signup"
-              className="px-8 py-4 rounded-xl bg-marketing-ink text-marketing-bg font-medium hover:bg-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
+              className="inline-flex items-center justify-center rounded-full bg-marketing-sage text-marketing-bg font-semibold px-7 py-3.5 shadow-sm hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
             >
-              {t("splash.ctaCreate")}
+              {t("marketing.hero.ctaCreate")}
             </Link>
             <Link
               to="/invite"
-              className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium hover:bg-marketing-surface transition-colors"
+              className="inline-flex items-center justify-center rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink font-semibold px-7 py-3.5 hover:border-marketing-sage hover:text-marketing-sage transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
             >
-              {t("splash.ctaInvite")}
+              {t("marketing.hero.ctaInvite")}
             </Link>
           </div>
-          <p className="text-sm text-marketing-muted pt-4">
-            {t("splash.haveAccount")}{" "}
-            <Link to="/auth/login" className="text-marketing-sage hover:underline font-medium">
-              {t("splash.login")}
-            </Link>
-          </p>
-        </div>
+        </Reveal>
       </section>
 
       <MarketingFooter />
@@ -329,25 +439,18 @@ function Landing() {
   );
 }
 
-/* ─────────────────────── building blocks ─────────────────────── */
+/* ───────────────── building blocks ───────────────── */
 
-function Kicker({ children }: { children: React.ReactNode }) {
+function Kicker({ children }: { children: ReactNode }) {
   return (
-    <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
-      {children}
+    <p className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
+      <Sparkles className="size-3" />
+      <span>{children}</span>
     </p>
   );
 }
 
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full bg-marketing-bg border border-marketing-line px-4 py-1.5 text-sm text-marketing-ink">
-      {children}
-    </span>
-  );
-}
-
-function PillTag({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+function PillTag({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full bg-marketing-bg border border-marketing-line px-3.5 py-1.5 text-xs font-medium text-marketing-ink">
       <span className="text-marketing-sage">{icon}</span>
@@ -356,48 +459,251 @@ function PillTag({ icon, children }: { icon: React.ReactNode; children: React.Re
   );
 }
 
-function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+function OutcomeCard({
+  icon,
+  title,
+  body,
+  chips,
+}: {
+  icon: ReactNode;
+  title: string;
+  body: string;
+  chips: string[];
+}) {
   return (
-    <div className="group space-y-3.5">
-      <div className="size-11 rounded-2xl border border-marketing-line bg-marketing-bg text-marketing-sage flex items-center justify-center transition-transform group-hover:-translate-y-0.5">
+    <Reveal className="group rounded-3xl border border-marketing-line bg-marketing-bg p-7 md:p-8 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:border-marketing-sage-line">
+      <div className="size-11 rounded-2xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-5">
         {icon}
       </div>
-      <h3 className="text-2xl italic text-marketing-ink leading-tight" style={serif}>
+      <h3
+        className="italic text-marketing-ink leading-[1.15] mb-3"
+        style={{ ...serif, fontSize: "clamp(1.25rem, 2.2vw, 1.6rem)" }}
+      >
         {title}
       </h3>
-      <p className="text-marketing-muted leading-relaxed">{body}</p>
+      <p className="text-marketing-muted leading-[1.7] mb-5">{body}</p>
+      <div className="flex flex-wrap gap-2">
+        {chips.map((c) => (
+          <span
+            key={c}
+            className="rounded-full bg-marketing-surface border border-marketing-line px-3 py-1 text-xs text-marketing-muted"
+          >
+            {c}
+          </span>
+        ))}
+      </div>
+    </Reveal>
+  );
+}
+
+function ComparisonCard({
+  title,
+  subtitle,
+  items,
+  accent,
+}: {
+  title: string;
+  subtitle: string;
+  items: string[];
+  accent?: boolean;
+}) {
+  return (
+    <Reveal
+      className={`rounded-3xl bg-marketing-bg p-7 md:p-9 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+        accent ? "border-2 border-marketing-sage" : "border border-marketing-line"
+      }`}
+    >
+      <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
+      <h3 className="italic text-marketing-ink mb-6" style={{ ...serif, fontSize: "clamp(1.35rem, 2.4vw, 1.75rem)" }}>
+        {title}
+      </h3>
+      <ul className="space-y-3.5">
+        {items.map((it) => (
+          <li key={it} className="flex items-start gap-3 text-[0.95rem] text-marketing-ink leading-[1.6]">
+            <Check className={`size-4 shrink-0 mt-1 ${accent ? "text-marketing-sage" : "text-marketing-sage"}`} />
+            <span>{it}</span>
+          </li>
+        ))}
+      </ul>
+    </Reveal>
+  );
+}
+
+function PriceCard({
+  label,
+  price,
+  sub,
+  featuresLabel,
+  cta,
+  badge,
+  accent,
+}: {
+  label: string;
+  price: string;
+  sub: string;
+  featuresLabel: string;
+  cta: string;
+  badge?: string;
+  accent?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div
+      className={`relative rounded-3xl bg-marketing-bg p-7 md:p-8 flex flex-col items-start shadow-sm ${
+        accent ? "border-2 border-marketing-sage" : "border border-marketing-line"
+      }`}
+    >
+      {badge && (
+        <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-marketing-sage text-marketing-bg px-3 py-1 text-xs font-semibold tracking-wide">
+          {badge}
+        </span>
+      )}
+      <p className="text-sm font-medium text-marketing-muted mb-4">{label}</p>
+      <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
+        {price}
+      </p>
+      <p className="text-sm text-marketing-muted mb-6">{sub}</p>
+      <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
+        {featuresLabel}
+      </p>
+      <ul className="space-y-2.5 mb-8">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+          <li key={n} className="flex items-start gap-2.5 text-sm text-marketing-ink">
+            <Check className="size-4 text-marketing-sage shrink-0 mt-0.5" />
+            <span>{t(`marketing.pricing.f${n}`)}</span>
+          </li>
+        ))}
+      </ul>
+      <Link
+        to="/auth/signup"
+        className={`mt-auto w-full text-center px-6 py-3.5 rounded-xl font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage ${
+          accent
+            ? "bg-marketing-sage text-marketing-bg hover:brightness-[1.08] shadow-sm"
+            : "bg-marketing-bg border border-marketing-line text-marketing-ink hover:border-marketing-sage hover:text-marketing-sage"
+        }`}
+      >
+        {cta}
+      </Link>
     </div>
   );
 }
 
-function DayStep({ n, icon, title, body }: { n: string; icon: React.ReactNode; title: string; body: string }) {
+/* Day timeline (Section 4) */
+function DaySection() {
+  const { t } = useTranslation();
+  const steps = [1, 2, 3, 4].map((n) => ({
+    time: t(`marketing.day.t${n}Time`),
+    title: t(`marketing.day.t${n}Title`),
+    body: t(`marketing.day.t${n}Body`),
+  }));
   return (
-    <li className="bg-marketing-bg p-6 md:p-8 space-y-3">
-      <div className="flex items-center justify-between text-marketing-muted">
-        <span className="text-xs font-medium tracking-[0.2em]">{n}</span>
-        <span className="text-marketing-sage">{icon}</span>
+    <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
+      <div className="max-w-5xl mx-auto">
+        <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-16">
+          <Kicker>{t("marketing.day.kicker")}</Kicker>
+          <h2
+            className="tracking-tight text-marketing-ink"
+            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+          >
+            {t("marketing.day.title")}
+          </h2>
+          <p className="text-marketing-muted text-[1.05rem]">{t("marketing.day.sub")}</p>
+        </Reveal>
+
+        <ol className="relative md:pl-8">
+          {/* Vertical rail (desktop) */}
+          <span
+            aria-hidden
+            className="hidden md:block absolute left-2 top-2 bottom-2 w-px"
+            style={{ background: "color-mix(in oklab, var(--primary) 35%, transparent)" }}
+          />
+          {steps.map((s, i) => (
+            <li key={i} className="relative mb-10 last:mb-0">
+              <Reveal delayMs={i * 80}>
+                <div className="md:grid md:grid-cols-[9rem_1fr] md:gap-8 items-start">
+                  <div className="flex items-center gap-3 mb-3 md:mb-0">
+                    <span
+                      aria-hidden
+                      className="hidden md:block absolute left-0 -translate-x-[3px] size-3 rounded-full ring-4 ring-marketing-surface"
+                      style={{ top: "0.65rem", background: "var(--primary)" }}
+                    />
+                    <span
+                      className="rounded-full bg-marketing-bg border border-marketing-sage-line text-marketing-sage px-3 py-1 text-xs font-semibold tabular-nums"
+                    >
+                      {s.time}
+                    </span>
+                  </div>
+                  <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-6 md:p-7 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <h3
+                      className="italic text-marketing-ink mb-2 leading-tight"
+                      style={{ ...serif, fontSize: "clamp(1.15rem, 2vw, 1.5rem)" }}
+                    >
+                      {s.title}
+                    </h3>
+                    <p className="text-marketing-muted leading-[1.75] text-[0.98rem]">{s.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            </li>
+          ))}
+        </ol>
       </div>
-      <h3 className="text-xl italic text-marketing-ink leading-snug" style={serif}>
-        {title}
-      </h3>
-      <p className="text-sm text-marketing-muted leading-relaxed">{body}</p>
-    </li>
+    </section>
   );
 }
 
-function SafetyRow({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+/* Reveal: fade-up on IntersectionObserver (respects prefers-reduced-motion) */
+function Reveal({
+  children,
+  className = "",
+  delayMs = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  delayMs?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    if (mq.matches) {
+      setVisible(true);
+      return;
+    }
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setVisible(true);
+            io.disconnect();
+          }
+        }
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <li className="flex gap-5 items-start py-6">
-      <div className="size-10 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
-        {icon}
-      </div>
-      <div className="flex-1">
-        <h3 className="text-lg italic text-marketing-ink mb-1" style={serif}>
-          {title}
-        </h3>
-        <p className="text-marketing-muted leading-relaxed">{body}</p>
-      </div>
-    </li>
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible || reduced ? "translateY(0)" : "translateY(14px)",
+        transition: reduced ? "none" : `opacity 0.5s ease-out ${delayMs}ms, transform 0.5s ease-out ${delayMs}ms`,
+        willChange: "opacity, transform",
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -419,7 +725,6 @@ function Hero() {
         const el = ref.current;
         if (!el) return;
         const rect = el.getBoundingClientRect();
-        // 0 when hero top hits top of viewport; grows negative as page scrolls
         const y = Math.max(-200, Math.min(200, -rect.top * 0.06));
         setOffset(y);
       });
@@ -434,7 +739,7 @@ function Hero() {
       ref={ref}
       className="relative px-6 md:px-8 pt-10 md:pt-16 pb-20 md:pb-32 overflow-hidden"
     >
-      {/* Aurora — two large radial gradients on the lavender base */}
+      {/* Aurora */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10"
@@ -445,7 +750,6 @@ function Hero() {
       />
 
       <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-14 lg:gap-10 items-center">
-        {/* Left: copy */}
         <div className="max-w-xl">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-7">
             <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
@@ -465,10 +769,7 @@ function Hero() {
 
           <p
             className="text-marketing-muted mb-10 max-w-lg"
-            style={{
-              fontSize: "clamp(1rem, 1.15vw, 1.125rem)",
-              lineHeight: 1.7,
-            }}
+            style={{ fontSize: "clamp(1rem, 1.15vw, 1.125rem)", lineHeight: 1.7 }}
           >
             {t("marketing.hero.subline")}
           </p>
@@ -489,7 +790,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* Right: tablet on the wall + satellites */}
         <div className="relative w-full">
           <div
             className="relative mx-auto max-w-[560px]"
@@ -498,14 +798,9 @@ function Hero() {
               transition: "transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)",
             }}
           >
-            {/* Tablet bezel */}
             <div className="relative rounded-[2.25rem] bg-marketing-ink p-3 md:p-4 shadow-[0_40px_80px_-30px_rgba(45,41,38,0.35)] ring-1 ring-black/5">
-              {/* front camera dot */}
               <span className="absolute top-2 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-marketing-line/40" />
-
-              {/* Screen */}
               <div className="bg-marketing-surface rounded-[1.5rem] overflow-hidden">
-                {/* Top bar */}
                 <div className="h-11 border-b border-marketing-line px-5 flex items-center justify-between">
                   <div className="flex gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-marketing-line" />
@@ -517,18 +812,15 @@ function Hero() {
                   </div>
                   <div className="size-5 rounded-full bg-marketing-sage-soft border border-marketing-sage-line" />
                 </div>
-
-                {/* Body — task list, screenshot-quality */}
                 <div className="p-4 md:p-5 space-y-2.5">
                   <PreviewTask icon={<Pill className="size-4" />} title={t("marketing.inside.f3Title")} meta="08:00" done />
                   <PreviewTask icon={<Wind className="size-4" />} title={t("marketing.inside.f4Title")} meta="68 min" />
                   <PreviewTask icon={<Activity className="size-4" />} title={t("marketing.inside.f2Title")} meta="now" highlight />
-                  <PreviewTask icon={<CalendarCheck className="size-4" />} title={t("marketing.day.s3Title")} meta="15:00" />
+                  <PreviewTask icon={<CalendarCheck className="size-4" />} title={t("marketing.inside.f5Title")} meta="15:00" />
                 </div>
               </div>
             </div>
 
-            {/* Satellite: Oxygen — top-left overlap. Hidden on mobile. */}
             <div
               className="hidden md:block absolute -left-14 top-10 w-[220px] rounded-2xl bg-marketing-bg border border-marketing-line shadow-lg p-4"
               style={{
@@ -555,7 +847,6 @@ function Hero() {
               </p>
             </div>
 
-            {/* Satellite: Handover — bottom-right overlap. Hidden on mobile. */}
             <div
               className="hidden md:block absolute -right-10 -bottom-6 w-[260px] rounded-2xl bg-marketing-bg border border-marketing-line shadow-lg p-4"
               style={{
@@ -585,8 +876,6 @@ function Hero() {
   );
 }
 
-
-
 function PreviewTask({
   icon,
   title,
@@ -594,7 +883,7 @@ function PreviewTask({
   done,
   highlight,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   meta: string;
   done?: boolean;
@@ -621,17 +910,6 @@ function PreviewTask({
         {title}
       </span>
       <span className="text-xs text-marketing-muted tabular-nums">{meta}</span>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-[10px] uppercase tracking-wider text-marketing-muted">{label}</p>
-      <p className="text-2xl italic text-marketing-ink leading-tight" style={serif}>
-        {value}
-      </p>
     </div>
   );
 }
