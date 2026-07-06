@@ -22,6 +22,7 @@ const LIV_MINI_2L: FlowDuration[] = [
   { flow: 0.10, minutes: 2 * 1440 + 16 * 60 }, // 2 d 16 h
   { flow: 0.12, minutes: 2 * 1440 + 7 * 60 },  // 2 d 7 h
   { flow: 0.20, minutes: 33 * 60 },             // 33 h
+  { flow: 0.30, minutes: 22 * 60 },             // 22 h
 ];
 
 export const TANKS: Record<TankType, { label: string; flows: FlowDuration[] }> = {
