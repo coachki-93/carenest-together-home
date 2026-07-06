@@ -293,7 +293,7 @@ function HandoverPage() {
         <Button
           size="sm"
           className="rounded-full gap-1.5 font-semibold"
-          onClick={() => setOpen(true)}
+          onClick={openDialog}
         >
           <Plus className="size-4" /> {t("handoverPage.new")}
         </Button>
