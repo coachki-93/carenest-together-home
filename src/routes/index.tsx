@@ -68,63 +68,8 @@ function Landing() {
       <MarketingHeader />
 
       {/* ───────── Hero ───────── */}
-      <section className="relative px-6 md:px-8 pt-12 md:pt-20 pb-16 md:pb-24 overflow-hidden">
-        <div className="max-w-5xl mx-auto flex flex-col items-center text-center">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
-            {t("splash.badge")}
-          </span>
+      <Hero />
 
-          <h1
-            className="text-5xl md:text-7xl leading-[1.02] tracking-tight mb-7 max-w-4xl text-marketing-ink"
-            style={serif}
-          >
-            {t("marketing.hero.h1a")}{" "}
-            <span className="italic text-marketing-sage">
-              {t("marketing.hero.h1b")}
-            </span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-marketing-ink/90 max-w-2xl mb-4 leading-relaxed font-medium">
-            {t("marketing.hero.subhead")}
-          </p>
-
-          <p className="text-base md:text-lg text-marketing-muted max-w-2xl mb-6 leading-relaxed">
-            {t("marketing.hero.sub")}
-          </p>
-
-          <p className="text-sm text-marketing-muted/90 italic mb-10">
-            {t("marketing.hero.trust")}
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 mb-16 w-full justify-center">
-            <Link
-              to="/auth/signup"
-              className="px-8 py-4 rounded-xl bg-marketing-ink text-marketing-bg font-medium text-base hover:bg-black transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
-            >
-              {t("splash.ctaCreate")}
-            </Link>
-            <a
-              href="#day"
-              className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
-            >
-              {t("marketing.hero.ctaTour")}
-            </a>
-            <Link
-              to="/invite"
-              className="px-8 py-4 rounded-xl bg-marketing-bg border border-marketing-line text-marketing-ink font-medium text-base hover:bg-marketing-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
-            >
-              {t("splash.ctaInvite")}
-            </Link>
-          </div>
-
-          {/* App preview surface */}
-          <HeroPreview />
-        </div>
-
-        {/* hairline rule under hero */}
-        <div className="max-w-6xl mx-auto mt-20 border-t border-marketing-line" />
-      </section>
 
       {/* ───────── Who it's for ───────── */}
       <section className="px-6 md:px-8 py-20 md:py-24">
