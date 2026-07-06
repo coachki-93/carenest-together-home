@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import {
   Heart,
   Users,
@@ -19,8 +20,10 @@ import {
   Moon,
   Plus,
   Check,
+  MessageSquareText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
 import {
   Accordion,
   AccordionContent,
