@@ -12,7 +12,7 @@ export function MarketingFooter() {
             <Logo size={32} />
             <span
               className="text-xl tracking-tight text-marketing-ink"
-              style={{ fontFamily: "var(--font-serif)" }}
+              style={{ fontFamily: "var(--font-display)", fontWeight: 800, letterSpacing: "-0.02em" }}
             >
               CareNest
             </span>
@@ -20,7 +20,7 @@ export function MarketingFooter() {
           <p className="text-sm text-marketing-muted max-w-sm leading-relaxed">
             {t("marketing.footer.tagline")}
           </p>
-          <p className="text-xs text-marketing-muted italic" style={{ fontFamily: "var(--font-serif)" }}>
+          <p className="text-xs text-marketing-muted italic">
             {t("marketing.footer.trustLine")}
           </p>
         </div>
