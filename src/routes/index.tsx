@@ -155,7 +155,7 @@ function Landing() {
             </h2>
           </Reveal>
 
-          <div className="grid md:grid-cols-2 gap-6 md:gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6">
             <OutcomeCard
               icon={<Home className="size-5" />}
               title={t("marketing.outcomes.c1Title")}
