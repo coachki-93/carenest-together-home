@@ -86,7 +86,7 @@ function Landing() {
           </Reveal>
 
           {/* Right: For whom */}
-          <Reveal className="space-y-5 text-left" delay={90}>
+          <Reveal className="space-y-5 text-left" delayMs={90}>
             <Kicker>{t("marketing.forWhom.kicker")}</Kicker>
             <h2 className="text-display-sm text-marketing-ink" style={display}>
               {t("marketing.forWhom.title")}
