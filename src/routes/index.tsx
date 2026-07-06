@@ -421,7 +421,7 @@ function Landing() {
             type="single"
             collapsible
             defaultValue="q1"
-            className="divide-y divide-marketing-line border-y border-marketing-line"
+            className="mk-glass rounded-3xl px-5 md:px-7 divide-y divide-marketing-line/60"
           >
             {["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"].map((k) => (
               <AccordionItem key={k} value={k} className="border-0">
