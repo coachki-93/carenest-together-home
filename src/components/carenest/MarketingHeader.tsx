@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { cn } from "@/lib/utils";
-import logoIcon from "@/assets/carenest-icon-only.png.asset.json";
+
 
 export function MarketingHeader() {
   const { t } = useTranslation();
@@ -36,29 +36,36 @@ export function MarketingHeader() {
           {/* Liquid glass pill */}
           <div
             className={cn(
-              "flex items-center justify-between gap-3 md:gap-5 w-full md:w-auto rounded-full",
-              "bg-marketing-bg/60 supports-[backdrop-filter]:bg-marketing-bg/45 backdrop-blur-2xl",
-              "transition-all duration-300",
+              "flex items-center justify-between gap-3 md:gap-5 w-full md:w-auto rounded-full overflow-visible",
+              "transition-[background-color,box-shadow,padding,transform] duration-200 ease-out",
               scrolled
                 ? "px-3 py-1.5 md:px-4 md:py-2 scale-[0.99] md:scale-100"
                 : "px-4 py-2 md:px-5 md:py-2.5",
             )}
             style={{
-              border: "1px solid color-mix(in oklab, var(--primary) 14%, transparent)",
-              boxShadow:
-                "0 10px 40px -20px color-mix(in oklab, var(--primary) 35%, transparent), inset 0 1px 0 rgba(255,255,255,0.55)",
+              backgroundColor: scrolled
+                ? "rgba(255,255,255,0.70)"
+                : "rgba(255,255,255,0.50)",
+              WebkitBackdropFilter: "blur(20px) saturate(1.5)",
+              backdropFilter: "blur(20px) saturate(1.5)",
+              border: "1px solid rgba(255,255,255,0.6)",
+              boxShadow: scrolled
+                ? "0 12px 40px -18px color-mix(in oklab, var(--primary) 40%, transparent), 0 2px 8px -4px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)"
+                : "0 8px 30px -20px color-mix(in oklab, var(--primary) 30%, transparent), inset 0 1px 0 rgba(255,255,255,0.6)",
             }}
           >
             {/* Logo (left) */}
             <Link
               to="/"
-              className="flex items-center hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full"
+              className="flex items-center hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full -my-1"
               aria-label="CareNest"
             >
               <img
-                src={logoIcon.url}
+                src="/carenest-logo-nav.png"
                 alt="CareNest"
-                className="h-9 md:h-10 w-auto select-none"
+                width={215}
+                height={96}
+                className="h-9 w-auto select-none"
                 draggable={false}
               />
             </Link>
