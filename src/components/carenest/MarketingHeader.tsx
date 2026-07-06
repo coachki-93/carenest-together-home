@@ -20,10 +20,11 @@ export function MarketingHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Deep violet ink — CareNest primary hue, very low lightness
+  // Deep violet ink — CareNest primary hue, very low lightness.
+  // More liquid: lower opacity so the aurora glows through.
   const pillBg = scrolled
-    ? "color-mix(in oklab, var(--primary) 22%, #0a0612 90%)"
-    : "color-mix(in oklab, var(--primary) 22%, #0a0612 75%)";
+    ? "color-mix(in oklab, var(--primary) 22%, #0a0612 75%)"
+    : "color-mix(in oklab, var(--primary) 22%, #0a0612 58%)";
 
   const linkBase =
     "px-3 py-1.5 text-sm font-medium text-white/85 hover:text-white hover:bg-white/10 rounded-full transition-all";
@@ -51,28 +52,27 @@ export function MarketingHeader() {
             )}
             style={{
               backgroundColor: pillBg,
-              WebkitBackdropFilter: "blur(16px) saturate(1.3)",
-              backdropFilter: "blur(16px) saturate(1.3)",
+              WebkitBackdropFilter: "blur(20px) saturate(1.5)",
+              backdropFilter: "blur(20px) saturate(1.5)",
               border: "1px solid rgba(255,255,255,0.10)",
               boxShadow: scrolled
-                ? "0 14px 44px -18px rgba(0,0,0,0.55), 0 2px 10px -4px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)"
-                : "0 10px 32px -20px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+                ? "0 14px 44px -18px rgba(0,0,0,0.55), 0 2px 10px -4px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.10)"
+                : "0 10px 32px -20px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.10)",
             }}
           >
-            {/* Logo (left) — white via filter */}
+            {/* Logo (left) — white variant */}
             <Link
               to="/"
-              className="flex items-center hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-full -my-1"
+              className="flex items-center hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-full"
               aria-label="CareNest"
             >
               <img
-                src="/carenest-logo-nav.png"
+                src="/carenest-logo-nav-white.png"
                 alt="CareNest"
-                width={215}
-                height={96}
-                className="h-9 w-auto select-none"
+                width={157}
+                height={70}
+                className="h-7 w-auto select-none"
                 draggable={false}
-                style={{ filter: "brightness(0) invert(1)" }}
               />
             </Link>
 
