@@ -1136,6 +1136,9 @@ export const sv = {
     imageTooLarge: "Bilden är för stor (max 1,5 MB). Välj en mindre.",
   },
   carePlace: {
+    whoWorking: "Vem jobbar det här passet?",
+    checkedBy: "Kontrollerad av",
+    pickProfileFirst: "Välj vem som jobbar det här passet först.",
     badge: "Kontroll utav vårdplats",
     bannerTitle: "Utför kontroll utav vårdplats",
     bannerSubtitle: "Schemalagd kontroll för {{slot}} väntar.",

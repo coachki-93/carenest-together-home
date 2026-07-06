@@ -32,6 +32,8 @@ import {
 } from "@/lib/data/adhoc-items";
 import { useInventoryItems, isLowStock, type InventoryItem } from "@/lib/data/inventory";
 import { useFamily } from "@/lib/data/family";
+import { useCurrentActor, guardActingProfile } from "@/lib/data/current-actor";
+import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 
 interface Props {
   familyId: string | undefined | null;
@@ -65,6 +67,13 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const { data: family } = useFamily(familyId);
   const submit = useSubmitCarePlaceCheck();
   const resolveAdhoc = useResolveAdhocItem();
+  const actor = useCurrentActor(familyId ?? null);
+  // Shared store — same subscription as ActiveProfileSwitcher / useCurrentActor.
+  const { setActive } = useActiveCaregiverProfile(familyId ?? null, userId ?? null);
+  const myProfiles = actor.profiles;
+  const activeProfile = actor.activeProfile;
+  const multiProfileNoActive =
+    myProfiles.length > 1 && !actor.activeProfileId;
 
   const inventoryById = useMemo(() => {
     const map = new Map<string, InventoryItem>();
@@ -159,12 +168,18 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
       toast.error(err);
       return;
     }
+    const guard = guardActingProfile(actor);
+    if (guard.blocked) {
+      toast.error(t("carePlace.pickProfileFirst"));
+      return;
+    }
     try {
       const today = new Date();
       const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
       const check = await submit.mutateAsync({
         family_id: familyId!,
         performed_by: userId!,
+        caregiver_profile_id: guard.caregiverProfileId,
         scheduled_time: currentSlot.time_of_day,
         scheduled_date: localDate,
         notes: notes.trim() || null,
@@ -283,6 +298,39 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             </div>
           </DialogHeader>
 
+          {myProfiles.length > 0 && (
+            <div className="rounded-xl border bg-muted/40 p-3 space-y-2">
+              <Label className="text-sm font-semibold">
+                {t("carePlace.whoWorking")}
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {myProfiles.map((p) => {
+                  const isActive = activeProfile?.id === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setActive(p.id)}
+                      className={
+                        "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold transition " +
+                        (isActive
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-input bg-background hover:bg-accent")
+                      }
+                      aria-pressed={isActive}
+                    >
+                      <span
+                        className="inline-block size-2.5 rounded-full"
+                        style={{ background: p.color }}
+                      />
+                      {p.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {activeItems.length === 0 && slotAdhocs.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
               {t("carePlace.empty")}
@@ -336,7 +384,11 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={submit.isPending || activeItems.length === 0}
+              disabled={
+                submit.isPending ||
+                activeItems.length === 0 ||
+                multiProfileNoActive
+              }
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               {submit.isPending && <Loader2 className="size-4 animate-spin" />}

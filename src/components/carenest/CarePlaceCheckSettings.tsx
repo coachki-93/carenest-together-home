@@ -24,6 +24,7 @@ import {
   type CarePlaceItemType,
 } from "@/lib/data/care-place-checks";
 import { useInventoryItems } from "@/lib/data/inventory";
+import { ByProfile } from "@/components/carenest/ByProfile";
 
 interface Props {
   familyId: string | undefined | null;
@@ -505,7 +506,7 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
             {t("carePlace.noHistory")}
           </p>
         ) : (
-          <HistoryList history={history} />
+          <HistoryList history={history} familyId={familyId} userId={userId} />
         )}
       </div>
     </section>
@@ -514,12 +515,16 @@ export function CarePlaceCheckSettings({ familyId, userId, isOwner }: Props) {
 
 function HistoryList({
   history,
+  familyId,
+  userId,
 }: {
   history: ReturnType<typeof useCarePlaceCheckHistory>["data"] extends
     | infer H
     | undefined
     ? H
     : never;
+  familyId: string | undefined | null;
+  userId: string | undefined | null;
 }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -538,6 +543,15 @@ function HistoryList({
               {h.answers.length} {t("carePlace.itemsLabel")}
             </span>
           </summary>
+          <div className="mt-2 text-xs">
+            <ByProfile
+              familyId={familyId}
+              caregiverProfileId={h.caregiver_profile_id}
+              authorUserId={h.performed_by}
+              viewerUserId={userId}
+              label={t("carePlace.checkedBy")}
+            />
+          </div>
           <ul className="mt-2 space-y-1 text-sm">
             {h.answers.map((a) => (
               <li key={a.id} className="flex justify-between gap-3">
