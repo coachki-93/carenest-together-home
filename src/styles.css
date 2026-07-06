@@ -290,7 +290,6 @@
   --color-marketing-sage: var(--primary);
   --color-marketing-sage-soft: var(--primary-soft);
   --color-marketing-sage-line: var(--lavender-deep);
-  --font-serif: "Instrument Serif", ui-serif, Georgia, "Times New Roman", serif;
   --font-sans-marketing: var(--font-sans);
 }
 
