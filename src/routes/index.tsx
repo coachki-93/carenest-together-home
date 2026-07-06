@@ -630,8 +630,10 @@ function PriceCard({
   const { t } = useTranslation();
   return (
     <div
-      className={`relative rounded-3xl bg-marketing-bg p-7 md:p-8 flex flex-col items-start shadow-sm ${
-        accent ? "border-2 border-marketing-sage" : "border border-marketing-line"
+      className={`relative rounded-3xl bg-marketing-bg p-7 md:p-8 flex flex-col items-start ${
+        accent
+          ? "mk-price-glow border-2 border-marketing-sage"
+          : "border border-marketing-line shadow-sm"
       }`}
     >
       {badge && (
