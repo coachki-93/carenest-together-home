@@ -272,6 +272,12 @@ function SettingsPage() {
         </section>
 
 
+        {/* Family timezone & notification language */}
+        <FamilyLocaleSettings
+          familyId={membership.data?.family_id}
+          isOwner={membership.data?.role === "owner"}
+        />
+
         {/* Care place control */}
         <CarePlaceCheckSettings
           familyId={membership.data?.family_id}
