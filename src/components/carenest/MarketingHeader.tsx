@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { cn } from "@/lib/utils";
-import wordmark from "@/assets/carenest-wordmark.png.asset.json";
+import logoIcon from "@/assets/carenest-icon-only.png.asset.json";
 
 export function MarketingHeader() {
   const { t } = useTranslation();
