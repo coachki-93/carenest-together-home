@@ -447,12 +447,12 @@ function Landing() {
       <section className="px-6 md:px-8 py-24 md:py-32 bg-marketing-surface border-t border-marketing-line">
         <Reveal className="max-w-3xl mx-auto text-center space-y-7">
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...display, fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.05 }}
+            className="text-display-lg text-marketing-ink"
+            style={display}
           >
             {t("marketing.cta.title")}
           </h2>
-          <p className="text-marketing-muted text-[1.05rem] max-w-xl mx-auto leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg max-w-xl mx-auto leading-[1.7]">
             {t("marketing.cta.body")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
