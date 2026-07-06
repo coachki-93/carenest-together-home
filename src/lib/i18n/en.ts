@@ -1601,6 +1601,23 @@ export const en = {
     timeAdded: "Handover time added.",
     saved: "Handover reminder updated.",
   },
+  familyLocale: {
+    title: "Timezone & notifications",
+    subtitle:
+      "Controls how scheduled reminders compute today's date and which language push notifications use for this family.",
+    ownerOnly: "Only the family owner can change these settings.",
+    timezone: "Timezone",
+    tzSearch: "Search timezones…",
+    tzNoMatch: "No timezone matches.",
+    tzHint:
+      "Used by scheduled jobs (missed checks, task reminders) to know when the day rolls over.",
+    invalidTz: "That timezone isn't recognized by your browser.",
+    tzSaved: "Timezone updated.",
+    notificationLanguage: "Notification language",
+    langHint:
+      "Language used for push notifications sent by the server (independent of each caregiver's app language).",
+    langSaved: "Notification language updated.",
+  },
   maintenance: {
     title: "Maintenance",
     subtitle: "Machines and their scheduled maintenance.",
