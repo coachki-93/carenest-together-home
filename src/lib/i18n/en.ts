@@ -1136,6 +1136,9 @@ export const en = {
     imageTooLarge: "Image is too large (max 1.5 MB). Please pick a smaller one.",
   },
   carePlace: {
+    whoWorking: "Who's working this shift?",
+    checkedBy: "Checked by",
+    pickProfileFirst: "Choose who's working this shift first.",
     badge: "Care place control",
     bannerTitle: "Perform care place control",
     bannerSubtitle: "Scheduled check for {{slot}} is waiting.",

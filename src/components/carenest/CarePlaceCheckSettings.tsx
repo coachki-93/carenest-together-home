@@ -543,6 +543,15 @@ function HistoryList({
               {h.answers.length} {t("carePlace.itemsLabel")}
             </span>
           </summary>
+          <div className="mt-2 text-xs">
+            <ByProfile
+              familyId={familyId}
+              caregiverProfileId={h.caregiver_profile_id}
+              authorUserId={h.performed_by}
+              viewerUserId={userId}
+              label={t("carePlace.checkedBy")}
+            />
+          </div>
           <ul className="mt-2 space-y-1 text-sm">
             {h.answers.map((a) => (
               <li key={a.id} className="flex justify-between gap-3">
