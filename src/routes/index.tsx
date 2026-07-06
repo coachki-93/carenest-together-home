@@ -54,7 +54,7 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const serif = { fontFamily: "var(--font-serif)" } as const;
+const serif = { fontFamily: "var(--font-display)", fontWeight: 800, letterSpacing: "-0.02em" } as const;
 const sansMk = { fontFamily: "var(--font-sans-marketing)" } as const;
 
 function Landing() {
@@ -744,7 +744,7 @@ function Hero() {
         }}
       />
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-14 lg:gap-10 items-center">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.1fr] gap-14 lg:gap-14 items-center">
         <div className="max-w-xl">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-7">
             <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
@@ -752,10 +752,10 @@ function Hero() {
           </span>
 
           <h1
-            className="tracking-tight text-marketing-ink mb-6"
+            className="tracking-tight text-primary mb-6 max-w-[16ch]"
             style={{
               ...serif,
-              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+              fontSize: "clamp(2.5rem, 5.5vw, 4.25rem)",
               lineHeight: 1.05,
             }}
           >

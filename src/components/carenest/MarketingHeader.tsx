@@ -32,7 +32,7 @@ export function MarketingHeader() {
           <Logo size={32} />
           <span
             className="text-xl tracking-tight text-marketing-ink"
-            style={{ fontFamily: "var(--font-serif)" }}
+            style={{ fontFamily: "var(--font-display)", fontWeight: 800, letterSpacing: "-0.02em" }}
           >
             CareNest
           </span>
@@ -70,7 +70,7 @@ export function MarketingHeader() {
           </Link>
           <Link
             to="/auth/signup"
-            className="inline-flex items-center rounded-full bg-marketing-sage px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-medium text-marketing-bg hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage shadow-sm"
+            className="inline-flex items-center rounded-full bg-primary px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-primary-foreground hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary shadow-sm"
           >
             {t("splash.getStarted")}
           </Link>
