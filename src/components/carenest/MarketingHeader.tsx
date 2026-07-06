@@ -56,9 +56,9 @@ export function MarketingHeader() {
               aria-label="CareNest"
             >
               <img
-                src={wordmark.url}
+                src={logoIcon.url}
                 alt="CareNest"
-                className="h-6 md:h-7 w-auto select-none"
+                className="h-9 md:h-10 w-auto select-none"
                 draggable={false}
               />
             </Link>
