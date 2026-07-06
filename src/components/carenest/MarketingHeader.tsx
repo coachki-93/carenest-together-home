@@ -21,10 +21,10 @@ export function MarketingHeader() {
   }, []);
 
   // Deep violet ink — CareNest primary hue, very low lightness.
-  // More liquid: lower opacity so the aurora glows through.
+  // Even more liquid: let the aurora glow through.
   const pillBg = scrolled
-    ? "color-mix(in oklab, var(--primary) 22%, #0a0612 75%)"
-    : "color-mix(in oklab, var(--primary) 22%, #0a0612 58%)";
+    ? "color-mix(in oklab, var(--primary) 22%, #0a0612 55%)"
+    : "color-mix(in oklab, var(--primary) 22%, #0a0612 38%)";
 
   const linkBase =
     "px-3 py-1.5 text-sm font-medium text-white/85 hover:text-white hover:bg-white/10 rounded-full transition-all";
@@ -71,7 +71,7 @@ export function MarketingHeader() {
                 alt="CareNest"
                 width={157}
                 height={70}
-                className="h-7 w-auto select-none"
+                className="h-[22px] w-auto select-none"
                 draggable={false}
               />
             </Link>
