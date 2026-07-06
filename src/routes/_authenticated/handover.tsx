@@ -133,6 +133,7 @@ function HandoverPage() {
       medRefused: t("handoverPage.prefill.medRefused"),
       medPostponed: t("handoverPage.prefill.medPostponed"),
       medMissed: t("handoverPage.prefill.medMissed"),
+      medAllGiven: t("handoverPage.prefill.medAllGiven"),
       apptMissed: t("handoverPage.prefill.apptMissed"),
       apptCancelled: t("handoverPage.prefill.apptCancelled"),
       vitalAbnormal: t("handoverPage.prefill.vitalAbnormal"),
