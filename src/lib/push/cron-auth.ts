@@ -1,16 +1,14 @@
 /**
  * Auth check for `/api/public/hooks/*` cron endpoints.
  *
- * Primary: caller sends `x-cron-secret: <secret>`, where the expected value
- * is stored in `private.app_secrets` (key='cron_secret') and fetched via the
- * `public.get_app_secret` SECURITY DEFINER RPC using the service role. This
- * lets us rotate the secret with a single UPDATE — no redeploy required.
+ * Caller must send `x-cron-secret: <secret>`. The expected value is stored in
+ * `private.app_secrets` (key='cron_secret') and fetched via the
+ * `public.get_app_secret` SECURITY DEFINER RPC using the service role, cached
+ * in module scope for 60s. Rotation is a one-line UPDATE on the table — no
+ * redeploy required.
  *
- * Optional override: env `CRON_SECRET`, when set, takes precedence over the DB
- * value (useful for local runs).
- *
- * Legacy fallback (one deploy cycle, remove after pg_cron jobs are verified
- * green on x-cron-secret): caller sends `apikey: <SUPABASE_PUBLISHABLE_KEY>`.
+ * Optional override: env `CRON_SECRET`, when set and matched, is accepted too
+ * (useful for local runs / emergency access).
  *
  * Returns null when authorized, or a 401 Response otherwise.
  */
@@ -37,20 +35,13 @@ async function loadDbSecret(): Promise<string | null> {
 
 export async function authorizeCronRequest(request: Request): Promise<Response | null> {
   const provided = request.headers.get("x-cron-secret") || "";
+  if (!provided) return new Response("Unauthorized", { status: 401 });
 
   const envOverride = process.env.CRON_SECRET || "";
-  if (envOverride && provided && provided === envOverride) return null;
+  if (envOverride && provided === envOverride) return null;
 
-  if (provided) {
-    const dbSecret = await loadDbSecret();
-    if (dbSecret && provided === dbSecret) return null;
-  }
-
-  // Legacy fallback — remove once pg_cron jobs are verified green.
-  const legacyKey =
-    process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || "";
-  const apiKey = request.headers.get("apikey") || "";
-  if (legacyKey && apiKey && apiKey === legacyKey) return null;
+  const dbSecret = await loadDbSecret();
+  if (dbSecret && provided === dbSecret) return null;
 
   return new Response("Unauthorized", { status: 401 });
 }
