@@ -25,12 +25,22 @@ export async function setI18nLanguage(lang: Lang) {
   }
 }
 
-/** Resolve the language for the very first paint (SSR + hydration).
- *  Uses ONLY the cookie so server and client always agree. Post-hydration
- *  code can call `detectClientLanguage()` to upgrade from localStorage/nav. */
+/** Resolve the language for the very first client paint.
+ *  Prefers the cookie (matches SSR), then localStorage, then "en".
+ *  The localStorage fallback keeps preferences sticky in environments
+ *  where the cookie write is rejected (cross-origin preview iframe,
+ *  Safari block-all-cookies, private mode). */
 export function resolveClientLanguage(): Lang {
   if (typeof window === "undefined") return "en";
-  return readLangCookieClient() ?? "en";
+  const fromCookie = readLangCookieClient();
+  if (fromCookie) return fromCookie;
+  try {
+    const ls = window.localStorage.getItem(I18N_STORAGE_KEY);
+    if (isLang(ls)) return ls;
+  } catch {
+    // ignore
+  }
+  return "en";
 }
 
 /** Detect a language preference from localStorage or navigator.
