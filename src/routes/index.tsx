@@ -339,15 +339,15 @@ function Landing() {
         <Reveal className="max-w-3xl mx-auto text-center space-y-6">
           <Kicker>{t("marketing.tablet.kicker")}</Kicker>
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...display, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            className="text-display-md text-marketing-ink"
+            style={display}
           >
             {t("marketing.tablet.title")}
           </h2>
-          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.tablet.body")}
           </p>
-          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.tablet.bodyExtra")}
           </p>
           <div className="flex flex-wrap gap-2 justify-center pt-4">
