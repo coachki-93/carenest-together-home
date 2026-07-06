@@ -481,20 +481,53 @@ function Landing() {
 
 function Kicker({ children }: { children: ReactNode }) {
   return (
-    <p className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
+    <span className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
       <Sparkles className="size-3" />
       <span>{children}</span>
-    </p>
+    </span>
   );
 }
 
 function PillTag({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full bg-marketing-bg border border-marketing-line px-3.5 py-1.5 text-xs font-medium text-marketing-ink">
+    <span className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium text-marketing-ink">
       <span className="text-marketing-sage">{icon}</span>
       {children}
     </span>
   );
+}
+
+/* Mouse-following radial highlight on cards. Desktop-hover only. */
+function useFlashlight<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const el = ref.current;
+    if (!el) return;
+    const hoverMq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const reducedMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!hoverMq.matches || reducedMq.matches) return;
+    let raf = 0;
+    let lastX = 0;
+    let lastY = 0;
+    const onMove = (e: MouseEvent) => {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty("--mx", `${lastX - rect.left}px`);
+        el.style.setProperty("--my", `${lastY - rect.top}px`);
+      });
+    };
+    el.addEventListener("mousemove", onMove);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
+  return ref;
 }
 
 function OutcomeCard({
