@@ -2074,6 +2074,7 @@ export type Database = {
         Args: { _family_id: string; _profile_id: string }
         Returns: boolean
       }
+      get_app_secret: { Args: { _key: string }; Returns: string }
       is_family_member: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
