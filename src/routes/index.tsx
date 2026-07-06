@@ -61,7 +61,7 @@ function Landing() {
   const { t } = useTranslation();
   return (
     <main
-      className="min-h-screen bg-marketing-bg text-marketing-ink antialiased"
+      className="min-h-screen bg-marketing-bg text-marketing-ink antialiased pt-20 md:pt-24"
       style={sansMk}
     >
       <MarketingHeader />
