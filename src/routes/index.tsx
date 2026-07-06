@@ -321,8 +321,8 @@ function Landing() {
           {[1, 2, 3, 4].map((n) => (
             <Reveal key={n} delayMs={n * 60}>
               <p
-                className="italic text-marketing-ink leading-[1.15] tracking-tight"
-                style={{ ...display, fontSize: "clamp(1.25rem, 2vw, 1.75rem)" }}
+                className="text-display-sm italic text-marketing-ink"
+                style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
               </p>
