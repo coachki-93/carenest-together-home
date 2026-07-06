@@ -1,6 +1,11 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource/figtree/400.css";
+@import "@fontsource/figtree/500.css";
+@import "@fontsource/figtree/600.css";
+@import "@fontsource/figtree/700.css";
+@import "@fontsource/figtree/800.css";
 
 
 @custom-variant dark (&:is(.dark *));
@@ -61,8 +66,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: "Nunito", "Inter", system-ui, -apple-system, sans-serif;
-  --font-display: "Nunito", "Inter", system-ui, sans-serif;
+  --font-sans: "Figtree", "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Figtree", "Inter", system-ui, sans-serif;
 
   --shadow-soft: 0 4px 20px -8px color-mix(in oklab, var(--primary) 18%, transparent);
   --shadow-card: 0 1px 2px oklch(0.6 0.08 290 / 0.05), 0 8px 24px -12px oklch(0.55 0.15 290 / 0.12);
