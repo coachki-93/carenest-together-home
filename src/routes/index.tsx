@@ -815,13 +815,13 @@ function HeroHeadline({ text }: { text: string }) {
   const words = text.split(" ");
   return (
     <h1
-      className="mk-headline-gradient text-display-xl mx-auto"
+      className="text-display-xl mx-auto text-primary"
       style={{ ...display, maxWidth: "18ch" }}
     >
       {words.map((w, i) => (
         <span
           key={i}
-          className="inline-block"
+          className="mk-headline-gradient inline-block"
           style={{
             opacity: visible || reduced ? 1 : 0,
             transform: visible || reduced ? "translateY(0)" : "translateY(10px)",
