@@ -6,31 +6,53 @@ import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
 
+import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
+
 const SITE = "https://carenest-together-home.lovable.app";
+const OG_IMAGE = SITE + "/og-image.jpg";
+
+const INSTALL_META = {
+  en: {
+    title: "Install CareNest on your phone or tablet — CareNest",
+    description:
+      "Add CareNest to your home screen and it opens full-screen like an app. Step-by-step for iPhone/iPad (Safari) and Android (Chrome).",
+    ogTitle: "Install CareNest on your device",
+    ogDescription:
+      "A quick guide to add CareNest to your home screen — no app store needed. Notifications work once installed.",
+  },
+  sv: {
+    title: "Installera CareNest på din telefon eller surfplatta — CareNest",
+    description:
+      "Lägg till CareNest på hemskärmen så öppnas den i helskärm som en app. Steg för steg för iPhone/iPad (Safari) och Android (Chrome).",
+    ogTitle: "Installera CareNest på din enhet",
+    ogDescription:
+      "En snabb guide för att lägga till CareNest på hemskärmen — ingen appbutik behövs. Aviseringar fungerar när den är installerad.",
+  },
+} as const;
 
 export const Route = createFileRoute("/install")({
-  head: () => ({
-    meta: [
-      { title: "Install CareNest on your phone or tablet — CareNest" },
-      {
-        name: "description",
-        content:
-          "Add CareNest to your home screen and it opens full-screen like an app. Step-by-step for iPhone/iPad (Safari) and Android (Chrome).",
-      },
-      { property: "og:title", content: "Install CareNest on your device" },
-      {
-        property: "og:description",
-        content:
-          "A quick guide to add CareNest to your home screen — no app store needed. Notifications work once installed.",
-      },
-      { property: "og:url", content: SITE + "/install" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: SITE + "/install" }],
-  }),
+  head: () => {
+    const lang = resolveHeadLanguage();
+    const m = INSTALL_META[lang];
+    return {
+      meta: [
+        { title: m.title },
+        { name: "description", content: m.description },
+        { property: "og:title", content: m.ogTitle },
+        { property: "og:description", content: m.ogDescription },
+        { property: "og:url", content: SITE + "/install" },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: OG_LOCALE[lang] },
+        { property: "og:image", content: OG_IMAGE },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: SITE + "/install" }],
+    };
+  },
   component: InstallPage,
 });
+
 
 const serif = { fontFamily: "var(--font-display)", fontWeight: 700, letterSpacing: "-0.025em" } as const;
 
