@@ -1367,6 +1367,18 @@ export const sv = {
       faq: "Vanliga frågor",
     },
     hero: {
+      kicker: "Omsorg, tillsammans",
+      headline: "Allt om ditt barns omsorg — ur ditt huvud, till en lugn plats.",
+      subline: "CareNest är familjens gemensamma bas när ett barn har särskilda behov. Schemat, medicinerna, maskinerna, allt som varje assistent behöver veta — synligt för alla ni litar på, så att dagen inte längre hänger på att just du kommer ihåg allt.",
+      ctaCreate: "Skapa er familjeplats",
+      ctaInvite: "Jag har en inbjudan",
+      mockShift: "Skiftbyte · 14:00",
+      satOxygenLabel: "Syrgas",
+      satOxygenValue: "2 d 6 h kvar",
+      satOxygenSub: "Tub 67 % · lugnt",
+      satHandoverLabel: "Ny överlämning",
+      satHandoverTitle: "Ny överlämning från Rahma",
+      satHandoverCta: "Läs den",
       h1a: "Omsorg, lugnt —",
       h1b: "tillsammans.",
       subhead: "En delad hemmabas för ert barns vårdteam — mediciner, vitalvärden, syrgas och överlämningar på ett ställe.",
@@ -1374,6 +1386,7 @@ export const sv = {
       trust: "Byggt med familjer till medicinskt komplexa barn.",
       ctaTour: "Se en dag med CareNest",
     },
+
     who: {
       kicker: "För vem",
       title: "För dem som gör det tuffaste, tystaste arbetet",
