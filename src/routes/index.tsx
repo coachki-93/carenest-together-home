@@ -797,6 +797,48 @@ function Reveal({
   );
 }
 
+/* Hero H1: word-by-word fade-up on mount, violet gradient text. */
+function HeroHeadline({ text }: { text: string }) {
+  const [visible, setVisible] = useState(false);
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    if (mq.matches) {
+      setVisible(true);
+      return;
+    }
+    const raf = window.requestAnimationFrame(() => setVisible(true));
+    return () => window.cancelAnimationFrame(raf);
+  }, []);
+  const words = text.split(" ");
+  return (
+    <h1
+      className="mk-headline-gradient text-display-xl mx-auto"
+      style={{ ...display, maxWidth: "18ch" }}
+    >
+      {words.map((w, i) => (
+        <span
+          key={i}
+          className="inline-block"
+          style={{
+            opacity: visible || reduced ? 1 : 0,
+            transform: visible || reduced ? "translateY(0)" : "translateY(10px)",
+            transition: reduced
+              ? "none"
+              : `opacity 0.55s ease-out ${90 + i * 40}ms, transform 0.55s ease-out ${90 + i * 40}ms`,
+            willChange: "opacity, transform",
+          }}
+        >
+          {w}
+          {i < words.length - 1 ? "\u00A0" : ""}
+        </span>
+      ))}
+    </h1>
+  );
+}
+
 /* ─────────── Hero (Aave-style centered) ─────────── */
 function Hero() {
   const { t } = useTranslation();
