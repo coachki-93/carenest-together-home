@@ -16,17 +16,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { OfflineBanner } from "@/components/carenest/OfflineBanner";
 import { createIsomorphicFn } from "@tanstack/react-start";
-import {
+import i18n, {
   resolveClientLanguage,
   detectClientLanguage,
   setI18nLanguage,
 } from "@/lib/i18n";
-import { writeLangCookieClient, type Lang } from "@/lib/i18n/cookie";
+import { writeLangCookieClient, isLang, type Lang } from "@/lib/i18n/cookie";
 import { resolveLanguageServer } from "@/lib/i18n/resolve.server";
 import { useTranslation } from "react-i18next";
 
+// On the client, only compute a language when i18n hasn't been set yet
+// (i.e. the very first paint). On subsequent SPA navigations we return
+// the current i18n.language so a stale cookie can't clobber a user's
+// in-session choice (e.g. preview iframe where SameSite=Lax writes are
+// rejected). SSR always resolves from the request cookie header.
 const resolveLanguageIso = createIsomorphicFn()
-  .client((): Lang => resolveClientLanguage())
+  .client((): Lang => {
+    if (i18n.isInitialized && isLang(i18n.language)) {
+      return i18n.language;
+    }
+    return resolveClientLanguage();
+  })
   .server((): Lang => resolveLanguageServer());
 
 function NotFoundComponent() {
