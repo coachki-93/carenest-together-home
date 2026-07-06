@@ -265,6 +265,7 @@ function HandoverPage() {
       });
       toast.success(t("handoverPage.saved"));
       setOpen(false);
+      setManualWindow(null);
       resetForm();
       if (shiftStartIso || shiftEndIso || compose) {
         navigate({ search: {}, replace: true });
