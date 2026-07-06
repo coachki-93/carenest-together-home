@@ -31,7 +31,7 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
 
-const serif = { fontFamily: "var(--font-display)", fontWeight: 800, letterSpacing: "-0.02em" } as const;
+const serif = { fontFamily: "var(--font-display)", fontWeight: 700, letterSpacing: "-0.025em" } as const;
 
 function AboutPage() {
   const { t } = useTranslation();
