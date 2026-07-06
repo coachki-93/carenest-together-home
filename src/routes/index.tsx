@@ -30,30 +30,52 @@ import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
 
 const SITE = "https://carenest-together-home.lovable.app";
+const OG_IMAGE = SITE + "/og-image.jpg";
+
+import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
+
+const LANDING_META = {
+  en: {
+    title: "CareNest — A calm home base for your child's care team",
+    description:
+      "CareNest is the shared home base for families of children with special needs. Meds, vitals, oxygen, schedules and handovers — visible to every caregiver you trust.",
+    ogTitle: "CareNest — Care, together",
+    ogDescription:
+      "Everything about your child's care — out of your head, into one calm place. Bilingual, tablet-friendly, built with families.",
+  },
+  sv: {
+    title: "CareNest — En lugn hemmabas för ditt barns vårdteam",
+    description:
+      "CareNest är den gemensamma hemmabasen för familjer med barn med särskilda behov. Mediciner, vitala värden, syrgas, scheman och överlämningar — synligt för varje assistent du litar på.",
+    ogTitle: "CareNest — Omsorg, tillsammans",
+    ogDescription:
+      "Allt om ditt barns vård — ut ur ditt huvud, in på ett lugnt ställe. Tvåspråkigt, surfplatte-vänligt, byggt med familjer.",
+  },
+} as const;
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "CareNest — A calm home base for your child's care team" },
-      {
-        name: "description",
-        content:
-          "CareNest is the shared home base for families of children with special needs. Meds, vitals, oxygen, schedules and handovers — visible to every caregiver you trust.",
-      },
-      { property: "og:title", content: "CareNest — Care, together" },
-      {
-        property: "og:description",
-        content:
-          "Everything about your child's care — out of your head, into one calm place. Bilingual, tablet-friendly, built with families.",
-      },
-      { property: "og:url", content: SITE + "/" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: SITE + "/" }],
-  }),
+  head: () => {
+    const lang = resolveHeadLanguage();
+    const m = LANDING_META[lang];
+    return {
+      meta: [
+        { title: m.title },
+        { name: "description", content: m.description },
+        { property: "og:title", content: m.ogTitle },
+        { property: "og:description", content: m.ogDescription },
+        { property: "og:url", content: SITE + "/" },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: OG_LOCALE[lang] },
+        { property: "og:image", content: OG_IMAGE },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: SITE + "/" }],
+    };
+  },
   component: Landing,
 });
+
 
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 const sansMk = { fontFamily: "var(--font-sans-marketing)" } as const;
@@ -296,7 +318,7 @@ function Landing() {
                       <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
                         {t("marketing.team.mockCheckedBy")}
                       </p>
-                      <p className="text-lg italic text-marketing-ink" style={display}>
+                      <p className="text-lg text-marketing-ink" style={display}>
                         {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
                       </p>
                     </div>
@@ -319,7 +341,7 @@ function Landing() {
           {[1, 2, 3, 4].map((n) => (
             <Reveal key={n} delayMs={n * 60}>
               <p
-                className="text-display-sm italic text-marketing-ink"
+                className="text-display-sm text-marketing-ink"
                 style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
@@ -550,7 +572,7 @@ function OutcomeCard({
           {icon}
         </div>
         <h3
-          className="text-display-xs italic text-marketing-ink mb-2"
+          className="text-display-xs text-marketing-ink mb-2"
           style={display}
         >
           {title}
@@ -593,7 +615,7 @@ function ComparisonCard({
         }`}
       >
         <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-        <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
+        <h3 className="text-display-xs text-marketing-ink mb-6" style={display}>
           {title}
         </h3>
         <ul className="space-y-3.5">
@@ -641,7 +663,7 @@ function PriceCard({
         </span>
       )}
       <p className="text-sm font-medium text-marketing-muted mb-4">{label}</p>
-      <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={display}>
+      <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
         {price}
       </p>
       <p className="text-sm text-marketing-muted mb-6">{sub}</p>
@@ -706,8 +728,13 @@ function DaySection() {
                   <div className="flex items-center gap-3 mb-3 md:mb-0">
                     <span
                       aria-hidden
-                      className="hidden md:block absolute left-0 -translate-x-[3px] size-3 rounded-full ring-4 ring-marketing-surface"
-                      style={{ top: "0.65rem", background: "var(--primary)" }}
+                      className="hidden md:block absolute size-3 rounded-full ring-4 ring-marketing-surface"
+                      style={{
+                        left: "-1.5rem",
+                        transform: "translateX(-50%)",
+                        top: "0.375rem",
+                        background: "var(--primary)",
+                      }}
                     />
                     <span
                       className="rounded-full bg-marketing-bg border border-marketing-sage-line text-marketing-sage px-3 py-1 text-xs font-semibold tabular-nums"
@@ -717,7 +744,7 @@ function DaySection() {
                   </div>
                   <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-6 md:p-7 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     <h3
-                      className="text-display-xs italic text-marketing-ink mb-2"
+                      className="text-display-xs text-marketing-ink mb-2"
                       style={display}
                     >
                       {s.title}
@@ -962,7 +989,7 @@ function HeroDevice({ platform: _platform }: { platform: "ios" | "android" | "de
               <span className="w-2 h-2 rounded-full bg-marketing-line" />
               <span className="w-2 h-2 rounded-full bg-marketing-line" />
             </div>
-            <div className="text-[11px] italic text-marketing-muted" style={display}>
+            <div className="text-[11px] text-marketing-muted" style={display}>
               {t("marketing.hero.mockShift")}
             </div>
             <div className="size-5 rounded-full bg-marketing-sage-soft border border-marketing-sage-line" />
@@ -993,7 +1020,7 @@ function HeroDevice({ platform: _platform }: { platform: "ios" | "android" | "de
             {t("marketing.hero.satOxygenLabel")}
           </p>
         </div>
-        <p className="text-xl italic text-marketing-ink leading-tight" style={display}>
+        <p className="text-xl text-marketing-ink leading-tight" style={display}>
           {t("marketing.hero.satOxygenValue")}
         </p>
         <div className="mt-2 h-1.5 rounded-full bg-marketing-faint overflow-hidden">

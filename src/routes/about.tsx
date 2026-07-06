@@ -4,32 +4,54 @@ import { Mail } from "lucide-react";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 
+import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
+
 const SITE = "https://carenest-together-home.lovable.app";
+const OG_IMAGE = SITE + "/og-image.jpg";
 const CONTACT_EMAIL = "hello@carenest.app";
 
+const ABOUT_META = {
+  en: {
+    title: "About CareNest — built with families",
+    description:
+      "CareNest is built with and for families of children with special needs. The knowledge shouldn't live in one parent's head — this is a calm, shared place for it.",
+    ogTitle: "About CareNest",
+    ogDescription:
+      "Why CareNest exists, what it believes, and how to get in touch. Built with families of medically complex children.",
+  },
+  sv: {
+    title: "Om CareNest — byggt med familjer",
+    description:
+      "CareNest är byggt med och för familjer till barn med särskilda behov. Kunskapen ska inte bo i en förälders huvud — det här är en lugn, gemensam plats för den.",
+    ogTitle: "Om CareNest",
+    ogDescription:
+      "Varför CareNest finns, vad vi tror på, och hur du kontaktar oss. Byggt med familjer till barn med komplexa vårdbehov.",
+  },
+} as const;
+
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About CareNest — built with families" },
-      {
-        name: "description",
-        content:
-          "CareNest is built with and for families of children with special needs. The knowledge shouldn't live in one parent's head — this is a calm, shared place for it.",
-      },
-      { property: "og:title", content: "About CareNest" },
-      {
-        property: "og:description",
-        content:
-          "Why CareNest exists, what it believes, and how to get in touch. Built with families of medically complex children.",
-      },
-      { property: "og:url", content: SITE + "/about" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: SITE + "/about" }],
-  }),
+  head: () => {
+    const lang = resolveHeadLanguage();
+    const m = ABOUT_META[lang];
+    return {
+      meta: [
+        { title: m.title },
+        { name: "description", content: m.description },
+        { property: "og:title", content: m.ogTitle },
+        { property: "og:description", content: m.ogDescription },
+        { property: "og:url", content: SITE + "/about" },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: OG_LOCALE[lang] },
+        { property: "og:image", content: OG_IMAGE },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: SITE + "/about" }],
+    };
+  },
   component: AboutPage,
 });
+
 
 const serif = { fontFamily: "var(--font-display)", fontWeight: 700, letterSpacing: "-0.025em" } as const;
 
