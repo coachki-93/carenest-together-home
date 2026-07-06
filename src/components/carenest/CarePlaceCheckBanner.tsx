@@ -33,6 +33,7 @@ import {
 import { useInventoryItems, isLowStock, type InventoryItem } from "@/lib/data/inventory";
 import { useFamily } from "@/lib/data/family";
 import { useCurrentActor, guardActingProfile } from "@/lib/data/current-actor";
+import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 
 interface Props {
   familyId: string | undefined | null;
@@ -67,7 +68,10 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const submit = useSubmitCarePlaceCheck();
   const resolveAdhoc = useResolveAdhocItem();
   const actor = useCurrentActor(familyId ?? null);
-  const { profiles: myProfiles, activeProfile, setActive } = actor;
+  // Shared store — same subscription as ActiveProfileSwitcher / useCurrentActor.
+  const { setActive } = useActiveCaregiverProfile(familyId ?? null, userId ?? null);
+  const myProfiles = actor.profiles;
+  const activeProfile = actor.activeProfile;
   const multiProfileNoActive =
     myProfiles.length > 1 && !actor.activeProfileId;
 
