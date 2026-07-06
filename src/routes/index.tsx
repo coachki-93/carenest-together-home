@@ -514,12 +514,12 @@ function OutcomeCard({
         {icon}
       </div>
       <h3
-        className="italic text-marketing-ink leading-[1.15] mb-3"
-        style={{ ...display, fontSize: "clamp(1.25rem, 2.2vw, 1.6rem)" }}
+        className="text-display-xs italic text-marketing-ink mb-3"
+        style={display}
       >
         {title}
       </h3>
-      <p className="text-marketing-muted leading-[1.7] mb-5">{body}</p>
+      <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-5">{body}</p>
       <div className="flex flex-wrap gap-2">
         {chips.map((c) => (
           <span
