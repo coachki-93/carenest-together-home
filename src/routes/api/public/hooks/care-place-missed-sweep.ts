@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { wallClockIn, yesterdayStrIn } from "@/lib/time/family-tz";
+import { authorizeCronRequest } from "@/lib/push/cron-auth";
+import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 
 /**
  * Sweeps for Care Place Control slots whose grace window has expired today
