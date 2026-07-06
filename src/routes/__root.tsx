@@ -25,16 +25,18 @@ import { writeLangCookieClient, isLang, type Lang } from "@/lib/i18n/cookie";
 import { resolveLanguageServer } from "@/lib/i18n/resolve.server";
 import { useTranslation } from "react-i18next";
 
-// On the client, only compute a language when i18n hasn't been set yet
-// (i.e. the very first paint). On subsequent SPA navigations we return
-// the current i18n.language so a stale cookie can't clobber a user's
-// in-session choice (e.g. preview iframe where SameSite=Lax writes are
-// rejected). SSR always resolves from the request cookie header.
+// On the client, resolve from cookie/localStorage only on the first
+// paint. On subsequent SPA navigations return the current i18n.language
+// so a stale/unwritable cookie (preview iframe rejects SameSite=Lax,
+// Safari block-all-cookies, private mode) cannot clobber the user's
+// in-session choice. SSR always resolves from the request cookie header.
+let clientLangResolved = false;
 const resolveLanguageIso = createIsomorphicFn()
   .client((): Lang => {
-    if (i18n.isInitialized && isLang(i18n.language)) {
-      return i18n.language;
+    if (clientLangResolved && isLang(i18n.language)) {
+      return i18n.language as Lang;
     }
+    clientLangResolved = true;
     return resolveClientLanguage();
   })
   .server((): Lang => resolveLanguageServer());
