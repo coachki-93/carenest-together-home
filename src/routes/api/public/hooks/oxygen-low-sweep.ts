@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { computeRemaining, type OxygenTankRow } from "@/lib/oxygen/tanks";
+import { authorizeCronRequest } from "@/lib/push/cron-auth";
+import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 
 /**
  * Scans every active oxygen tank and pushes one notification when remaining
@@ -13,25 +15,18 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const expectedKey =
-          process.env.SUPABASE_PUBLISHABLE_KEY ||
-          process.env.SUPABASE_ANON_KEY ||
-          "";
-        const apiKey = request.headers.get("apikey") || "";
-        if (!expectedKey || apiKey !== expectedKey) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const unauthorized = authorizeCronRequest(request);
+        if (unauthorized) return unauthorized;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const webpush = (await import("web-push")).default;
 
-        const vapidPublic =
-          "BKhqzimlxSXKmf1FK9n0jaINDW5QKsWBwQBD_LZYhpE2GPPdLIDPQAQz2oo4UNQP0riQtptO71Mu2zU5cvoyP38";
         const vapidPrivate = process.env.VAPID_PRIVATE_KEY || "";
         const vapidSubject = process.env.VAPID_SUBJECT || "mailto:admin@carenest.app";
         if (vapidPrivate) {
-          webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
+          webpush.setVapidDetails(vapidSubject, VAPID_PUBLIC_KEY, vapidPrivate);
         }
+
 
         const { data: tanks } = await supabaseAdmin
           .from("oxygen_tanks")
