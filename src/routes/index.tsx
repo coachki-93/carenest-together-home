@@ -434,7 +434,7 @@ function Landing() {
                     <Plus className="size-5 transition-transform [[data-state=open]_&]:rotate-45" />
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-6 text-marketing-muted leading-[1.75] text-[1rem]">
+                <AccordionContent className="pb-6 text-marketing-muted text-base md:text-lg leading-[1.7]">
                   {t(`marketing.faq.${k}A`)}
                 </AccordionContent>
               </AccordionItem>
