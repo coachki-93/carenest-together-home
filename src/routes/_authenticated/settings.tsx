@@ -11,6 +11,7 @@ import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSett
 import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
+import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
 
 import {
   AvatarColorPicker,
@@ -270,6 +271,12 @@ function SettingsPage() {
           <HospitalToggle />
         </section>
 
+
+        {/* Family timezone & notification language */}
+        <FamilyLocaleSettings
+          familyId={membership.data?.family_id}
+          isOwner={membership.data?.role === "owner"}
+        />
 
         {/* Care place control */}
         <CarePlaceCheckSettings

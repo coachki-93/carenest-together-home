@@ -176,7 +176,7 @@ export function useFamily(familyId: string | undefined | null) {
       const { data, error } = await supabase
         .from("families")
         .select(
-          "id, name, owner_id, at_hospital_since, handover_reminder_minutes, handover_reminder_duration_minutes",
+          "id, name, owner_id, at_hospital_since, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language",
         )
         .eq("id", familyId!)
         .single();
@@ -204,6 +204,34 @@ export function useUpdateHandoverReminderMinutes() {
           handover_reminder_minutes: leadMinutes,
           handover_reminder_duration_minutes: durationMinutes,
         })
+        .eq("id", familyId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+    },
+  });
+}
+
+export function useUpdateFamilyLocale() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      familyId,
+      timezone,
+      notificationLanguage,
+    }: {
+      familyId: string;
+      timezone?: string;
+      notificationLanguage?: "en" | "sv";
+    }) => {
+      const patch: Database["public"]["Tables"]["families"]["Update"] = {};
+      if (timezone !== undefined) patch.timezone = timezone;
+      if (notificationLanguage !== undefined)
+        patch.notification_language = notificationLanguage;
+      const { error } = await supabase
+        .from("families")
+        .update(patch)
         .eq("id", familyId);
       if (error) throw error;
     },

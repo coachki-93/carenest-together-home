@@ -1601,6 +1601,23 @@ export const sv = {
     timeAdded: "Överlämningstid tillagd.",
     saved: "Påminnelse uppdaterad.",
   },
+  familyLocale: {
+    title: "Tidszon & aviseringar",
+    subtitle:
+      "Styr hur schemalagda påminnelser räknar ut dagens datum och vilket språk push-aviseringar använder för familjen.",
+    ownerOnly: "Endast familjens ägare kan ändra dessa inställningar.",
+    timezone: "Tidszon",
+    tzSearch: "Sök tidszoner…",
+    tzNoMatch: "Ingen tidszon matchar.",
+    tzHint:
+      "Används av schemalagda jobb (missade kontroller, uppgiftspåminnelser) för att veta när dygnet växlar.",
+    invalidTz: "Din webbläsare känner inte igen den tidszonen.",
+    tzSaved: "Tidszon uppdaterad.",
+    notificationLanguage: "Aviseringsspråk",
+    langHint:
+      "Språk som används i push-aviseringar från servern (oberoende av varje vårdgivares app-språk).",
+    langSaved: "Aviseringsspråk uppdaterat.",
+  },
   maintenance: {
     title: "Underhåll",
     subtitle: "Maskiner och deras planerade underhåll.",
