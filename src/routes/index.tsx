@@ -150,8 +150,8 @@ function Landing() {
           <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
             <Kicker>{t("marketing.outcomes.kicker")}</Kicker>
             <h2
-              className="tracking-tight text-marketing-ink"
-              style={{ ...display, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+              className="text-display-md text-marketing-ink"
+              style={display}
             >
               {t("marketing.outcomes.title")}
             </h2>
