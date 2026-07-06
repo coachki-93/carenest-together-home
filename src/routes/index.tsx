@@ -795,23 +795,15 @@ function Hero() {
 
         <Reveal immediate delayMs={90}>
           <h1
-            className="tracking-tight text-primary mx-auto"
-            style={{
-              ...display,
-              fontSize: "clamp(2.5rem, 5.5vw, 4.25rem)",
-              lineHeight: 1.05,
-              maxWidth: "18ch",
-            }}
+            className="text-display-xl text-primary mx-auto"
+            style={{ ...display, maxWidth: "18ch" }}
           >
             {t("marketing.hero.headline")}
           </h1>
         </Reveal>
 
         <Reveal immediate delayMs={180}>
-          <p
-            className="text-marketing-muted mt-6 mx-auto max-w-xl"
-            style={{ fontSize: "clamp(1rem, 1.15vw, 1.125rem)", lineHeight: 1.7 }}
-          >
+          <p className="text-marketing-muted mt-6 mx-auto max-w-xl text-base md:text-lg leading-[1.7]">
             {t("marketing.hero.subline")}
           </p>
         </Reveal>
