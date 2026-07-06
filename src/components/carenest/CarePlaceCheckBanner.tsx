@@ -168,12 +168,18 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
       toast.error(err);
       return;
     }
+    const guard = guardActingProfile(actor);
+    if (guard.blocked) {
+      toast.error(t("carePlace.pickProfileFirst"));
+      return;
+    }
     try {
       const today = new Date();
       const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
       const check = await submit.mutateAsync({
         family_id: familyId!,
         performed_by: userId!,
+        caregiver_profile_id: guard.caregiverProfileId,
         scheduled_time: currentSlot.time_of_day,
         scheduled_date: localDate,
         notes: notes.trim() || null,
