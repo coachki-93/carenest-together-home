@@ -673,12 +673,12 @@ function DaySection() {
                   </div>
                   <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-6 md:p-7 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     <h3
-                      className="italic text-marketing-ink mb-2 leading-tight"
-                      style={{ ...display, fontSize: "clamp(1.15rem, 2vw, 1.5rem)" }}
+                      className="text-display-xs italic text-marketing-ink mb-2"
+                      style={display}
                     >
                       {s.title}
                     </h3>
-                    <p className="text-marketing-muted leading-[1.75] text-[0.98rem]">{s.body}</p>
+                    <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{s.body}</p>
                   </div>
                 </div>
               </Reveal>
