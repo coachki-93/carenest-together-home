@@ -127,12 +127,19 @@ function HandoverPage() {
     return null;
   }, [shiftStartIso, shiftEndIso, compose]);
 
+  // Window used when the dialog is opened via the plain "New handover"
+  // button (no URL params, no compose flag). Captured at click-time so it
+  // stays stable while the dialog is open.
+  const [manualWindow, setManualWindow] = useState<{ start: Date; end: Date } | null>(null);
+  const effectiveWindow = shiftWindow ?? manualWindow;
+
   const prefillLabels = useMemo(
     () => ({
       medSkipped: t("handoverPage.prefill.medSkipped"),
       medRefused: t("handoverPage.prefill.medRefused"),
       medPostponed: t("handoverPage.prefill.medPostponed"),
       medMissed: t("handoverPage.prefill.medMissed"),
+      medAllGiven: t("handoverPage.prefill.medAllGiven"),
       apptMissed: t("handoverPage.prefill.apptMissed"),
       apptCancelled: t("handoverPage.prefill.apptCancelled"),
       vitalAbnormal: t("handoverPage.prefill.vitalAbnormal"),
@@ -150,11 +157,11 @@ function HandoverPage() {
   );
 
   const prefillInput =
-    membership?.family_id && shiftWindow
+    membership?.family_id && effectiveWindow
       ? {
           familyId: membership.family_id,
-          shiftStart: shiftWindow.start,
-          shiftEnd: shiftWindow.end,
+          shiftStart: effectiveWindow.start,
+          shiftEnd: effectiveWindow.end,
         }
       : null;
   const { data: prefill } = useHandoverPrefill(prefillInput, prefillLabels);
@@ -179,17 +186,33 @@ function HandoverPage() {
     notes: "",
   });
 
-  // When arriving with shift query params, open dialog + seed from prefill
+  // Auto-open when arriving with shift query params or compose flag.
   useEffect(() => {
-    if (!shiftWindow || !prefill) return;
+    if (!shiftWindow) return;
+    setOpen(true);
+  }, [shiftWindow]);
+
+  // Seed the form from prefill once the window + data are ready. The
+  // "prev || prefill" merge protects anything the user has typed. Runs for
+  // all three entry points: URL params, compose flag, and plain button.
+  useEffect(() => {
+    if (!open || !effectiveWindow || !prefill) return;
     setForm((prev) => ({
       ...prev,
-      shift: shiftLabelFromDate(shiftWindow.start),
+      shift: shiftLabelFromDate(effectiveWindow.start),
       meds: prev.meds || prefill.meds,
       notes: prev.notes || prefill.notes,
     }));
+  }, [open, effectiveWindow, prefill]);
+
+  function openDialog() {
+    if (!shiftWindow) {
+      const end = new Date();
+      setManualWindow({ start: inferredShiftStart(end), end });
+    }
     setOpen(true);
-  }, [shiftWindow, prefill]);
+  }
+
 
   const dateFmt = useMemo(
     () =>
@@ -242,6 +265,7 @@ function HandoverPage() {
       });
       toast.success(t("handoverPage.saved"));
       setOpen(false);
+      setManualWindow(null);
       resetForm();
       if (shiftStartIso || shiftEndIso || compose) {
         navigate({ search: {}, replace: true });
@@ -270,7 +294,7 @@ function HandoverPage() {
         <Button
           size="sm"
           className="rounded-full gap-1.5 font-semibold"
-          onClick={() => setOpen(true)}
+          onClick={openDialog}
         >
           <Plus className="size-4" /> {t("handoverPage.new")}
         </Button>
@@ -288,7 +312,7 @@ function HandoverPage() {
           </div>
           <h2 className="text-2xl font-extrabold mb-2">{t("handoverPage.emptyTitle")}</h2>
           <p className="text-muted-foreground mb-6">{t("handoverPage.emptyBody")}</p>
-          <Button className="rounded-full gap-1.5 font-semibold" onClick={() => setOpen(true)}>
+          <Button className="rounded-full gap-1.5 font-semibold" onClick={openDialog}>
             <Plus className="size-4" /> {t("handoverPage.new")}
           </Button>
         </div>
@@ -396,9 +420,10 @@ function HandoverPage() {
         open={open}
         onOpenChange={(o) => {
           if (o) {
-            setOpen(true);
+            openDialog();
           } else {
             setOpen(false);
+            setManualWindow(null);
             resetForm();
             if (shiftStartIso || shiftEndIso || compose) {
               navigate({ search: {}, replace: true });
@@ -412,7 +437,7 @@ function HandoverPage() {
             <DialogDescription>{t("handoverPage.newBody")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            {shiftWindow && (
+            {effectiveWindow && (
               <div className="rounded-xl bg-primary-soft/60 text-sm px-4 py-3 flex items-start gap-2">
                 <Sparkles className="size-4 mt-0.5 text-primary shrink-0" />
                 <div>
@@ -420,7 +445,7 @@ function HandoverPage() {
                     {t("handoverPage.prefill.banner")}
                   </p>
                   <p className="text-muted-foreground text-xs mt-0.5">
-                    {dateFmt.format(shiftWindow.start)} – {dateFmt.format(shiftWindow.end)}
+                    {dateFmt.format(effectiveWindow.start)} – {dateFmt.format(effectiveWindow.end)}
                     {prefill && !prefill.hasContent
                       ? ` · ${t("handoverPage.prefill.nothing")}`
                       : ""}

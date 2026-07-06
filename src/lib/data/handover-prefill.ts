@@ -27,6 +27,7 @@ interface Labels {
   medRefused: string;
   medPostponed: string;
   medMissed: string;
+  medAllGiven: string; // "... ({{given}}/{{total}})"
   apptMissed: string;
   apptCancelled: string;
   vitalAbnormal: string;
@@ -192,6 +193,8 @@ export function useHandoverPrefill(
       // Walk every scheduled dose intersecting the shift window for each day.
       const medLines: string[] = [];
       const medById = new Map(meds.map((m) => [m.id, m]));
+      let totalDoses = 0;
+      let givenCount = 0;
 
       // Build per-day doses across the shift window
       const dayCursor = new Date(shiftStart);
@@ -209,8 +212,10 @@ export function useHandoverPrefill(
             continue;
           if (seen.has(d.key)) continue;
           seen.add(d.key);
+          totalDoses++;
           const time = fmtTime(d.scheduled_for);
           if (d.log) {
+            if (d.log.status === "given") givenCount++;
             const line = statusLine(
               d.log.status,
               labels,
@@ -251,6 +256,17 @@ export function useHandoverPrefill(
       }
 
       medLines.sort();
+
+      // Calm-shift positive summary: no exception lines but doses were
+      // scheduled and (at least some) actually given → say so plainly.
+      if (medLines.length === 0 && totalDoses > 0) {
+        medLines.push(
+          labels.medAllGiven
+            .replace("{{given}}", String(givenCount))
+            .replace("{{total}}", String(totalDoses)),
+        );
+      }
+
 
       // Notes: appointments missed/cancelled + abnormal vitals + extras
       const noteLines: string[] = [];
