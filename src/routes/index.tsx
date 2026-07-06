@@ -541,27 +541,33 @@ function OutcomeCard({
   body: string;
   chips: string[];
 }) {
+  const flashRef = useFlashlight<HTMLDivElement>();
   return (
-    <Reveal className="group rounded-3xl border border-marketing-line bg-marketing-bg p-7 md:p-8 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:border-marketing-sage-line">
-      <div className="size-11 rounded-2xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-5">
-        {icon}
-      </div>
-      <h3
-        className="text-display-xs italic text-marketing-ink mb-3"
-        style={display}
+    <Reveal>
+      <div
+        ref={flashRef}
+        className="mk-glass mk-flashlight group rounded-3xl p-7 md:p-8 transition-all hover:-translate-y-0.5"
       >
-        {title}
-      </h3>
-      <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-5">{body}</p>
-      <div className="flex flex-wrap gap-2">
-        {chips.map((c) => (
-          <span
-            key={c}
-            className="rounded-full bg-marketing-surface border border-marketing-line px-3 py-1 text-xs text-marketing-muted"
-          >
-            {c}
-          </span>
-        ))}
+        <div className="size-11 rounded-2xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-5">
+          {icon}
+        </div>
+        <h3
+          className="text-display-xs italic text-marketing-ink mb-3"
+          style={display}
+        >
+          {title}
+        </h3>
+        <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-5">{body}</p>
+        <div className="flex flex-wrap gap-2">
+          {chips.map((c) => (
+            <span
+              key={c}
+              className="mk-glass-pill rounded-full px-3 py-1 text-xs text-marketing-muted"
+            >
+              {c}
+            </span>
+          ))}
+        </div>
       </div>
     </Reveal>
   );
@@ -578,24 +584,28 @@ function ComparisonCard({
   items: string[];
   accent?: boolean;
 }) {
+  const flashRef = useFlashlight<HTMLDivElement>();
   return (
-    <Reveal
-      className={`rounded-3xl bg-marketing-bg p-7 md:p-9 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
-        accent ? "border-2 border-marketing-sage" : "border border-marketing-line"
-      }`}
-    >
-      <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-      <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
-        {title}
-      </h3>
-      <ul className="space-y-3.5">
-        {items.map((it) => (
-          <li key={it} className="flex items-start gap-3 text-[0.95rem] text-marketing-ink leading-[1.6]">
-            <Check className={`size-4 shrink-0 mt-1 ${accent ? "text-marketing-sage" : "text-marketing-sage"}`} />
-            <span>{it}</span>
-          </li>
-        ))}
-      </ul>
+    <Reveal>
+      <div
+        ref={flashRef}
+        className={`mk-glass mk-flashlight rounded-3xl p-7 md:p-9 transition-all hover:-translate-y-0.5 ${
+          accent ? "ring-2 ring-marketing-sage" : ""
+        }`}
+      >
+        <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
+        <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
+          {title}
+        </h3>
+        <ul className="space-y-3.5">
+          {items.map((it) => (
+            <li key={it} className="flex items-start gap-3 text-[0.95rem] text-marketing-ink leading-[1.6]">
+              <Check className={`size-4 shrink-0 mt-1 ${accent ? "text-marketing-sage" : "text-marketing-sage"}`} />
+              <span>{it}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Reveal>
   );
 }
