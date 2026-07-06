@@ -1,165 +1,103 @@
-## Feature: Maintenance page — revised plan
 
-### Corrections about how the system actually works (before diving in)
+## Goal
 
-You had it right on all four points, with one nuance:
+Add a "Who's working this shift?" selector to the care-place check dialog and attribute the resulting row to a `caregiver_profile_id`. **Precondition:** fix `useActiveCaregiverProfile` to share state across instances first, so the selector, header, and guarded write all see the same active profile within one render.
 
-- **Roles**: `family_members.role` is an enum (`member_role`) with `owner` and `caregiver`. Owners are also full members. `is_family_member(family_id, uid)` returns true for **any** row in `family_members` — including caregivers — so caregivers already get read access under our standard SELECT policy. `is_material_manager(family_id, uid)` = `role = 'owner' OR material_responsible = true`. So the desired split (caregivers can read + mark done, only managers can create/edit/delete) maps cleanly onto the existing helpers — no new role plumbing needed.
-- **Today's page** (`/_authenticated/dashboard.tsx`) builds its task list in a single `useMemo` (around line 538) by merging: scheduled medication doses, appointment occurrences + completions, and vitals. It's derived at read time from the underlying data — no "tasks" table. Perfect fit for adding a "maintenance-due" kind derived from `maintenance_items`.
-- **Live helpers used everywhere**: `private.is_family_member`, `public.is_material_manager`, and the standard SELECT-family-member / INSERT-with-manager / UPDATE-with-manager / DELETE-with-manager pattern. Migration will follow this exactly.
+## Order of work
 
-Everything else you described matches the codebase.
+1. Rewrite `src/lib/data/active-profile.ts` (shared store).
+2. Migration (already applied — `caregiver_profile_id` on `care_place_checks`, updated INSERT policy).
+3. Dialog UI + write path + display + i18n.
 
----
+## 1. Hook fix — `src/lib/data/active-profile.ts`
 
-### 1. Atomic "mark done"
+Replace per-instance `useState(storedId)` with a module-level store keyed by `${familyId}.${userId}`, consumed via `useSyncExternalStore`. Public API unchanged (`profiles`, `activeId`, `activeProfile`, `setActive`, `isLoading`) so header (`ActiveProfileSwitcher`), `useCurrentActor`, and every guarded write get the fix without edits.
 
-Replaced the two-write client mutation with a single Postgres RPC:
+Shape:
+
+- `const memory = new Map<Key, string | null>()` — hot cache, primed lazily from `localStorage`.
+- `const listeners = new Map<Key, Set<() => void>>()` — per-key subscribers.
+- `setStored(key, v)` writes memory + `localStorage` + notifies subscribers synchronously (same tick, same tab).
+- `subscribe(key, cb)` returns unsubscribe. `getSnapshot(key)` returns `memory` or reads `localStorage` once.
+- Module-level `window.addEventListener("storage", ...)` updates `memory` + notifies on cross-tab writes.
+- `getServerSnapshot` returns `null` (SSR-safe).
+- When `familyId`/`userId` is missing, subscribe becomes a no-op and snapshot is `null` — same shape as today's uninitialized state.
+
+This also repairs the pre-existing bug where switching profiles in the header didn't propagate to already-mounted pages until remount.
+
+## 2. Migration (applied)
 
 ```sql
-CREATE FUNCTION public.mark_maintenance_done(
-  _item_id uuid,
-  _note text DEFAULT NULL
-) RETURNS uuid  -- returns the new log row id
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
-DECLARE
-  v_uid uuid := auth.uid();
-  v_family uuid;
-  v_log_id uuid;
-BEGIN
-  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
+ALTER TABLE public.care_place_checks
+  ADD COLUMN caregiver_profile_id uuid
+    REFERENCES public.caregiver_profiles(id) ON DELETE SET NULL;
 
-  SELECT family_id INTO v_family
-    FROM public.maintenance_items WHERE id = _item_id;
-  IF v_family IS NULL THEN RAISE EXCEPTION 'Item not found'; END IF;
-  IF NOT public.is_family_member(v_family, v_uid) THEN
-    RAISE EXCEPTION 'Not a family member';
-  END IF;
+CREATE INDEX care_place_checks_caregiver_profile_idx
+  ON public.care_place_checks(caregiver_profile_id)
+  WHERE caregiver_profile_id IS NOT NULL;
 
-  INSERT INTO public.maintenance_logs
-    (maintenance_item_id, family_id, performed_by, note)
-    VALUES (_item_id, v_family, v_uid, _note)
-    RETURNING id INTO v_log_id;
+DROP POLICY IF EXISTS "Family members can insert checks" ON public.care_place_checks;
 
-  UPDATE public.maintenance_items
-    SET last_done_at = now(), last_done_by = v_uid, updated_at = now()
-    WHERE id = _item_id;
-
-  RETURN v_log_id;
-END $$;
-
-REVOKE ALL ON FUNCTION public.mark_maintenance_done(uuid, text) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.mark_maintenance_done(uuid, text) TO authenticated, service_role;
+CREATE POLICY "Family members can insert checks"
+  ON public.care_place_checks FOR INSERT TO authenticated
+  WITH CHECK (
+    public.is_family_member(family_id, auth.uid())
+    AND performed_by = auth.uid()
+    AND public.caregiver_profile_in_family(caregiver_profile_id, family_id)
+  );
 ```
 
-Chose RPC over a trigger because the RPC also enforces the "must be a family member" check up-front and lets us return the log id in one round trip. Client calls `supabase.rpc("mark_maintenance_done", { _item_id, _note })`. Both the Maintenance page and Today's page use `useMarkMaintenanceDone()` which wraps this RPC.
+## 3. Dialog UI — `src/components/carenest/CarePlaceCheckBanner.tsx`
 
-### 2. `machine_type` — DB stays free text, UI presents presets
+Between `DialogHeader` and the questions:
 
-- DB: `machine_type text NOT NULL` (unchanged).
-- Client writes a stable slug (`'respiratory' | 'feeding' | 'suction' | 'oxygen' | 'monitoring' | 'other'`) or a free-text string when a user picks "Other" and types one in.
-- i18n renders the slug via `t(\`maintenance.type.\${slug}\`)` when it matches a known preset, otherwise renders the raw string.
-- No enum, no migration lock-in — families that later need a new preset just get a new i18n key, no schema change.
+- New section titled `t("carePlace.whoWorking")`.
+- `useActiveCaregiverProfile(familyId, userId)` → wrap-flex row of pill buttons, one per profile (color dot + name). Active = primary filled; others = outline. Tap → `setActive(p.id)`.
+- Hidden entirely when `profiles.length === 0`.
+- Countdown stays pinned in the header, section sits just below it so the timer is never pushed off-screen.
 
-### 3. Caregiver access & RLS (final policies)
+## Write path — same file + `src/lib/data/care-place-checks.ts`
 
-Both caregivers and owners can read and mark done. Only material managers (owner or `material_responsible = true`) can add/edit/delete/archive machines and maintenance items. Logs are immutable.
+- In `handleSubmit`: `const actor = useCurrentActor(familyId)` (top of component); `const guard = guardActingProfile(actor)`. If `guard.blocked` → `toast.error(t("carePlace.pickProfileFirst"))` + return.
+- Pass `caregiver_profile_id: guard.caregiverProfileId` into `submit.mutateAsync`.
+- Submit button also gets `disabled: ... || (actor.profiles.length > 1 && !actor.activeProfileId)`.
+- `SubmitCheckInput` extended with `caregiver_profile_id?: string | null`; the insert payload includes it.
 
-**`public.machines`**
-- SELECT: `is_family_member(family_id, auth.uid())` ✅ caregivers included.
-- INSERT: `is_material_manager(family_id, auth.uid()) AND created_by = auth.uid()`.
-- UPDATE: `is_material_manager(...)` (using + with check).
-- DELETE: `is_material_manager(...)`.
+Because the hook is now shared, the same `activeProfileId` value flows through the dialog's own `setActive` call → the `useCurrentActor` reading it → `handleSubmit`, all inside the same render.
 
-**`public.maintenance_items`** — same four policies as `machines`.
+## Display
 
-**`public.maintenance_logs`**
-- SELECT: `is_family_member(family_id, auth.uid())` ✅ caregivers see history.
-- INSERT: `is_family_member(family_id, auth.uid()) AND performed_by = auth.uid()` — any caregiver can log a completion. (The RPC is the canonical path; direct inserts stay blocked to non-members.)
-- No UPDATE policy.
-- DELETE: `is_family_owner(family_id, auth.uid())` only, so audit trail stays intact except for owner-driven cleanup.
+Every completed-check surface (`useCarePlaceCheckHistory` list rows in the settings/history views) renders:
 
-**GRANTs**: `authenticated` = SELECT/INSERT/UPDATE/DELETE on all three (RLS gates the rest); `service_role` = ALL. No `anon`.
-
-**UI mirror**: `useMyMembership()` already exposes role + `material_responsible`. A `canManageMaintenance = membership.role === 'owner' || membership.material_responsible === true` helper hides add/edit/delete/archive buttons for caregivers. Mark-done and history are always visible.
-
-### 4. Today's page integration — derived, not persisted
-
-Add a new task kind alongside `dose | appt | vital` in `dashboard.tsx`:
-
-```ts
-type TaskSource =
-  | { kind: "dose"; dose: ScheduledDose }
-  | { kind: "appt"; appt: ExpandedAppointment; completion?: AppointmentCompletion }
-  | { kind: "vital"; vital: Vital }
-  | { kind: "maintenance"; item: MaintenanceItem; machine: Machine };  // NEW
+```tsx
+<ByProfile
+  familyId={familyId}
+  caregiverProfileId={c.caregiver_profile_id}
+  authorUserId={c.performed_by}
+  viewerUserId={me.id}
+  label={t("carePlace.checkedBy")}
+/>
 ```
 
-New hook `useDueMaintenanceItems(familyId)` in `src/lib/data/maintenance.ts`:
+Historical rows keep working — `caregiver_profile_id` is `NULL`, `ByProfile` falls back to the account.
 
-```ts
-// pseudo
-const items = await supabase
-  .from("maintenance_items")
-  .select("*, machine:machines!inner(id,name,active,family_id)")
-  .eq("family_id", familyId)
-  .eq("active", true)
-  .not("interval_days", "is", null);   // "as needed" never appears on Today
+## i18n keys (en + sv)
 
-// client-side filter using the same pure helper the Maintenance page uses:
-return items.filter(i => {
-  const s = maintenanceStatus(i, now);
-  return s === "overdue" || (s === "due_soon" && isDueToday(i, now));
-});
-```
+Under the existing `carePlace` block:
 
-Where `isDueToday(item, now)` returns true when `nextDueAt(item) <= endOfToday(now)`. So:
+- `whoWorking` — "Who's working this shift?" / "Vem jobbar det här passet?"
+- `checkedBy` — "Checked by" / "Kontrollerad av"
+- `pickProfileFirst` — "Choose who's working this shift first." / "Välj vem som jobbar det här passet först."
 
-- Filter, 7-day interval, last done **June 28** → `nextDueAt` = **July 5** → shows on July 5 as *Due today*.
-- Not marked → July 6 onward it stays visible marked **Overdue** until completed.
-- Marked done July 5 → resets, next shows July 12.
+## Verification
 
-The dashboard `useMemo` merges these into the same `tasks` array. Rendering:
-- Icon: `Wrench` from `lucide-react`.
-- Title: `${machine.name} — ${item.name}`.
-- Status pill: "Due today" / "Overdue" (red).
-- Action: single "Mark done" button using `useMarkMaintenanceDone()` (same RPC → same cache invalidation → Maintenance page updates instantly).
-- Clicking the row navigates to `/maintenance` and (nice-to-have) scrolls to that item; safe first pass is just navigate.
+1. Single-profile account: selector shows one preselected pill; submit writes the row with that `caregiver_profile_id`.
+2. Multi-profile shared account, no stored choice: preselect follows suggestion → first-profile chain; submit works.
+3. **Cross-instance test:** open the dialog, tap a different profile in the selector, then submit. The inserted `care_place_checks` row carries the newly tapped `caregiver_profile_id` (this is the specific case the hook fix unblocks).
+4. Tapping in the dialog also updates the header pill immediately — no remount required (proves the shared store works).
+5. History surface shows "Checked by {name}" with color dot; NULL rows fall back to the account name.
 
-`useMarkMaintenanceDone` invalidates: `["maintenance-items"]`, `["maintenance-machines"]`, `["maintenance-history", itemId]`, `["maintenance-due", familyId]`. That keeps both views consistent.
+## Out of scope
 
-### 5. Dashboard summary card
-
-Deferred. `useMaintenanceSummary(familyId)` will still be shipped in `src/lib/data/maintenance.ts` (returns `{ overdueCount, dueSoonCount }`), unused for now, so wiring the card later is a one-file change.
-
-### 6. Approved as originally proposed
-
-- Tables/columns: `machines`, `maintenance_items` (with `scope`, nullable `interval_days`, `last_done_at`, `last_done_by`, `active`), `maintenance_logs` (immutable).
-- Denormalized `family_id` on items and logs for fast RLS.
-- Soft-delete via `active` on both machines and items; hard delete allowed for managers.
-- `DUE_SOON_DAYS = 7`.
-- Indexes: `machines(family_id, active)`, `maintenance_items(machine_id)`, `maintenance_items(family_id, active, interval_days)` (helps Today's filter), `maintenance_logs(maintenance_item_id, performed_at desc)`.
-- `updated_at` triggers via existing `public.set_updated_at()`.
-
-### Route, components, i18n
-
-Unchanged from the previous plan except:
-- `useMarkMaintenanceDone` wraps the RPC.
-- `canManageMaintenance` gates add/edit/delete/archive UI on the page.
-- New i18n keys: `maintenance.type.respiratory|feeding|suction|oxygen|monitoring|other`, `maintenance.dueToday`, `maintenance.overdue`, plus everything from the earlier list.
-- Sidebar entry uses `Wrench` icon, added to the **Care** group after **Inventory**, added to both English and Swedish `nav.maintenance`.
-
-### Out of scope (unchanged)
-
-Push notifications, photo attachments, warranty/expiry on the machine itself, dashboard summary tile (deferred, ready to wire).
-
----
-
-### Rollout order
-
-1. **This turn: database migration only.** Three tables + policies + GRANTs + indexes + `updated_at` triggers + `mark_maintenance_done` RPC. Shown for review before running.
-2. After migration approval: data hooks (`src/lib/data/maintenance.ts`), Maintenance route + components, i18n keys, sidebar entry.
-3. Today's page integration (new task kind + hook).
-4. (Later) dashboard summary card.
-
-I'll now prepare the migration and surface it for you to review before running.
+- Handover-prefill care-place lines (new prefill source, not an edit — propose separately).
+- Retro-attribution of pre-migration rows (leave `NULL`).
