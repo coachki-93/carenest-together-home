@@ -298,6 +298,39 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             </div>
           </DialogHeader>
 
+          {myProfiles.length > 0 && (
+            <div className="rounded-xl border bg-muted/40 p-3 space-y-2">
+              <Label className="text-sm font-semibold">
+                {t("carePlace.whoWorking")}
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {myProfiles.map((p) => {
+                  const isActive = activeProfile?.id === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setActive(p.id)}
+                      className={
+                        "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold transition " +
+                        (isActive
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-input bg-background hover:bg-accent")
+                      }
+                      aria-pressed={isActive}
+                    >
+                      <span
+                        className="inline-block size-2.5 rounded-full"
+                        style={{ background: p.color }}
+                      />
+                      {p.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {activeItems.length === 0 && slotAdhocs.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
               {t("carePlace.empty")}
@@ -351,7 +384,11 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={submit.isPending || activeItems.length === 0}
+              disabled={
+                submit.isPending ||
+                activeItems.length === 0 ||
+                multiProfileNoActive
+              }
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               {submit.isPending && <Loader2 className="size-4 animate-spin" />}
