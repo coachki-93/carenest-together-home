@@ -55,7 +55,7 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const serif = { fontFamily: "var(--font-display)", fontWeight: 700, letterSpacing: "-0.025em" } as const;
+const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 const sansMk = { fontFamily: "var(--font-sans-marketing)" } as const;
 
 function Landing() {
@@ -73,15 +73,15 @@ function Landing() {
         <Reveal className="max-w-2xl mx-auto text-center space-y-6">
           <Kicker>{t("marketing.problem.kicker")}</Kicker>
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            className="text-display-md text-marketing-ink"
+            style={display}
           >
             {t("marketing.problem.title")}
           </h2>
-          <p className="text-marketing-muted leading-[1.75] text-[1.05rem]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.problem.body1")}
           </p>
-          <p className="text-marketing-muted leading-[1.75] text-[1.05rem]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.problem.body2")}
           </p>
         </Reveal>
@@ -92,12 +92,12 @@ function Landing() {
         <Reveal className="max-w-3xl mx-auto text-center space-y-5">
           <Kicker>{t("marketing.forWhom.kicker")}</Kicker>
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            className="text-display-md text-marketing-ink"
+            style={display}
           >
             {t("marketing.forWhom.title")}
           </h2>
-          <p className="text-marketing-muted leading-[1.75] text-[1.05rem]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.forWhom.body")}
           </p>
           <div className="flex flex-wrap gap-2 justify-center pt-2">
@@ -115,12 +115,12 @@ function Landing() {
         <Reveal className="max-w-2xl mx-auto mt-10">
           <div className="rounded-2xl border border-marketing-line bg-marketing-surface p-6 md:p-7 text-center">
             <h3
-              className="text-marketing-ink mb-2"
-              style={{ ...serif, fontSize: "clamp(1.15rem, 1.6vw, 1.35rem)" }}
+              className="text-display-xs text-marketing-ink mb-2"
+              style={display}
             >
               {t("marketing.forWhom.caregiverTitle")}
             </h3>
-            <p className="text-marketing-muted leading-relaxed text-[0.98rem]">
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
               {t("marketing.forWhom.caregiverBody")}
             </p>
           </div>
@@ -133,8 +133,8 @@ function Landing() {
       <section className="px-6 md:px-8 py-24 md:py-36">
         <Reveal className="max-w-4xl mx-auto text-center">
           <h2
-            className="tracking-tight text-marketing-ink italic"
-            style={{ ...serif, fontSize: "clamp(2rem, 5vw, 3.75rem)", lineHeight: 1.1 }}
+            className="text-display-lg text-marketing-ink italic"
+            style={display}
           >
             {t("marketing.bridge.line")}
           </h2>
@@ -150,8 +150,8 @@ function Landing() {
           <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
             <Kicker>{t("marketing.outcomes.kicker")}</Kicker>
             <h2
-              className="tracking-tight text-marketing-ink"
-              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+              className="text-display-md text-marketing-ink"
+              style={display}
             >
               {t("marketing.outcomes.title")}
             </h2>
@@ -192,12 +192,12 @@ function Landing() {
           <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
             <Kicker>{t("marketing.inside.kicker")}</Kicker>
             <h2
-              className="tracking-tight text-marketing-ink"
-              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+              className="text-display-md text-marketing-ink"
+              style={display}
             >
               {t("marketing.inside.title")}
             </h2>
-            <p className="text-marketing-muted text-[1.05rem] leading-[1.7]">
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
               {t("marketing.inside.sub")}
             </p>
           </Reveal>
@@ -252,12 +252,12 @@ function Landing() {
                   {t("marketing.team.kicker")}
                 </p>
                 <h2
-                  className="tracking-tight mb-6"
-                  style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+                  className="text-display-md mb-6"
+                  style={display}
                 >
                   {t("marketing.team.title")}
                 </h2>
-                <p className="text-[1rem] leading-[1.75] opacity-90 max-w-xl mb-8">
+                <p className="text-base md:text-lg leading-[1.7] opacity-90 max-w-xl mb-8">
                   {t("marketing.team.body")}
                 </p>
                 <ul className="space-y-4">
@@ -298,7 +298,7 @@ function Landing() {
                       <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
                         {t("marketing.team.mockCheckedBy")}
                       </p>
-                      <p className="text-lg italic text-marketing-ink" style={serif}>
+                      <p className="text-lg italic text-marketing-ink" style={display}>
                         {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
                       </p>
                     </div>
@@ -321,8 +321,8 @@ function Landing() {
           {[1, 2, 3, 4].map((n) => (
             <Reveal key={n} delayMs={n * 60}>
               <p
-                className="italic text-marketing-ink leading-[1.15] tracking-tight"
-                style={{ ...serif, fontSize: "clamp(1.25rem, 2vw, 1.75rem)" }}
+                className="text-display-sm italic text-marketing-ink"
+                style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
               </p>
@@ -339,15 +339,15 @@ function Landing() {
         <Reveal className="max-w-3xl mx-auto text-center space-y-6">
           <Kicker>{t("marketing.tablet.kicker")}</Kicker>
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            className="text-display-md text-marketing-ink"
+            style={display}
           >
             {t("marketing.tablet.title")}
           </h2>
-          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.tablet.body")}
           </p>
-          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.tablet.bodyExtra")}
           </p>
           <div className="flex flex-wrap gap-2 justify-center pt-4">
@@ -362,7 +362,7 @@ function Landing() {
       <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line">
         <Reveal className="max-w-2xl mx-auto text-center space-y-5">
           <Kicker>{t("marketing.not.kicker")}</Kicker>
-          <p className="text-marketing-muted text-[1.05rem] leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
             {t("marketing.not.body")}
           </p>
         </Reveal>
@@ -374,12 +374,12 @@ function Landing() {
           <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
             <Kicker>{t("marketing.pricing.kicker")}</Kicker>
             <h2
-              className="tracking-tight text-marketing-ink"
-              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+              className="text-display-md text-marketing-ink"
+              style={display}
             >
               {t("marketing.pricing.title")}
             </h2>
-            <p className="text-marketing-muted text-[1.05rem] leading-[1.7]">
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
               {t("marketing.pricing.sub")}
             </p>
           </Reveal>
@@ -411,8 +411,8 @@ function Landing() {
           <Reveal className="text-center mb-12 space-y-3">
             <Kicker>{t("marketing.faq.kicker")}</Kicker>
             <h2
-              className="tracking-tight text-marketing-ink"
-              style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+              className="text-display-md text-marketing-ink"
+              style={display}
             >
               {t("marketing.faq.title")}
             </h2>
@@ -427,14 +427,14 @@ function Landing() {
               <AccordionItem key={k} value={k} className="border-0">
                 <AccordionTrigger
                   className="text-left text-lg py-5 hover:no-underline [&[data-state=open]>svg]:hidden text-marketing-ink"
-                  style={serif}
+                  style={display}
                 >
                   <span className="flex-1 pr-4">{t(`marketing.faq.${k}Q`)}</span>
                   <span className="text-marketing-sage shrink-0">
                     <Plus className="size-5 transition-transform [[data-state=open]_&]:rotate-45" />
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-6 text-marketing-muted leading-[1.75] text-[1rem]">
+                <AccordionContent className="pb-6 text-marketing-muted text-base md:text-lg leading-[1.7]">
                   {t(`marketing.faq.${k}A`)}
                 </AccordionContent>
               </AccordionItem>
@@ -447,12 +447,12 @@ function Landing() {
       <section className="px-6 md:px-8 py-24 md:py-32 bg-marketing-surface border-t border-marketing-line">
         <Reveal className="max-w-3xl mx-auto text-center space-y-7">
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...serif, fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.05 }}
+            className="text-display-lg text-marketing-ink"
+            style={display}
           >
             {t("marketing.cta.title")}
           </h2>
-          <p className="text-marketing-muted text-[1.05rem] max-w-xl mx-auto leading-[1.75]">
+          <p className="text-marketing-muted text-base md:text-lg max-w-xl mx-auto leading-[1.7]">
             {t("marketing.cta.body")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
@@ -514,12 +514,12 @@ function OutcomeCard({
         {icon}
       </div>
       <h3
-        className="italic text-marketing-ink leading-[1.15] mb-3"
-        style={{ ...serif, fontSize: "clamp(1.25rem, 2.2vw, 1.6rem)" }}
+        className="text-display-xs italic text-marketing-ink mb-3"
+        style={display}
       >
         {title}
       </h3>
-      <p className="text-marketing-muted leading-[1.7] mb-5">{body}</p>
+      <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-5">{body}</p>
       <div className="flex flex-wrap gap-2">
         {chips.map((c) => (
           <span
@@ -552,7 +552,7 @@ function ComparisonCard({
       }`}
     >
       <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-      <h3 className="italic text-marketing-ink mb-6" style={{ ...serif, fontSize: "clamp(1.35rem, 2.4vw, 1.75rem)" }}>
+      <h3 className="text-display-xs italic text-marketing-ink mb-6" style={display}>
         {title}
       </h3>
       <ul className="space-y-3.5">
@@ -597,7 +597,7 @@ function PriceCard({
         </span>
       )}
       <p className="text-sm font-medium text-marketing-muted mb-4">{label}</p>
-      <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={serif}>
+      <p className="text-4xl md:text-5xl italic text-marketing-ink mb-2" style={display}>
         {price}
       </p>
       <p className="text-sm text-marketing-muted mb-6">{sub}</p>
@@ -640,12 +640,12 @@ function DaySection() {
         <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-16">
           <Kicker>{t("marketing.day.kicker")}</Kicker>
           <h2
-            className="tracking-tight text-marketing-ink"
-            style={{ ...serif, fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", lineHeight: 1.1 }}
+            className="text-display-md text-marketing-ink"
+            style={display}
           >
             {t("marketing.day.title")}
           </h2>
-          <p className="text-marketing-muted text-[1.05rem]">{t("marketing.day.sub")}</p>
+          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{t("marketing.day.sub")}</p>
         </Reveal>
 
         <ol className="relative md:pl-8">
@@ -673,12 +673,12 @@ function DaySection() {
                   </div>
                   <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-6 md:p-7 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     <h3
-                      className="italic text-marketing-ink mb-2 leading-tight"
-                      style={{ ...serif, fontSize: "clamp(1.15rem, 2vw, 1.5rem)" }}
+                      className="text-display-xs italic text-marketing-ink mb-2"
+                      style={display}
                     >
                       {s.title}
                     </h3>
-                    <p className="text-marketing-muted leading-[1.75] text-[0.98rem]">{s.body}</p>
+                    <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{s.body}</p>
                   </div>
                 </div>
               </Reveal>
@@ -795,23 +795,15 @@ function Hero() {
 
         <Reveal immediate delayMs={90}>
           <h1
-            className="tracking-tight text-primary mx-auto"
-            style={{
-              ...serif,
-              fontSize: "clamp(2.5rem, 5.5vw, 4.25rem)",
-              lineHeight: 1.05,
-              maxWidth: "18ch",
-            }}
+            className="text-display-xl text-primary mx-auto"
+            style={{ ...display, maxWidth: "18ch" }}
           >
             {t("marketing.hero.headline")}
           </h1>
         </Reveal>
 
         <Reveal immediate delayMs={180}>
-          <p
-            className="text-marketing-muted mt-6 mx-auto max-w-xl"
-            style={{ fontSize: "clamp(1rem, 1.15vw, 1.125rem)", lineHeight: 1.7 }}
-          >
+          <p className="text-marketing-muted mt-6 mx-auto max-w-xl text-base md:text-lg leading-[1.7]">
             {t("marketing.hero.subline")}
           </p>
         </Reveal>
@@ -891,7 +883,7 @@ function HeroDevice({ platform: _platform }: { platform: "ios" | "android" | "de
               <span className="w-2 h-2 rounded-full bg-marketing-line" />
               <span className="w-2 h-2 rounded-full bg-marketing-line" />
             </div>
-            <div className="text-[11px] italic text-marketing-muted" style={serif}>
+            <div className="text-[11px] italic text-marketing-muted" style={display}>
               {t("marketing.hero.mockShift")}
             </div>
             <div className="size-5 rounded-full bg-marketing-sage-soft border border-marketing-sage-line" />
@@ -922,7 +914,7 @@ function HeroDevice({ platform: _platform }: { platform: "ios" | "android" | "de
             {t("marketing.hero.satOxygenLabel")}
           </p>
         </div>
-        <p className="text-xl italic text-marketing-ink leading-tight" style={serif}>
+        <p className="text-xl italic text-marketing-ink leading-tight" style={display}>
           {t("marketing.hero.satOxygenValue")}
         </p>
         <div className="mt-2 h-1.5 rounded-full bg-marketing-faint overflow-hidden">
