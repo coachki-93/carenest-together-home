@@ -1486,7 +1486,7 @@ export const sv = {
       c1Headline: "Varje dos har ett namn och ett klockslag.",
       c1Title: "Inget lever längre bara i ditt huvud.",
       c1Body:
-        "Dagsschemat, medicinplanen, vårdinstruktionerna, nödinformationen och ditt barns profil — nedskrivet en gång, synligt för alla ni bjuder in, på svenska och engelska.",
+        "Varje dos loggas med namn och tid, synligt för alla ni bjuder in.",
       c1Chip1: "Dagens plan",
       c1Chip2: "Vårdinstruktioner",
       c1Chip3: "Nödinformation",
@@ -1494,7 +1494,7 @@ export const sv = {
       c2Headline: "Överlämningar läses, inte bara skrivs.",
       c2Title: "Nya vårdgivare blir bra vårdgivare snabbare.",
       c2Body:
-        "Era checklistor vid era tider (\"Finns handsprit? Ligger sugkatetrarna på plats?\"), steg-för-steg-instruktioner och förifyllda överlämningar med läskvitton. Den nya assistentens första pass kommer med kunskapen inbyggd.",
+        "Passanteckningar fylls i från dagen och markeras som lästa av nästa vårdgivare.",
       c2Chip1: "Vårdplatskontroll",
       c2Chip2: "Överlämningar",
       c2Chip3: "Läskvitton",
@@ -1502,7 +1502,7 @@ export const sv = {
       c3Headline: "Tuben säger till innan den tar slut.",
       c3Title: "Det praktiska sköter sig självt.",
       c3Body:
-        "Syrgasnedräkning matchad mot tillverkarens egna tabeller. Maskindelar — filter, slangar, kammare — var och en med sitt eget underhållsschema, som dyker upp på dagens lista när de är aktuella. Förbrukningsvaror som flyttas till inköpslistan när ett checklistesvar säger att de saknas.",
+        "Syrgas, maskiner och förråd har varsin nedräkning — inget tar slut i tysthet.",
       c3Chip1: "Syrgas",
       c3Chip2: "Underhåll",
       c3Chip3: "Lager → Inköpslista",
@@ -1510,7 +1510,7 @@ export const sv = {
       c4Headline: "Missade tillsyner tystnar aldrig.",
       c4Title: "När något behöver dig får du veta. Annars är det tyst.",
       c4Body:
-        "Larm bara för det som spelar roll: ett kritiskt checklistesvar, en missad kontroll efter sitt tidsfönster, en tub som håller på att ta slut, upprepade vitalvärden utanför intervallet, en sen medicin. Allt annat stannar lugnt grönt.",
+        "Larm bara för det som spelar roll: ett kritiskt svar, en missad tillsyn, en låg tub.",
       c4Chip1: "Push-notiser",
       c4Chip2: "Skyddsnät",
       vignette: {
