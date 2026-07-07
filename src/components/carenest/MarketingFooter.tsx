@@ -42,12 +42,9 @@ export function MarketingFooter() {
             <p className="text-xs text-marketing-muted italic">
               {t("marketing.footer.trustLine")}
             </p>
-            <div className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1.5">
-              <span className="size-1.5 rounded-full bg-marketing-sage" />
-              <p className="text-xs text-marketing-sage font-medium">
-                {t("marketing.footer.dataPrivacy")}
-              </p>
-            </div>
+            <p className="text-xs text-marketing-muted">
+              {t("marketing.footer.dataPrivacy")}
+            </p>
           </div>
 
           {/* Product */}

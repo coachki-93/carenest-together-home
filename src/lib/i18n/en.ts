@@ -1374,7 +1374,7 @@ export const en = {
       kicker: "Care, together",
       headline: "Everything about your child's care — out of your head, into one calm place.",
       subline:
-        "CareNest is the shared home base for families of children with special needs. The schedule, the medications, the machines, the things every caregiver needs to know — visible to everyone you trust, so the whole day no longer depends on you remembering it.",
+        "The shared home base for families of children with special needs — so the day no longer depends on your memory.",
       ctaCreate: "Create your family space",
       ctaInvite: "I have an invite",
       ctaInstall: "Add CareNest to your device",
@@ -1443,7 +1443,7 @@ export const en = {
       t1Time: "07:00",
       t1Title: "The shift starts itself.",
       t1Body:
-        "The morning assistant opens the tablet on the wall, taps their name, and sees the whole day: which meds at which times, the vitals to check, the filter that's due today. No phone call. No retelling.",
+        "The morning assistant opens the tablet, taps their name, and sees the whole day: which meds at which times, the vitals to check, the filter that's due today. No phone call. No retelling.",
       t2Time: "During the day",
       t2Title: "You can look, instead of asking.",
       t2Body:
@@ -1570,14 +1570,14 @@ export const en = {
       s4Label: "In daily use, shaped by real care",
     },
     tablet: {
-      kicker: "Designed for the tablet on the wall",
+      kicker: "Designed for the family tablet",
       title: "Made for tired hands at 3 a.m.",
       body:
-        "Large touch targets, calm typography, and a layout made for a tablet on the wall. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
+        "Large touch targets, calm typography, and a layout made for a shared family tablet. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
       bodyExtra:
         "Every family sets its own timezone and notification language — alerts arrive at the right local time, in the language your team reads.",
       t1: "Installable on iPad & Android",
-      t2: "English & Svenska",
+      t2: "English & Swedish",
       t3: "Private to your family",
     },
     not: {
@@ -1588,14 +1588,14 @@ export const en = {
     pricing: {
       kicker: "Pricing",
       title: "Free while we build it together.",
-      sub: "Planned pricing is 159 kr/month per family with unlimited caregivers — early families keep a founding discount.",
+      sub: "Planned pricing is about €14/month per family with unlimited caregivers — early families keep a founding discount.",
       monthlyLabel: "Right now",
       monthlyPrice: "Free",
       monthlySub: "While we build with our first families",
       monthlyCta: "Create your family space",
       annualBadge: "Founding families",
       annualLabel: "When billing begins",
-      annualPrice: "159 kr / month",
+      annualPrice: "€14 / month",
       annualSub: "Per family · unlimited caregivers · founding discount kept",
       annualCta: "Join early — keep the discount",
       featuresLabel: "Everything included",
@@ -1606,7 +1606,7 @@ export const en = {
       f5: "Care Place Control checklists with instant critical alerts",
       f6: "Inventory, low-stock warnings & shared shopping list",
       f7: "Per-caregiver attribution — who did what, when",
-      f8: "Unlimited caregivers, invite codes, English & Svenska",
+      f8: "Unlimited caregivers, invite codes, English & Swedish",
     },
     faq: {
       kicker: "Frequently asked",
@@ -1618,7 +1618,7 @@ export const en = {
       q3Q: "Does CareNest give medical advice?",
       q3A: "No. The reference ranges and reminders are screening aids, not medical advice. Always follow your care team's guidance.",
       q4Q: "What does it cost?",
-      q4A: "CareNest is free while we build it together with our first families. Planned pricing is 159 kr/month per family with unlimited caregivers — and early families keep a founding discount.",
+      q4A: "CareNest is free while we build it together with our first families. Planned pricing is about €14/month per family with unlimited caregivers — and early families keep a founding discount.",
       q5Q: "What languages do you support?",
       q5A: "English and Swedish today — every screen and notification is fully translated.",
       q6Q: "Does it work offline?",

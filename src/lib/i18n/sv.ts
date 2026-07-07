@@ -1374,7 +1374,7 @@ export const sv = {
       kicker: "Omsorg, tillsammans",
       headline: "Allt om ditt barns omsorg — ur ditt huvud, till en lugn plats.",
       subline:
-        "CareNest är familjens gemensamma bas när ett barn har särskilda behov. Schemat, medicinerna, maskinerna, allt som varje assistent behöver veta — synligt för alla ni litar på, så att dagen inte längre hänger på att just du kommer ihåg allt.",
+        "Det gemensamma navet för familjer med barn med särskilda behov — så att dagen inte hänger på ditt minne.",
       ctaCreate: "Skapa er familjeplats",
       ctaInvite: "Jag har en inbjudan",
       ctaInstall: "Lägg till CareNest på din enhet",
@@ -1441,7 +1441,7 @@ export const sv = {
       t1Time: "07:00",
       t1Title: "Passet börjar av sig självt.",
       t1Body:
-        "Morgonassistenten öppnar surfplattan på väggen, trycker på sitt namn och ser hela dagen: vilka mediciner vid vilka tider, vilka vitalvärden som ska kontrolleras, filtret som ska bytas idag. Inget telefonsamtal. Ingen genomgång.",
+        "Morgonassistenten öppnar surfplattan, trycker på sitt namn och ser hela dagen: vilka mediciner vid vilka tider, vilka vitalvärden som ska kontrolleras, filtret som ska bytas idag. Inget telefonsamtal. Ingen genomgång.",
       t2Time: "Under dagen",
       t2Title: "Du kan titta i stället för att fråga.",
       t2Body:
@@ -1567,14 +1567,14 @@ export const sv = {
       s4Label: "I daglig användning, formad av verklig omsorg",
     },
     tablet: {
-      kicker: "Designad för surfplattan på väggen",
+      kicker: "Designad för familjens surfplatta",
       title: "Gjord för trötta händer kl 03",
       body:
-        "Stora knappar, lugn typografi och en layout gjord för surfplattan på väggen. Lägg till på hemskärmen så känns det som en app — på svenska och engelska från dag ett.",
+        "Stora knappar, lugn typografi och en layout gjord för familjens surfplatta. Lägg till på hemskärmen så känns det som en app — på svenska och engelska från dag ett.",
       bodyExtra:
         "Varje familj sätter sin egen tidszon och notisspråk — larmen kommer på rätt lokal tid, på det språk ert team läser.",
       t1: "Installerbar på iPad och Android",
-      t2: "Svenska & English",
+      t2: "Engelska & svenska",
       t3: "Privat för er familj",
     },
     not: {

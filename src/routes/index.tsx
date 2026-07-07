@@ -114,20 +114,6 @@ function Landing() {
 
 
 
-
-
-      {/* ── 3. The bridge line ── */}
-      <section className="px-6 md:px-8 py-24 md:py-36">
-        <Reveal className="max-w-4xl mx-auto text-center">
-          <h2
-            className="mk-headline-gradient text-display-lg italic"
-            style={display}
-          >
-            {t("marketing.bridge.line")}
-          </h2>
-        </Reveal>
-      </section>
-
       {/* ── 4. A day with CareNest — timeline ── */}
       <DaySection />
 
@@ -308,12 +294,12 @@ function Landing() {
       </section>
 
       {/* ── 8. Trust strip ── */}
-      <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line bg-marketing-surface">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
+      <section className="px-6 md:px-8 py-10 md:py-12 border-y border-marketing-line bg-marketing-surface">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-5">
           {[1, 2, 3, 4].map((n) => (
             <Reveal key={n} delayMs={n * 60}>
               <p
-                className="text-display-sm text-marketing-ink"
+                className="text-lg md:text-xl text-marketing-ink xl:whitespace-nowrap"
                 style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
@@ -1129,7 +1115,7 @@ function Hero() {
       </div>
 
       {/* Device — single centered iPad, clips into fold via mk-hero-device margin. */}
-      <Reveal immediate delayMs={480} className="relative mt-14 md:mt-20">
+      <Reveal immediate delayMs={480} className="relative mt-6 md:mt-8">
         <HeroDevice />
       </Reveal>
     </section>
