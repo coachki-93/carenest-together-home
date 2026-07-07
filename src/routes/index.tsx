@@ -12,6 +12,15 @@ import {
   Plus,
   MessageSquareText,
   Sparkles,
+  ListChecks,
+  Calendar,
+  BookOpen,
+  Siren,
+  Activity,
+  Droplet,
+  Wrench,
+  RefreshCw,
+  type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
