@@ -12,6 +12,15 @@ import {
   Plus,
   MessageSquareText,
   Sparkles,
+  ListChecks,
+  Calendar,
+  BookOpen,
+  Siren,
+  Activity,
+  Droplet,
+  Wrench,
+  RefreshCw,
+  type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -112,8 +121,6 @@ function Landing() {
         </div>
       </section>
 
-
-
       {/* ── 4. A day with CareNest — timeline ── */}
       <DaySection />
 
@@ -135,28 +142,24 @@ function Landing() {
               eyebrow={t("marketing.outcomes.c1Eyebrow")}
               headline={t("marketing.outcomes.c1Headline")}
               body={t("marketing.outcomes.c1Body")}
-              chips={[t("marketing.outcomes.c1Chip1"), t("marketing.outcomes.c1Chip2"), t("marketing.outcomes.c1Chip3")]}
               vignette={<MedicationVignette />}
             />
             <OutcomeCard
               eyebrow={t("marketing.outcomes.c2Eyebrow")}
               headline={t("marketing.outcomes.c2Headline")}
               body={t("marketing.outcomes.c2Body")}
-              chips={[t("marketing.outcomes.c2Chip1"), t("marketing.outcomes.c2Chip2"), t("marketing.outcomes.c2Chip3")]}
               vignette={<HandoverVignette />}
             />
             <OutcomeCard
               eyebrow={t("marketing.outcomes.c3Eyebrow")}
               headline={t("marketing.outcomes.c3Headline")}
               body={t("marketing.outcomes.c3Body")}
-              chips={[t("marketing.outcomes.c3Chip1"), t("marketing.outcomes.c3Chip2"), t("marketing.outcomes.c3Chip3")]}
               vignette={<OxygenVignette />}
             />
             <OutcomeCard
               eyebrow={t("marketing.outcomes.c4Eyebrow")}
               headline={t("marketing.outcomes.c4Headline")}
               body={t("marketing.outcomes.c4Body")}
-              chips={[t("marketing.outcomes.c4Chip1"), t("marketing.outcomes.c4Chip2")]}
               vignette={<CheckVignette />}
             />
           </div>
@@ -183,14 +186,26 @@ function Landing() {
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             <ComparisonCard
               title={t("marketing.essentials.title")}
-              subtitle={t("marketing.essentials.subtitle")}
-              items={[1, 2, 3, 4, 5, 6, 7, 8].map((n) => t(`marketing.essentials.i${n}`))}
+              intro={t("marketing.essentials.intro")}
+              rows={[
+                { icon: ListChecks, key: "i1" },
+                { icon: Pill, key: "i2" },
+                { icon: Calendar, key: "i3" },
+                { icon: BookOpen, key: "i4" },
+                { icon: Siren, key: "i5" },
+              ].map((r) => ({ icon: r.icon, label: t(`marketing.essentials.${r.key}`) }))}
             />
             <ComparisonCard
               accent
               title={t("marketing.complex.title")}
-              subtitle={t("marketing.complex.subtitle")}
-              items={[1, 2, 3, 4, 5, 6].map((n) => t(`marketing.complex.i${n}`))}
+              intro={t("marketing.complex.intro")}
+              rows={[
+                { icon: Activity, key: "i1" },
+                { icon: Droplet, key: "i2" },
+                { icon: Wrench, key: "i3" },
+                { icon: ShieldCheck, key: "i4" },
+                { icon: RefreshCw, key: "i5" },
+              ].map((r) => ({ icon: r.icon, label: t(`marketing.complex.${r.key}`) }))}
             />
           </div>
 
@@ -238,23 +253,6 @@ function Landing() {
                 <p className="text-base md:text-lg leading-[1.7] opacity-90 max-w-xl mb-8">
                   {t("marketing.team.body")}
                 </p>
-                <ul className="space-y-4">
-                  {[1, 2, 3].map((n) => (
-                    <li key={n} className="flex gap-3 items-start">
-                      <span className="mt-1 size-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                        <Check className="size-3" />
-                      </span>
-                      <div>
-                        <p className="font-semibold text-[0.95rem]">
-                          {t(`marketing.team.b${n}Title`)}
-                        </p>
-                        <p className="text-sm opacity-85 leading-relaxed">
-                          {t(`marketing.team.b${n}Body`)}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
               </div>
 
               {/* Mock screenshot: "Checked by Rusan · Kommun" */}
@@ -512,13 +510,11 @@ function OutcomeCard({
   eyebrow,
   headline,
   body,
-  chips,
   vignette,
 }: {
   eyebrow: string;
   headline: string;
   body: string;
-  chips: string[];
   vignette: ReactNode;
 }) {
   const flashRef = useFlashlight<HTMLDivElement>();
@@ -538,17 +534,7 @@ function OutcomeCard({
           {headline}
         </h3>
         <div className="mb-4">{vignette}</div>
-        <p className="text-marketing-muted text-sm leading-relaxed mb-4">{body}</p>
-        <div className="mt-auto flex flex-wrap gap-1.5">
-          {chips.map((c) => (
-            <span
-              key={c}
-              className="mk-glass-pill rounded-full px-2.5 py-1 text-xs text-marketing-muted"
-            >
-              {c}
-            </span>
-          ))}
-        </div>
+        <p className="text-marketing-muted text-sm leading-relaxed mt-auto">{body}</p>
       </div>
     </Reveal>
   );
@@ -572,44 +558,46 @@ function ProblemOldCard() {
           {t("marketing.problem.oldHeadline")}
         </h3>
 
-        {/* Torn-notebook block */}
+        {/* Binder note — enters as a single block at t=0 */}
         <div
-          className="relative rounded-lg bg-[oklch(0.98_0.01_85)] border border-marketing-line p-4 mb-4 rotate-[-0.6deg] shadow-sm"
-          style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
+          className="mk-slide-in relative rounded-lg bg-[oklch(0.98_0.01_85)] border border-marketing-line p-4 mb-4 rotate-[-0.6deg] shadow-sm"
+          style={{
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            ["--mk-delay" as string]: "0ms",
+          } as React.CSSProperties}
         >
           <p className="text-[10px] uppercase tracking-wider text-marketing-muted mb-2">
             {t("marketing.problem.oldNoteTitle")}
           </p>
           <ul className="space-y-1.5 text-[13px] text-marketing-ink/80">
-            <Reveal delayMs={120}>
-              <li className="tabular-nums">{t("marketing.problem.oldNoteRow1")}</li>
-            </Reveal>
-            <Reveal delayMs={200}>
-              <li className="tabular-nums text-marketing-ink">{t("marketing.problem.oldNoteRow2")}</li>
-            </Reveal>
-            <Reveal delayMs={280}>
-              <li className="tabular-nums text-marketing-muted line-through decoration-marketing-muted/40">
-                {t("marketing.problem.oldNoteRow3")}
-              </li>
-            </Reveal>
+            <li className="tabular-nums">{t("marketing.problem.oldNoteRow1")}</li>
+            <li className="tabular-nums text-marketing-ink">{t("marketing.problem.oldNoteRow2")}</li>
+            <li className="tabular-nums text-marketing-muted line-through decoration-marketing-muted/40">
+              {t("marketing.problem.oldNoteRow3")}
+            </li>
           </ul>
         </div>
 
-        {/* Chat bubbles */}
+        {/* Chat bubbles — question, then unsure reply */}
         <div className="relative space-y-2 mb-4">
-          <Reveal delayMs={360}>
-            <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-ink">
-              {t("marketing.problem.oldChat1")}
-            </div>
-          </Reveal>
-          <Reveal delayMs={440}>
-            <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-muted">
-              {t("marketing.problem.oldChat2")}
-            </div>
-          </Reveal>
+          <div
+            className="mk-slide-in max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-ink"
+            style={{ ["--mk-delay" as string]: "250ms" } as React.CSSProperties}
+          >
+            {t("marketing.problem.oldChat1")}
+          </div>
+          <div
+            className="mk-slide-in ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-muted"
+            style={{ ["--mk-delay" as string]: "500ms" } as React.CSSProperties}
+          >
+            {t("marketing.problem.oldChat2")}
+          </div>
         </div>
 
-        <p className="relative text-sm text-marketing-muted leading-relaxed">
+        <p
+          className="mk-slide-in relative text-sm text-marketing-muted leading-relaxed"
+          style={{ ["--mk-delay" as string]: "750ms" } as React.CSSProperties}
+        >
           {t("marketing.problem.oldCaption")}
         </p>
       </div>
@@ -621,7 +609,7 @@ function ProblemNewCard() {
   const { t } = useTranslation();
   const flashRef = useFlashlight<HTMLDivElement>();
   return (
-    <Reveal delayMs={140}>
+    <Reveal>
       <div
         ref={flashRef}
         className="relative h-full mk-glass mk-glass-border mk-flashlight rounded-3xl p-6 md:p-7"
@@ -636,53 +624,64 @@ function ProblemNewCard() {
           {t("marketing.problem.newHeadline")}
         </h3>
 
-        {/* Rebuilt med row — real product state */}
-        <Reveal delayMs={220}>
-          <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-3 flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
-              <Pill className="size-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-marketing-ink truncate">
-                {t("marketing.problem.newMedName")}
-              </p>
-              <p className="text-xs text-marketing-muted tabular-nums">
-                {t("marketing.problem.newMedTime")} · {t("marketing.problem.newMedBy")}
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-xs font-semibold shrink-0">
-              <span className="mk-check-pop">
-                <Check className="size-3" />
-              </span>
-              {t("marketing.problem.newMedStatus")}
-            </span>
+        {/* Med row — arrives at +150 (base offset vs left card) */}
+        <div
+          className="mk-slide-in rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-3 flex items-center gap-3"
+          style={{ ["--mk-delay" as string]: "150ms" } as React.CSSProperties}
+        >
+          <div className="size-10 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
+            <Pill className="size-5" />
           </div>
-        </Reveal>
-
-        {/* Rebuilt handover header with read receipt */}
-        <Reveal delayMs={310}>
-          <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-4">
-            <div className="flex items-center gap-2 mb-1.5">
-              <ClipboardIcon />
-              <p className="text-sm font-semibold text-marketing-ink">
-                {t("marketing.problem.newHandoverTitle")}
-              </p>
-            </div>
-            <p className="text-xs text-marketing-muted mb-2">
-              {t("marketing.problem.newHandoverBy")}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-marketing-ink truncate">
+              {t("marketing.problem.newMedName")}
             </p>
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-1.5">
-                <AvatarDot letter="K" />
-              </div>
-              <p className="text-xs text-marketing-sage font-medium">
-                {t("marketing.problem.newHandoverRead")}
-              </p>
-            </div>
+            <p className="text-xs text-marketing-muted tabular-nums">
+              {t("marketing.problem.newMedTime")} · {t("marketing.problem.newMedBy")}
+            </p>
           </div>
-        </Reveal>
+          <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-xs font-semibold shrink-0">
+            <span
+              className="mk-check-pop"
+              style={{ ["--mk-delay" as string]: "350ms" } as React.CSSProperties}
+            >
+              <Check className="size-3" />
+            </span>
+            {t("marketing.problem.newMedStatus")}
+          </span>
+        </div>
 
-        <p className="text-sm text-marketing-muted leading-relaxed">
+        {/* Handover card — arrives at +450 */}
+        <div
+          className="mk-slide-in rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-4"
+          style={{ ["--mk-delay" as string]: "450ms" } as React.CSSProperties}
+        >
+          <div className="flex items-center gap-2 mb-1.5">
+            <ClipboardIcon />
+            <p className="text-sm font-semibold text-marketing-ink">
+              {t("marketing.problem.newHandoverTitle")}
+            </p>
+          </div>
+          <p className="text-xs text-marketing-muted mb-2">
+            {t("marketing.problem.newHandoverBy")}
+          </p>
+          <div className="flex items-center gap-2">
+            <div
+              className="mk-check-pop flex -space-x-1.5"
+              style={{ ["--mk-delay" as string]: "650ms" } as React.CSSProperties}
+            >
+              <AvatarDot letter="K" />
+            </div>
+            <p className="text-xs text-marketing-sage font-medium">
+              {t("marketing.problem.newHandoverRead")}
+            </p>
+          </div>
+        </div>
+
+        <p
+          className="mk-slide-in text-sm text-marketing-muted leading-relaxed"
+          style={{ ["--mk-delay" as string]: "850ms" } as React.CSSProperties}
+        >
           {t("marketing.problem.newCaption")}
         </p>
       </div>
@@ -832,13 +831,13 @@ function CheckVignette() {
 
 function ComparisonCard({
   title,
-  subtitle,
-  items,
+  intro,
+  rows,
   accent,
 }: {
   title: string;
-  subtitle: string;
-  items: string[];
+  intro: string;
+  rows: { icon: LucideIcon; label: string }[];
   accent?: boolean;
 }) {
   const flashRef = useFlashlight<HTMLDivElement>();
@@ -850,15 +849,20 @@ function ComparisonCard({
           accent ? "ring-2 ring-marketing-sage" : ""
         }`}
       >
-        <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-        <h3 className="text-display-xs text-marketing-ink mb-6" style={display}>
+        <h3 className="text-display-xs text-marketing-ink mb-2" style={display}>
           {title}
         </h3>
-        <ul className="space-y-3.5">
-          {items.map((it) => (
-            <li key={it} className="flex items-start gap-3 text-[0.95rem] text-marketing-ink leading-[1.6]">
-              <Check className={`size-4 shrink-0 mt-1 ${accent ? "text-marketing-sage" : "text-marketing-sage"}`} />
-              <span>{it}</span>
+        <p className="text-sm text-marketing-muted leading-relaxed mb-6">{intro}</p>
+        <ul className="space-y-3">
+          {rows.map(({ icon: Icon, label }) => (
+            <li
+              key={label}
+              className="flex items-center gap-3 text-[0.95rem] text-marketing-ink"
+            >
+              <span className="inline-flex size-8 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage items-center justify-center shrink-0">
+                <Icon className="size-4" />
+              </span>
+              <span className="font-medium">{label}</span>
             </li>
           ))}
         </ul>
@@ -931,15 +935,16 @@ function PriceCard({
 /* Day timeline (Section 4) */
 function DaySection() {
   const { t } = useTranslation();
-  const steps = [1, 2, 3, 4].map((n) => ({
-    time: t(`marketing.day.t${n}Time`),
-    title: t(`marketing.day.t${n}Title`),
-    body: t(`marketing.day.t${n}Body`),
-  }));
+  const visuals: Record<number, ReactNode> = {
+    1: <DayShiftSelectorVisual />,
+    2: <DayProgressVisual />,
+    3: <DayPrefillVisual />,
+    4: <DayLowStockVisual />,
+  };
   return (
     <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
-      <div className="max-w-5xl mx-auto">
-        <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-16">
+      <div className="max-w-6xl mx-auto">
+        <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
           <Kicker>{t("marketing.day.kicker")}</Kicker>
           <h2
             className="text-display-md text-marketing-ink"
@@ -950,52 +955,153 @@ function DaySection() {
           <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{t("marketing.day.sub")}</p>
         </Reveal>
 
-        <ol className="relative md:pl-8">
-          {/* Vertical rail (desktop) */}
-          <span
-            aria-hidden
-            className="hidden md:block absolute left-2 top-2 bottom-2 w-px"
-            style={{ background: "color-mix(in oklab, var(--primary) 35%, transparent)" }}
-          />
-          {steps.map((s, i) => (
-            <li key={i} className="relative mb-10 last:mb-0">
-              <Reveal delayMs={i * 80}>
-                <div className="md:grid md:grid-cols-[9rem_1fr] md:gap-8 items-start">
-                  <div className="flex items-center gap-3 mb-3 md:mb-0">
-                    <span
-                      aria-hidden
-                      className="hidden md:block absolute size-3 rounded-full ring-4 ring-marketing-surface"
-                      style={{
-                        left: "-1.5rem",
-                        transform: "translateX(-50%)",
-                        top: "0.375rem",
-                        background: "var(--primary)",
-                      }}
-                    />
-                    <span
-                      className="rounded-full bg-marketing-bg border border-marketing-sage-line text-marketing-sage px-3 py-1 text-xs font-semibold tabular-nums"
-                    >
-                      {s.time}
-                    </span>
-                  </div>
-                  <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-6 md:p-7 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                    <h3
-                      className="text-display-xs text-marketing-ink mb-2"
-                      style={display}
-                    >
-                      {s.title}
-                    </h3>
-                    <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{s.body}</p>
-                  </div>
-                </div>
-              </Reveal>
-            </li>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {[1, 2, 3, 4].map((n) => (
+            <Reveal key={n} delayMs={(n - 1) * 90}>
+              <div className="h-full rounded-3xl bg-marketing-bg border border-marketing-line p-6 md:p-8 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-3">
+                  {t(`marketing.day.t${n}Time`)}
+                </p>
+                <h3
+                  className="text-display-xs text-marketing-ink mb-3"
+                  style={display}
+                >
+                  {t(`marketing.day.t${n}Title`)}
+                </h3>
+                <p className="text-marketing-muted text-sm md:text-base leading-[1.65] mb-5">
+                  {t(`marketing.day.t${n}Body`)}
+                </p>
+                <div className="mt-auto">{visuals[n]}</div>
+              </div>
+            </Reveal>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );
 }
+
+/* Day-bento visual anchors — each mirrors a real shipped feature. */
+
+function DayShiftSelectorVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-marketing-muted mb-2.5">
+        {t("marketing.day.t1.selectorLabel")}
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-marketing-sage text-marketing-bg px-2.5 py-1 text-xs font-semibold">
+          <span className="size-2 rounded-full bg-marketing-bg/90" />
+          {t("marketing.day.t1.picked")}
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink px-2.5 py-1 text-xs">
+          <span className="size-2 rounded-full" style={{ background: "oklch(0.72 0.15 30)" }} />
+          {t("marketing.day.t1.other1")}
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink px-2.5 py-1 text-xs">
+          <span className="size-2 rounded-full" style={{ background: "oklch(0.70 0.15 200)" }} />
+          {t("marketing.day.t1.other2")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function DayProgressVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5">
+      <div className="flex items-baseline justify-between mb-2">
+        <span className="text-display-xs text-marketing-ink tabular-nums" style={display}>
+          {t("marketing.day.t2.progress")}
+        </span>
+        <span className="text-[11px] uppercase tracking-[0.18em] text-marketing-muted font-semibold">
+          {t("marketing.day.t2.progressLabel")}
+        </span>
+      </div>
+      <div className="h-2 rounded-full bg-marketing-line overflow-hidden mb-2.5">
+        <div
+          className="mk-bar-fill h-full rounded-full"
+          style={
+            {
+              background:
+                "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 70%, white) 100%)",
+              ["--fill" as string]: "54%",
+            } as React.CSSProperties
+          }
+        />
+      </div>
+      <p className="text-[11px] text-marketing-muted">{t("marketing.day.t2.quiet")}</p>
+    </div>
+  );
+}
+
+function DayPrefillVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5">
+      <div className="flex items-center gap-2 mb-2">
+        <ClipboardIcon />
+        <p className="text-[13px] font-semibold text-marketing-ink">
+          {t("marketing.day.t3.title")}
+        </p>
+      </div>
+      <p className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold mb-1.5">
+        {t("marketing.day.t3.prefillLabel")}
+      </p>
+      <ul className="space-y-1 mb-2 text-[12px] text-marketing-muted italic">
+        <li>• {t("marketing.day.t3.line1")}</li>
+        <li>• {t("marketing.day.t3.line2")}</li>
+      </ul>
+      <p className="text-[12px] text-marketing-ink font-medium">
+        {t("marketing.day.t3.addHuman")}
+      </p>
+    </div>
+  );
+}
+
+function DayLowStockVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-2">
+      <div
+        className="rounded-2xl border p-2.5 flex items-center gap-2.5"
+        style={{
+          background: "color-mix(in oklab, oklch(0.75 0.15 60) 10%, transparent)",
+          borderColor: "color-mix(in oklab, oklch(0.75 0.15 60) 30%, transparent)",
+        }}
+      >
+        <span
+          className="size-2 rounded-full shrink-0"
+          style={{ background: "oklch(0.72 0.16 60)" }}
+        />
+        <p className="text-[12px] font-semibold text-marketing-ink flex-1 min-w-0 truncate">
+          {t("marketing.day.t4.stockName")}
+        </p>
+        <span className="text-[11px] tabular-nums text-marketing-muted shrink-0">
+          {t("marketing.day.t4.stockLeft")}
+        </span>
+      </div>
+      <div className="flex justify-center text-marketing-muted" aria-hidden>
+        <svg viewBox="0 0 12 12" className="size-3" fill="currentColor">
+          <path d="M6 9L1 4h10z" />
+        </svg>
+      </div>
+      <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-2.5 flex items-center gap-2.5">
+        <Check className="size-3.5 text-marketing-sage shrink-0" />
+        <p className="text-[12px] text-marketing-ink flex-1 min-w-0 truncate">
+          {t("marketing.day.t4.stockName")}
+        </p>
+        <span className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold shrink-0">
+          {t("marketing.day.t4.listName")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
 
 
 /* Hero H1: word-by-word fade-up on mount, violet gradient text. */

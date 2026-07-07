@@ -55,6 +55,7 @@ export function Reveal({
     <div
       ref={ref}
       className={className}
+      data-visible={visible ? "true" : "false"}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible || reduced ? "translateY(0)" : "translateY(14px)",
