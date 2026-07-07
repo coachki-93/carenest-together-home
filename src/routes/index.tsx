@@ -1115,7 +1115,7 @@ function Hero() {
       </div>
 
       {/* Device — single centered iPad, clips into fold via mk-hero-device margin. */}
-      <Reveal immediate delayMs={480} className="relative mt-14 md:mt-20">
+      <Reveal immediate delayMs={480} className="relative mt-6 md:mt-8">
         <HeroDevice />
       </Reveal>
     </section>
