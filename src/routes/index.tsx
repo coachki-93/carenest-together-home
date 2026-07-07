@@ -621,7 +621,7 @@ function ProblemNewCard() {
           </div>
           <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-xs font-semibold shrink-0">
             <span
-              className="mk-slide-in mk-check-pop"
+              className="mk-check-pop"
               style={{ ["--mk-delay" as string]: "350ms" } as React.CSSProperties}
             >
               <Check className="size-3" />
