@@ -469,9 +469,9 @@
     /* Top-to-bottom fade: near-white at top → transparent by mid */
     linear-gradient(
       180deg,
-      var(--marketing-bg) 0%,
-      var(--marketing-bg) 34%,
-      color-mix(in oklab, var(--marketing-bg) 70%, transparent) 55%,
+      var(--color-marketing-bg) 0%,
+      var(--color-marketing-bg) 34%,
+      color-mix(in oklab, var(--color-marketing-bg) 70%, transparent) 55%,
       transparent 80%
     );
 }
