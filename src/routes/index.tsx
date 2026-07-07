@@ -238,23 +238,6 @@ function Landing() {
                 <p className="text-base md:text-lg leading-[1.7] opacity-90 max-w-xl mb-8">
                   {t("marketing.team.body")}
                 </p>
-                <ul className="space-y-4">
-                  {[1, 2, 3].map((n) => (
-                    <li key={n} className="flex gap-3 items-start">
-                      <span className="mt-1 size-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                        <Check className="size-3" />
-                      </span>
-                      <div>
-                        <p className="font-semibold text-[0.95rem]">
-                          {t(`marketing.team.b${n}Title`)}
-                        </p>
-                        <p className="text-sm opacity-85 leading-relaxed">
-                          {t(`marketing.team.b${n}Body`)}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
               </div>
 
               {/* Mock screenshot: "Checked by Rusan · Kommun" */}
