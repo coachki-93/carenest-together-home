@@ -1443,19 +1443,43 @@ export const en = {
       t1Time: "07:00",
       t1Title: "The shift starts itself.",
       t1Body:
-        "The morning assistant opens the tablet, taps their name, and sees the whole day: which meds at which times, the vitals to check, the filter that's due today. No phone call. No retelling.",
+        "The morning caregiver taps their name and the whole day appears — meds, vitals, the filter that's due.",
+      t1: {
+        selectorLabel: "Who's working this shift?",
+        picked: "Gabriella",
+        other1: "Ryan",
+        other2: "Kim",
+      },
       t2Time: "During the day",
       t2Title: "You can look, instead of asking.",
       t2Body:
-        "From work, you see the day moving: 47 of 87 tasks done, the 11 o'clock meds given, oxygen at 67% with two days remaining. If something needs you — a critical checklist answer, a missed check, three low readings in a row — CareNest tells you. Otherwise, it stays quiet.",
+        "From work, you see the day moving forward — and CareNest stays quiet so long as nothing needs you.",
+      t2: {
+        progress: "47 / 87",
+        progressLabel: "tasks today",
+        quiet: "Quiet so long as nothing needs you.",
+      },
       t3Time: "15:00",
       t3Title: "The handover writes itself.",
       t3Body:
-        "When the shift ends, CareNest has already drafted the handover from what actually happened — the dose that was postponed, the reading that was out of range. The assistant adds the human part: how he slept, what made him laugh. The next caregiver reads it and marks it read — and you can see that they did.",
+        "The handover is already drafted from what actually happened; the caregiver adds the human part.",
+      t3: {
+        title: "Handover · 15:00",
+        prefillLabel: "Pre-filled from your shift",
+        line1: "Paracetamol 10:00 postponed to 11:15",
+        line2: "SpO₂ dipped at 13:20 — recovered",
+        addHuman: "Add the human part…",
+      },
       t4Time: "22:00",
       t4Title: "The day ends without a debrief.",
       t4Body:
-        "The evening checklist is done, the supplies that ran low are already on the shopping list, tomorrow is already planned. Nothing is waiting in your head for the morning.",
+        "The evening list is done, and anything that ran low is already on tomorrow's shopping list.",
+      t4: {
+        stockName: "Suction catheters",
+        stockLeft: "2 left",
+        addedTo: "Added to",
+        listName: "Shopping list",
+      },
     },
     outcomes: {
       kicker: "What changes",
