@@ -186,14 +186,26 @@ function Landing() {
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             <ComparisonCard
               title={t("marketing.essentials.title")}
-              subtitle={t("marketing.essentials.subtitle")}
-              items={[1, 2, 3, 4, 5, 6, 7, 8].map((n) => t(`marketing.essentials.i${n}`))}
+              intro={t("marketing.essentials.intro")}
+              rows={[
+                { icon: ListChecks, key: "i1" },
+                { icon: Pill, key: "i2" },
+                { icon: Calendar, key: "i3" },
+                { icon: BookOpen, key: "i4" },
+                { icon: Siren, key: "i5" },
+              ].map((r) => ({ icon: r.icon, label: t(`marketing.essentials.${r.key}`) }))}
             />
             <ComparisonCard
               accent
               title={t("marketing.complex.title")}
-              subtitle={t("marketing.complex.subtitle")}
-              items={[1, 2, 3, 4, 5, 6].map((n) => t(`marketing.complex.i${n}`))}
+              intro={t("marketing.complex.intro")}
+              rows={[
+                { icon: Activity, key: "i1" },
+                { icon: Droplet, key: "i2" },
+                { icon: Wrench, key: "i3" },
+                { icon: ShieldCheck, key: "i4" },
+                { icon: RefreshCw, key: "i5" },
+              ].map((r) => ({ icon: r.icon, label: t(`marketing.complex.${r.key}`) }))}
             />
           </div>
 
