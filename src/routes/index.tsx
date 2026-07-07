@@ -884,18 +884,9 @@ function Hero() {
   }, []);
 
   return (
-    <section className="relative px-6 md:px-8 pt-10 md:pt-16 pb-24 md:pb-32 overflow-hidden">
-      {/* Aurora — horizontal lavender band behind the device */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 -z-10"
-        style={{
-          top: "38%",
-          bottom: "-10%",
-          background:
-            "radial-gradient(55rem 22rem at 50% 55%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 72%), radial-gradient(30rem 14rem at 15% 60%, color-mix(in oklab, oklch(0.85 0.09 55) 10%, transparent), transparent 70%)",
-        }}
-      />
+    <section className="relative px-6 md:px-8 pt-10 md:pt-16 pb-0 overflow-hidden">
+      {/* Layered lavender bloom — near-white top, violet radials below. */}
+      <div aria-hidden className="mk-hero-bloom pointer-events-none absolute inset-0 -z-10" />
 
       {/* Text — centered */}
       <div className="max-w-3xl mx-auto text-center relative z-10">
@@ -948,151 +939,33 @@ function Hero() {
         </Reveal>
       </div>
 
-      {/* Device composition — below text, wide */}
-      <Reveal immediate delayMs={360} className="relative mt-16 md:mt-20">
-        <HeroDevice platform={platform} />
+      {/* Device — single centered iPad, clips into fold via mk-hero-device margin. */}
+      <Reveal immediate delayMs={480} className="relative mt-14 md:mt-20">
+        <HeroDevice />
       </Reveal>
     </section>
   );
 }
 
-function HeroDevice({ platform: _platform }: { platform: "ios" | "android" | "desktop" }) {
+function HeroDevice() {
   const { t } = useTranslation();
   return (
-    <div className="relative mx-auto max-w-4xl">
+    <div className="mk-hero-device relative mx-auto w-full max-w-[1080px]">
+      {/* Faint violet glow behind the device for separation */}
+      <div aria-hidden className="mk-hero-glow mk-hero-glow--violet" />
       {/* Soft elliptical ground shadow */}
-      <div
-        aria-hidden
-        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{
-          bottom: "-28px",
-          width: "72%",
-          height: "44px",
-          background:
-            "radial-gradient(closest-side, color-mix(in oklab, var(--primary) 30%, transparent), transparent 75%)",
-          filter: "blur(14px)",
-          opacity: 0.55,
-        }}
+      <div aria-hidden className="mk-hero-glow mk-hero-glow--shadow" />
+      <img
+        src="/landing/hero-dashboard.webp"
+        alt={t("marketing.hero.dashboardAlt")}
+        width={1920}
+        height={1806}
+        fetchPriority="high"
+        decoding="async"
+        className="relative block w-full h-auto select-none"
+        draggable={false}
       />
-
-      {/* Tablet (straightened) — screen is one swappable element */}
-      <div
-        className="relative mx-auto max-w-[720px] rounded-[2rem] bg-marketing-ink p-3 md:p-4 shadow-[0_50px_100px_-40px_rgba(45,41,38,0.4)] ring-1 ring-black/5"
-        style={{ transform: "rotate(-0.5deg)" }}
-      >
-        <span className="absolute top-2 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-marketing-line/40" />
-        {/* ⤵ Swap this <div> for a real <img src="/landing/hero-tablet.webp" /> when screenshots land. */}
-        <div className="bg-marketing-surface rounded-[1.4rem] overflow-hidden">
-          <div className="h-11 border-b border-marketing-line px-5 flex items-center justify-between">
-            <div className="flex gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-marketing-line" />
-              <span className="w-2 h-2 rounded-full bg-marketing-line" />
-              <span className="w-2 h-2 rounded-full bg-marketing-line" />
-            </div>
-            <div className="text-[11px] text-marketing-muted" style={display}>
-              {t("marketing.hero.mockShift")}
-            </div>
-            <div className="size-5 rounded-full bg-marketing-sage-soft border border-marketing-sage-line" />
-          </div>
-          <div className="p-4 md:p-5 space-y-2.5">
-            <PreviewTask icon={<Pill className="size-4" />} title={t("marketing.inside.f3Title")} meta="08:00" done />
-            <PreviewTask icon={<Wind className="size-4" />} title={t("marketing.inside.f4Title")} meta="68 min" />
-            <PreviewTask icon={<Activity className="size-4" />} title={t("marketing.inside.f2Title")} meta="now" highlight />
-            <PreviewTask icon={<CalendarCheck className="size-4" />} title={t("marketing.inside.f5Title")} meta="15:00" />
-          </div>
-        </div>
-      </div>
-
-      {/* Satellite: oxygen — clearly outside the tablet's left edge */}
-      <div
-        className="hidden md:block absolute w-[220px] rounded-2xl bg-marketing-bg border border-marketing-line shadow-xl p-4"
-        style={{
-          left: "-4px",
-          top: "22%",
-          transform: "translateX(-70%) rotate(-2deg)",
-        }}
-      >
-        <div className="flex items-center gap-2 mb-3">
-          <span className="size-8 rounded-lg bg-marketing-sage-soft text-marketing-sage flex items-center justify-center">
-            <Wind className="size-4" />
-          </span>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold">
-            {t("marketing.hero.satOxygenLabel")}
-          </p>
-        </div>
-        <p className="text-xl text-marketing-ink leading-tight" style={display}>
-          {t("marketing.hero.satOxygenValue")}
-        </p>
-        <div className="mt-2 h-1.5 rounded-full bg-marketing-faint overflow-hidden">
-          <div className="h-full w-[67%] rounded-full bg-marketing-sage" />
-        </div>
-        <p className="mt-1.5 text-[11px] text-marketing-muted">
-          {t("marketing.hero.satOxygenSub")}
-        </p>
-      </div>
-
-      {/* Satellite: handover — clearly outside the tablet's right edge */}
-      <div
-        className="hidden md:block absolute w-[240px] rounded-2xl bg-marketing-bg border border-marketing-line shadow-xl p-4"
-        style={{
-          right: "-4px",
-          bottom: "18%",
-          transform: "translateX(70%) rotate(2deg)",
-        }}
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <span className="size-8 rounded-lg bg-marketing-sage text-marketing-bg flex items-center justify-center">
-            <MessageSquareText className="size-4" />
-          </span>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold">
-            {t("marketing.hero.satHandoverLabel")}
-          </p>
-        </div>
-        <p className="text-sm text-marketing-ink leading-snug font-medium">
-          {t("marketing.hero.satHandoverTitle")}
-        </p>
-        <p className="mt-1 text-xs text-marketing-sage font-semibold">
-          {t("marketing.hero.satHandoverCta")} →
-        </p>
-      </div>
     </div>
   );
 }
 
-function PreviewTask({
-  icon,
-  title,
-  meta,
-  done,
-  highlight,
-}: {
-  icon: ReactNode;
-  title: string;
-  meta: string;
-  done?: boolean;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${
-        highlight
-          ? "border-marketing-sage-line bg-marketing-sage-soft/60"
-          : "border-marketing-line bg-marketing-bg"
-      }`}
-    >
-      <span
-        className={`size-8 rounded-lg flex items-center justify-center ${
-          done
-            ? "bg-marketing-sage text-marketing-bg"
-            : "bg-marketing-faint text-marketing-muted"
-        }`}
-      >
-        {done ? <Check className="size-4" /> : icon}
-      </span>
-      <span className={`flex-1 text-sm font-medium ${done ? "text-marketing-muted line-through" : "text-marketing-ink"}`}>
-        {title}
-      </span>
-      <span className="text-xs text-marketing-muted tabular-nums">{meta}</span>
-    </div>
-  );
-}
