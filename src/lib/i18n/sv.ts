@@ -1392,7 +1392,7 @@ export const sv = {
     problem: {
       kicker: "Vi vet hur det är",
       title: "Just nu är du systemet.",
-      sub: "Två versioner av samma morgon.",
+      sub: "Samma morgon, två gånger: en gång i huvuden och i hallen, en gång nedskriven där alla kan se den.",
       oldEyebrow: "I morse",
       oldHeadline: "En pärm och tre chattrådar.",
       oldNoteTitle: "Medicin — måndag",
