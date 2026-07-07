@@ -294,12 +294,12 @@ function Landing() {
       </section>
 
       {/* ── 8. Trust strip ── */}
-      <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line bg-marketing-surface">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
+      <section className="px-6 md:px-8 py-10 md:py-12 border-y border-marketing-line bg-marketing-surface">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-5">
           {[1, 2, 3, 4].map((n) => (
             <Reveal key={n} delayMs={n * 60}>
               <p
-                className="text-display-sm text-marketing-ink"
+                className="text-xl md:text-2xl text-marketing-ink md:whitespace-nowrap"
                 style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
