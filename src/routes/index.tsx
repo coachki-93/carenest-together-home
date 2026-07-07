@@ -1,17 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Reveal } from "@/components/marketing/Reveal";
 import {
-  CalendarCheck,
-  Activity,
   Pill,
   Wind,
   Bell,
-  Users,
   ShieldCheck,
   Languages,
   Tablet,
-  Home,
-  Wrench,
   Check,
   Plus,
   MessageSquareText,
@@ -90,61 +86,32 @@ function Landing() {
       <MarketingHeader />
       <Hero />
 
-      {/* ── 2. Problem + For whom (two columns) ── */}
-      <section className="px-6 md:px-8 py-20 md:py-28">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
-          {/* Left: The problem */}
-          <Reveal className="space-y-5 text-left">
+      {/* ── 2. The problem — two-card old/new comparison ── */}
+      <section className="relative px-6 md:px-8 py-20 md:py-28 overflow-hidden">
+        {/* Ambient section orb behind both cards */}
+        <div
+          aria-hidden
+          className="mk-section-orb"
+          style={{ width: "44rem", height: "44rem", top: "10%", left: "50%", transform: "translateX(-50%)" }}
+        />
+        <div className="relative max-w-6xl mx-auto">
+          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-12">
             <Kicker>{t("marketing.problem.kicker")}</Kicker>
-            <h2 className="text-display-sm text-marketing-ink" style={display}>
+            <h2 className="text-display-md text-marketing-ink" style={display}>
               {t("marketing.problem.title")}
             </h2>
-            <p className="text-marketing-muted text-base md:text-lg leading-[1.65]">
-              {t("marketing.problem.body1")}
-            </p>
-            <p className="text-marketing-muted text-base md:text-lg leading-[1.65]">
-              {t("marketing.problem.body2")}
-            </p>
-          </Reveal>
-
-          {/* Right: For whom */}
-          <Reveal className="space-y-5 text-left" delayMs={90}>
-            <Kicker>{t("marketing.forWhom.kicker")}</Kicker>
-            <h2 className="text-display-sm text-marketing-ink" style={display}>
-              {t("marketing.forWhom.title")}
-            </h2>
-            <p className="text-marketing-muted text-base md:text-lg leading-[1.65]">
-              {t("marketing.forWhom.body")}
-            </p>
-            <div className="flex flex-wrap gap-2 pt-1">
-              <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
-                {t("marketing.forWhom.chip1")}
-              </span>
-              <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
-                {t("marketing.forWhom.chip2")}
-              </span>
-              <span className="inline-flex items-center rounded-full border border-marketing-line bg-marketing-surface px-4 py-1.5 text-sm text-marketing-ink">
-                {t("marketing.forWhom.chip3")}
-              </span>
-            </div>
-          </Reveal>
-        </div>
-
-        {/* Full-width caregiver card spanning both columns */}
-        <Reveal className="max-w-6xl mx-auto mt-10 md:mt-12">
-          <div className="rounded-2xl border border-marketing-line bg-marketing-surface p-6 md:p-8">
-            <h3
-              className="text-display-xs text-marketing-ink mb-2"
-              style={display}
-            >
-              {t("marketing.forWhom.caregiverTitle")}
-            </h3>
             <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-              {t("marketing.forWhom.caregiverBody")}
+              {t("marketing.problem.sub")}
             </p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch">
+            <ProblemOldCard />
+            <ProblemNewCard />
           </div>
-        </Reveal>
+        </div>
       </section>
+
 
 
 
@@ -179,30 +146,35 @@ function Landing() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6">
             <OutcomeCard
-              icon={<Home className="size-5" />}
-              title={t("marketing.outcomes.c1Title")}
+              eyebrow={t("marketing.outcomes.c1Eyebrow")}
+              headline={t("marketing.outcomes.c1Headline")}
               body={t("marketing.outcomes.c1Body")}
               chips={[t("marketing.outcomes.c1Chip1"), t("marketing.outcomes.c1Chip2"), t("marketing.outcomes.c1Chip3")]}
+              vignette={<MedicationVignette />}
             />
             <OutcomeCard
-              icon={<Users className="size-5" />}
-              title={t("marketing.outcomes.c2Title")}
+              eyebrow={t("marketing.outcomes.c2Eyebrow")}
+              headline={t("marketing.outcomes.c2Headline")}
               body={t("marketing.outcomes.c2Body")}
               chips={[t("marketing.outcomes.c2Chip1"), t("marketing.outcomes.c2Chip2"), t("marketing.outcomes.c2Chip3")]}
+              vignette={<HandoverVignette />}
             />
             <OutcomeCard
-              icon={<Wrench className="size-5" />}
-              title={t("marketing.outcomes.c3Title")}
+              eyebrow={t("marketing.outcomes.c3Eyebrow")}
+              headline={t("marketing.outcomes.c3Headline")}
               body={t("marketing.outcomes.c3Body")}
               chips={[t("marketing.outcomes.c3Chip1"), t("marketing.outcomes.c3Chip2"), t("marketing.outcomes.c3Chip3")]}
+              vignette={<OxygenVignette />}
             />
             <OutcomeCard
-              icon={<Bell className="size-5" />}
-              title={t("marketing.outcomes.c4Title")}
+              eyebrow={t("marketing.outcomes.c4Eyebrow")}
+              headline={t("marketing.outcomes.c4Headline")}
               body={t("marketing.outcomes.c4Body")}
               chips={[t("marketing.outcomes.c4Chip1"), t("marketing.outcomes.c4Chip2")]}
+              vignette={<CheckVignette />}
             />
           </div>
+
         </div>
       </section>
 
@@ -551,34 +523,37 @@ function useFlashlight<T extends HTMLElement>() {
 }
 
 function OutcomeCard({
-  icon,
-  title,
+  eyebrow,
+  headline,
   body,
   chips,
+  vignette,
 }: {
-  icon: ReactNode;
-  title: string;
+  eyebrow: string;
+  headline: string;
   body: string;
   chips: string[];
+  vignette: ReactNode;
 }) {
   const flashRef = useFlashlight<HTMLDivElement>();
   return (
     <Reveal>
       <div
         ref={flashRef}
-        className="mk-glass mk-flashlight group rounded-3xl p-5 transition-all hover:-translate-y-0.5 h-full"
+        className="mk-glass mk-flashlight group rounded-3xl p-5 transition-all hover:-translate-y-0.5 h-full flex flex-col"
       >
-        <div className="size-9 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center mb-4">
-          {icon}
-        </div>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-3">
+          {eyebrow}
+        </p>
         <h3
-          className="text-display-xs text-marketing-ink mb-2"
+          className="text-display-xs text-marketing-ink mb-4"
           style={display}
         >
-          {title}
+          {headline}
         </h3>
+        <div className="mb-4">{vignette}</div>
         <p className="text-marketing-muted text-sm leading-relaxed mb-4">{body}</p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="mt-auto flex flex-wrap gap-1.5">
           {chips.map((c) => (
             <span
               key={c}
@@ -590,9 +565,284 @@ function OutcomeCard({
         </div>
       </div>
     </Reveal>
-
   );
 }
+
+/* ─── Problem section — old-way / CareNest-way cards ─────────────────────── */
+
+function ProblemOldCard() {
+  const { t } = useTranslation();
+  return (
+    <Reveal>
+      <div className="relative h-full rounded-3xl p-6 md:p-7 bg-marketing-surface border border-marketing-line overflow-hidden">
+        <div aria-hidden className="mk-grain" />
+        <p className="relative text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-muted mb-3">
+          {t("marketing.problem.oldEyebrow")}
+        </p>
+        <h3
+          className="relative text-display-xs text-marketing-ink mb-5"
+          style={display}
+        >
+          {t("marketing.problem.oldHeadline")}
+        </h3>
+
+        {/* Torn-notebook block */}
+        <div
+          className="relative rounded-lg bg-[oklch(0.98_0.01_85)] border border-marketing-line p-4 mb-4 rotate-[-0.6deg] shadow-sm"
+          style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
+        >
+          <p className="text-[10px] uppercase tracking-wider text-marketing-muted mb-2">
+            {t("marketing.problem.oldNoteTitle")}
+          </p>
+          <ul className="space-y-1.5 text-[13px] text-marketing-ink/80">
+            <Reveal delayMs={120}>
+              <li className="tabular-nums">{t("marketing.problem.oldNoteRow1")}</li>
+            </Reveal>
+            <Reveal delayMs={200}>
+              <li className="tabular-nums text-marketing-ink">{t("marketing.problem.oldNoteRow2")}</li>
+            </Reveal>
+            <Reveal delayMs={280}>
+              <li className="tabular-nums text-marketing-muted line-through decoration-marketing-muted/40">
+                {t("marketing.problem.oldNoteRow3")}
+              </li>
+            </Reveal>
+          </ul>
+        </div>
+
+        {/* Chat bubbles */}
+        <div className="relative space-y-2 mb-4">
+          <Reveal delayMs={360}>
+            <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-ink">
+              {t("marketing.problem.oldChat1")}
+            </div>
+          </Reveal>
+          <Reveal delayMs={440}>
+            <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-muted">
+              {t("marketing.problem.oldChat2")}
+            </div>
+          </Reveal>
+        </div>
+
+        <p className="relative text-sm text-marketing-muted leading-relaxed">
+          {t("marketing.problem.oldCaption")}
+        </p>
+      </div>
+    </Reveal>
+  );
+}
+
+function ProblemNewCard() {
+  const { t } = useTranslation();
+  const flashRef = useFlashlight<HTMLDivElement>();
+  return (
+    <Reveal delayMs={140}>
+      <div
+        ref={flashRef}
+        className="relative h-full mk-glass mk-glass-border mk-flashlight rounded-3xl p-6 md:p-7"
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-3">
+          {t("marketing.problem.newEyebrow")}
+        </p>
+        <h3
+          className="text-display-xs text-marketing-ink mb-5"
+          style={display}
+        >
+          {t("marketing.problem.newHeadline")}
+        </h3>
+
+        {/* Rebuilt med row — real product state */}
+        <Reveal delayMs={220}>
+          <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-3 flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
+              <Pill className="size-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-marketing-ink truncate">
+                {t("marketing.problem.newMedName")}
+              </p>
+              <p className="text-xs text-marketing-muted tabular-nums">
+                {t("marketing.problem.newMedTime")} · {t("marketing.problem.newMedBy")}
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-xs font-semibold shrink-0">
+              <span className="mk-check-pop">
+                <Check className="size-3" />
+              </span>
+              {t("marketing.problem.newMedStatus")}
+            </span>
+          </div>
+        </Reveal>
+
+        {/* Rebuilt handover header with read receipt */}
+        <Reveal delayMs={310}>
+          <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-4">
+            <div className="flex items-center gap-2 mb-1.5">
+              <ClipboardIcon />
+              <p className="text-sm font-semibold text-marketing-ink">
+                {t("marketing.problem.newHandoverTitle")}
+              </p>
+            </div>
+            <p className="text-xs text-marketing-muted mb-2">
+              {t("marketing.problem.newHandoverBy")}
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-1.5">
+                <AvatarDot letter="K" />
+              </div>
+              <p className="text-xs text-marketing-sage font-medium">
+                {t("marketing.problem.newHandoverRead")}
+              </p>
+            </div>
+          </div>
+        </Reveal>
+
+        <p className="text-sm text-marketing-muted leading-relaxed">
+          {t("marketing.problem.newCaption")}
+        </p>
+      </div>
+    </Reveal>
+  );
+}
+
+function ClipboardIcon() {
+  return (
+    <span className="inline-flex size-5 rounded-md bg-primary-soft/60 text-primary items-center justify-center">
+      <MessageSquareText className="size-3" />
+    </span>
+  );
+}
+
+function AvatarDot({ letter }: { letter: string }) {
+  return (
+    <span
+      className="size-6 rounded-full flex items-center justify-center text-[10px] font-bold text-marketing-bg ring-2 ring-marketing-bg"
+      style={{ background: "var(--primary)" }}
+    >
+      {letter}
+    </span>
+  );
+}
+
+/* ─── Outcome-card vignettes — rebuilt real-product UI ───────────────────── */
+
+function MedicationVignette() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3 flex items-center gap-3">
+      <div className="size-9 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
+        <Pill className="size-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-semibold text-marketing-ink truncate">
+          {t("marketing.outcomes.vignette.medName")}
+        </p>
+        <p className="text-[11px] text-marketing-muted tabular-nums truncate">
+          {t("marketing.outcomes.vignette.medTime")} · {t("marketing.outcomes.vignette.medBy")}
+        </p>
+      </div>
+      <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 text-[11px] font-semibold shrink-0">
+        <span className="mk-check-pop">
+          <Check className="size-2.5" />
+        </span>
+        {t("marketing.outcomes.vignette.medGiven")}
+      </span>
+    </div>
+  );
+}
+
+function OxygenVignette() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-marketing-muted">
+          {t("marketing.outcomes.vignette.oxLabel")}
+        </p>
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-marketing-ink tabular-nums">
+          <Wind className="size-3 text-marketing-sage" />
+          {t("marketing.outcomes.vignette.oxFlow")}
+        </span>
+      </div>
+      <div className="h-2 rounded-full bg-marketing-line overflow-hidden mb-2">
+        <div
+          className="mk-bar-fill h-full rounded-full"
+          style={
+            {
+              background:
+                "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 70%, white) 100%)",
+              ["--fill" as string]: "35%",
+            } as React.CSSProperties
+          }
+        />
+      </div>
+      <p className="text-[11px] text-marketing-muted tabular-nums">
+        {t("marketing.outcomes.vignette.oxRemaining")}
+      </p>
+    </div>
+  );
+}
+
+function HandoverVignette() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5">
+      <div className="flex items-center gap-2 mb-1">
+        <ClipboardIcon />
+        <p className="text-[13px] font-semibold text-marketing-ink truncate">
+          {t("marketing.outcomes.vignette.hoTitle")}
+        </p>
+      </div>
+      <p className="text-[11px] text-marketing-muted mb-2">
+        {t("marketing.outcomes.vignette.hoBy")}
+      </p>
+      <div className="flex items-center gap-2">
+        <div className="flex -space-x-1.5">
+          <AvatarDot letter="K" />
+          <AvatarDot letter="G" />
+        </div>
+        <p className="text-[11px] text-marketing-sage font-medium">
+          {t("marketing.outcomes.vignette.hoReadBy")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function CheckVignette() {
+  const { t } = useTranslation();
+  return (
+    <div
+      className="rounded-2xl border p-3 flex items-center gap-3"
+      style={{
+        background: "color-mix(in oklab, #ef4444 6%, transparent)",
+        borderColor: "color-mix(in oklab, #ef4444 25%, transparent)",
+      }}
+    >
+      <span
+        className="size-9 rounded-xl flex items-center justify-center shrink-0"
+        style={{
+          background: "color-mix(in oklab, #ef4444 14%, transparent)",
+          color: "#ef4444",
+        }}
+      >
+        <Bell className="size-4" />
+      </span>
+      <p className="text-[13px] font-semibold text-marketing-ink flex-1 min-w-0 truncate">
+        {t("marketing.outcomes.vignette.checkTitle")}
+      </p>
+      <span
+        className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums shrink-0"
+        style={{
+          background: "color-mix(in oklab, #ef4444 12%, transparent)",
+          color: "#ef4444",
+        }}
+      >
+        {t("marketing.outcomes.vignette.checkLate")}
+      </span>
+    </div>
+  );
+}
+
 
 function ComparisonCard({
   title,
@@ -761,67 +1011,6 @@ function DaySection() {
   );
 }
 
-/* Reveal: fade-up on intersection, or immediate on mount (with stagger) */
-function Reveal({
-  children,
-  className = "",
-  delayMs = 0,
-  immediate = false,
-}: {
-  children: ReactNode;
-  className?: string;
-  delayMs?: number;
-  immediate?: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    if (mq.matches) {
-      setVisible(true);
-      return;
-    }
-    if (immediate) {
-      // Trigger fade-up on mount (next frame so the transition applies).
-      const raf = window.requestAnimationFrame(() => setVisible(true));
-      return () => window.cancelAnimationFrame(raf);
-    }
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setVisible(true);
-            io.disconnect();
-          }
-        }
-      },
-      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [immediate]);
-
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible || reduced ? "translateY(0)" : "translateY(14px)",
-        transition: reduced ? "none" : `opacity 0.55s ease-out ${delayMs}ms, transform 0.55s ease-out ${delayMs}ms`,
-        willChange: "opacity, transform",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
 
 /* Hero H1: word-by-word fade-up on mount, violet gradient text. */
 function HeroHeadline({ text }: { text: string }) {
