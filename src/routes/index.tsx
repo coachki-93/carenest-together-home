@@ -831,13 +831,13 @@ function CheckVignette() {
 
 function ComparisonCard({
   title,
-  subtitle,
-  items,
+  intro,
+  rows,
   accent,
 }: {
   title: string;
-  subtitle: string;
-  items: string[];
+  intro: string;
+  rows: { icon: LucideIcon; label: string }[];
   accent?: boolean;
 }) {
   const flashRef = useFlashlight<HTMLDivElement>();
@@ -849,15 +849,20 @@ function ComparisonCard({
           accent ? "ring-2 ring-marketing-sage" : ""
         }`}
       >
-        <p className="text-xs uppercase tracking-[0.2em] text-marketing-muted mb-2">{subtitle}</p>
-        <h3 className="text-display-xs text-marketing-ink mb-6" style={display}>
+        <h3 className="text-display-xs text-marketing-ink mb-2" style={display}>
           {title}
         </h3>
-        <ul className="space-y-3.5">
-          {items.map((it) => (
-            <li key={it} className="flex items-start gap-3 text-[0.95rem] text-marketing-ink leading-[1.6]">
-              <Check className={`size-4 shrink-0 mt-1 ${accent ? "text-marketing-sage" : "text-marketing-sage"}`} />
-              <span>{it}</span>
+        <p className="text-sm text-marketing-muted leading-relaxed mb-6">{intro}</p>
+        <ul className="space-y-3">
+          {rows.map(({ icon: Icon, label }) => (
+            <li
+              key={label}
+              className="flex items-center gap-3 text-[0.95rem] text-marketing-ink"
+            >
+              <span className="inline-flex size-8 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage items-center justify-center shrink-0">
+                <Icon className="size-4" />
+              </span>
+              <span className="font-medium">{label}</span>
             </li>
           ))}
         </ul>
