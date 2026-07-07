@@ -1588,7 +1588,7 @@ export const en = {
     pricing: {
       kicker: "Pricing",
       title: "Free while we build it together.",
-      sub: "Planned pricing is 159 kr/month per family with unlimited caregivers — early families keep a founding discount.",
+      sub: "Planned pricing is about €14/month per family with unlimited caregivers — early families keep a founding discount.",
       monthlyLabel: "Right now",
       monthlyPrice: "Free",
       monthlySub: "While we build with our first families",
