@@ -1374,7 +1374,7 @@ export const en = {
       kicker: "Care, together",
       headline: "Everything about your child's care — out of your head, into one calm place.",
       subline:
-        "CareNest is the shared home base for families of children with special needs. The schedule, the medications, the machines, the things every caregiver needs to know — visible to everyone you trust, so the whole day no longer depends on you remembering it.",
+        "The shared home base for families of children with special needs — so the day no longer depends on your memory.",
       ctaCreate: "Create your family space",
       ctaInvite: "I have an invite",
       ctaInstall: "Add CareNest to your device",
