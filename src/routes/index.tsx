@@ -646,7 +646,7 @@ function ProblemNewCard() {
           </p>
           <div className="flex items-center gap-2">
             <div
-              className="mk-slide-in mk-check-pop flex -space-x-1.5"
+              className="mk-check-pop flex -space-x-1.5"
               style={{ ["--mk-delay" as string]: "650ms" } as React.CSSProperties}
             >
               <AvatarDot letter="K" />
