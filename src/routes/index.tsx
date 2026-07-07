@@ -299,7 +299,7 @@ function Landing() {
           {[1, 2, 3, 4].map((n) => (
             <Reveal key={n} delayMs={n * 60}>
               <p
-                className="text-xl md:text-2xl text-marketing-ink md:whitespace-nowrap"
+                className="text-lg md:text-xl text-marketing-ink xl:whitespace-nowrap"
                 style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
