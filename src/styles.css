@@ -443,5 +443,85 @@
   border-top: 1px solid color-mix(in oklab, var(--primary) 18%, transparent);
 }
 
+/* Hero — Aave-style layered bloom behind the iPad.
+ * Near-white top band keeps the gradient headline and dark navbar clean.
+ * Layered lavender radials bloom below, behind the device. */
+.mk-hero-bloom {
+  background:
+    /* Primary bloom, centered lower — the strongest violet */
+    radial-gradient(
+      60rem 34rem at 50% 78%,
+      color-mix(in oklab, var(--primary) 22%, transparent) 0%,
+      transparent 70%
+    ),
+    /* Left offset tint */
+    radial-gradient(
+      36rem 22rem at 22% 68%,
+      color-mix(in oklab, var(--primary) 12%, transparent) 0%,
+      transparent 72%
+    ),
+    /* Right offset warm-violet wash */
+    radial-gradient(
+      40rem 24rem at 82% 72%,
+      color-mix(in oklab, oklch(0.82 0.11 300) 14%, transparent) 0%,
+      transparent 74%
+    ),
+    /* Top-to-bottom fade: near-white at top → transparent by mid */
+    linear-gradient(
+      180deg,
+      var(--color-marketing-bg) 0%,
+      var(--color-marketing-bg) 34%,
+      color-mix(in oklab, var(--color-marketing-bg) 70%, transparent) 55%,
+      transparent 80%
+    );
+}
 
+/* iPad wrapper — clips into the section fold via negative margin-bottom.
+ * Fixed rem values per breakpoint (percentage margins resolve against width). */
+.mk-hero-device {
+  margin-bottom: -4rem;
+}
+@media (min-width: 768px) {
+  .mk-hero-device {
+    margin-bottom: -7rem;
+  }
+}
+@media (min-width: 1024px) {
+  .mk-hero-device {
+    margin-bottom: -9rem;
+  }
+}
+
+/* Soft elliptical ground shadow + faint violet glow behind the device. */
+.mk-hero-glow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: -1;
+}
+.mk-hero-glow--shadow {
+  bottom: 6%;
+  width: 68%;
+  height: 3.5rem;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, black 22%, transparent),
+    transparent 76%
+  );
+  filter: blur(20px);
+  opacity: 0.5;
+}
+.mk-hero-glow--violet {
+  bottom: 14%;
+  width: 82%;
+  height: 60%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--primary) 24%, transparent),
+    transparent 72%
+  );
+  filter: blur(28px);
+  opacity: 0.7;
+}
 

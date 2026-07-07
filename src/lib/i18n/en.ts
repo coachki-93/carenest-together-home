@@ -1386,6 +1386,7 @@ export const en = {
       satHandoverLabel: "New handover",
       satHandoverTitle: "New handover from Rahma",
       satHandoverCta: "Read it",
+      dashboardAlt: "CareNest dashboard on iPad — today's schedule, vitals snapshot, oxygen, and handover preview.",
       trust: "Built with families of medically complex children.",
     },
     problem: {

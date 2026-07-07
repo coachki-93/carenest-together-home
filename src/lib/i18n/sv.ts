@@ -1386,6 +1386,7 @@ export const sv = {
       satHandoverLabel: "Ny överlämning",
       satHandoverTitle: "Ny överlämning från Rahma",
       satHandoverCta: "Läs den",
+      dashboardAlt: "CareNest-instrumentpanelen på iPad — dagens schema, vitalvärden, syrgas och överlämningsförhandsvisning.",
       trust: "Byggt med familjer till medicinskt komplexa barn.",
     },
     problem: {
