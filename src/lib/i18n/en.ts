@@ -1488,7 +1488,7 @@ export const en = {
       c1Headline: "Every dose has a name and a time.",
       c1Title: "Nothing lives only in your head anymore.",
       c1Body:
-        "The daily schedule, medication plan, care instructions, emergency information, and your child's profile — written down once, visible to everyone you invite, in English and Swedish.",
+        "Every dose is logged with a name and a time, visible to everyone you invite.",
       c1Chip1: "Today's plan",
       c1Chip2: "Care instructions",
       c1Chip3: "Emergency info",
@@ -1496,7 +1496,7 @@ export const en = {
       c2Headline: "Handovers are read, not just written.",
       c2Title: "New caregivers become good caregivers, faster.",
       c2Body:
-        "Your checklists at your chosen times (\"Is there hand sanitizer? Are the suction catheters in place?\"), step-by-step instructions, and pre-filled handovers with read receipts. A new assistant's first shift comes with the knowledge built in.",
+        "Shift notes are pre-filled from the day and marked read by the next caregiver.",
       c2Chip1: "Care Place Control",
       c2Chip2: "Handovers",
       c2Chip3: "Read receipts",
@@ -1504,7 +1504,7 @@ export const en = {
       c3Headline: "The tank tells you before it runs out.",
       c3Title: "The practical things run themselves.",
       c3Body:
-        "Oxygen countdown matched to the manufacturer's own tables. Machine parts — filters, tubing, chambers — each on its own maintenance schedule, appearing on the day's list when due. Supplies that move to the shopping list when a checklist answer says they're missing.",
+        "Oxygen, machines and supplies each have their own countdown — nothing runs out silently.",
       c3Chip1: "Oxygen",
       c3Chip2: "Maintenance",
       c3Chip3: "Inventory → Shopping list",
@@ -1512,7 +1512,7 @@ export const en = {
       c4Headline: "Missed checks don't stay quiet.",
       c4Title: "When something needs you, you'll know. Otherwise, quiet.",
       c4Body:
-        "Alerts only for what matters: a critical checklist answer, a missed check past its grace window, a tank running low, repeated out-of-range vitals, a late medication. Everything else stays a calm green.",
+        "Alerts only for what matters: a critical answer, a missed window, a low tank.",
       c4Chip1: "Push notifications",
       c4Chip2: "Safety nets",
       vignette: {
