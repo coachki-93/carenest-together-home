@@ -1400,7 +1400,7 @@ export const sv = {
       oldNoteRow2: "10:00  D-vitamindroppar    ?",
       oldNoteRow3: "14:00  Paracetamol 250 mg",
       oldChat1: "Fick han 06-dosen?",
-      oldChat2: "Vet inte — fråga natten.",
+      oldChat2: "Vet inte — fråga nattpasset?",
       oldCaption: "Överlämningar sker i hallen. Någon måste alltid komma ihåg.",
       newEyebrow: "Med CareNest",
       newHeadline: "Samma morgon, nedskriven en gång.",
