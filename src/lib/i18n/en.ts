@@ -1570,14 +1570,14 @@ export const en = {
       s4Label: "In daily use, shaped by real care",
     },
     tablet: {
-      kicker: "Designed for the tablet on the wall",
+      kicker: "Designed for the family tablet",
       title: "Made for tired hands at 3 a.m.",
       body:
-        "Large touch targets, calm typography, and a layout made for a tablet on the wall. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
+        "Large touch targets, calm typography, and a layout made for a shared family tablet. Add it to a home screen and it feels like an app — bilingual in English and Swedish from day one.",
       bodyExtra:
         "Every family sets its own timezone and notification language — alerts arrive at the right local time, in the language your team reads.",
       t1: "Installable on iPad & Android",
-      t2: "English & Svenska",
+      t2: "English & Swedish",
       t3: "Private to your family",
     },
     not: {
