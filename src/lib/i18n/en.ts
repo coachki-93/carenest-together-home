@@ -1392,7 +1392,7 @@ export const en = {
     problem: {
       kicker: "We know how it is",
       title: "Right now, you are the system.",
-      sub: "Two versions of the same morning.",
+      sub: "The same morning, twice: once held in heads and hallways, once written down where everyone can see it.",
       oldEyebrow: "This morning",
       oldHeadline: "A paper binder and three text threads.",
       oldNoteTitle: "Medicine — Monday",
