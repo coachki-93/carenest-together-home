@@ -909,15 +909,16 @@ function PriceCard({
 /* Day timeline (Section 4) */
 function DaySection() {
   const { t } = useTranslation();
-  const steps = [1, 2, 3, 4].map((n) => ({
-    time: t(`marketing.day.t${n}Time`),
-    title: t(`marketing.day.t${n}Title`),
-    body: t(`marketing.day.t${n}Body`),
-  }));
+  const visuals: Record<number, ReactNode> = {
+    1: <DayShiftSelectorVisual />,
+    2: <DayProgressVisual />,
+    3: <DayPrefillVisual />,
+    4: <DayLowStockVisual />,
+  };
   return (
     <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
-      <div className="max-w-5xl mx-auto">
-        <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-16">
+      <div className="max-w-6xl mx-auto">
+        <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
           <Kicker>{t("marketing.day.kicker")}</Kicker>
           <h2
             className="text-display-md text-marketing-ink"
@@ -928,52 +929,153 @@ function DaySection() {
           <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{t("marketing.day.sub")}</p>
         </Reveal>
 
-        <ol className="relative md:pl-8">
-          {/* Vertical rail (desktop) */}
-          <span
-            aria-hidden
-            className="hidden md:block absolute left-2 top-2 bottom-2 w-px"
-            style={{ background: "color-mix(in oklab, var(--primary) 35%, transparent)" }}
-          />
-          {steps.map((s, i) => (
-            <li key={i} className="relative mb-10 last:mb-0">
-              <Reveal delayMs={i * 80}>
-                <div className="md:grid md:grid-cols-[9rem_1fr] md:gap-8 items-start">
-                  <div className="flex items-center gap-3 mb-3 md:mb-0">
-                    <span
-                      aria-hidden
-                      className="hidden md:block absolute size-3 rounded-full ring-4 ring-marketing-surface"
-                      style={{
-                        left: "-1.5rem",
-                        transform: "translateX(-50%)",
-                        top: "0.375rem",
-                        background: "var(--primary)",
-                      }}
-                    />
-                    <span
-                      className="rounded-full bg-marketing-bg border border-marketing-sage-line text-marketing-sage px-3 py-1 text-xs font-semibold tabular-nums"
-                    >
-                      {s.time}
-                    </span>
-                  </div>
-                  <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-6 md:p-7 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                    <h3
-                      className="text-display-xs text-marketing-ink mb-2"
-                      style={display}
-                    >
-                      {s.title}
-                    </h3>
-                    <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">{s.body}</p>
-                  </div>
-                </div>
-              </Reveal>
-            </li>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {[1, 2, 3, 4].map((n) => (
+            <Reveal key={n} delayMs={(n - 1) * 90}>
+              <div className="h-full rounded-3xl bg-marketing-bg border border-marketing-line p-6 md:p-8 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-3">
+                  {t(`marketing.day.t${n}Time`)}
+                </p>
+                <h3
+                  className="text-display-xs text-marketing-ink mb-3"
+                  style={display}
+                >
+                  {t(`marketing.day.t${n}Title`)}
+                </h3>
+                <p className="text-marketing-muted text-sm md:text-base leading-[1.65] mb-5">
+                  {t(`marketing.day.t${n}Body`)}
+                </p>
+                <div className="mt-auto">{visuals[n]}</div>
+              </div>
+            </Reveal>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );
 }
+
+/* Day-bento visual anchors — each mirrors a real shipped feature. */
+
+function DayShiftSelectorVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-marketing-muted mb-2.5">
+        {t("marketing.day.t1.selectorLabel")}
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-marketing-sage text-marketing-bg px-2.5 py-1 text-xs font-semibold">
+          <span className="size-2 rounded-full bg-marketing-bg/90" />
+          {t("marketing.day.t1.picked")}
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink px-2.5 py-1 text-xs">
+          <span className="size-2 rounded-full" style={{ background: "oklch(0.72 0.15 30)" }} />
+          {t("marketing.day.t1.other1")}
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink px-2.5 py-1 text-xs">
+          <span className="size-2 rounded-full" style={{ background: "oklch(0.70 0.15 200)" }} />
+          {t("marketing.day.t1.other2")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function DayProgressVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5">
+      <div className="flex items-baseline justify-between mb-2">
+        <span className="text-display-xs text-marketing-ink tabular-nums" style={display}>
+          {t("marketing.day.t2.progress")}
+        </span>
+        <span className="text-[11px] uppercase tracking-[0.18em] text-marketing-muted font-semibold">
+          {t("marketing.day.t2.progressLabel")}
+        </span>
+      </div>
+      <div className="h-2 rounded-full bg-marketing-line overflow-hidden mb-2.5">
+        <div
+          className="mk-bar-fill h-full rounded-full"
+          style={
+            {
+              background:
+                "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 70%, white) 100%)",
+              ["--fill" as string]: "54%",
+            } as React.CSSProperties
+          }
+        />
+      </div>
+      <p className="text-[11px] text-marketing-muted">{t("marketing.day.t2.quiet")}</p>
+    </div>
+  );
+}
+
+function DayPrefillVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5">
+      <div className="flex items-center gap-2 mb-2">
+        <ClipboardIcon />
+        <p className="text-[13px] font-semibold text-marketing-ink">
+          {t("marketing.day.t3.title")}
+        </p>
+      </div>
+      <p className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold mb-1.5">
+        {t("marketing.day.t3.prefillLabel")}
+      </p>
+      <ul className="space-y-1 mb-2 text-[12px] text-marketing-muted italic">
+        <li>• {t("marketing.day.t3.line1")}</li>
+        <li>• {t("marketing.day.t3.line2")}</li>
+      </ul>
+      <p className="text-[12px] text-marketing-ink font-medium">
+        {t("marketing.day.t3.addHuman")}
+      </p>
+    </div>
+  );
+}
+
+function DayLowStockVisual() {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-2">
+      <div
+        className="rounded-2xl border p-2.5 flex items-center gap-2.5"
+        style={{
+          background: "color-mix(in oklab, oklch(0.75 0.15 60) 10%, transparent)",
+          borderColor: "color-mix(in oklab, oklch(0.75 0.15 60) 30%, transparent)",
+        }}
+      >
+        <span
+          className="size-2 rounded-full shrink-0"
+          style={{ background: "oklch(0.72 0.16 60)" }}
+        />
+        <p className="text-[12px] font-semibold text-marketing-ink flex-1 min-w-0 truncate">
+          {t("marketing.day.t4.stockName")}
+        </p>
+        <span className="text-[11px] tabular-nums text-marketing-muted shrink-0">
+          {t("marketing.day.t4.stockLeft")}
+        </span>
+      </div>
+      <div className="flex justify-center text-marketing-muted" aria-hidden>
+        <svg viewBox="0 0 12 12" className="size-3" fill="currentColor">
+          <path d="M6 9L1 4h10z" />
+        </svg>
+      </div>
+      <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-2.5 flex items-center gap-2.5">
+        <Check className="size-3.5 text-marketing-sage shrink-0" />
+        <p className="text-[12px] text-marketing-ink flex-1 min-w-0 truncate">
+          {t("marketing.day.t4.stockName")}
+        </p>
+        <span className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold shrink-0">
+          {t("marketing.day.t4.listName")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
 
 
 /* Hero H1: word-by-word fade-up on mount, violet gradient text. */
