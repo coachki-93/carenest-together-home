@@ -418,17 +418,111 @@
   z-index: 1;
 }
 
-/* Featured pricing card — soft ambient violet glow. */
+/* Featured pricing card — soft ambient violet glow.
+ * Transition is gated on prefers-reduced-motion: no-preference so users who
+ * request reduced motion get the static shadow with no animated shift. */
 .mk-price-glow {
   box-shadow:
     0 0 60px -15px color-mix(in oklab, var(--primary) 45%, transparent),
     0 12px 30px -14px color-mix(in oklab, var(--primary) 22%, transparent);
-  transition: box-shadow 400ms ease, transform 300ms ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mk-price-glow {
+    transition: box-shadow 400ms ease, transform 300ms ease;
+  }
 }
 .mk-price-glow:hover {
   box-shadow:
     0 0 80px -12px color-mix(in oklab, var(--primary) 60%, transparent),
     0 16px 36px -12px color-mix(in oklab, var(--primary) 32%, transparent);
+}
+
+/* ── Marketing vignette utilities (ported ideas from audora-access-scan,
+ *    reimplemented as pure CSS, all reduced-motion safe). ─────────────── */
+
+/* "Lit from above" gradient border, achieved via a mask overlay on a
+ * pseudo-element. Additive to .mk-glass — does not replace it. */
+.mk-glass-border {
+  position: relative;
+}
+.mk-glass-border::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--primary) 55%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 6%, transparent) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+/* Reusable blurred section orb — anchors a soft ambient glow inside a
+ * `relative overflow-hidden` section. Static, no motion. */
+.mk-section-orb {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--primary) 22%, transparent) 0%,
+    transparent 70%
+  );
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grain overlay for tactile finish on frosted panels. Static. */
+.mk-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  border-radius: inherit;
+}
+
+/* One-shot check-mark scale pop (spring-like). Applied to the SVG wrapper
+ * once its parent Reveal has become visible. */
+@keyframes mk-check-pop {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.mk-check-pop {
+  animation: mk-check-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: center;
+  display: inline-flex;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-check-pop {
+    animation: none;
+    transform: scale(1);
+  }
+}
+
+/* Oxygen countdown bar fill: reads `--fill` custom prop (e.g. 35%) and
+ * tweens from 0 → --fill on reveal. Under reduced-motion, jumps to --fill. */
+@keyframes mk-bar-fill {
+  from { width: 0%; }
+  to   { width: var(--fill, 50%); }
+}
+.mk-bar-fill {
+  width: var(--fill, 50%);
+  animation: mk-bar-fill 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-bar-fill {
+    animation: none;
+    width: var(--fill, 50%);
+  }
 }
 
 /* Marketing footer — soft violet gradient band. */
