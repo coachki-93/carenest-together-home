@@ -2,17 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Reveal } from "@/components/marketing/Reveal";
 import {
-  CalendarCheck,
-  Activity,
   Pill,
   Wind,
   Bell,
-  Users,
   ShieldCheck,
   Languages,
   Tablet,
-  Home,
-  Wrench,
   Check,
   Plus,
   MessageSquareText,
