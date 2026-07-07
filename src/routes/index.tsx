@@ -489,13 +489,11 @@ function OutcomeCard({
   eyebrow,
   headline,
   body,
-  chips,
   vignette,
 }: {
   eyebrow: string;
   headline: string;
   body: string;
-  chips: string[];
   vignette: ReactNode;
 }) {
   const flashRef = useFlashlight<HTMLDivElement>();
@@ -515,17 +513,7 @@ function OutcomeCard({
           {headline}
         </h3>
         <div className="mb-4">{vignette}</div>
-        <p className="text-marketing-muted text-sm leading-relaxed mb-4">{body}</p>
-        <div className="mt-auto flex flex-wrap gap-1.5">
-          {chips.map((c) => (
-            <span
-              key={c}
-              className="mk-glass-pill rounded-full px-2.5 py-1 text-xs text-marketing-muted"
-            >
-              {c}
-            </span>
-          ))}
-        </div>
+        <p className="text-marketing-muted text-sm leading-relaxed mt-auto">{body}</p>
       </div>
     </Reveal>
   );
