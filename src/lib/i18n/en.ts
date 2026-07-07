@@ -1595,7 +1595,7 @@ export const en = {
       monthlyCta: "Create your family space",
       annualBadge: "Founding families",
       annualLabel: "When billing begins",
-      annualPrice: "159 kr / month",
+      annualPrice: "€14 / month",
       annualSub: "Per family · unlimited caregivers · founding discount kept",
       annualCta: "Join early — keep the discount",
       featuresLabel: "Everything included",
