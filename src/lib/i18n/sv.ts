@@ -1441,7 +1441,7 @@ export const sv = {
       t1Time: "07:00",
       t1Title: "Passet börjar av sig självt.",
       t1Body:
-        "Morgonassistenten öppnar surfplattan på väggen, trycker på sitt namn och ser hela dagen: vilka mediciner vid vilka tider, vilka vitalvärden som ska kontrolleras, filtret som ska bytas idag. Inget telefonsamtal. Ingen genomgång.",
+        "Morgonassistenten öppnar surfplattan, trycker på sitt namn och ser hela dagen: vilka mediciner vid vilka tider, vilka vitalvärden som ska kontrolleras, filtret som ska bytas idag. Inget telefonsamtal. Ingen genomgång.",
       t2Time: "Under dagen",
       t2Title: "Du kan titta i stället för att fråga.",
       t2Body:
