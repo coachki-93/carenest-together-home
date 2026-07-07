@@ -1567,14 +1567,14 @@ export const sv = {
       s4Label: "I daglig användning, formad av verklig omsorg",
     },
     tablet: {
-      kicker: "Designad för surfplattan på väggen",
+      kicker: "Designad för familjens surfplatta",
       title: "Gjord för trötta händer kl 03",
       body:
-        "Stora knappar, lugn typografi och en layout gjord för surfplattan på väggen. Lägg till på hemskärmen så känns det som en app — på svenska och engelska från dag ett.",
+        "Stora knappar, lugn typografi och en layout gjord för familjens surfplatta. Lägg till på hemskärmen så känns det som en app — på svenska och engelska från dag ett.",
       bodyExtra:
         "Varje familj sätter sin egen tidszon och notisspråk — larmen kommer på rätt lokal tid, på det språk ert team läser.",
       t1: "Installerbar på iPad och Android",
-      t2: "Svenska & English",
+      t2: "Engelska & svenska",
       t3: "Privat för er familj",
     },
     not: {
