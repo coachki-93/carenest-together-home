@@ -114,49 +114,29 @@ function Landing() {
 
 
 
-      {/* ── 4. A day with CareNest — timeline ── */}
-      <DaySection />
-
-      {/* ── 5. Outcomes ── */}
-      <section className="px-6 md:px-8 py-20 md:py-28">
-        <div className="max-w-6xl mx-auto">
-          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
-            <Kicker>{t("marketing.outcomes.kicker")}</Kicker>
-            <h2
-              className="text-display-md text-marketing-ink"
-              style={display}
-            >
-              {t("marketing.outcomes.title")}
-            </h2>
-          </Reveal>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6">
             <OutcomeCard
               eyebrow={t("marketing.outcomes.c1Eyebrow")}
               headline={t("marketing.outcomes.c1Headline")}
               body={t("marketing.outcomes.c1Body")}
-              chips={[t("marketing.outcomes.c1Chip1"), t("marketing.outcomes.c1Chip2"), t("marketing.outcomes.c1Chip3")]}
               vignette={<MedicationVignette />}
             />
             <OutcomeCard
               eyebrow={t("marketing.outcomes.c2Eyebrow")}
               headline={t("marketing.outcomes.c2Headline")}
               body={t("marketing.outcomes.c2Body")}
-              chips={[t("marketing.outcomes.c2Chip1"), t("marketing.outcomes.c2Chip2"), t("marketing.outcomes.c2Chip3")]}
               vignette={<HandoverVignette />}
             />
             <OutcomeCard
               eyebrow={t("marketing.outcomes.c3Eyebrow")}
               headline={t("marketing.outcomes.c3Headline")}
               body={t("marketing.outcomes.c3Body")}
-              chips={[t("marketing.outcomes.c3Chip1"), t("marketing.outcomes.c3Chip2"), t("marketing.outcomes.c3Chip3")]}
               vignette={<OxygenVignette />}
             />
             <OutcomeCard
               eyebrow={t("marketing.outcomes.c4Eyebrow")}
               headline={t("marketing.outcomes.c4Headline")}
               body={t("marketing.outcomes.c4Body")}
-              chips={[t("marketing.outcomes.c4Chip1"), t("marketing.outcomes.c4Chip2")]}
               vignette={<CheckVignette />}
             />
           </div>
