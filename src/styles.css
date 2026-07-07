@@ -573,16 +573,16 @@
 /* iPad wrapper — clips into the section fold via negative margin-bottom.
  * Fixed rem values per breakpoint (percentage margins resolve against width). */
 .mk-hero-device {
-  margin-bottom: -4rem;
+  margin-bottom: -6rem;
 }
 @media (min-width: 768px) {
   .mk-hero-device {
-    margin-bottom: -7rem;
+    margin-bottom: -13rem;
   }
 }
 @media (min-width: 1024px) {
   .mk-hero-device {
-    margin-bottom: -9rem;
+    margin-bottom: -19rem;
   }
 }
 
