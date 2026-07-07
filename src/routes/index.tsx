@@ -537,44 +537,46 @@ function ProblemOldCard() {
           {t("marketing.problem.oldHeadline")}
         </h3>
 
-        {/* Torn-notebook block */}
+        {/* Binder note — enters as a single block at t=0 */}
         <div
-          className="relative rounded-lg bg-[oklch(0.98_0.01_85)] border border-marketing-line p-4 mb-4 rotate-[-0.6deg] shadow-sm"
-          style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
+          className="mk-slide-in relative rounded-lg bg-[oklch(0.98_0.01_85)] border border-marketing-line p-4 mb-4 rotate-[-0.6deg] shadow-sm"
+          style={{
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            ["--mk-delay" as string]: "0ms",
+          } as React.CSSProperties}
         >
           <p className="text-[10px] uppercase tracking-wider text-marketing-muted mb-2">
             {t("marketing.problem.oldNoteTitle")}
           </p>
           <ul className="space-y-1.5 text-[13px] text-marketing-ink/80">
-            <Reveal delayMs={120}>
-              <li className="tabular-nums">{t("marketing.problem.oldNoteRow1")}</li>
-            </Reveal>
-            <Reveal delayMs={200}>
-              <li className="tabular-nums text-marketing-ink">{t("marketing.problem.oldNoteRow2")}</li>
-            </Reveal>
-            <Reveal delayMs={280}>
-              <li className="tabular-nums text-marketing-muted line-through decoration-marketing-muted/40">
-                {t("marketing.problem.oldNoteRow3")}
-              </li>
-            </Reveal>
+            <li className="tabular-nums">{t("marketing.problem.oldNoteRow1")}</li>
+            <li className="tabular-nums text-marketing-ink">{t("marketing.problem.oldNoteRow2")}</li>
+            <li className="tabular-nums text-marketing-muted line-through decoration-marketing-muted/40">
+              {t("marketing.problem.oldNoteRow3")}
+            </li>
           </ul>
         </div>
 
-        {/* Chat bubbles */}
+        {/* Chat bubbles — question, then unsure reply */}
         <div className="relative space-y-2 mb-4">
-          <Reveal delayMs={360}>
-            <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-ink">
-              {t("marketing.problem.oldChat1")}
-            </div>
-          </Reveal>
-          <Reveal delayMs={440}>
-            <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-muted">
-              {t("marketing.problem.oldChat2")}
-            </div>
-          </Reveal>
+          <div
+            className="mk-slide-in max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-ink"
+            style={{ ["--mk-delay" as string]: "250ms" } as React.CSSProperties}
+          >
+            {t("marketing.problem.oldChat1")}
+          </div>
+          <div
+            className="mk-slide-in ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-muted"
+            style={{ ["--mk-delay" as string]: "500ms" } as React.CSSProperties}
+          >
+            {t("marketing.problem.oldChat2")}
+          </div>
         </div>
 
-        <p className="relative text-sm text-marketing-muted leading-relaxed">
+        <p
+          className="mk-slide-in relative text-sm text-marketing-muted leading-relaxed"
+          style={{ ["--mk-delay" as string]: "750ms" } as React.CSSProperties}
+        >
           {t("marketing.problem.oldCaption")}
         </p>
       </div>
@@ -586,7 +588,7 @@ function ProblemNewCard() {
   const { t } = useTranslation();
   const flashRef = useFlashlight<HTMLDivElement>();
   return (
-    <Reveal delayMs={140}>
+    <Reveal>
       <div
         ref={flashRef}
         className="relative h-full mk-glass mk-glass-border mk-flashlight rounded-3xl p-6 md:p-7"
@@ -601,53 +603,64 @@ function ProblemNewCard() {
           {t("marketing.problem.newHeadline")}
         </h3>
 
-        {/* Rebuilt med row — real product state */}
-        <Reveal delayMs={220}>
-          <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-3 flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
-              <Pill className="size-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-marketing-ink truncate">
-                {t("marketing.problem.newMedName")}
-              </p>
-              <p className="text-xs text-marketing-muted tabular-nums">
-                {t("marketing.problem.newMedTime")} · {t("marketing.problem.newMedBy")}
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-xs font-semibold shrink-0">
-              <span className="mk-check-pop">
-                <Check className="size-3" />
-              </span>
-              {t("marketing.problem.newMedStatus")}
-            </span>
+        {/* Med row — arrives at +150 (base offset vs left card) */}
+        <div
+          className="mk-slide-in rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-3 flex items-center gap-3"
+          style={{ ["--mk-delay" as string]: "150ms" } as React.CSSProperties}
+        >
+          <div className="size-10 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
+            <Pill className="size-5" />
           </div>
-        </Reveal>
-
-        {/* Rebuilt handover header with read receipt */}
-        <Reveal delayMs={310}>
-          <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-4">
-            <div className="flex items-center gap-2 mb-1.5">
-              <ClipboardIcon />
-              <p className="text-sm font-semibold text-marketing-ink">
-                {t("marketing.problem.newHandoverTitle")}
-              </p>
-            </div>
-            <p className="text-xs text-marketing-muted mb-2">
-              {t("marketing.problem.newHandoverBy")}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-marketing-ink truncate">
+              {t("marketing.problem.newMedName")}
             </p>
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-1.5">
-                <AvatarDot letter="K" />
-              </div>
-              <p className="text-xs text-marketing-sage font-medium">
-                {t("marketing.problem.newHandoverRead")}
-              </p>
-            </div>
+            <p className="text-xs text-marketing-muted tabular-nums">
+              {t("marketing.problem.newMedTime")} · {t("marketing.problem.newMedBy")}
+            </p>
           </div>
-        </Reveal>
+          <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-xs font-semibold shrink-0">
+            <span
+              className="mk-slide-in mk-check-pop"
+              style={{ ["--mk-delay" as string]: "350ms" } as React.CSSProperties}
+            >
+              <Check className="size-3" />
+            </span>
+            {t("marketing.problem.newMedStatus")}
+          </span>
+        </div>
 
-        <p className="text-sm text-marketing-muted leading-relaxed">
+        {/* Handover card — arrives at +450 */}
+        <div
+          className="mk-slide-in rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-4"
+          style={{ ["--mk-delay" as string]: "450ms" } as React.CSSProperties}
+        >
+          <div className="flex items-center gap-2 mb-1.5">
+            <ClipboardIcon />
+            <p className="text-sm font-semibold text-marketing-ink">
+              {t("marketing.problem.newHandoverTitle")}
+            </p>
+          </div>
+          <p className="text-xs text-marketing-muted mb-2">
+            {t("marketing.problem.newHandoverBy")}
+          </p>
+          <div className="flex items-center gap-2">
+            <div
+              className="mk-slide-in mk-check-pop flex -space-x-1.5"
+              style={{ ["--mk-delay" as string]: "650ms" } as React.CSSProperties}
+            >
+              <AvatarDot letter="K" />
+            </div>
+            <p className="text-xs text-marketing-sage font-medium">
+              {t("marketing.problem.newHandoverRead")}
+            </p>
+          </div>
+        </div>
+
+        <p
+          className="mk-slide-in text-sm text-marketing-muted leading-relaxed"
+          style={{ ["--mk-delay" as string]: "850ms" } as React.CSSProperties}
+        >
           {t("marketing.problem.newCaption")}
         </p>
       </div>
