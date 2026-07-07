@@ -1443,7 +1443,7 @@ export const en = {
       t1Time: "07:00",
       t1Title: "The shift starts itself.",
       t1Body:
-        "The morning assistant opens the tablet on the wall, taps their name, and sees the whole day: which meds at which times, the vitals to check, the filter that's due today. No phone call. No retelling.",
+        "The morning assistant opens the tablet, taps their name, and sees the whole day: which meds at which times, the vitals to check, the filter that's due today. No phone call. No retelling.",
       t2Time: "During the day",
       t2Title: "You can look, instead of asking.",
       t2Body:
