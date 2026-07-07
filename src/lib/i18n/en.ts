@@ -1400,7 +1400,7 @@ export const en = {
       oldNoteRow2: "10:00  D-vitamin drops     ?",
       oldNoteRow3: "14:00  Paracetamol 250 mg",
       oldChat1: "Did he get the 06 dose?",
-      oldChat2: "Not sure — ask night shift.",
+      oldChat2: "Not sure — ask night shift?",
       oldCaption: "Handovers happen in the hallway. Someone always has to remember.",
       newEyebrow: "With CareNest",
       newHeadline: "The same morning, written down once.",
