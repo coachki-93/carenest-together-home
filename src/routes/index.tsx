@@ -114,20 +114,6 @@ function Landing() {
 
 
 
-
-
-      {/* ── 3. The bridge line ── */}
-      <section className="px-6 md:px-8 py-24 md:py-36">
-        <Reveal className="max-w-4xl mx-auto text-center">
-          <h2
-            className="mk-headline-gradient text-display-lg italic"
-            style={display}
-          >
-            {t("marketing.bridge.line")}
-          </h2>
-        </Reveal>
-      </section>
-
       {/* ── 4. A day with CareNest — timeline ── */}
       <DaySection />
 
