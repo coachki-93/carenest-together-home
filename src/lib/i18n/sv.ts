@@ -1441,19 +1441,43 @@ export const sv = {
       t1Time: "07:00",
       t1Title: "Passet börjar av sig självt.",
       t1Body:
-        "Morgonassistenten öppnar surfplattan, trycker på sitt namn och ser hela dagen: vilka mediciner vid vilka tider, vilka vitalvärden som ska kontrolleras, filtret som ska bytas idag. Inget telefonsamtal. Ingen genomgång.",
+        "Morgonens assistent trycker på sitt namn och hela dagen visas — mediciner, vitalvärden, filtret som ska bytas.",
+      t1: {
+        selectorLabel: "Vem jobbar det här passet?",
+        picked: "Gabriella",
+        other1: "Ryan",
+        other2: "Kim",
+      },
       t2Time: "Under dagen",
       t2Title: "Du kan titta i stället för att fråga.",
       t2Body:
-        "Från jobbet ser du dagen röra sig: 47 av 87 uppgifter klara, 11-medicinen given, syrgas på 67 % med två dagar kvar. Om något behöver dig — ett kritiskt checklistesvar, en missad kontroll, tre låga värden i rad — säger CareNest till. Annars är det tyst.",
+        "Från jobbet ser du dagen röra sig framåt — och CareNest håller tyst så länge inget behöver dig.",
+      t2: {
+        progress: "47 / 87",
+        progressLabel: "uppgifter idag",
+        quiet: "Tyst så länge inget behöver dig.",
+      },
       t3Time: "15:00",
       t3Title: "Överlämningen skriver sig själv.",
       t3Body:
-        "När passet tar slut har CareNest redan skrivit ett utkast till överlämningen utifrån det som faktiskt hänt — dosen som sköts upp, värdet som var utanför intervallet. Assistenten lägger till det mänskliga: hur han sov, vad som fick honom att skratta. Nästa vårdgivare läser och markerar som läst — och du ser att det är gjort.",
+        "Överlämningen är redan påbörjad utifrån vad som faktiskt hänt; assistenten lägger till det mänskliga.",
+      t3: {
+        title: "Överlämning · 15:00",
+        prefillLabel: "Förifylld från passet",
+        line1: "Paracetamol 10:00 senarelagd till 11:15",
+        line2: "SpO₂ dippade 13:20 — återhämtade sig",
+        addHuman: "Lägg till det mänskliga…",
+      },
       t4Time: "22:00",
       t4Title: "Dagen slutar utan genomgång.",
       t4Body:
-        "Kvällens checklista är klar, det som tog slut ligger redan på inköpslistan, morgondagen är planerad. Inget väntar i ditt huvud till imorgon.",
+        "Kvällslistan är klar, och det som tog slut ligger redan på morgondagens inköpslista.",
+      t4: {
+        stockName: "Sugkatetrar",
+        stockLeft: "2 kvar",
+        addedTo: "Tillagd i",
+        listName: "Inköpslista",
+      },
     },
     outcomes: {
       kicker: "Vad som förändras",
