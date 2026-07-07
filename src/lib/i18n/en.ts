@@ -1618,7 +1618,7 @@ export const en = {
       q3Q: "Does CareNest give medical advice?",
       q3A: "No. The reference ranges and reminders are screening aids, not medical advice. Always follow your care team's guidance.",
       q4Q: "What does it cost?",
-      q4A: "CareNest is free while we build it together with our first families. Planned pricing is 159 kr/month per family with unlimited caregivers — and early families keep a founding discount.",
+      q4A: "CareNest is free while we build it together with our first families. Planned pricing is about €14/month per family with unlimited caregivers — and early families keep a founding discount.",
       q5Q: "What languages do you support?",
       q5A: "English and Swedish today — every screen and notification is fully translated.",
       q6Q: "Does it work offline?",
