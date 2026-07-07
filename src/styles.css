@@ -572,7 +572,12 @@
 
 /* iPad wrapper — clips into the section fold via negative margin-bottom.
  * Fixed rem values per breakpoint (percentage margins resolve against width). */
+/* iPad wrapper — clips into the section fold via negative margin-bottom.
+ * Fixed rem values per breakpoint (percentage margins resolve against width).
+ * Negative margin-top eats the PNG's transparent bezel above the device
+ * so there is no dead space between the CTA block and the iPad's top edge. */
 .mk-hero-device {
+  margin-top: -14%;
   margin-bottom: -6rem;
 }
 @media (min-width: 768px) {
