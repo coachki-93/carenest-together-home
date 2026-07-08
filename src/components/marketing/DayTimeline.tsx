@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Clock, Bell, Pill } from "lucide-react";
-import { Reveal } from "@/components/marketing/Reveal";
+
 
 /**
  * Section 4 — "A day held together by everyone."
