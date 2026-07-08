@@ -1396,7 +1396,7 @@ export const sv = {
       title: "Just nu är du systemet.",
       sub: "Samma morgon, två gånger: en gång i huvuden och i hallen, en gång nedskriven där alla kan se den.",
       oldEyebrow: "I morse",
-      oldHeadline: "En pärm och tre chattrådar.",
+      oldHeadline: "Tre sms och en lapp på kylen.",
       oldChatPeer: "Ryan",
       oldChat1: "Fick han 06-medicinen?",
       oldChat1Time: "07:38",
