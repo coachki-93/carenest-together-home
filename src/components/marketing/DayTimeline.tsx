@@ -396,7 +396,7 @@ function Card2Visual() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold text-marketing-ink truncate">{r.task}</p>
-            <p className="text-[11px] text-marketing-muted truncate">{r.sub}</p>
+            {r.sub ? <p className="text-[11px] text-marketing-muted truncate">{r.sub}</p> : null}
           </div>
         </li>
       ))}
