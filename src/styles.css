@@ -590,6 +590,13 @@
       color-mix(in oklab, oklch(0.82 0.11 300) 14%, transparent) 0%,
       transparent 74%
     ),
+    /* Faint CTA-row tint — lets the glass buttons refract violet without
+     * touching the near-white headline zone above. */
+    radial-gradient(
+      26rem 12rem at 50% 52%,
+      color-mix(in oklab, var(--primary) 10%, transparent) 0%,
+      transparent 72%
+    ),
     /* Top-to-bottom fade: near-white at top → transparent by mid */
     linear-gradient(
       180deg,
@@ -667,4 +674,95 @@
 }
 @media (min-width: 768px) {
   .mk-hero-fold { height: 7rem; }
+}
+
+/* ── Hero CTA liquid glass ─────────────────────────────────────────────
+ * Two variants over the hero bloom: violet-filled primary and clear
+ * white secondary. Both share the same specular top-edge highlight,
+ * hairline gradient border (mask technique), backdrop blur + saturate,
+ * and hover/active behavior gated on prefers-reduced-motion. */
+.mk-cta-glass {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  backdrop-filter: blur(14px) saturate(1.6);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mk-cta-glass {
+    transition: transform 220ms ease, box-shadow 220ms ease,
+      background-color 220ms ease, filter 220ms ease;
+  }
+  .mk-cta-glass:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+  .mk-cta-glass:active {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
+/* Specular top-edge highlight (inset white gradient). */
+.mk-cta-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, white 55%, transparent) 0%,
+    color-mix(in oklab, white 0%, transparent) 45%
+  );
+  mix-blend-mode: screen;
+  z-index: 1;
+}
+/* Hairline gradient border via mask. */
+.mk-cta-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, white 70%, transparent) 0%,
+    color-mix(in oklab, white 12%, transparent) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  z-index: 2;
+}
+.mk-cta-glass > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* Primary — violet liquid glass. Fill kept high enough that white text
+ * clears WCAG AA against the effective color over the pale hero bg. */
+.mk-cta-glass--primary {
+  background-color: color-mix(in oklab, var(--primary) 78%, transparent);
+  color: #fff;
+  box-shadow:
+    0 10px 28px -12px color-mix(in oklab, var(--primary) 55%, transparent),
+    0 0 42px -10px color-mix(in oklab, var(--primary) 40%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 35%, transparent);
+}
+.mk-cta-glass--primary::after {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, white 65%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 35%, transparent) 100%
+  );
+}
+
+/* Clear — white liquid glass. */
+.mk-cta-glass--clear {
+  background-color: color-mix(in oklab, white 48%, transparent);
+  box-shadow:
+    0 8px 24px -14px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 color-mix(in oklab, white 70%, transparent);
 }
