@@ -120,8 +120,8 @@ function Landing() {
         </div>
       </section>
 
-      {/* ── 4. A day with CareNest — timeline ── */}
-      <DaySection />
+      {/* ── 4. A day with CareNest — pinned timeline ── */}
+      <DayTimeline />
 
       {/* ── 5. Outcomes ── */}
       <section className="px-6 md:px-8 py-20 md:py-28">
