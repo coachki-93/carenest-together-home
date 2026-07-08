@@ -1478,7 +1478,7 @@ export const sv = {
           progress: "4 / 7",
           progressLabel: "klara idag",
           alertTitle: "Syrgastub låg",
-          alertMeta: "~45 min kvar · aviserad 12:41",
+          alertMeta: "~45 min kvar · avisering 12:41",
         },
         c4: {
           eyebrow: "15:00",
