@@ -160,11 +160,10 @@ export function DayTimeline() {
           className="mk-day-track relative"
           style={{ height: `calc(100vh + ${(CARD_COUNT - 1) * STEP_VH}vh)` }}
         >
-          <div className="sticky top-0 h-screen min-h-[560px] flex flex-col px-6 md:px-8 pt-10 md:pt-14 pb-6 md:pb-10">
+          <div className="sticky top-0 h-screen min-h-[560px] flex flex-col justify-center px-6 md:px-8 pt-10 md:pt-14 pb-6 md:pb-10">
             <div className="mk-day-header-wrap shrink-0 pb-6 md:pb-8">
               {header}
             </div>
-            <div className="flex-1 flex items-center min-h-0">
             <div className="max-w-6xl w-full mx-auto grid md:grid-cols-[128px_1fr] gap-8 md:gap-12">
               <Rail activeIndex={activeIndex} sub={sub} />
               <div className="relative grid" role="list">
@@ -198,8 +197,8 @@ export function DayTimeline() {
                 })}
               </div>
             </div>
-            </div>
           </div>
+
         </div>
       ) : (
         <div className="px-6 md:px-8 pt-16 md:pt-20 pb-20 md:pb-28">

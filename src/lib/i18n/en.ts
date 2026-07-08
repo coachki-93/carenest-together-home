@@ -1486,8 +1486,8 @@ export const en = {
           body:
             "The report to the next shift is already drafted from what actually happened. The caregiver adds the human part — and you can see it's been read.",
           prefillLead: "Auto-drafted from today",
-          prefill1: "SpO₂ dipped at 11:24 — recovered.",
-          prefill2: "All morning meds given on time.",
+          prefill1: "SpO₂ 89 % at 11:24 (target 90–95)",
+          prefill2: "Paracetamol 10:00 — postponed to 11:15",
           readBy: "Read by Ryan · 15:04",
         },
       },
