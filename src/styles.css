@@ -809,3 +809,11 @@
     transparent 45%
   );
 }
+
+/* DayTimeline: short-viewport compression — hide the sub-copy and tighten
+ * padding so card 4's read-receipt row still clears the fold on ~700px
+ * laptops. */
+@media (max-height: 640px) {
+  .mk-day-header-sub { display: none; }
+  .mk-day-header-wrap { padding-bottom: 0.75rem !important; }
+}
