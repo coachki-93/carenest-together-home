@@ -11,7 +11,6 @@ import {
   Check,
   Plus,
   MessageSquareText,
-  Sparkles,
   ListChecks,
   Calendar,
   BookOpen,
@@ -457,9 +456,8 @@ function Landing() {
 
 function Kicker({ children }: { children: ReactNode }) {
   return (
-    <span className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
-      <Sparkles className="size-3" />
-      <span>{children}</span>
+    <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
+      {children}
     </span>
   );
 }
@@ -1105,7 +1103,7 @@ function DayLowStockVisual() {
 
 
 /* Hero H1: word-by-word fade-up on mount, violet gradient text. */
-function HeroHeadline({ text }: { text: string }) {
+function HeroHeadline({ line1, line2 }: { line1: string; line2: string }) {
   const [visible, setVisible] = useState(false);
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -1119,27 +1117,39 @@ function HeroHeadline({ text }: { text: string }) {
     const raf = window.requestAnimationFrame(() => setVisible(true));
     return () => window.cancelAnimationFrame(raf);
   }, []);
-  const words = text.split(" ");
+  const lines = [line1, line2];
+  const words = lines.map((l) => l.split(" "));
+  let idx = 0;
   return (
     <h1
-      className="text-display-xl mx-auto text-primary"
-      style={{ ...display, maxWidth: "18ch" }}
+      className="text-display-md mx-auto text-primary"
+      style={display}
     >
-      {words.map((w, i) => (
+      {words.map((ws, li) => (
         <span
-          key={i}
-          className="mk-headline-gradient inline-block"
-          style={{
-            opacity: visible || reduced ? 1 : 0,
-            transform: visible || reduced ? "translateY(0)" : "translateY(10px)",
-            transition: reduced
-              ? "none"
-              : `opacity 0.55s ease-out ${90 + i * 40}ms, transform 0.55s ease-out ${90 + i * 40}ms`,
-            willChange: "opacity, transform",
-          }}
+          key={li}
+          className="block md:whitespace-nowrap"
         >
-          {w}
-          {i < words.length - 1 ? "\u00A0" : ""}
+          {ws.map((w, i) => {
+            const k = idx++;
+            return (
+              <span
+                key={i}
+                className="mk-headline-gradient inline-block"
+                style={{
+                  opacity: visible || reduced ? 1 : 0,
+                  transform: visible || reduced ? "translateY(0)" : "translateY(10px)",
+                  transition: reduced
+                    ? "none"
+                    : `opacity 0.55s ease-out ${90 + k * 40}ms, transform 0.55s ease-out ${90 + k * 40}ms`,
+                  willChange: "opacity, transform",
+                }}
+              >
+                {w}
+                {i < ws.length - 1 ? "\u00A0" : ""}
+              </span>
+            );
+          })}
         </span>
       ))}
     </h1>
@@ -1172,13 +1182,15 @@ function Hero() {
       {/* Text — centered */}
       <div className="max-w-3xl mx-auto text-center relative z-10">
         <Reveal immediate delayMs={0}>
-          <span className="mk-glass-pill inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-7">
-            <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
+          <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-7">
             {t("marketing.hero.kicker")}
           </span>
         </Reveal>
 
-        <HeroHeadline text={t("marketing.hero.headline")} />
+        <HeroHeadline
+          line1={t("marketing.hero.headline1")}
+          line2={t("marketing.hero.headline2")}
+        />
 
         <Reveal immediate delayMs={180}>
           <p className="text-marketing-muted mt-6 mx-auto max-w-xl text-base md:text-lg leading-[1.7]">
@@ -1224,6 +1236,9 @@ function Hero() {
       <Reveal immediate delayMs={480} className="relative mt-6 md:mt-8">
         <HeroDevice />
       </Reveal>
+
+      {/* Fold fade — dissolves the device edge into the next section. */}
+      <div aria-hidden className="mk-hero-fold pointer-events-none absolute inset-x-0 bottom-0 z-10" />
     </section>
   );
 }
