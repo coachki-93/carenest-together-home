@@ -1488,7 +1488,7 @@ export const en = {
           prefillLead: "Auto-drafted from today",
           prefill1: "SpO₂ dipped at 11:24 — recovered.",
           prefill2: "All morning meds given on time.",
-          readBy: "Read by Gabriella · 15:04",
+          readBy: "Read by Ryan · 15:04",
         },
       },
     },
