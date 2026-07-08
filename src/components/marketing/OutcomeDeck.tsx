@@ -410,7 +410,7 @@ export function OutcomeDeck() {
           <div
             ref={deckRef}
             className="relative mx-auto"
-            style={{ height: 520, maxWidth: 1152 }}
+            style={{ height: 520, maxWidth: 1120 }}
           >
             {CARDS.map((c, i) => {
               const isOpen = openIndex === i;
