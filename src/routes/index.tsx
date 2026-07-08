@@ -11,7 +11,6 @@ import {
   Check,
   Plus,
   MessageSquareText,
-  Sparkles,
   ListChecks,
   Calendar,
   BookOpen,
