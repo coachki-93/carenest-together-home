@@ -159,7 +159,7 @@ export function DayTimeline() {
         <div
           ref={trackRef}
           className="mk-day-track relative"
-          style={{ height: `calc(100vh + ${CARD_COUNT * STEP_VH}vh)` }}
+          style={{ height: `calc(100vh + ${(CARD_COUNT - 1) * STEP_VH}vh)` }}
         >
           <div className="sticky top-0 h-screen min-h-[560px] flex items-center px-6 md:px-8">
             <div className="max-w-6xl w-full mx-auto grid md:grid-cols-[128px_1fr] gap-8 md:gap-12">
