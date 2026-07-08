@@ -550,7 +550,12 @@ function OutcomeFanCard({
         </div>
         <h3
           className="text-[22px] leading-[1.2]"
-          style={{ ...display, color: theme.ink, textWrap: "balance" as never }}
+          style={{
+            ...display,
+            color: theme.ink,
+            textWrap: "balance" as never,
+            maxWidth: 210,
+          }}
         >
           {t(card.headlineKey)}
         </h3>
