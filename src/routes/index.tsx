@@ -556,45 +556,66 @@ function ProblemOldCard() {
           {t("marketing.problem.oldHeadline")}
         </h3>
 
-        {/* Binder note — enters as a single block at t=0 */}
-        <div
-          className="mk-slide-in relative rounded-lg bg-[oklch(0.98_0.01_85)] border border-marketing-line p-4 mb-4 rotate-[-0.6deg] shadow-sm"
-          style={{
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-            ["--mk-delay" as string]: "0ms",
-          } as React.CSSProperties}
-        >
-          <p className="text-[10px] uppercase tracking-wider text-marketing-muted mb-2">
-            {t("marketing.problem.oldNoteTitle")}
+        {/* Thread header */}
+        <div className="relative flex items-center gap-2 pb-3 mb-3 border-b border-marketing-line/70">
+          <AvatarDot letter="R" />
+          <p className="text-xs font-semibold text-marketing-ink">
+            {t("marketing.problem.oldChatPeer")}
           </p>
-          <ul className="space-y-1.5 text-[13px] text-marketing-ink/80">
-            <li className="tabular-nums">{t("marketing.problem.oldNoteRow1")}</li>
-            <li className="tabular-nums text-marketing-ink">{t("marketing.problem.oldNoteRow2")}</li>
-            <li className="tabular-nums text-marketing-muted line-through decoration-marketing-muted/40">
-              {t("marketing.problem.oldNoteRow3")}
-            </li>
-          </ul>
         </div>
 
-        {/* Chat bubbles — question, then unsure reply */}
-        <div className="relative space-y-2 mb-4">
-          <div
-            className="mk-slide-in max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-ink"
-            style={{ ["--mk-delay" as string]: "250ms" } as React.CSSProperties}
-          >
-            {t("marketing.problem.oldChat1")}
+        {/* Conversation */}
+        <div className="relative space-y-2.5 mb-4">
+          {/* Outgoing — 07:38 */}
+          <ChatBubble
+            side="out"
+            text={t("marketing.problem.oldChat1")}
+            time={t("marketing.problem.oldChat1Time")}
+            delay={0}
+          />
+
+          {/* Typing indicator (incoming) — 500ms in, out at 1200ms */}
+          <div className="flex flex-col items-start">
+            <div
+              className="mk-typing max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2.5 inline-flex items-center gap-1"
+              style={{ ["--mk-delay" as string]: "500ms" } as React.CSSProperties}
+              aria-hidden
+            >
+              <span
+                className="mk-typing-dot size-1.5 rounded-full bg-marketing-muted"
+                style={{ ["--mk-delay" as string]: "0ms" } as React.CSSProperties}
+              />
+              <span
+                className="mk-typing-dot size-1.5 rounded-full bg-marketing-muted"
+                style={{ ["--mk-delay" as string]: "150ms" } as React.CSSProperties}
+              />
+              <span
+                className="mk-typing-dot size-1.5 rounded-full bg-marketing-muted"
+                style={{ ["--mk-delay" as string]: "300ms" } as React.CSSProperties}
+              />
+            </div>
           </div>
-          <div
-            className="mk-slide-in ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-marketing-bg border border-marketing-line px-3.5 py-2 text-sm text-marketing-muted"
-            style={{ ["--mk-delay" as string]: "500ms" } as React.CSSProperties}
-          >
-            {t("marketing.problem.oldChat2")}
-          </div>
+
+          {/* Incoming — 07:41 */}
+          <ChatBubble
+            side="in"
+            text={t("marketing.problem.oldChat2")}
+            time={t("marketing.problem.oldChat2Time")}
+            delay={1200}
+          />
+
+          {/* Outgoing — 07:55 */}
+          <ChatBubble
+            side="out"
+            text={t("marketing.problem.oldChat3")}
+            time={t("marketing.problem.oldChat3Time")}
+            delay={1900}
+          />
         </div>
 
         <p
           className="mk-slide-in relative text-sm text-marketing-muted leading-relaxed"
-          style={{ ["--mk-delay" as string]: "750ms" } as React.CSSProperties}
+          style={{ ["--mk-delay" as string]: "2400ms" } as React.CSSProperties}
         >
           {t("marketing.problem.oldCaption")}
         </p>
@@ -603,9 +624,94 @@ function ProblemOldCard() {
   );
 }
 
+function ChatBubble({
+  side,
+  text,
+  time,
+  delay,
+}: {
+  side: "in" | "out";
+  text: string;
+  time: string;
+  delay: number;
+}) {
+  const isOut = side === "out";
+  return (
+    <div className={`flex flex-col ${isOut ? "items-end" : "items-start"}`}>
+      <div
+        className={
+          isOut
+            ? "mk-slide-in max-w-[85%] rounded-2xl rounded-br-md px-3.5 py-2 text-sm text-white shadow-sm"
+            : "mk-slide-in max-w-[85%] rounded-2xl rounded-bl-md px-3.5 py-2 text-sm text-marketing-ink bg-marketing-bg border border-marketing-line"
+        }
+        style={
+          isOut
+            ? ({
+                ["--mk-delay" as string]: `${delay}ms`,
+                background:
+                  "linear-gradient(180deg, color-mix(in oklab, var(--primary) 96%, white) 0%, var(--primary) 100%)",
+              } as React.CSSProperties)
+            : ({ ["--mk-delay" as string]: `${delay}ms` } as React.CSSProperties)
+        }
+      >
+        {text}
+      </div>
+      <p
+        className="mk-slide-in mt-1 text-[10px] tabular-nums text-marketing-muted/80"
+        style={{ ["--mk-delay" as string]: `${delay + 80}ms` } as React.CSSProperties}
+      >
+        {time}
+      </p>
+    </div>
+  );
+}
+
 function ProblemNewCard() {
   const { t } = useTranslation();
   const flashRef = useFlashlight<HTMLDivElement>();
+  const rows = [
+    {
+      key: "r1",
+      time: t("marketing.problem.newRow1Time"),
+      name: t("marketing.problem.newRow1Name"),
+      by: null as string | null,
+      slideDelay: 0,
+      missed: true,
+      missedDelay: 1600,
+      icon: Pill,
+    },
+    {
+      key: "r2",
+      time: t("marketing.problem.newRow2Time"),
+      name: t("marketing.problem.newRow2Name"),
+      by: t("marketing.problem.newRow2By"),
+      slideDelay: 120,
+      chipDelay: 320,
+      icon: Wind,
+      missed: false,
+    },
+    {
+      key: "r3",
+      time: t("marketing.problem.newRow3Time"),
+      name: t("marketing.problem.newRow3Name"),
+      by: t("marketing.problem.newRow3By"),
+      slideDelay: 240,
+      chipDelay: 440,
+      icon: Droplet,
+      missed: false,
+    },
+    {
+      key: "r4",
+      time: t("marketing.problem.newRow4Time"),
+      name: t("marketing.problem.newRow4Name"),
+      by: t("marketing.problem.newRow4By"),
+      slideDelay: 360,
+      chipDelay: 560,
+      icon: Activity,
+      missed: false,
+    },
+  ];
+
   return (
     <Reveal>
       <div
@@ -622,63 +728,88 @@ function ProblemNewCard() {
           {t("marketing.problem.newHeadline")}
         </h3>
 
-        {/* Med row — arrives at +150 (base offset vs left card) */}
-        <div
-          className="mk-slide-in rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-3 flex items-center gap-3"
-          style={{ ["--mk-delay" as string]: "150ms" } as React.CSSProperties}
-        >
-          <div className="size-10 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
-            <Pill className="size-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-marketing-ink truncate">
-              {t("marketing.problem.newMedName")}
-            </p>
-            <p className="text-xs text-marketing-muted tabular-nums">
-              {t("marketing.problem.newMedTime")} · {t("marketing.problem.newMedBy")}
-            </p>
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-xs font-semibold shrink-0">
-            <span
-              className="mk-check-pop"
-              style={{ ["--mk-delay" as string]: "350ms" } as React.CSSProperties}
-            >
-              <Check className="size-3" />
-            </span>
-            {t("marketing.problem.newMedStatus")}
-          </span>
-        </div>
-
-        {/* Handover card — arrives at +450 */}
-        <div
-          className="mk-slide-in rounded-2xl bg-marketing-bg border border-marketing-line p-3.5 mb-4"
-          style={{ ["--mk-delay" as string]: "450ms" } as React.CSSProperties}
-        >
-          <div className="flex items-center gap-2 mb-1.5">
-            <ClipboardIcon />
-            <p className="text-sm font-semibold text-marketing-ink">
-              {t("marketing.problem.newHandoverTitle")}
-            </p>
-          </div>
-          <p className="text-xs text-marketing-muted mb-2">
-            {t("marketing.problem.newHandoverBy")}
-          </p>
-          <div className="flex items-center gap-2">
-            <div
-              className="mk-check-pop flex -space-x-1.5"
-              style={{ ["--mk-delay" as string]: "650ms" } as React.CSSProperties}
-            >
-              <AvatarDot letter="K" />
-            </div>
-            <p className="text-xs text-marketing-sage font-medium">
-              {t("marketing.problem.newHandoverRead")}
-            </p>
-          </div>
-        </div>
+        <ul className="space-y-2.5 mb-4">
+          {rows.map((r) => {
+            const Icon = r.icon;
+            return (
+              <li
+                key={r.key}
+                className="mk-slide-in rounded-2xl bg-marketing-bg border border-marketing-line p-3 flex items-center gap-3"
+                style={{ ["--mk-delay" as string]: `${r.slideDelay}ms` } as React.CSSProperties}
+              >
+                <span className="text-xs font-bold text-marketing-muted tabular-nums shrink-0 w-11">
+                  {r.time}
+                </span>
+                <div
+                  className={
+                    r.missed
+                      ? "size-9 rounded-xl flex items-center justify-center shrink-0"
+                      : "size-9 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0"
+                  }
+                  style={
+                    r.missed
+                      ? {
+                          background:
+                            "color-mix(in oklab, var(--destructive) 12%, transparent)",
+                          border:
+                            "1px solid color-mix(in oklab, var(--destructive) 35%, transparent)",
+                          color: "var(--destructive)",
+                        }
+                      : undefined
+                  }
+                >
+                  <Icon className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-marketing-ink truncate">
+                    {r.name}
+                  </p>
+                  {r.by ? (
+                    <p className="text-[11px] text-marketing-muted tabular-nums truncate">
+                      {t("marketing.problem.newStatusGiven")} · {r.by}
+                    </p>
+                  ) : null}
+                </div>
+                {r.missed ? (
+                  <span
+                    className="mk-slide-in inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide shrink-0"
+                    style={
+                      {
+                        ["--mk-delay" as string]: `${r.missedDelay}ms`,
+                        background:
+                          "color-mix(in oklab, var(--destructive) 12%, transparent)",
+                        border:
+                          "1px solid color-mix(in oklab, var(--destructive) 35%, transparent)",
+                        color: "var(--destructive)",
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span
+                      className="mk-check-pop inline-flex"
+                      style={{ ["--mk-delay" as string]: `${r.missedDelay}ms` } as React.CSSProperties}
+                    >
+                      {t("marketing.problem.newRow1Missed")}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2.5 py-1 text-[11px] font-semibold shrink-0">
+                    <span
+                      className="mk-check-pop"
+                      style={{ ["--mk-delay" as string]: `${r.chipDelay}ms` } as React.CSSProperties}
+                    >
+                      <Check className="size-3" />
+                    </span>
+                    {t("marketing.problem.newStatusGiven")}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
 
         <p
           className="mk-slide-in text-sm text-marketing-muted leading-relaxed"
-          style={{ ["--mk-delay" as string]: "850ms" } as React.CSSProperties}
+          style={{ ["--mk-delay" as string]: "1900ms" } as React.CSSProperties}
         >
           {t("marketing.problem.newCaption")}
         </p>
