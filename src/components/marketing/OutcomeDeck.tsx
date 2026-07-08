@@ -92,7 +92,7 @@ type OutcomeDef = {
   bodyKey: string;
   icon: LucideIcon;
   theme: keyof typeof THEME;
-  Vignette: () => JSX.Element;
+  Vignette: () => ReactElement;
 };
 
 /* ── Vignettes ─────────────────────────────────────────────────────── */
