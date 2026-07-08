@@ -1373,6 +1373,8 @@ export const en = {
     hero: {
       kicker: "Care, together",
       headline: "Everything about your child's care — out of your head, into one calm place.",
+      headline1: "Everything about your child's care.",
+      headline2: "Out of your head, into one calm place.",
       subline:
         "The shared home base for families of children with special needs — so the day no longer depends on your memory.",
       ctaCreate: "Create your family space",
