@@ -198,10 +198,12 @@ export function DayTimeline() {
                 })}
               </div>
             </div>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="px-6 md:px-8 pb-20 md:pb-28">
+        <div className="px-6 md:px-8 pt-16 md:pt-20 pb-20 md:pb-28">
+          <div className="pb-10 md:pb-12">{header}</div>
           <div className="max-w-3xl mx-auto grid gap-6 md:gap-8">
             {cards.map((c, i) => (
               <article
