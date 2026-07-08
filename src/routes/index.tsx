@@ -1104,7 +1104,7 @@ function DayLowStockVisual() {
 
 
 /* Hero H1: word-by-word fade-up on mount, violet gradient text. */
-function HeroHeadline({ text }: { text: string }) {
+function HeroHeadline({ line1, line2 }: { line1: string; line2: string }) {
   const [visible, setVisible] = useState(false);
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -1118,27 +1118,39 @@ function HeroHeadline({ text }: { text: string }) {
     const raf = window.requestAnimationFrame(() => setVisible(true));
     return () => window.cancelAnimationFrame(raf);
   }, []);
-  const words = text.split(" ");
+  const lines = [line1, line2];
+  const words = lines.map((l) => l.split(" "));
+  let idx = 0;
   return (
     <h1
-      className="text-display-xl mx-auto text-primary"
-      style={{ ...display, maxWidth: "18ch" }}
+      className="text-display-lg mx-auto text-primary"
+      style={display}
     >
-      {words.map((w, i) => (
+      {words.map((ws, li) => (
         <span
-          key={i}
-          className="mk-headline-gradient inline-block"
-          style={{
-            opacity: visible || reduced ? 1 : 0,
-            transform: visible || reduced ? "translateY(0)" : "translateY(10px)",
-            transition: reduced
-              ? "none"
-              : `opacity 0.55s ease-out ${90 + i * 40}ms, transform 0.55s ease-out ${90 + i * 40}ms`,
-            willChange: "opacity, transform",
-          }}
+          key={li}
+          className="block md:whitespace-nowrap"
         >
-          {w}
-          {i < words.length - 1 ? "\u00A0" : ""}
+          {ws.map((w, i) => {
+            const k = idx++;
+            return (
+              <span
+                key={i}
+                className="mk-headline-gradient inline-block"
+                style={{
+                  opacity: visible || reduced ? 1 : 0,
+                  transform: visible || reduced ? "translateY(0)" : "translateY(10px)",
+                  transition: reduced
+                    ? "none"
+                    : `opacity 0.55s ease-out ${90 + k * 40}ms, transform 0.55s ease-out ${90 + k * 40}ms`,
+                  willChange: "opacity, transform",
+                }}
+              >
+                {w}
+                {i < ws.length - 1 ? "\u00A0" : ""}
+              </span>
+            );
+          })}
         </span>
       ))}
     </h1>
