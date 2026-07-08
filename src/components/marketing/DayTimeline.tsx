@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Clock, Bell, Pill } from "lucide-react";
-import { Reveal } from "@/components/marketing/Reveal";
+
 
 /**
  * Section 4 — "A day held together by everyone."
@@ -23,9 +23,9 @@ import { Reveal } from "@/components/marketing/Reveal";
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 
 const CARD_COUNT = 4;
-// Total track = 100vh viewport + (N-1) × stepVh transitions = 325vh. The four
-// cards divide the 225vh of scroll evenly (56.25vh each) via progress × N below.
-const STEP_VH = 75;
+// Total track = 100vh viewport + (N-1) × stepVh transitions = 280vh. The four
+// cards divide the 180vh of scroll evenly (45vh each) via progress × N below.
+const STEP_VH = 60;
 
 export function DayTimeline() {
   const { t } = useTranslation();
@@ -138,30 +138,33 @@ export function DayTimeline() {
     [t],
   );
 
+  const header = (
+    <div className="max-w-2xl mx-auto text-center space-y-3 md:space-y-4 mk-day-header">
+      <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
+        {t("marketing.day.kicker")}
+      </span>
+      <h2 className="text-display-sm md:text-display-md text-marketing-ink" style={display}>
+        {t("marketing.day.title")}
+      </h2>
+      <p className="mk-day-header-sub text-marketing-muted text-base md:text-lg leading-[1.7]">
+        {t("marketing.day.sub")}
+      </p>
+    </div>
+  );
+
   return (
     <section className="bg-marketing-surface border-y border-marketing-line">
-      {/* Section header — scrolls in normally, above the pinned viewport. */}
-      <div className="px-6 md:px-8 pt-20 md:pt-28 pb-8 md:pb-12">
-        <Reveal className="max-w-2xl mx-auto text-center space-y-4">
-          <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
-            {t("marketing.day.kicker")}
-          </span>
-          <h2 className="text-display-md text-marketing-ink" style={display}>
-            {t("marketing.day.title")}
-          </h2>
-          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-            {t("marketing.day.sub")}
-          </p>
-        </Reveal>
-      </div>
-
       {enabled ? (
         <div
           ref={trackRef}
           className="mk-day-track relative"
           style={{ height: `calc(100vh + ${(CARD_COUNT - 1) * STEP_VH}vh)` }}
         >
-          <div className="sticky top-0 h-screen min-h-[560px] flex items-center px-6 md:px-8">
+          <div className="sticky top-0 h-screen min-h-[560px] flex flex-col px-6 md:px-8 pt-10 md:pt-14 pb-6 md:pb-10">
+            <div className="mk-day-header-wrap shrink-0 pb-6 md:pb-8">
+              {header}
+            </div>
+            <div className="flex-1 flex items-center min-h-0">
             <div className="max-w-6xl w-full mx-auto grid md:grid-cols-[128px_1fr] gap-8 md:gap-12">
               <Rail activeIndex={activeIndex} sub={sub} />
               <div className="relative grid" role="list">
@@ -195,10 +198,12 @@ export function DayTimeline() {
                 })}
               </div>
             </div>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="px-6 md:px-8 pb-20 md:pb-28">
+        <div className="px-6 md:px-8 pt-16 md:pt-20 pb-20 md:pb-28">
+          <div className="pb-10 md:pb-12">{header}</div>
           <div className="max-w-3xl mx-auto grid gap-6 md:gap-8">
             {cards.map((c, i) => (
               <article
@@ -391,7 +396,7 @@ function Card2Visual() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold text-marketing-ink truncate">{r.task}</p>
-            <p className="text-[11px] text-marketing-muted truncate">{r.sub}</p>
+            {r.sub ? <p className="text-[11px] text-marketing-muted truncate">{r.sub}</p> : null}
           </div>
         </li>
       ))}
