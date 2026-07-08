@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Reveal } from "@/components/marketing/Reveal";
 import { DayTimeline } from "@/components/marketing/DayTimeline";
+import { OutcomeDeck } from "@/components/marketing/OutcomeDeck";
 import {
   Pill,
   Wind,
