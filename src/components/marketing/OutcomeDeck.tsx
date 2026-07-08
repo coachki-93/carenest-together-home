@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { Pill, Package, BellOff, BellRing, Check, type LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/marketing/Reveal";
