@@ -1441,55 +1441,55 @@ export const en = {
       kicker: "A day with CareNest",
       title: "A day held together by everyone.",
       sub: "Same day, less to remember.",
-      // Old keys kept for Hero mock:
-      s1Title: "Morning",
-      s1Body: "Today's schedule shows what's due. Mark meds and inhalations as done in one tap.",
-      s2Title: "Daytime",
-      s2Body: "Log vitals with context (awake, sleeping, fever). Age-appropriate ranges show right away.",
-      s3Title: "Shift change",
-      s3Body: "End-of-shift handover is pre-filled with the day so far — sleep, mood, oxygen, notes.",
-      s4Title: "Evening",
-      s4Body: "A calm overview for tomorrow, with low-oxygen warnings if a tank is running close.",
-      // New timeline copy:
-      t1Time: "07:00",
-      t1Title: "The shift starts itself.",
-      t1Body:
-        "The morning caregiver taps their name and the whole day appears — meds, vitals, the filter that's due.",
-      t1: {
-        selectorLabel: "Who's working this shift?",
-        picked: "Gabriella",
-        other1: "Ryan",
-        other2: "Kim",
-      },
-      t2Time: "During the day",
-      t2Title: "You can look, instead of asking.",
-      t2Body:
-        "From work, you see the day moving forward — and CareNest stays quiet so long as nothing needs you.",
-      t2: {
-        progress: "47 / 87",
-        progressLabel: "tasks today",
-        quiet: "Quiet so long as nothing needs you.",
-      },
-      t3Time: "15:00",
-      t3Title: "The handover writes itself.",
-      t3Body:
-        "The handover is already drafted from what actually happened; the caregiver adds the human part.",
-      t3: {
-        title: "Handover · 15:00",
-        prefillLabel: "Pre-filled from your shift",
-        line1: "Paracetamol 10:00 postponed to 11:15",
-        line2: "SpO₂ dipped at 13:20 — recovered",
-        addHuman: "Add the human part…",
-      },
-      t4Time: "22:00",
-      t4Title: "The day ends without a debrief.",
-      t4Body:
-        "The evening list is done, and anything that ran low is already on tomorrow's shopping list.",
-      t4: {
-        stockName: "Suction catheters",
-        stockLeft: "2 left",
-        addedTo: "Added to",
-        listName: "Shopping list",
+      timeline: {
+        c1: {
+          eyebrow: "07:00",
+          title: "The shift starts itself.",
+          body:
+            "The caregiver taps their name and runs the morning check — supplies, equipment, anything you've asked them to look at before the day begins.",
+          selectorLabel: "Who's working this shift?",
+          chipPicked: "Gabriella",
+          chipOther1: "Ryan",
+          chipOther2: "Kim",
+          checklistLabel: "Morning check",
+          checkA: "Suction supplies · in stock",
+          checkB: "Pulse oximeter · charged",
+        },
+        c2: {
+          eyebrow: "07:10",
+          title: "The day is already planned.",
+          body:
+            "Every dose, check and appointment sits in today's list with its time. No phone call, no retelling.",
+          row1Time: "07:15",
+          row1Task: "Morning meds",
+          row1Sub: "with breakfast",
+          row2Time: "09:00",
+          row2Task: "Physio check-in",
+          row2Sub: "15 minutes",
+          row3Time: "13:00",
+          row3Task: "Nebulizer",
+          row3Sub: "after lunch",
+        },
+        c3: {
+          eyebrow: "During the day",
+          title: "You look instead of asking.",
+          body:
+            "From anywhere, you see the day ticking along — and if something is missed or out of range, CareNest tells you. Otherwise it stays quiet.",
+          progress: "4 / 7",
+          progressLabel: "done today",
+          alertTitle: "Oxygen tank low",
+          alertMeta: "~45 min left · notified 12:41",
+        },
+        c4: {
+          eyebrow: "15:00",
+          title: "The handover writes itself.",
+          body:
+            "The report to the next shift is already drafted from what actually happened. The caregiver adds the human part — and you can see it's been read.",
+          prefillLead: "Auto-drafted from today",
+          prefill1: "SpO₂ dipped at 11:24 — recovered.",
+          prefill2: "All morning meds given on time.",
+          readBy: "Read by Gabriella · 15:04",
+        },
       },
     },
     outcomes: {
