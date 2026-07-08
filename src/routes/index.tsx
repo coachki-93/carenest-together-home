@@ -1202,13 +1202,13 @@ function Hero() {
           <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
               to="/auth/signup"
-              className="inline-flex items-center justify-center rounded-full bg-marketing-sage text-marketing-bg font-semibold px-7 py-3.5 text-base shadow-sm hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
+              className="mk-cta-glass mk-cta-glass--primary inline-flex items-center justify-center rounded-full font-semibold px-7 py-3.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg focus-visible:ring-primary"
             >
               {t("marketing.hero.ctaCreate")}
             </Link>
             <Link
               to="/install"
-              className="inline-flex items-center justify-center gap-2.5 rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink font-semibold px-6 py-3.5 text-base hover:border-marketing-sage hover:text-marketing-sage transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
+              className="mk-cta-glass mk-cta-glass--clear inline-flex items-center justify-center gap-2.5 rounded-full text-marketing-ink font-semibold px-6 py-3.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg focus-visible:ring-marketing-sage"
             >
               <span className="inline-flex items-center gap-1.5">
                 {(platform === "desktop" || platform === "ios") && (
