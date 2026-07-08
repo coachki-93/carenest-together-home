@@ -818,7 +818,7 @@ function ProblemNewCard() {
 
         <p
           className="mk-slide-in text-sm text-marketing-muted leading-relaxed"
-          style={{ ["--mk-delay" as string]: "1900ms" } as React.CSSProperties}
+          style={{ ["--mk-delay" as string]: "2900ms" } as React.CSSProperties}
         >
           {t("marketing.problem.newCaption")}
         </p>
