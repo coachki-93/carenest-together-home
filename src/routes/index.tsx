@@ -619,11 +619,44 @@ function ProblemOldCard() {
             time={t("marketing.problem.oldChat3Time")}
             delay={3000}
           />
+
+          {/* Typing 2 + incoming emoji reply — same grid-stack pattern */}
+          <div className="grid">
+            <div
+              className="mk-typing [grid-area:1/1] justify-self-start max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2.5 inline-flex items-center gap-1"
+              style={{
+                ["--mk-delay" as string]: "3400ms",
+                animationDuration: "1300ms",
+              } as React.CSSProperties}
+              aria-hidden
+            >
+              <span
+                className="mk-typing-dot size-1.5 rounded-full bg-marketing-muted"
+                style={{ ["--mk-delay" as string]: "0ms" } as React.CSSProperties}
+              />
+              <span
+                className="mk-typing-dot size-1.5 rounded-full bg-marketing-muted"
+                style={{ ["--mk-delay" as string]: "150ms" } as React.CSSProperties}
+              />
+              <span
+                className="mk-typing-dot size-1.5 rounded-full bg-marketing-muted"
+                style={{ ["--mk-delay" as string]: "300ms" } as React.CSSProperties}
+              />
+            </div>
+            <div className="[grid-area:1/1] justify-self-start w-full">
+              <ChatBubble
+                side="in"
+                text={t("marketing.problem.oldChat4")}
+                time={t("marketing.problem.oldChat4Time")}
+                delay={4700}
+              />
+            </div>
+          </div>
         </div>
 
         <p
           className="mk-slide-in relative text-sm text-marketing-muted leading-relaxed"
-          style={{ ["--mk-delay" as string]: "3600ms" } as React.CSSProperties}
+          style={{ ["--mk-delay" as string]: "5300ms" } as React.CSSProperties}
         >
           {t("marketing.problem.oldCaption")}
         </p>

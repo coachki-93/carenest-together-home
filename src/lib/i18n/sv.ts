@@ -1404,6 +1404,8 @@ export const sv = {
       oldChat2Time: "07:41",
       oldChat3: "Den gavs aldrig. Ger den nu — två timmar för sent.",
       oldChat3Time: "07:55",
+      oldChat4: "😰",
+      oldChat4Time: "07:56",
       oldCaption: "Överlämningar sker i hallen. Någon måste alltid komma ihåg.",
       newEyebrow: "Med CareNest",
       newHeadline: "Samma morgon, nedskriven en gång.",

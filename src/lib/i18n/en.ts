@@ -1404,6 +1404,8 @@ export const en = {
       oldChat2Time: "07:41",
       oldChat3: "It was never given. Doing it now — two hours late.",
       oldChat3Time: "07:55",
+      oldChat4: "😰",
+      oldChat4Time: "07:56",
       oldCaption: "Handovers happen in the hallway. Someone always has to remember.",
       newEyebrow: "With CareNest",
       newHeadline: "The same morning, written down once.",
