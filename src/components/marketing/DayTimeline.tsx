@@ -138,30 +138,33 @@ export function DayTimeline() {
     [t],
   );
 
+  const header = (
+    <div className="max-w-2xl mx-auto text-center space-y-3 md:space-y-4 mk-day-header">
+      <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
+        {t("marketing.day.kicker")}
+      </span>
+      <h2 className="text-display-sm md:text-display-md text-marketing-ink" style={display}>
+        {t("marketing.day.title")}
+      </h2>
+      <p className="mk-day-header-sub text-marketing-muted text-base md:text-lg leading-[1.7]">
+        {t("marketing.day.sub")}
+      </p>
+    </div>
+  );
+
   return (
     <section className="bg-marketing-surface border-y border-marketing-line">
-      {/* Section header — scrolls in normally, above the pinned viewport. */}
-      <div className="px-6 md:px-8 pt-20 md:pt-28 pb-8 md:pb-12">
-        <Reveal className="max-w-2xl mx-auto text-center space-y-4">
-          <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
-            {t("marketing.day.kicker")}
-          </span>
-          <h2 className="text-display-md text-marketing-ink" style={display}>
-            {t("marketing.day.title")}
-          </h2>
-          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-            {t("marketing.day.sub")}
-          </p>
-        </Reveal>
-      </div>
-
       {enabled ? (
         <div
           ref={trackRef}
           className="mk-day-track relative"
           style={{ height: `calc(100vh + ${(CARD_COUNT - 1) * STEP_VH}vh)` }}
         >
-          <div className="sticky top-0 h-screen min-h-[560px] flex items-center px-6 md:px-8">
+          <div className="sticky top-0 h-screen min-h-[560px] flex flex-col px-6 md:px-8 pt-10 md:pt-14 pb-6 md:pb-10">
+            <div className="mk-day-header-wrap shrink-0 pb-6 md:pb-8">
+              {header}
+            </div>
+            <div className="flex-1 flex items-center min-h-0">
             <div className="max-w-6xl w-full mx-auto grid md:grid-cols-[128px_1fr] gap-8 md:gap-12">
               <Rail activeIndex={activeIndex} sub={sub} />
               <div className="relative grid" role="list">
