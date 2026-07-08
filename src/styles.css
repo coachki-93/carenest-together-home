@@ -752,8 +752,8 @@
 .mk-cta-glass--primary::after {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, white 70%, transparent) 0%,
-    color-mix(in oklab, var(--primary) 45%, transparent) 100%
+    color-mix(in oklab, white 28%, transparent) 0%,
+    transparent 45%
   );
 }
 
