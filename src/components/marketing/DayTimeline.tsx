@@ -23,8 +23,8 @@ import { Reveal } from "@/components/marketing/Reveal";
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 
 const CARD_COUNT = 4;
-// Total track = 100vh viewport + N × stepVh transitions. 75vh per step gives
-// ~one wheel-flick per card on typical laptops without feeling padded.
+// Total track = 100vh viewport + (N-1) × stepVh transitions = 325vh. The four
+// cards divide the 225vh of scroll evenly (56.25vh each) via progress × N below.
 const STEP_VH = 75;
 
 export function DayTimeline() {
