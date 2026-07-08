@@ -467,39 +467,8 @@ function useFlashlight<T extends HTMLElement>() {
   return ref;
 }
 
-function OutcomeCard({
-  eyebrow,
-  headline,
-  body,
-  vignette,
-}: {
-  eyebrow: string;
-  headline: string;
-  body: string;
-  vignette: ReactNode;
-}) {
-  const flashRef = useFlashlight<HTMLDivElement>();
-  return (
-    <Reveal>
-      <div
-        ref={flashRef}
-        className="mk-glass mk-flashlight group rounded-3xl p-5 transition-all hover:-translate-y-0.5 h-full flex flex-col"
-      >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-3">
-          {eyebrow}
-        </p>
-        <h3
-          className="text-display-xs text-marketing-ink mb-4"
-          style={display}
-        >
-          {headline}
-        </h3>
-        <div className="mb-4">{vignette}</div>
-        <p className="text-marketing-muted text-sm leading-relaxed mt-auto">{body}</p>
-      </div>
-    </Reveal>
-  );
-}
+
+
 
 /* ─── Problem section — old-way / CareNest-way cards ─────────────────────── */
 
