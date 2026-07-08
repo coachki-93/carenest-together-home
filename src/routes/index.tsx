@@ -1122,7 +1122,7 @@ function HeroHeadline({ line1, line2 }: { line1: string; line2: string }) {
   let idx = 0;
   return (
     <h1
-      className="text-display-md lg:text-display-lg mx-auto text-center text-primary"
+      className="text-display-md xl:text-display-lg mx-auto text-center text-primary"
       style={display}
     >
       {words.map((ws, li) => (
@@ -1179,8 +1179,9 @@ function Hero() {
       {/* Layered lavender bloom — near-white top, violet radials below. */}
       <div aria-hidden className="mk-hero-bloom pointer-events-none absolute inset-0 -z-10" />
 
-      {/* Text — centered */}
-      <div className="max-w-3xl mx-auto text-center relative z-10">
+      {/* Kicker + headline — wider column so line 1 doesn't fill the box
+       *  (that's what proves centering: line 1 is shorter than line 2). */}
+      <div className="max-w-6xl mx-auto text-center relative z-10">
         <Reveal immediate delayMs={0}>
           <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-7">
             {t("marketing.hero.kicker")}
@@ -1191,7 +1192,10 @@ function Hero() {
           line1={t("marketing.hero.headline1")}
           line2={t("marketing.hero.headline2")}
         />
+      </div>
 
+      {/* Subline + CTAs — original narrower column. */}
+      <div className="max-w-3xl mx-auto text-center relative z-10">
         <Reveal immediate delayMs={180}>
           <p className="text-marketing-muted mt-6 mx-auto max-w-xl text-base md:text-lg leading-[1.7]">
             {t("marketing.hero.subline")}
