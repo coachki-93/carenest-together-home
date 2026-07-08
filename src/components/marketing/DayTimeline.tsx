@@ -23,9 +23,9 @@ import { Check, Clock, Bell, Pill } from "lucide-react";
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 
 const CARD_COUNT = 4;
-// Total track = 100vh viewport + (N-1) × stepVh transitions = 325vh. The four
-// cards divide the 225vh of scroll evenly (56.25vh each) via progress × N below.
-const STEP_VH = 75;
+// Total track = 100vh viewport + (N-1) × stepVh transitions = 280vh. The four
+// cards divide the 180vh of scroll evenly (45vh each) via progress × N below.
+const STEP_VH = 60;
 
 export function DayTimeline() {
   const { t } = useTranslation();
