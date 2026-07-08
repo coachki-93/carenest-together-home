@@ -1373,6 +1373,8 @@ export const sv = {
     hero: {
       kicker: "Omsorg, tillsammans",
       headline: "Allt om ditt barns omsorg — ur ditt huvud, till en lugn plats.",
+      headline1: "Allt om ditt barns omsorg.",
+      headline2: "Ur ditt huvud, till en lugn plats.",
       subline:
         "Det gemensamma navet för familjer med barn med särskilda behov — så att dagen inte hänger på ditt minne.",
       ctaCreate: "Skapa er familjeplats",
