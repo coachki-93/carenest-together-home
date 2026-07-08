@@ -124,48 +124,9 @@ function Landing() {
       {/* ── 4. A day with CareNest — pinned timeline ── */}
       <DayTimeline />
 
-      {/* ── 5. Outcomes ── */}
-      <section className="px-6 md:px-8 py-20 md:py-28">
-        <div className="max-w-6xl mx-auto">
-          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
-            <Kicker>{t("marketing.outcomes.kicker")}</Kicker>
-            <h2
-              className="text-display-md text-marketing-ink"
-              style={display}
-            >
-              {t("marketing.outcomes.title")}
-            </h2>
-          </Reveal>
+      {/* ── 5. Outcomes — fanned deck ── */}
+      <OutcomeDeck />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6">
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c1Eyebrow")}
-              headline={t("marketing.outcomes.c1Headline")}
-              body={t("marketing.outcomes.c1Body")}
-              vignette={<MedicationVignette />}
-            />
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c2Eyebrow")}
-              headline={t("marketing.outcomes.c2Headline")}
-              body={t("marketing.outcomes.c2Body")}
-              vignette={<HandoverVignette />}
-            />
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c3Eyebrow")}
-              headline={t("marketing.outcomes.c3Headline")}
-              body={t("marketing.outcomes.c3Body")}
-              vignette={<OxygenVignette />}
-            />
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c4Eyebrow")}
-              headline={t("marketing.outcomes.c4Headline")}
-              body={t("marketing.outcomes.c4Body")}
-              vignette={<CheckVignette />}
-            />
-          </div>
-
-        </div>
-      </section>
 
       {/* ── 6. Essentials vs complex care ── */}
       <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
