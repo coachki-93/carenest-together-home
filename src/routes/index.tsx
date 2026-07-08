@@ -818,6 +818,14 @@ function ProblemNewCard() {
   );
 }
 
+function ClipboardIcon() {
+  return (
+    <span className="inline-flex size-5 rounded-md bg-primary-soft/60 text-primary items-center justify-center">
+      <MessageSquareText className="size-3" />
+    </span>
+  );
+}
+
 function AvatarDot({ letter }: { letter: string }) {
   return (
     <span
