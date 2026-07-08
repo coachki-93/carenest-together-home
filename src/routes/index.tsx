@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Reveal } from "@/components/marketing/Reveal";
 import { DayTimeline } from "@/components/marketing/DayTimeline";
+import { OutcomeDeck } from "@/components/marketing/OutcomeDeck";
 import {
   Pill,
   Wind,
@@ -124,48 +125,9 @@ function Landing() {
       {/* ── 4. A day with CareNest — pinned timeline ── */}
       <DayTimeline />
 
-      {/* ── 5. Outcomes ── */}
-      <section className="px-6 md:px-8 py-20 md:py-28">
-        <div className="max-w-6xl mx-auto">
-          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
-            <Kicker>{t("marketing.outcomes.kicker")}</Kicker>
-            <h2
-              className="text-display-md text-marketing-ink"
-              style={display}
-            >
-              {t("marketing.outcomes.title")}
-            </h2>
-          </Reveal>
+      {/* ── 5. Outcomes — fanned deck ── */}
+      <OutcomeDeck />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6">
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c1Eyebrow")}
-              headline={t("marketing.outcomes.c1Headline")}
-              body={t("marketing.outcomes.c1Body")}
-              vignette={<MedicationVignette />}
-            />
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c2Eyebrow")}
-              headline={t("marketing.outcomes.c2Headline")}
-              body={t("marketing.outcomes.c2Body")}
-              vignette={<HandoverVignette />}
-            />
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c3Eyebrow")}
-              headline={t("marketing.outcomes.c3Headline")}
-              body={t("marketing.outcomes.c3Body")}
-              vignette={<OxygenVignette />}
-            />
-            <OutcomeCard
-              eyebrow={t("marketing.outcomes.c4Eyebrow")}
-              headline={t("marketing.outcomes.c4Headline")}
-              body={t("marketing.outcomes.c4Body")}
-              vignette={<CheckVignette />}
-            />
-          </div>
-
-        </div>
-      </section>
 
       {/* ── 6. Essentials vs complex care ── */}
       <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
@@ -505,39 +467,8 @@ function useFlashlight<T extends HTMLElement>() {
   return ref;
 }
 
-function OutcomeCard({
-  eyebrow,
-  headline,
-  body,
-  vignette,
-}: {
-  eyebrow: string;
-  headline: string;
-  body: string;
-  vignette: ReactNode;
-}) {
-  const flashRef = useFlashlight<HTMLDivElement>();
-  return (
-    <Reveal>
-      <div
-        ref={flashRef}
-        className="mk-glass mk-flashlight group rounded-3xl p-5 transition-all hover:-translate-y-0.5 h-full flex flex-col"
-      >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-3">
-          {eyebrow}
-        </p>
-        <h3
-          className="text-display-xs text-marketing-ink mb-4"
-          style={display}
-        >
-          {headline}
-        </h3>
-        <div className="mb-4">{vignette}</div>
-        <p className="text-marketing-muted text-sm leading-relaxed mt-auto">{body}</p>
-      </div>
-    </Reveal>
-  );
-}
+
+
 
 /* ─── Problem section — old-way / CareNest-way cards ─────────────────────── */
 
@@ -880,125 +811,8 @@ function AvatarDot({ letter }: { letter: string }) {
   );
 }
 
-/* ─── Outcome-card vignettes — rebuilt real-product UI ───────────────────── */
 
-function MedicationVignette() {
-  const { t } = useTranslation();
-  return (
-    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3 flex items-center gap-3">
-      <div className="size-9 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
-        <Pill className="size-4" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[13px] font-semibold text-marketing-ink truncate">
-          {t("marketing.outcomes.vignette.medName")}
-        </p>
-        <p className="text-[11px] text-marketing-muted tabular-nums truncate">
-          {t("marketing.outcomes.vignette.medTime")} · {t("marketing.outcomes.vignette.medBy")}
-        </p>
-      </div>
-      <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 text-[11px] font-semibold shrink-0">
-        <span className="mk-check-pop">
-          <Check className="size-2.5" />
-        </span>
-        {t("marketing.outcomes.vignette.medGiven")}
-      </span>
-    </div>
-  );
-}
 
-function OxygenVignette() {
-  const { t } = useTranslation();
-  return (
-    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-marketing-muted">
-          {t("marketing.outcomes.vignette.oxLabel")}
-        </p>
-        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-marketing-ink tabular-nums">
-          <Wind className="size-3 text-marketing-sage" />
-          {t("marketing.outcomes.vignette.oxFlow")}
-        </span>
-      </div>
-      <div className="h-2 rounded-full bg-marketing-line overflow-hidden mb-2">
-        <div
-          className="mk-bar-fill h-full rounded-full"
-          style={
-            {
-              background:
-                "linear-gradient(90deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 70%, white) 100%)",
-              ["--fill" as string]: "35%",
-            } as React.CSSProperties
-          }
-        />
-      </div>
-      <p className="text-[11px] text-marketing-muted tabular-nums">
-        {t("marketing.outcomes.vignette.oxRemaining")}
-      </p>
-    </div>
-  );
-}
-
-function HandoverVignette() {
-  const { t } = useTranslation();
-  return (
-    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5">
-      <div className="flex items-center gap-2 mb-1">
-        <ClipboardIcon />
-        <p className="text-[13px] font-semibold text-marketing-ink truncate">
-          {t("marketing.outcomes.vignette.hoTitle")}
-        </p>
-      </div>
-      <p className="text-[11px] text-marketing-muted mb-2">
-        {t("marketing.outcomes.vignette.hoBy")}
-      </p>
-      <div className="flex items-center gap-2">
-        <div className="flex -space-x-1.5">
-          <AvatarDot letter="K" />
-          <AvatarDot letter="G" />
-        </div>
-        <p className="text-[11px] text-marketing-sage font-medium">
-          {t("marketing.outcomes.vignette.hoReadBy")}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function CheckVignette() {
-  const { t } = useTranslation();
-  return (
-    <div
-      className="rounded-2xl border p-3 flex items-center gap-3"
-      style={{
-        background: "color-mix(in oklab, #ef4444 6%, transparent)",
-        borderColor: "color-mix(in oklab, #ef4444 25%, transparent)",
-      }}
-    >
-      <span
-        className="size-9 rounded-xl flex items-center justify-center shrink-0"
-        style={{
-          background: "color-mix(in oklab, #ef4444 14%, transparent)",
-          color: "#ef4444",
-        }}
-      >
-        <Bell className="size-4" />
-      </span>
-      <p className="text-[13px] font-semibold text-marketing-ink flex-1 min-w-0 truncate">
-        {t("marketing.outcomes.vignette.checkTitle")}
-      </p>
-      <span
-        className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums shrink-0"
-        style={{
-          background: "color-mix(in oklab, #ef4444 12%, transparent)",
-          color: "#ef4444",
-        }}
-      >
-        {t("marketing.outcomes.vignette.checkLate")}
-      </span>
-    </div>
-  );
-}
 
 
 function ComparisonCard({
