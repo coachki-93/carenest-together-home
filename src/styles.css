@@ -654,3 +654,17 @@
   opacity: 0.7;
 }
 
+
+/* Hero fold fade — dissolves the device's bottom crop edge into the next
+ * section's background so there is no visible cut line. */
+.mk-hero-fold {
+  height: 4rem;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--color-marketing-bg) 100%
+  );
+}
+@media (min-width: 768px) {
+  .mk-hero-fold { height: 7rem; }
+}
