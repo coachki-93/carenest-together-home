@@ -1122,7 +1122,7 @@ function HeroHeadline({ line1, line2 }: { line1: string; line2: string }) {
   let idx = 0;
   return (
     <h1
-      className="text-display-md mx-auto text-primary"
+      className="text-display-md lg:text-display-lg mx-auto text-center text-primary"
       style={display}
     >
       {words.map((ws, li) => (
