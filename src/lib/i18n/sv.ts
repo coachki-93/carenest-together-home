@@ -1486,8 +1486,8 @@ export const sv = {
           body:
             "Rapporten till nästa pass är redan förberedd utifrån det som faktiskt hände. Assistenten lägger till det mänskliga — och du kan se att den är läst.",
           prefillLead: "Utkast från dagens händelser",
-          prefill1: "SpO₂ dippade 11:24 — återhämtade sig.",
-          prefill2: "Alla morgonmediciner givna i tid.",
+          prefill1: "SpO₂ 89 % kl. 11:24 (målvärde 90–95)",
+          prefill2: "Paracetamol 10:00 — framflyttad till 11:15",
           readBy: "Läst av Ryan · 15:04",
         },
       },
