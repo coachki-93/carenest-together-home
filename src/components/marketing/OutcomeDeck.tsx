@@ -7,17 +7,24 @@ import { Reveal } from "@/components/marketing/Reveal";
  * Section 5 — "What actually changes at home."
  *
  * Fanned deck of four outcome cards on xl+ with no-preference reduced-motion.
- * Closed state: eyebrow + headline + icon fully legible for every card. Hover
- * or focus-visible on a card: it lifts to the front (z + shadow), straightens
- * to 0deg, scales ~1.03, reveals body + vignette. Siblings dim + part slightly.
+ * ALL card content is rendered at rest (eyebrow, headline, body, vignette).
+ * Hover / focus-visible is pure emphasis — the hovered card lifts to the
+ * front (z + shadow), straightens to 0deg, scales ~1.03; siblings dim and
+ * part slightly. No content is gated behind interaction.
  *
- * Below xl (<1280px) OR prefers-reduced-motion: reduce → the existing stacked
- * OutcomeCard grid renders instead. Same gating pattern as DayTimeline.
+ * Below xl (<1280px) OR prefers-reduced-motion: reduce → the stacked
+ * OutcomeCard grid renders instead, using the same enriched vignettes.
  *
- * Entrance choreography: one-shot deal-in on scroll-into-view (IO 20%). Cards
- * start collapsed at center-x and animate to their fan positions, staggered
- * 60ms cards 1→4, 420ms each. After the last card lands the deck is "armed"
- * (hover/focus enabled). Reduced-motion skips the deal-in.
+ * Entrance choreography: one-shot deal-in on scroll-into-view (IO 20%).
+ * Cards start collapsed at center-x and animate to their fan positions,
+ * staggered 60ms cards 1→4. Reduced-motion skips the deal-in.
+ *
+ * ── Geometry (near-kiss, all content legible at rest) ────────────────
+ * Card 300w × 500h, stage width 1120px. Center-anchored (top-0 left-1/2).
+ * Horizontal centers: ±140, ±420  →  advance 280  →  overlap 20px.
+ * Rotations kept: outer ±8°, inner ±3°.
+ * At 8°, sin(8°)·250 ≈ 34.8px corner shift — neighbour top/bottom corners
+ * dive a few px under; content zone (vertical middle) stays uncovered.
  */
 
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
@@ -97,26 +104,79 @@ type OutcomeDef = {
 
 /* ── Vignettes ─────────────────────────────────────────────────────── */
 
+function MedRow({
+  time,
+  name,
+  by,
+  status,
+}: {
+  time: string;
+  name: string;
+  by?: string;
+  status?: { label: string; kind: "given" | "upcoming" };
+}) {
+  return (
+    <li className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 bg-marketing-bg border border-marketing-line">
+      <span className="text-[10px] tabular-nums font-semibold text-marketing-muted w-10 shrink-0">
+        {time}
+      </span>
+      <div className="min-w-0 flex-1">
+        {by ? (
+          <>
+            <p className="text-[12px] font-semibold text-marketing-ink truncate leading-tight">
+              {by}
+            </p>
+            <p className="text-[10px] text-marketing-muted truncate leading-tight">
+              {name}
+            </p>
+          </>
+        ) : (
+          <p className="text-[12px] font-medium text-marketing-ink truncate leading-tight">
+            {name}
+          </p>
+        )}
+      </div>
+      {status ? (
+        status.kind === "given" ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-1.5 py-0.5 text-[10px] font-semibold shrink-0">
+            <Check className="size-2.5" strokeWidth={3} />
+            {status.label}
+          </span>
+        ) : (
+          <span className="inline-flex items-center rounded-full border border-marketing-line text-marketing-muted px-1.5 py-0.5 text-[10px] font-semibold shrink-0">
+            {status.label}
+          </span>
+        )
+      ) : (
+        <span className="inline-flex items-center rounded-full border border-marketing-line text-marketing-muted px-1.5 py-0.5 text-[10px] font-semibold shrink-0">
+          —
+        </span>
+      )}
+    </li>
+  );
+}
+
 function MedicationVignette() {
   const { t } = useTranslation();
   return (
-    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3 flex items-center gap-3">
-      <div className="size-9 rounded-xl bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center shrink-0">
-        <Pill className="size-4" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[13px] font-semibold text-marketing-ink truncate">
-          {t("marketing.outcomes.vignette.medName")}
-        </p>
-        <p className="text-[11px] text-marketing-muted tabular-nums truncate">
-          {t("marketing.outcomes.vignette.medTime")} · {t("marketing.outcomes.vignette.medBy")}
-        </p>
-      </div>
-      <span className="inline-flex items-center gap-1 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 text-[11px] font-semibold shrink-0">
-        <Check className="size-2.5" strokeWidth={3} />
-        {t("marketing.outcomes.vignette.medGiven")}
-      </span>
-    </div>
+    <ul className="space-y-1.5">
+      <MedRow
+        time={t("marketing.outcomes.vignette.medRow1Time")}
+        name={t("marketing.outcomes.vignette.medRow1Name")}
+        by={t("marketing.outcomes.vignette.medRow1By")}
+        status={{ label: t("marketing.outcomes.vignette.medGiven"), kind: "given" }}
+      />
+      <MedRow
+        time={t("marketing.outcomes.vignette.medRow2Time")}
+        name={t("marketing.outcomes.vignette.medRow2Name")}
+        by={t("marketing.outcomes.vignette.medRow2By")}
+        status={{ label: t("marketing.outcomes.vignette.medGiven"), kind: "given" }}
+      />
+      <MedRow
+        time={t("marketing.outcomes.vignette.medRow3Time")}
+        name={t("marketing.outcomes.vignette.medRow3Name")}
+      />
+    </ul>
   );
 }
 
@@ -131,9 +191,13 @@ function SuppliesVignette() {
       name: t("marketing.outcomes.vignette.suppliesItem2Name"),
       qty: t("marketing.outcomes.vignette.suppliesItem2Qty"),
     },
+    {
+      name: t("marketing.outcomes.vignette.suppliesItem3Name"),
+      qty: t("marketing.outcomes.vignette.suppliesItem3Qty"),
+    },
   ];
   return (
-    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3 space-y-2">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <p
           className="text-[10px] font-bold uppercase tracking-[0.18em]"
@@ -171,36 +235,16 @@ function SuppliesVignette() {
 function CalmVignette() {
   const { t } = useTranslation();
   return (
-    <div className="rounded-2xl bg-marketing-bg border border-marketing-line p-3.5">
-      <div className="flex items-baseline justify-between mb-2">
-        <span
-          className="text-display-xs text-marketing-ink tabular-nums"
-          style={display}
-        >
-          {t("marketing.outcomes.vignette.calmProgress")}
-        </span>
-        <span className="text-[10px] uppercase tracking-[0.18em] text-marketing-muted font-semibold">
-          {t("marketing.outcomes.vignette.calmProgressLabel")}
-        </span>
-      </div>
-      <div className="h-2 rounded-full bg-marketing-line overflow-hidden mb-3">
-        <div
-          className="h-full rounded-full"
-          style={{
-            width: "100%",
-            background:
-              "linear-gradient(90deg, var(--color-marketing-sage) 0%, color-mix(in oklab, var(--color-marketing-sage) 60%, white) 100%)",
-          }}
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="size-6 rounded-full grid place-items-center bg-marketing-sage/15 text-marketing-sage shrink-0">
-          <Check className="size-3.5" strokeWidth={3} />
-        </span>
-        <p className="text-[12px] font-medium text-marketing-ink flex-1">
-          {t("marketing.outcomes.vignette.calmAllClear")}
-        </p>
-      </div>
+    <div className="flex flex-col items-center text-center gap-3 py-2">
+      <span className="size-10 rounded-full grid place-items-center bg-marketing-sage/15 text-marketing-sage">
+        <Check className="size-5" strokeWidth={3} />
+      </span>
+      <p
+        className="text-[17px] leading-[1.35] text-marketing-ink"
+        style={{ ...display, textWrap: "balance" as never }}
+      >
+        {t("schedule.allCaughtUp")}
+      </p>
     </div>
   );
 }
@@ -284,22 +328,24 @@ const CARDS: OutcomeDef[] = [
   },
 ];
 
-/* Fan geometry — center-anchored. 260px spacing → 60px overlap; leaves
- * ~200px of headline width per card outside any neighbor's overhang. */
+/* Fan geometry — center-anchored. Advance 280 → overlap 20px near-kiss. */
 const FAN = [
-  { rotate: -8, tx: -390, ty: 12 },
-  { rotate: -3, tx: -130, ty: 2 },
-  { rotate: 3, tx: 130, ty: 2 },
-  { rotate: 8, tx: 390, ty: 12 },
+  { rotate: -8, tx: -420, ty: 10 },
+  { rotate: -3, tx: -140, ty: 0 },
+  { rotate: 3, tx: 140, ty: 0 },
+  { rotate: 8, tx: 420, ty: 10 },
 ] as const;
 
-/* Sibling parting when another card is open — outer cards move outward more. */
+/* Sibling parting when another card is hovered — outer moves outward more. */
 const PART = [
   { rotate: -1, tx: -10 },
   { rotate: -0.5, tx: -4 },
   { rotate: 0.5, tx: 4 },
   { rotate: 1, tx: 10 },
 ] as const;
+
+const CARD_W = 300;
+const CARD_H = 500;
 
 /* ── Deck ─────────────────────────────────────────────────────────── */
 
@@ -308,9 +354,8 @@ export function OutcomeDeck() {
   const [enabled, setEnabled] = useState(false);
   const [dealt, setDealt] = useState(false);
   const [reduced, setReduced] = useState(false);
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const deckRef = useRef<HTMLDivElement | null>(null);
-  const closeTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -353,47 +398,6 @@ export function OutcomeDeck() {
     return () => io.disconnect();
   }, [enabled, reduced]);
 
-  // Escape closes; outside-tap closes.
-  useEffect(() => {
-    if (openIndex == null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpenIndex(null);
-    };
-    const onDown = (e: PointerEvent) => {
-      const el = deckRef.current;
-      if (!el) return;
-      if (!(e.target instanceof Node) || !el.contains(e.target)) {
-        setOpenIndex(null);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("pointerdown", onDown);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("pointerdown", onDown);
-    };
-  }, [openIndex]);
-
-  useEffect(() => () => {
-    if (closeTimer.current != null) window.clearTimeout(closeTimer.current);
-  }, []);
-
-  const openNow = (i: number) => {
-    if (closeTimer.current != null) {
-      window.clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
-    setOpenIndex(i);
-  };
-  const closeDeferred = (i: number) => {
-    if (closeTimer.current != null) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => {
-      // Only close if this card is still the open one.
-      setOpenIndex((cur) => (cur === i ? null : cur));
-      closeTimer.current = null;
-    }, 150);
-  };
-
   return (
     <section className="px-6 md:px-8 py-20 md:py-28">
       <div className="max-w-6xl mx-auto">
@@ -410,33 +414,30 @@ export function OutcomeDeck() {
           <div
             ref={deckRef}
             className="relative mx-auto"
-            style={{ height: 520, maxWidth: 1120 }}
+            style={{ height: CARD_H + 40, maxWidth: 1120 }}
           >
             {CARDS.map((c, i) => {
-              const isOpen = openIndex === i;
-              const anyOpen = openIndex != null;
-              const otherOpen = anyOpen && !isOpen;
+              const isHover = hoverIndex === i;
+              const anyHover = hoverIndex != null;
+              const otherHover = anyHover && !isHover;
               const rest = FAN[i];
-              const part = otherOpen
+              const part = otherHover
                 ? { rotate: PART[i].rotate, tx: PART[i].tx, ty: 0 }
                 : { rotate: 0, tx: 0, ty: 0 };
 
-              // Not dealt yet: collapsed at center, no rotation, invisible.
-              // Dealt: rest position, or open (0deg + scale + lift), plus
-              // parting drift when another sibling is open.
               const rotate = !dealt
                 ? 0
-                : isOpen
+                : isHover
                   ? 0
                   : rest.rotate + part.rotate;
               const tx = !dealt ? 0 : rest.tx + part.tx;
               const ty = !dealt
                 ? 24
-                : isOpen
+                : isHover
                   ? rest.ty - 8
                   : rest.ty + part.ty;
-              const scale = !dealt ? 0.98 : isOpen ? 1.03 : 1;
-              const opacity = !dealt ? 0 : otherOpen ? 0.7 : 1;
+              const scale = !dealt ? 0.98 : isHover ? 1.03 : 1;
+              const opacity = !dealt ? 0 : otherHover ? 0.7 : 1;
 
               const theme = THEME[c.theme];
               const dealDelay = dealt && !reduced ? 0 : i * 60;
@@ -444,22 +445,21 @@ export function OutcomeDeck() {
               return (
                 <OutcomeFanCard
                   key={c.key}
-                  index={i}
                   card={c}
                   theme={theme}
-                  isOpen={isOpen}
+                  isHover={isHover}
                   reduced={reduced}
                   style={{
                     transform: `translate(-50%, 0) translate(${tx}px, ${ty}px) rotate(${rotate}deg) scale(${scale})`,
                     opacity,
-                    zIndex: isOpen ? 20 : 5 + i,
+                    zIndex: isHover ? 20 : 5 + i,
                     transitionDelay: dealt ? "0ms" : `${dealDelay}ms`,
-                    boxShadow: isOpen
+                    boxShadow: isHover
                       ? theme.ringShadow
                       : "0 12px 30px -18px color-mix(in oklab, var(--color-marketing-ink) 35%, transparent)",
                   }}
-                  onOpen={() => openNow(i)}
-                  onDeferClose={() => closeDeferred(i)}
+                  onEnter={() => setHoverIndex(i)}
+                  onLeave={() => setHoverIndex((cur) => (cur === i ? null : cur))}
                 />
               );
             })}
@@ -475,45 +475,37 @@ export function OutcomeDeck() {
 /* ── Individual card ──────────────────────────────────────────────── */
 
 function OutcomeFanCard({
-  index,
   card,
   theme,
-  isOpen,
+  isHover,
   reduced,
   style,
-  onOpen,
-  onDeferClose,
+  onEnter,
+  onLeave,
 }: {
-  index: number;
   card: OutcomeDef;
   theme: CardTheme;
-  isOpen: boolean;
+  isHover: boolean;
   reduced: boolean;
   style: React.CSSProperties;
-  onOpen: () => void;
-  onDeferClose: () => void;
+  onEnter: () => void;
+  onLeave: () => void;
 }) {
   const { t } = useTranslation();
   const Icon = card.icon;
   const Vignette = card.Vignette;
-  // Inner pair (cards 2 & 3) sit deeper below the outer card corners.
-  const topPad = index === 1 || index === 2 ? 32 : 20;
-  const revealId = `outcome-reveal-${card.key}`;
 
   return (
-    <button
-      type="button"
-      aria-expanded={isOpen}
-      aria-controls={revealId}
-      onPointerEnter={onOpen}
-      onPointerLeave={onDeferClose}
-      onFocus={onOpen}
-      onBlur={onDeferClose}
-      onClick={() => (isOpen ? onDeferClose() : onOpen())}
-      className="absolute top-0 left-1/2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg rounded-3xl"
+    <article
+      tabIndex={0}
+      onPointerEnter={onEnter}
+      onPointerLeave={onLeave}
+      onFocus={onEnter}
+      onBlur={onLeave}
+      className="absolute top-0 left-1/2 focus:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg rounded-3xl"
       style={{
-        width: 320,
-        height: 460,
+        width: CARD_W,
+        height: CARD_H,
         transformOrigin: "center center",
         transition: reduced
           ? "opacity 200ms ease-out"
@@ -523,68 +515,48 @@ function OutcomeFanCard({
       }}
     >
       <div
-        className="relative w-full h-full rounded-3xl border overflow-hidden"
+        className="relative w-full h-full rounded-3xl border overflow-hidden flex flex-col"
         style={{
           background: theme.bg,
           borderColor: theme.border,
-          padding: `${topPad}px 22px 22px 22px`,
+          padding: "22px",
         }}
       >
-        {/* Face (always visible) */}
-        <div className="flex items-start gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-3">
           <span
             className="size-10 rounded-xl grid place-items-center shrink-0"
-            style={{
-              background: theme.chipBg,
-              color: theme.chipFg,
-            }}
+            style={{ background: theme.chipBg, color: theme.chipFg }}
           >
             <Icon className="size-5" />
           </span>
           <p
-            className="text-[11px] font-bold uppercase tracking-[0.22em] pt-2.5"
+            className="text-[11px] font-bold uppercase tracking-[0.22em]"
             style={{ color: theme.eyebrow }}
           >
             {t(card.eyebrowKey)}
           </p>
         </div>
         <h3
-          className="text-[22px] leading-[1.2]"
+          className="text-[20px] leading-[1.22] mb-3"
           style={{
             ...display,
             color: theme.ink,
             textWrap: "balance" as never,
-            maxWidth: 210,
           }}
         >
           {t(card.headlineKey)}
         </h3>
-
-        {/* Reveal (body + vignette) — always in the DOM. */}
-        <div
-          id={revealId}
-          aria-hidden={!isOpen}
-          className="absolute left-0 right-0 px-[22px]"
-          style={{
-            bottom: 22,
-            opacity: isOpen ? 1 : 0,
-            transform: isOpen ? "translateY(0)" : "translateY(6px)",
-            transition: reduced
-              ? "opacity 180ms ease-out"
-              : "opacity 220ms ease-out 60ms, transform 220ms ease-out 60ms",
-            pointerEvents: isOpen ? "auto" : "none",
-          }}
+        <p
+          className="text-[12.5px] leading-[1.55] mb-4"
+          style={{ color: theme.bodyMuted }}
         >
-          <p
-            className="text-[13px] leading-[1.55] mb-3"
-            style={{ color: theme.bodyMuted }}
-          >
-            {t(card.bodyKey)}
-          </p>
+          {t(card.bodyKey)}
+        </p>
+        <div className="mt-auto">
           <Vignette />
         </div>
       </div>
-    </button>
+    </article>
   );
 }
 
@@ -604,7 +576,7 @@ function FallbackGrid() {
               className="rounded-3xl p-5 border h-full flex flex-col"
               style={{ background: theme.bg, borderColor: theme.border }}
             >
-              <div className="flex items-start gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-3">
                 <span
                   className="size-10 rounded-xl grid place-items-center shrink-0"
                   style={{ background: theme.chipBg, color: theme.chipFg }}
@@ -612,7 +584,7 @@ function FallbackGrid() {
                   <Icon className="size-5" />
                 </span>
                 <p
-                  className="text-[11px] font-bold uppercase tracking-[0.22em] pt-2.5"
+                  className="text-[11px] font-bold uppercase tracking-[0.22em]"
                   style={{ color: theme.eyebrow }}
                 >
                   {t(c.eyebrowKey)}
