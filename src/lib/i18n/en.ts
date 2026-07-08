@@ -1396,7 +1396,7 @@ export const en = {
       title: "Right now, you are the system.",
       sub: "The same morning, twice: once held in heads and hallways, once written down where everyone can see it.",
       oldEyebrow: "This morning",
-      oldHeadline: "A paper binder and three text threads.",
+      oldHeadline: "Three texts and a post-it on the fridge.",
       oldChatPeer: "Ryan",
       oldChat1: "Did he get the 06:00 meds?",
       oldChat1Time: "07:38",
