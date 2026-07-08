@@ -284,10 +284,10 @@ function Rail({ activeIndex, sub }: { activeIndex: number; sub: number }) {
                 <span
                   className="relative z-10 size-4 rounded-full border shrink-0 grid place-items-center"
                   style={{
-                    background: done || active ? "var(--marketing-sage)" : "var(--marketing-bg)",
-                    borderColor: done || active ? "var(--marketing-sage)" : "var(--marketing-line)",
+                    background: done || active ? "var(--color-marketing-sage)" : "var(--color-marketing-bg)",
+                    borderColor: done || active ? "var(--color-marketing-sage)" : "var(--color-marketing-line)",
                     boxShadow: active
-                      ? "0 0 0 4px color-mix(in oklab, var(--marketing-sage) 22%, transparent)"
+                      ? "0 0 0 4px color-mix(in oklab, var(--color-marketing-sage) 22%, transparent)"
                       : "none",
                     transition: "background-color 200ms, box-shadow 200ms",
                   }}
@@ -300,8 +300,8 @@ function Rail({ activeIndex, sub }: { activeIndex: number; sub: number }) {
                   className="text-xs font-mono tabular-nums"
                   style={{
                     color: active
-                      ? "var(--marketing-ink)"
-                      : "var(--marketing-muted)",
+                      ? "var(--color-marketing-ink)"
+                      : "var(--color-marketing-muted)",
                     fontWeight: active ? 600 : 400,
                     transition: "color 200ms",
                   }}
@@ -421,7 +421,7 @@ function Card3Visual() {
             style={{
               width: "57%",
               background:
-                "linear-gradient(90deg, var(--marketing-sage) 0%, color-mix(in oklab, var(--marketing-sage) 60%, white) 100%)",
+                "linear-gradient(90deg, var(--color-marketing-sage) 0%, color-mix(in oklab, var(--color-marketing-sage) 60%, white) 100%)",
             }}
           />
         </div>
