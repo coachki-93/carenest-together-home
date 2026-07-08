@@ -457,9 +457,8 @@ function Landing() {
 
 function Kicker({ children }: { children: ReactNode }) {
   return (
-    <span className="mk-glass-pill inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em] text-marketing-sage">
-      <Sparkles className="size-3" />
-      <span>{children}</span>
+    <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
+      {children}
     </span>
   );
 }
