@@ -1488,7 +1488,7 @@ export const sv = {
           prefillLead: "Utkast från dagens händelser",
           prefill1: "SpO₂ dippade 11:24 — återhämtade sig.",
           prefill2: "Alla morgonmediciner givna i tid.",
-          readBy: "Läst av Gabriella · 15:04",
+          readBy: "Läst av Ryan · 15:04",
         },
       },
     },
