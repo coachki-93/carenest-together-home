@@ -284,12 +284,13 @@ const CARDS: OutcomeDef[] = [
   },
 ];
 
-/* Fan geometry — center-anchored. */
+/* Fan geometry — center-anchored. 260px spacing → 60px overlap; leaves
+ * ~200px of headline width per card outside any neighbor's overhang. */
 const FAN = [
-  { rotate: -8, tx: -360, ty: 12 },
+  { rotate: -8, tx: -390, ty: 12 },
   { rotate: -3, tx: -130, ty: 2 },
   { rotate: 3, tx: 130, ty: 2 },
-  { rotate: 8, tx: 360, ty: 12 },
+  { rotate: 8, tx: 390, ty: 12 },
 ] as const;
 
 /* Sibling parting when another card is open — outer cards move outward more. */
