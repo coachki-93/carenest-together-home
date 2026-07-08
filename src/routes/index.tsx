@@ -574,11 +574,17 @@ function ProblemOldCard() {
             delay={0}
           />
 
-          {/* Typing indicator (incoming) — 500ms in, out at 1200ms */}
-          <div className="flex flex-col items-start">
+          {/* Typing indicator + incoming reply share one grid cell so the
+              reply replaces the typing bubble in place — no double bubble
+              during handoff, no ghost gap after fade-out, no gap under
+              reduced motion (where typing stays hidden). */}
+          <div className="grid">
             <div
-              className="mk-typing max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2.5 inline-flex items-center gap-1"
-              style={{ ["--mk-delay" as string]: "500ms" } as React.CSSProperties}
+              className="mk-typing [grid-area:1/1] justify-self-start max-w-[85%] rounded-2xl rounded-bl-md bg-marketing-bg border border-marketing-line px-3.5 py-2.5 inline-flex items-center gap-1"
+              style={{
+                ["--mk-delay" as string]: "600ms",
+                animationDuration: "1300ms",
+              } as React.CSSProperties}
               aria-hidden
             >
               <span
@@ -594,15 +600,17 @@ function ProblemOldCard() {
                 style={{ ["--mk-delay" as string]: "300ms" } as React.CSSProperties}
               />
             </div>
+            {/* Incoming — 07:41 */}
+            <div className="[grid-area:1/1] justify-self-start w-full">
+              <ChatBubble
+                side="in"
+                text={t("marketing.problem.oldChat2")}
+                time={t("marketing.problem.oldChat2Time")}
+                delay={1900}
+              />
+            </div>
           </div>
 
-          {/* Incoming — 07:41 */}
-          <ChatBubble
-            side="in"
-            text={t("marketing.problem.oldChat2")}
-            time={t("marketing.problem.oldChat2Time")}
-            delay={1200}
-          />
 
           {/* Outgoing — 07:55 */}
           <ChatBubble
