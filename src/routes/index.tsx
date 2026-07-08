@@ -617,16 +617,17 @@ function ProblemOldCard() {
             side="out"
             text={t("marketing.problem.oldChat3")}
             time={t("marketing.problem.oldChat3Time")}
-            delay={1900}
+            delay={3000}
           />
         </div>
 
         <p
           className="mk-slide-in relative text-sm text-marketing-muted leading-relaxed"
-          style={{ ["--mk-delay" as string]: "2400ms" } as React.CSSProperties}
+          style={{ ["--mk-delay" as string]: "3600ms" } as React.CSSProperties}
         >
           {t("marketing.problem.oldCaption")}
         </p>
+
       </div>
     </Reveal>
   );
