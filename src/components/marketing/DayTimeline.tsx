@@ -164,9 +164,21 @@ export function DayTimeline() {
             <div className="mk-day-header-wrap shrink-0 pb-6 md:pb-8">
               {header}
             </div>
-            <div className="max-w-6xl w-full mx-auto grid md:grid-cols-[128px_1fr] gap-8 md:gap-12">
+            <div className="relative max-w-6xl w-full mx-auto grid md:grid-cols-[128px_1fr] gap-8 md:gap-12">
               <Rail activeIndex={activeIndex} sub={sub} />
               <div className="relative grid" role="list">
+                <div
+                  aria-hidden
+                  className="mk-section-orb"
+                  style={{
+                    width: "40rem",
+                    height: "40rem",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    zIndex: 0,
+                  }}
+                />
                 {cards.map((c, i) => {
                   const isActive = i === activeIndex;
                   // Cards ahead drift down, cards behind drift up; active sits at 0.
@@ -176,13 +188,14 @@ export function DayTimeline() {
                       key={i}
                       role="listitem"
                       aria-hidden={!isActive}
-                      className="[grid-area:1/1] rounded-3xl bg-marketing-bg border border-marketing-line p-8 md:p-10 shadow-sm"
+                      className="relative [grid-area:1/1] rounded-3xl bg-marketing-bg border border-marketing-line p-8 md:p-10 lg:p-12 shadow-sm min-h-[22rem] lg:min-h-[26rem] xl:min-h-[28rem]"
                       style={{
                         opacity: isActive ? 1 : 0,
                         transform: `translateY(${dy}px)`,
                         transition:
                           "opacity 320ms ease-out, transform 320ms ease-out",
                         pointerEvents: isActive ? "auto" : "none",
+                        zIndex: 1,
                       }}
                     >
                       <CardBody
