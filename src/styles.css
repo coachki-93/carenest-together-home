@@ -590,6 +590,13 @@
       color-mix(in oklab, oklch(0.82 0.11 300) 14%, transparent) 0%,
       transparent 74%
     ),
+    /* Faint CTA-row tint — lets the glass buttons refract violet without
+     * touching the near-white headline zone above. */
+    radial-gradient(
+      26rem 12rem at 50% 52%,
+      color-mix(in oklab, var(--primary) 10%, transparent) 0%,
+      transparent 72%
+    ),
     /* Top-to-bottom fade: near-white at top → transparent by mid */
     linear-gradient(
       180deg,
