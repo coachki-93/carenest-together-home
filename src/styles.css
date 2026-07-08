@@ -744,25 +744,33 @@
 /* Primary — violet liquid glass. Fill kept high enough that white text
  * clears WCAG AA against the effective color over the pale hero bg. */
 .mk-cta-glass--primary {
-  background-color: color-mix(in oklab, var(--primary) 78%, transparent);
+  background-color: color-mix(in oklab, var(--primary) 92%, transparent);
   color: #fff;
   box-shadow:
-    0 10px 28px -12px color-mix(in oklab, var(--primary) 55%, transparent),
-    0 0 42px -10px color-mix(in oklab, var(--primary) 40%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 35%, transparent);
+    0 6px 24px -8px color-mix(in oklab, var(--primary) 55%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 40%, transparent);
 }
 .mk-cta-glass--primary::after {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, white 65%, transparent) 0%,
-    color-mix(in oklab, var(--primary) 35%, transparent) 100%
+    color-mix(in oklab, white 70%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 45%, transparent) 100%
   );
 }
 
-/* Clear — white liquid glass. */
+/* Clear — white liquid glass. Stronger hairline + inner highlight so it
+ * reads as material, not the previous plain white pill. */
 .mk-cta-glass--clear {
-  background-color: color-mix(in oklab, white 48%, transparent);
+  background-color: color-mix(in oklab, white 52%, transparent);
   box-shadow:
-    0 8px 24px -14px rgba(15, 23, 42, 0.22),
-    inset 0 1px 0 color-mix(in oklab, white 70%, transparent);
+    0 6px 20px -10px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 color-mix(in oklab, white 85%, transparent),
+    inset 0 -1px 0 color-mix(in oklab, var(--primary) 8%, transparent);
+}
+.mk-cta-glass--clear::after {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, white 90%, transparent) 0%,
+    color-mix(in oklab, var(--primary) 22%, transparent) 100%
+  );
 }
