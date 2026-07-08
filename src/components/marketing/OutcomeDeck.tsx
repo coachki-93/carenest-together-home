@@ -243,7 +243,7 @@ function CalmVignette() {
         className="text-[17px] leading-[1.35] text-marketing-ink"
         style={{ ...display, textWrap: "balance" as never }}
       >
-        {t("common.allCaughtUp")}
+        {t("schedule.allCaughtUp")}
       </p>
     </div>
   );
