@@ -1183,13 +1183,15 @@ function Hero() {
       {/* Text — centered */}
       <div className="max-w-3xl mx-auto text-center relative z-10">
         <Reveal immediate delayMs={0}>
-          <span className="mk-glass-pill inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-[0.18em] text-marketing-sage mb-7">
-            <span className="w-1.5 h-1.5 rounded-full bg-marketing-sage" />
+          <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage mb-7">
             {t("marketing.hero.kicker")}
           </span>
         </Reveal>
 
-        <HeroHeadline text={t("marketing.hero.headline")} />
+        <HeroHeadline
+          line1={t("marketing.hero.headline1")}
+          line2={t("marketing.hero.headline2")}
+        />
 
         <Reveal immediate delayMs={180}>
           <p className="text-marketing-muted mt-6 mx-auto max-w-xl text-base md:text-lg leading-[1.7]">
