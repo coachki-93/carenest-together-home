@@ -614,7 +614,6 @@
  * Negative margin-top eats the PNG's transparent bezel above the device
  * so there is no dead space between the CTA block and the iPad's top edge. */
 .mk-hero-device {
-  margin-top: -14%;
   margin-bottom: -6rem;
 }
 @media (min-width: 768px) {
@@ -753,8 +752,8 @@
 .mk-cta-glass--primary::after {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, white 70%, transparent) 0%,
-    color-mix(in oklab, var(--primary) 45%, transparent) 100%
+    color-mix(in oklab, white 28%, transparent) 0%,
+    transparent 45%
   );
 }
 
@@ -770,7 +769,7 @@
 .mk-cta-glass--clear::after {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, white 90%, transparent) 0%,
-    color-mix(in oklab, var(--primary) 22%, transparent) 100%
+    color-mix(in oklab, white 28%, transparent) 0%,
+    transparent 45%
   );
 }
