@@ -1737,10 +1737,7 @@ export const sv = {
       notifChipMissed: "Missade kontroller",
       subtitle:
         "Lägg till CareNest en gång så öppnas den i helskärm som en app — med aviseringar, på iPhone, iPad och Android.",
-      phoneMockLabel: "CareNest",
-      phoneMockAlt: "CareNest-ikon på en hemskärm",
-      desktopNote:
-        "På dator? Öppna sidan på familjens telefon eller surfplatta — eller installera från webbläsarens meny i Chrome och Edge på datorn.",
+      tabletAlt: "CareNest-appens ikon lyser på en surfplatteskärm",
       otherPlatformIos: "På iPhone eller iPad istället?",
       otherPlatformAndroid: "På Android istället?",
       iosBrowser: "iPhone & iPad · Safari",
