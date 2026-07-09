@@ -1688,6 +1688,10 @@ export const en = {
       q7A: "Yes. A team account holds multiple caregiver profiles — each caregiver picks their name at the start of a shift, and everything they do is recorded under it.",
       q8Q: "Is there an app?",
       q8A: "CareNest installs from the browser today — add it to your home screen and it opens full-screen like an app. A native app is planned. See the install guide for iOS and Android.",
+      q9Q: "Is CareNest a medical record system?",
+      q9A: "No. CareNest isn't a journal system and doesn't replace your clinic's records. It's the daily coordination layer around the clinic — the shared home base where your family and caregivers track what actually happens between appointments: doses given, vitals logged, questions answered on shift, notes handed over. Anything that belongs in the medical record still belongs there.",
+      q10Q: "Does CareNest give medical advice?",
+      q10A: "No. The age-adjusted reference ranges, streak alerts and reminders are screening aids — they help you notice patterns and remember timings, not diagnose or treat. Your care team's instructions always come first; when something looks off, contact them.",
     },
     cta: {
       title: "Ready to get it out of your head?",
