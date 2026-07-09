@@ -106,7 +106,7 @@ function AboutPage() {
                 }}
               >
                 <span className="block">{t("marketing.about.title")}</span>
-                <span className="block text-marketing-sage">
+                <span className="block mk-headline-gradient">
                   {t("marketing.about.titleB")}
                 </span>
               </h1>
