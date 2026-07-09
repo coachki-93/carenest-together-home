@@ -1625,6 +1625,19 @@ export const sv = {
       closing:
         "Det gemensamma minnet mellan de som tar hand om ert barn.",
     },
+    teamsMock: {
+      title: "Första passet",
+      step1Label: "Inbjuden med engångskod",
+      step1Email: "ryan@example.se",
+      step1Code: "H3K9PQ2M",
+      step1Status: "Accepterad",
+      step2Label: "Trycker på sitt namn",
+      step3Label: "Dagen finns redan där",
+      step3Time: "07:15",
+      step3Title: "Morgonmedicin",
+      step3Note: "med frukost",
+      step3MarkDone: "Markera klar",
+    },
     trust: {
       s1Value: "2 språk",
       s1Label: "Varje skärm, varje notis",

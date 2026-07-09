@@ -24,6 +24,7 @@ import {
   RefreshCw,
   Users,
   Heart,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -271,38 +272,105 @@ function Landing() {
                 </p>
               </div>
 
-              {/* Salvaged "Checked by Ryan · Care team" mock */}
+              {/* "First shift" sequence — invite → identity → first task */}
               <div className="relative">
-                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 space-y-4 rotate-[-1deg]">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold">
-                      {t("marketing.team.mockLabel")}
-                    </p>
-                    <span className="text-[10px] rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 font-semibold">
-                      ✓
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="size-11 rounded-full flex items-center justify-center font-bold text-marketing-bg"
-                      style={{ background: "var(--primary)" }}
+                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 rotate-[-1deg]">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold mb-4">
+                    {t("marketing.teamsMock.title")}
+                  </p>
+                  <ol className="relative space-y-4">
+                    <span
+                      aria-hidden
+                      className="absolute left-[11px] top-6 bottom-6 w-px bg-marketing-line"
+                    />
+                    {/* Step 1 — invite accepted */}
+                    <li
+                      className="mk-slide-in relative pl-9"
+                      style={{ ["--mk-delay" as string]: "0ms" }}
                     >
-                      R
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
-                        {t("marketing.team.mockCheckedBy")}
+                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
+                        1
+                      </span>
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
+                        {t("marketing.teamsMock.step1Label")}
                       </p>
-                      <p className="text-lg text-marketing-ink" style={display}>
-                        {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-marketing-surface border border-marketing-line">
+                        <div className="size-8 rounded-lg bg-marketing-sage-soft text-marketing-sage flex items-center justify-center flex-none">
+                          <Mail className="size-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-marketing-ink truncate">
+                            {t("marketing.teamsMock.step1Email")}
+                          </p>
+                          <p className="text-[10px] text-marketing-muted">
+                            <span className="font-mono">
+                              {t("marketing.teamsMock.step1Code")}
+                            </span>
+                            {" · "}
+                            {t("marketing.teamsMock.step1Status")}
+                          </p>
+                        </div>
+                        <Check className="size-4 text-marketing-sage flex-none" />
+                      </div>
+                    </li>
+
+                    {/* Step 2 — identity chip row */}
+                    <li
+                      className="mk-slide-in relative pl-9"
+                      style={{ ["--mk-delay" as string]: "150ms" }}
+                    >
+                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
+                        2
+                      </span>
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
+                        {t("marketing.teamsMock.step2Label")}
                       </p>
-                    </div>
-                  </div>
-                  <div className="h-px bg-marketing-line" />
-                  <div className="flex items-center gap-2 text-sm text-marketing-muted">
-                    <Check className="size-4 text-marketing-sage" />
-                    <span>{t("marketing.team.mockAnswer")}</span>
-                  </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        <IdentityChip name="Maria" color="#E4A15A" />
+                        <IdentityChip name="Ryan" color="#6C63FF" selected />
+                        <IdentityChip name="Anna" color="#5DA490" />
+                      </div>
+                    </li>
+
+                    {/* Step 3 — first task */}
+                    <li
+                      className="mk-slide-in relative pl-9"
+                      style={{ ["--mk-delay" as string]: "300ms" }}
+                    >
+                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
+                        3
+                      </span>
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
+                        {t("marketing.teamsMock.step3Label")}
+                      </p>
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-marketing-surface border border-marketing-line">
+                        <div
+                          className="size-8 rounded-lg flex items-center justify-center flex-none"
+                          style={{
+                            background:
+                              "color-mix(in oklab, var(--primary) 14%, transparent)",
+                            color: "var(--primary)",
+                          }}
+                        >
+                          <Pill className="size-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-marketing-ink">
+                            <span className="tabular-nums text-marketing-muted mr-1.5">
+                              {t("marketing.teamsMock.step3Time")}
+                            </span>
+                            {t("marketing.teamsMock.step3Title")}
+                          </p>
+                          <p className="text-[10px] text-marketing-muted">
+                            {t("marketing.teamsMock.step3Note")}
+                          </p>
+                        </div>
+                        <span className="text-[11px] font-semibold text-marketing-sage border border-marketing-sage-line rounded-full px-2.5 py-1 flex-none">
+                          {t("marketing.teamsMock.step3MarkDone")}
+                        </span>
+                      </div>
+                    </li>
+                  </ol>
                 </div>
               </div>
             </div>
@@ -438,6 +506,35 @@ function PillTag({ icon, children }: { icon: ReactNode; children: ReactNode }) {
     </span>
   );
 }
+
+function IdentityChip({
+  name,
+  color,
+  selected = false,
+}: {
+  name: string;
+  color: string;
+  selected?: boolean;
+}) {
+  return (
+    <span
+      className={
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border " +
+        (selected
+          ? "bg-marketing-sage-soft border-marketing-sage-line text-marketing-sage"
+          : "bg-marketing-surface border-marketing-line text-marketing-muted")
+      }
+    >
+      <span
+        className="inline-block size-2 rounded-full"
+        style={{ background: color }}
+        aria-hidden
+      />
+      {name}
+    </span>
+  );
+}
+
 
 /* Mouse-following radial highlight on cards. Desktop-hover only. */
 function useFlashlight<T extends HTMLElement>() {
