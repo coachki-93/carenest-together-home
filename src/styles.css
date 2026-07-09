@@ -861,8 +861,8 @@
       color-mix(in oklab, var(--primary) 3%, transparent)
     ),
     linear-gradient(
-      color-mix(in oklab, white 40%, transparent),
-      color-mix(in oklab, white 40%, transparent)
+      color-mix(in oklab, white 38%, transparent),
+      color-mix(in oklab, white 38%, transparent)
     );
   -webkit-backdrop-filter: blur(12px) saturate(1.5);
   backdrop-filter: blur(12px) saturate(1.5);
