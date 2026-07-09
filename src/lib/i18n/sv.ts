@@ -1645,11 +1645,6 @@ export const sv = {
       t2: "Engelska & svenska",
       t3: "Privat för er familj",
     },
-    not: {
-      kicker: "Vad CareNest inte är",
-      body:
-        "CareNest ger inte medicinska råd — referensintervall och påminnelser är hjälpmedel, och ert vårdteams anvisningar går alltid först. Det är inte ett journalsystem eller en ersättning för klinikens journal. Det är lagret er familj faktiskt lever i varje dag: det gemensamma minnet mellan de som tar hand om ert barn.",
-    },
     pricing: {
       kicker: "Priser",
       title: "Gratis medan vi bygger det tillsammans.",
