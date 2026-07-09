@@ -131,6 +131,7 @@ interface TileProps {
   reading?: number;
   rangeCaption?: string;
   runningTotalLabel?: string;
+  tileDelayMs?: number;
 }
 
 function VitalTile({
@@ -143,11 +144,10 @@ function VitalTile({
   reading,
   rangeCaption,
   runningTotalLabel,
+  tileDelayMs = 0,
 }: TileProps) {
   const hasBand =
     typeof low === "number" && typeof high === "number" && typeof reading === "number";
-  // Rail domain gives a little headroom around the band so the band segment
-  // isn't the full rail width. Domain = [low - 20%, high + 20%] of the band.
   let bandStart = 0;
   let bandEnd = 0;
   let dot = 0;
@@ -162,7 +162,10 @@ function VitalTile({
     dot = scale(reading!);
   }
   return (
-    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5 md:p-4">
+    <div
+      className="mk-slide-in rounded-2xl bg-marketing-surface border border-marketing-line p-3.5 md:p-4"
+      style={{ ["--mk-delay" as string]: `${tileDelayMs}ms` }}
+    >
       <div className="flex items-center gap-1.5">
         {icon}
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-marketing-muted">
@@ -179,14 +182,21 @@ function VitalTile({
         <div className="mt-3">
           <div className="relative h-1.5 rounded-full bg-marketing-line/70 overflow-hidden">
             <div
-              className="absolute inset-y-0 rounded-full bg-marketing-sage/45"
-              style={{ left: `${bandStart}%`, width: `${bandEnd - bandStart}%` }}
+              className="mk-band-scale-in absolute inset-y-0 rounded-full bg-marketing-sage/45"
+              style={{
+                left: `${bandStart}%`,
+                width: `${bandEnd - bandStart}%`,
+                ["--mk-delay" as string]: `${tileDelayMs + 200}ms`,
+              }}
             />
           </div>
           <div className="relative h-0" aria-hidden>
             <div
-              className="absolute -top-[7px] size-2 rounded-full bg-marketing-sage ring-2 ring-marketing-bg"
-              style={{ left: `calc(${dot}% - 4px)` }}
+              className="mk-check-pop absolute -top-[7px] size-2 rounded-full bg-marketing-sage ring-2 ring-marketing-bg"
+              style={{
+                left: `calc(${dot}% - 4px)`,
+                ["--mk-delay" as string]: `${tileDelayMs + 450}ms`,
+              }}
             />
           </div>
           <p className="mt-2 text-[10px] text-marketing-muted">{rangeCaption}</p>
@@ -205,10 +215,12 @@ function PlannedTile({
   label,
   plannedText,
   a11y,
+  tileDelayMs = 0,
 }: {
   label: string;
   plannedText: string;
   a11y: string;
+  tileDelayMs?: number;
 }) {
   return (
     <div
