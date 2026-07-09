@@ -632,7 +632,7 @@
     /* Primary bloom, centered lower — the strongest violet */
     radial-gradient(
       60rem 34rem at 50% 78%,
-      color-mix(in oklab, var(--primary) 22%, transparent) 0%,
+      color-mix(in oklab, var(--primary) 18%, transparent) 0%,
       transparent 70%
     ),
     /* Left offset tint */
@@ -654,12 +654,12 @@
       color-mix(in oklab, var(--primary) 10%, transparent) 0%,
       transparent 72%
     ),
-    /* Top-to-bottom fade: near-white at top → transparent by mid */
+    /* Top fade — transparent so the mk-hero-wash tint shows through at the
+     * headline zone; radials below still bloom. */
     linear-gradient(
       180deg,
-      var(--color-marketing-bg) 0%,
-      var(--color-marketing-bg) 34%,
-      color-mix(in oklab, var(--color-marketing-bg) 70%, transparent) 55%,
+      transparent 0%,
+      transparent 55%,
       transparent 80%
     );
 }
@@ -733,10 +733,10 @@
 }
 
 /* ── Hero CTA liquid glass ─────────────────────────────────────────────
- * Two variants over the hero bloom: violet-filled primary and clear
- * white secondary. Both share the same specular top-edge highlight,
- * hairline gradient border (mask technique), backdrop blur + saturate,
- * and hover/active behavior gated on prefers-reduced-motion. */
+ * Pillowy soft-3D buttons: primary reads as an inflated violet lozenge
+ * floating on colored light; clear is a quieter frosted white pill.
+ * Specular top edge, hairline gradient border, and hover/active gated
+ * on prefers-reduced-motion. */
 .mk-cta-glass {
   position: relative;
   isolation: isolate;
@@ -750,14 +750,15 @@
   }
   .mk-cta-glass:hover {
     transform: translateY(-1px);
-    filter: brightness(1.08);
+    filter: brightness(1.05);
   }
   .mk-cta-glass:active {
     transform: translateY(0);
-    filter: brightness(1);
+    filter: brightness(0.98);
   }
 }
-/* Specular top-edge highlight (inset white gradient). */
+/* Specular top-edge highlight — softened so the pillow reads inflated,
+ * not glossy. */
 .mk-cta-glass::before {
   content: "";
   position: absolute;
@@ -766,8 +767,8 @@
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, white 55%, transparent) 0%,
-    color-mix(in oklab, white 0%, transparent) 45%
+    color-mix(in oklab, white 35%, transparent) 0%,
+    color-mix(in oklab, white 0%, transparent) 55%
   );
   mix-blend-mode: screen;
   z-index: 1;
@@ -797,14 +798,21 @@
   z-index: 3;
 }
 
-/* Primary — violet liquid glass. Fill kept high enough that white text
- * clears WCAG AA against the effective color over the pale hero bg. */
+/* Primary — pillowy violet. Vertical gradient reads as inflated (light
+ * top → mid violet → darker foot); crisp inset top edge; layered outer
+ * glow so the button floats on violet light. */
 .mk-cta-glass--primary {
-  background-color: color-mix(in oklab, var(--primary) 92%, transparent);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--primary) 78%, white) 0%,
+    var(--primary) 55%,
+    color-mix(in oklab, var(--primary) 88%, black) 100%
+  );
   color: #fff;
   box-shadow:
-    0 6px 24px -8px color-mix(in oklab, var(--primary) 55%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 40%, transparent);
+    inset 0 1px 0 color-mix(in oklab, white 35%, transparent),
+    0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent),
+    0 10px 28px -8px color-mix(in oklab, var(--primary) 45%, transparent);
 }
 .mk-cta-glass--primary::after {
   background: linear-gradient(
@@ -813,13 +821,27 @@
     transparent 45%
   );
 }
+@media (prefers-reduced-motion: no-preference) {
+  .mk-cta-glass--primary:hover {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, white 35%, transparent),
+      0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent),
+      0 14px 36px -10px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+  .mk-cta-glass--primary:active {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, white 35%, transparent),
+      0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent),
+      0 10px 28px -8px color-mix(in oklab, var(--primary) 45%, transparent);
+  }
+}
 
-/* Clear — white liquid glass. Stronger hairline + inner highlight so it
- * reads as material, not the previous plain white pill. */
+/* Clear — frosted white pill. Quieter neutral shadow; the specular is
+ * softened on the primary utility already, so it doesn't wash the white. */
 .mk-cta-glass--clear {
-  background-color: color-mix(in oklab, white 52%, transparent);
+  background-color: color-mix(in oklab, white 72%, transparent);
   box-shadow:
-    0 6px 20px -10px rgba(15, 23, 42, 0.22),
+    0 6px 18px -8px color-mix(in oklab, var(--color-marketing-ink) 22%, transparent),
     inset 0 1px 0 color-mix(in oklab, white 85%, transparent),
     inset 0 -1px 0 color-mix(in oklab, var(--primary) 8%, transparent);
 }
@@ -828,6 +850,23 @@
     180deg,
     color-mix(in oklab, white 28%, transparent) 0%,
     transparent 45%
+  );
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mk-cta-glass--clear:hover {
+    background-color: color-mix(in oklab, white 85%, transparent);
+  }
+}
+
+/* Hero wash — very light violet dissolving into the page background.
+ * Sits beneath mk-hero-bloom/glow. The 100% stop is exactly the marketing
+ * bg color so the hero's foot is seamless with the next section. */
+.mk-hero-wash {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--primary) 9%, white) 0%,
+    color-mix(in oklab, var(--primary) 4%, var(--color-marketing-bg)) 55%,
+    var(--color-marketing-bg) 100%
   );
 }
 
