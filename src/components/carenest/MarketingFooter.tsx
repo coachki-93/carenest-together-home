@@ -23,6 +23,12 @@ export function MarketingFooter() {
         }}
       />
 
+      {/* Fold — dissolves the previous section's surface into the footer wash */}
+      <div
+        aria-hidden
+        className="mk-footer-fold pointer-events-none absolute top-0 left-0 right-0 h-16 md:h-24"
+      />
+
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 pt-16 pb-10">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           {/* Brand column */}

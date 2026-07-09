@@ -713,6 +713,17 @@
   .mk-hero-fold { height: 7rem; }
 }
 
+/* Footer fold fade — mirror of mk-hero-fold, placed at the TOP of the footer
+ * panel so its violet wash surfaces gradually out of the section above with
+ * no visible cut line. */
+.mk-footer-fold {
+  background: linear-gradient(
+    to bottom,
+    var(--color-marketing-surface) 0%,
+    transparent 100%
+  );
+}
+
 /* ── Hero CTA liquid glass ─────────────────────────────────────────────
  * Pillowy soft-3D buttons: primary reads as an inflated violet lozenge
  * floating on colored light; clear is a quieter frosted white pill.
