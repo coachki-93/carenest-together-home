@@ -224,7 +224,8 @@ function PlannedTile({
 }) {
   return (
     <div
-      className="rounded-2xl border border-dashed border-marketing-line bg-transparent p-3.5 md:p-4 opacity-80"
+      className="mk-slide-in rounded-2xl border border-dashed border-marketing-line bg-transparent p-3.5 md:p-4 opacity-80"
+      style={{ ["--mk-delay" as string]: `${tileDelayMs}ms` }}
       aria-label={a11y}
       role="group"
     >
