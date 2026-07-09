@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { Reveal } from "@/components/marketing/Reveal";
+import { HeroHeadline } from "@/components/marketing/HeroHeadline";
 import {
   OUTCOME_DECK_THEME,
   type CardTheme,
@@ -70,12 +71,30 @@ const serif = {
   letterSpacing: "-0.025em",
 } as const;
 
+const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
+
 // Bare uppercase tracked label — matches landing's Kicker (no dot, no pill).
 function Kicker({ children }: { children: ReactNode }) {
   return (
     <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
       {children}
     </span>
+  );
+}
+
+// Per-word mk-headline-gradient spans, static (no entrance) — used for
+// section-scale headings that want the same gradient signature as the hero.
+function GradientWords({ text }: { text: string }) {
+  const words = text.split(" ");
+  return (
+    <>
+      {words.map((w, i) => (
+        <span key={i} className="mk-headline-gradient inline-block">
+          {w}
+          {i < words.length - 1 ? "\u00A0" : ""}
+        </span>
+      ))}
+    </>
   );
 }
 
@@ -89,60 +108,24 @@ function AboutPage() {
     >
       <MarketingHeader />
 
-      {/* Hero */}
-      <section className="px-6 md:px-8 pt-10 md:pt-16 pb-16 md:pb-24">
-        <Reveal>
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <Reveal immediate delayMs={0}>
-              <Kicker>{t("marketing.about.kicker")}</Kicker>
-            </Reveal>
-            <Reveal immediate delayMs={120}>
-              <h1
-                className="tracking-tight text-marketing-ink"
-                style={{
-                  ...serif,
-                  fontSize: "clamp(2.25rem, 5.2vw, 3.75rem)",
-                  lineHeight: 1.05,
-                }}
-              >
-                <span className="block">{t("marketing.about.title")}</span>
-                <span className="block mk-headline-gradient">
-                  {t("marketing.about.titleB")}
-                </span>
-              </h1>
-            </Reveal>
-            <Reveal immediate delayMs={240}>
-              <p className="text-marketing-muted leading-[1.75] text-[1.05rem] max-w-2xl mx-auto">
-                {t("marketing.about.heroSub")}
-              </p>
-            </Reveal>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* Our story — centered */}
-      <section className="px-6 md:px-8 py-16 md:py-24 border-t border-marketing-line">
-        <div className="max-w-2xl mx-auto text-center">
+      {/* Hero + story (one continuous opening statement) */}
+      <section className="px-6 md:px-8 pt-10 md:pt-16 pb-20 md:pb-28">
+        <div className="max-w-2xl mx-auto text-center space-y-8">
           <Reveal immediate delayMs={0}>
-            <h2
-              className="tracking-tight text-marketing-ink"
-              style={{
-                ...serif,
-                fontSize: "clamp(1.75rem, 3.6vw, 2.5rem)",
-                lineHeight: 1.1,
-              }}
-            >
-              {t("marketing.about.storyLede")}
-            </h2>
+            <Kicker>{t("marketing.about.kicker")}</Kicker>
           </Reveal>
-          <div className="mt-8 space-y-6 text-[1.05rem] leading-[1.85] text-marketing-muted">
-            <Reveal immediate delayMs={120}>
+          <HeroHeadline
+            line1={t("marketing.about.title")}
+            line2={t("marketing.about.titleB")}
+          />
+          <div className="space-y-6 text-[1.05rem] leading-[1.85] text-marketing-muted pt-2">
+            <Reveal immediate delayMs={520}>
               <p>{t("marketing.about.p1")}</p>
             </Reveal>
-            <Reveal immediate delayMs={260}>
+            <Reveal immediate delayMs={640}>
               <p>{t("marketing.about.p2")}</p>
             </Reveal>
-            <Reveal immediate delayMs={400}>
+            <Reveal immediate delayMs={760}>
               <p>{t("marketing.about.p3")}</p>
             </Reveal>
           </div>
@@ -151,7 +134,7 @@ function AboutPage() {
 
       {/* Your child's data */}
       <section className="px-6 md:px-8 py-20 md:py-24 border-t border-marketing-line bg-marketing-surface">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="max-w-2xl mb-12">
               <Reveal immediate delayMs={0}>
@@ -169,57 +152,64 @@ function AboutPage() {
                   <span className="block">
                     {t("marketing.about.dataTitleA")}
                   </span>
-                  <span className="block mk-headline-gradient">
-                    {t("marketing.about.dataTitleB")}
+                  <span className="block">
+                    <GradientWords text={t("marketing.about.dataTitleB")} />
                   </span>
                 </h2>
               </Reveal>
             </div>
           </Reveal>
 
-          <Reveal>
-            <div className="grid gap-4 md:gap-5 sm:grid-cols-2">
-              <Reveal immediate delayMs={0}>
+          <div className="grid gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              {
+                Icon: Users,
+                theme: OUTCOME_DECK_THEME.sage,
+                eyebrow: "marketing.about.data1Eyebrow",
+                headline: "marketing.about.data1Headline",
+                body: "marketing.about.data1Body",
+                rotate: -2,
+              },
+              {
+                Icon: UserCheck,
+                theme: OUTCOME_DECK_THEME.amber,
+                eyebrow: "marketing.about.data2Eyebrow",
+                headline: "marketing.about.data2Headline",
+                body: "marketing.about.data2Body",
+                rotate: 1,
+              },
+              {
+                Icon: Ban,
+                theme: OUTCOME_DECK_THEME.violet,
+                eyebrow: "marketing.about.data3Eyebrow",
+                headline: "marketing.about.data3Headline",
+                body: "marketing.about.data3Body",
+                rotate: -1,
+              },
+              {
+                Icon: EyeOff,
+                theme: OUTCOME_DECK_THEME.ink,
+                eyebrow: "marketing.about.data4Eyebrow",
+                headline: "marketing.about.data4Headline",
+                body: "marketing.about.data4Body",
+                rotate: 2,
+              },
+            ].map((c, i) => (
+              <Reveal key={i} immediate delayMs={i * 120}>
                 <DataCard
-                  Icon={Users}
-                  theme={OUTCOME_DECK_THEME.sage}
-                  eyebrow={t("marketing.about.data1Eyebrow")}
-                  headline={t("marketing.about.data1Headline")}
-                  body={t("marketing.about.data1Body")}
+                  Icon={c.Icon}
+                  theme={c.theme}
+                  eyebrow={t(c.eyebrow)}
+                  headline={t(c.headline)}
+                  body={t(c.body)}
+                  rotate={c.rotate}
                 />
               </Reveal>
-              <Reveal immediate delayMs={120}>
-                <DataCard
-                  Icon={UserCheck}
-                  theme={OUTCOME_DECK_THEME.amber}
-                  eyebrow={t("marketing.about.data2Eyebrow")}
-                  headline={t("marketing.about.data2Headline")}
-                  body={t("marketing.about.data2Body")}
-                />
-              </Reveal>
-              <Reveal immediate delayMs={240}>
-                <DataCard
-                  Icon={Ban}
-                  theme={OUTCOME_DECK_THEME.violet}
-                  eyebrow={t("marketing.about.data3Eyebrow")}
-                  headline={t("marketing.about.data3Headline")}
-                  body={t("marketing.about.data3Body")}
-                />
-              </Reveal>
-              <Reveal immediate delayMs={360}>
-                <DataCard
-                  Icon={EyeOff}
-                  theme={OUTCOME_DECK_THEME.ink}
-                  eyebrow={t("marketing.about.data4Eyebrow")}
-                  headline={t("marketing.about.data4Headline")}
-                  body={t("marketing.about.data4Body")}
-                />
-              </Reveal>
-            </div>
-          </Reveal>
+            ))}
+          </div>
 
-          <Reveal immediate delayMs={480}>
-            <p className="mt-8 text-xs md:text-sm text-marketing-muted leading-[1.75] max-w-3xl">
+          <Reveal immediate delayMs={600}>
+            <p className="mt-10 text-xs md:text-sm text-marketing-muted leading-[1.75] max-w-3xl">
               {t("marketing.about.dataFootnote")}
             </p>
           </Reveal>
@@ -281,23 +271,33 @@ function DataCard({
   eyebrow,
   headline,
   body,
+  rotate,
 }: {
   Icon: LucideIcon;
   theme: CardTheme;
   eyebrow: string;
   headline: string;
   body: string;
+  rotate: number;
 }) {
   return (
     <div
       className={
-        "rounded-3xl p-5 md:p-6 border h-full flex flex-col transition-all duration-200 " +
-        "hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-22px_color-mix(in_oklab,var(--color-marketing-ink)_45%,transparent)] " +
-        "motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
+        "group rounded-3xl p-6 md:p-7 border flex flex-col min-h-[280px] md:min-h-[300px] xl:min-h-[320px] " +
+        "transition-transform duration-300 ease-out will-change-transform " +
+        "xl:[transform:rotate(var(--rest-rot))] xl:hover:[transform:rotate(0deg)_translateY(-4px)] " +
+        "hover:shadow-[0_22px_50px_-24px_color-mix(in_oklab,var(--color-marketing-ink)_45%,transparent)] " +
+        "motion-reduce:transition-none motion-reduce:xl:[transform:none] motion-reduce:hover:shadow-none"
       }
-      style={{ background: theme.bg, borderColor: theme.border }}
+      style={
+        {
+          background: theme.bg,
+          borderColor: theme.border,
+          ["--rest-rot" as string]: `${rotate}deg`,
+        } as React.CSSProperties
+      }
     >
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-3 mb-4">
         <span
           className="size-10 rounded-xl grid place-items-center shrink-0"
           style={{ background: theme.chipBg, color: theme.chipFg }}
@@ -312,10 +312,9 @@ function DataCard({
         </p>
       </div>
       <h3
-        className="text-[20px] leading-[1.22] mb-3"
+        className="text-display-xs mb-3"
         style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 600,
+          ...display,
           color: theme.ink,
           textWrap: "balance" as never,
         }}
@@ -331,5 +330,3 @@ function DataCard({
     </div>
   );
 }
-
-
