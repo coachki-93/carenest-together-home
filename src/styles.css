@@ -798,52 +798,85 @@
   z-index: 3;
 }
 
-/* Primary — pillowy violet. Vertical gradient reads as inflated (light
- * top → mid violet → darker foot); crisp inset top edge; layered outer
- * glow so the button floats on violet light. */
+/* Primary — lit-from-within violet. No white specular; the inner glow
+ * radiates from the bottom-center of the pill over a base that's slightly
+ * deeper at the top. That inversion (bright foot, dim crown) is the point. */
 .mk-cta-glass--primary {
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--primary) 78%, white) 0%,
-    var(--primary) 55%,
-    color-mix(in oklab, var(--primary) 88%, black) 100%
-  );
+  background:
+    radial-gradient(
+      90% 85% at 50% 100%,
+      color-mix(in oklab, white 38%, var(--primary)) 0%,
+      transparent 68%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--primary) 82%, black 5%) 0%,
+      var(--primary) 60%
+    );
   color: #fff;
+  text-shadow: 0 1px 2px color-mix(in oklab, var(--primary) 60%, black);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, white 35%, transparent),
-    0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent),
-    0 10px 28px -8px color-mix(in oklab, var(--primary) 45%, transparent);
+    0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent),
+    0 8px 24px -6px color-mix(in oklab, var(--primary) 50%, transparent);
 }
+/* Kill the shared specular sheen and hairline border on primary — the
+ * lit-from-within look owns those roles now. */
+.mk-cta-glass--primary::before,
 .mk-cta-glass--primary::after {
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, white 28%, transparent) 0%,
-    transparent 45%
-  );
+  content: none;
+  background: none;
+  display: none;
 }
 @media (prefers-reduced-motion: no-preference) {
   .mk-cta-glass--primary:hover {
+    background:
+      radial-gradient(
+        90% 85% at 50% 100%,
+        color-mix(in oklab, white 48%, var(--primary)) 0%,
+        transparent 68%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--primary) 82%, black 5%) 0%,
+        var(--primary) 60%
+      );
     box-shadow:
-      inset 0 1px 0 color-mix(in oklab, white 35%, transparent),
-      0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent),
-      0 14px 36px -10px color-mix(in oklab, var(--primary) 55%, transparent);
+      0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent),
+      0 12px 30px -8px color-mix(in oklab, var(--primary) 60%, transparent);
   }
   .mk-cta-glass--primary:active {
+    background:
+      radial-gradient(
+        90% 85% at 50% 100%,
+        color-mix(in oklab, white 38%, var(--primary)) 0%,
+        transparent 68%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--primary) 82%, black 5%) 0%,
+        var(--primary) 60%
+      );
     box-shadow:
-      inset 0 1px 0 color-mix(in oklab, white 35%, transparent),
-      0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent),
-      0 10px 28px -8px color-mix(in oklab, var(--primary) 45%, transparent);
+      0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent),
+      0 8px 24px -6px color-mix(in oklab, var(--primary) 50%, transparent);
   }
 }
 
-/* Clear — frosted white pill. Quieter neutral shadow; the specular is
- * softened on the primary utility already, so it doesn't wash the white. */
+/* Clear — solid-ish frosted white pill with a quiet neutral shadow and
+ * hairline border. Reduced specular so the top edge doesn't wash the fill. */
 .mk-cta-glass--clear {
-  background-color: color-mix(in oklab, white 72%, transparent);
+  background-color: color-mix(in oklab, white 82%, transparent);
   box-shadow:
-    0 6px 18px -8px color-mix(in oklab, var(--color-marketing-ink) 22%, transparent),
+    0 6px 16px -8px color-mix(in oklab, var(--color-marketing-ink) 20%, transparent),
     inset 0 1px 0 color-mix(in oklab, white 85%, transparent),
     inset 0 -1px 0 color-mix(in oklab, var(--primary) 8%, transparent);
+}
+.mk-cta-glass--clear::before {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, white 20%, transparent) 0%,
+    color-mix(in oklab, white 0%, transparent) 55%
+  );
 }
 .mk-cta-glass--clear::after {
   background: linear-gradient(
@@ -854,20 +887,36 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .mk-cta-glass--clear:hover {
-    background-color: color-mix(in oklab, white 85%, transparent);
+    background-color: color-mix(in oklab, white 92%, transparent);
   }
 }
 
-/* Hero wash — very light violet dissolving into the page background.
- * Sits beneath mk-hero-bloom/glow. The 100% stop is exactly the marketing
- * bg color so the hero's foot is seamless with the next section. */
+/* Hero wash — layered violet sky. Corner radials + a soft mid-glow over a
+ * vertical fade that lands exactly on the marketing bg. The wash starts at
+ * y=0 (hero section is pulled up under the fixed header). */
 .mk-hero-wash {
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--primary) 9%, white) 0%,
-    color-mix(in oklab, var(--primary) 4%, var(--color-marketing-bg)) 55%,
-    var(--color-marketing-bg) 100%
-  );
+  background:
+    radial-gradient(
+      110% 75% at 18% 0%,
+      color-mix(in oklab, var(--primary) 14%, white) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      95% 65% at 82% 8%,
+      color-mix(in oklab, var(--primary) 9%, white) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      130% 85% at 50% 35%,
+      color-mix(in oklab, var(--primary) 5%, white) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--primary) 10%, white) 0%,
+      color-mix(in oklab, var(--primary) 4%, var(--color-marketing-bg)) 60%,
+      var(--color-marketing-bg) 100%
+    );
 }
 
 /* DayTimeline: short-viewport compression — hide the sub-copy and tighten
