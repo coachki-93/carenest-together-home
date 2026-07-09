@@ -1728,8 +1728,14 @@ export const en = {
     },
     install: {
       kicker: "CareNest on your device",
-      headline1: "No app store.",
+      headline1: "No app store needed — yet.",
       headline2: "Straight to your home screen.",
+      notifMockAppName: "CareNest",
+      notifMockTitle: "🟧 Oxygen tank low",
+      notifMockNow: "now",
+      notifChipOxygen: "Oxygen",
+      notifChipCritical: "Critical answers",
+      notifChipMissed: "Missed checks",
       subtitle:
         "Add CareNest once and it opens full-screen like an app — with notifications, on iPhone, iPad and Android.",
       phoneMockLabel: "CareNest",
