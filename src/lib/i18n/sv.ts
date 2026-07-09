@@ -1687,6 +1687,10 @@ export const sv = {
       q7A: "Ja. Ett teamkonto rymmer flera vårdgivarprofiler — varje vårdgivare väljer sitt namn i början av passet, och allt de gör registreras under det.",
       q8Q: "Finns det en app?",
       q8A: "CareNest installeras från webbläsaren idag — lägg till den på hemskärmen så öppnas den i helskärm som en app. En native-app är planerad. Se installationsguiden för iOS och Android.",
+      q9Q: "Är CareNest ett journalsystem?",
+      q9A: "Nej. CareNest är inte ett journalsystem och ersätter inte klinikens journal. Det är det dagliga koordineringslagret runt kliniken — den gemensamma hemmabasen där familj och assistenter följer det som faktiskt händer mellan besöken: doser som ges, vitalvärden som loggas, frågor som besvaras under passet, anteckningar som lämnas över. Det som hör hemma i journalen hör hemma där.",
+      q10Q: "Ger CareNest medicinsk rådgivning?",
+      q10A: "Nej. De åldersanpassade referensintervallen, varningarna vid upprepade avvikande värden och påminnelserna är screeningshjälpmedel — de hjälper er att se mönster och komma ihåg tider, inte att diagnostisera eller behandla. Ert vårdteams anvisningar går alltid först; om något ser fel ut, kontakta dem.",
     },
     cta: {
       title: "Redo att släppa taget om minneslistan?",
