@@ -138,56 +138,157 @@ function Landing() {
 
 
 
-      {/* ── 6. Essentials vs complex care ── */}
+      {/* ── 6. Built for rotating teams (light) ── */}
       <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
         <div className="max-w-6xl mx-auto">
-          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
-            <Kicker>{t("marketing.inside.kicker")}</Kicker>
-            <h2
-              className="text-display-md text-marketing-ink"
-              style={display}
-            >
-              {t("marketing.inside.title")}
-            </h2>
-            <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-              {t("marketing.inside.sub")}
-            </p>
+          <Reveal>
+            <div className="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+              <div>
+                <Kicker>{t("marketing.teams.kicker")}</Kicker>
+                <h2 className="text-display-md text-marketing-ink mt-4 mb-6" style={display}>
+                  {t("marketing.teams.title")}
+                </h2>
+                <div className="space-y-4 mb-6">
+                  <p
+                    className="mk-slide-in text-marketing-muted text-base md:text-lg leading-[1.7]"
+                    style={{ ["--mk-delay" as string]: "0ms" }}
+                  >
+                    {t("marketing.teams.body1")}
+                  </p>
+                  <p
+                    className="mk-slide-in text-marketing-muted text-base md:text-lg leading-[1.7]"
+                    style={{ ["--mk-delay" as string]: "140ms" }}
+                  >
+                    {t("marketing.teams.body2")}
+                  </p>
+                  <p
+                    className="mk-slide-in text-marketing-muted text-base md:text-lg leading-[1.7]"
+                    style={{ ["--mk-delay" as string]: "280ms" }}
+                  >
+                    {t("marketing.teams.body3")}
+                  </p>
+                </div>
+                <p
+                  className="mk-slide-in text-marketing-ink/80 text-base md:text-lg italic leading-[1.7]"
+                  style={{ ["--mk-delay" as string]: "450ms" }}
+                >
+                  {t("marketing.teams.closing")}
+                </p>
+              </div>
+
+              {/* "First shift" sequence — invite → identity → first task */}
+              <div className="relative">
+                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 rotate-[-1deg]">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold mb-4">
+                    {t("marketing.teamsMock.title")}
+                  </p>
+                  <ol className="relative space-y-4">
+                    <span
+                      aria-hidden
+                      className="absolute left-[11px] top-6 bottom-6 w-px bg-marketing-line"
+                    />
+                    {/* Step 1 — invite accepted */}
+                    <li
+                      className="mk-slide-in relative pl-9"
+                      style={{ ["--mk-delay" as string]: "0ms" }}
+                    >
+                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
+                        1
+                      </span>
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
+                        {t("marketing.teamsMock.step1Label")}
+                      </p>
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-marketing-surface border border-marketing-line">
+                        <div className="size-8 rounded-lg bg-marketing-sage-soft text-marketing-sage flex items-center justify-center flex-none">
+                          <Mail className="size-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-marketing-ink truncate">
+                            {t("marketing.teamsMock.step1Email")}
+                          </p>
+                          <p className="text-[10px] text-marketing-muted">
+                            <span className="font-mono">
+                              {t("marketing.teamsMock.step1Code")}
+                            </span>
+                            {" · "}
+                            {t("marketing.teamsMock.step1Status")}
+                          </p>
+                        </div>
+                        <span
+                          className="mk-check-pop flex-none"
+                          style={{ ["--mk-delay" as string]: "200ms" }}
+                        >
+                          <Check className="size-4 text-marketing-sage" />
+                        </span>
+                      </div>
+                    </li>
+
+                    {/* Step 2 — identity chip row */}
+                    <li
+                      className="mk-slide-in relative pl-9"
+                      style={{ ["--mk-delay" as string]: "150ms" }}
+                    >
+                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
+                        2
+                      </span>
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
+                        {t("marketing.teamsMock.step2Label")}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        <IdentityChip name="Maria" color="#E4A15A" />
+                        <span
+                          className="mk-check-pop inline-flex"
+                          style={{ ["--mk-delay" as string]: "350ms" }}
+                        >
+                          <IdentityChip name="Ryan" color="#6C63FF" selected />
+                        </span>
+                        <IdentityChip name="Anna" color="#5DA490" />
+                      </div>
+                    </li>
+
+                    {/* Step 3 — first task */}
+                    <li
+                      className="mk-slide-in relative pl-9"
+                      style={{ ["--mk-delay" as string]: "300ms" }}
+                    >
+                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
+                        3
+                      </span>
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
+                        {t("marketing.teamsMock.step3Label")}
+                      </p>
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-marketing-surface border border-marketing-line">
+                        <div
+                          className="size-8 rounded-lg flex items-center justify-center flex-none"
+                          style={{
+                            background:
+                              "color-mix(in oklab, var(--primary) 14%, transparent)",
+                            color: "var(--primary)",
+                          }}
+                        >
+                          <Pill className="size-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-marketing-ink">
+                            <span className="tabular-nums text-marketing-muted mr-1.5">
+                              {t("marketing.teamsMock.step3Time")}
+                            </span>
+                            {t("marketing.teamsMock.step3Title")}
+                          </p>
+                          <p className="text-[10px] text-marketing-muted">
+                            {t("marketing.teamsMock.step3Note")}
+                          </p>
+                        </div>
+                        <span className="text-[11px] font-semibold text-marketing-sage border border-marketing-sage-line rounded-full px-2.5 py-1 flex-none">
+                          {t("marketing.teamsMock.step3MarkDone")}
+                        </span>
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
           </Reveal>
-
-          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-            <ComparisonCard
-              title={t("marketing.essentials.title")}
-              intro={t("marketing.essentials.intro")}
-              rows={[
-                { icon: ListChecks, key: "i1" },
-                { icon: Pill, key: "i2" },
-                { icon: Calendar, key: "i3" },
-                { icon: BookOpen, key: "i4" },
-                { icon: Siren, key: "i5" },
-              ].map((r) => ({ icon: r.icon, label: t(`marketing.essentials.${r.key}`) }))}
-            />
-            <ComparisonCard
-              accent
-              title={t("marketing.complex.title")}
-              intro={t("marketing.complex.intro")}
-              rows={[
-                { icon: Activity, key: "i1" },
-                { icon: Droplet, key: "i2" },
-                { icon: Wrench, key: "i3" },
-                { icon: ShieldCheck, key: "i4" },
-                { icon: RefreshCw, key: "i5" },
-              ].map((r) => ({ icon: r.icon, label: t(`marketing.complex.${r.key}`) }))}
-            />
-          </div>
-
-          <div className="mt-12 flex justify-center">
-            <Link
-              to="/features"
-              className="inline-flex items-center gap-2 text-sm font-medium text-marketing-ink border-b border-marketing-ink/30 hover:border-marketing-sage hover:text-marketing-sage transition-colors py-1"
-            >
-              {t("marketing.inside.seeAll")}
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -246,135 +347,56 @@ function Landing() {
         </Reveal>
       </section>
 
-      {/* ── 10. Built for rotating teams (light) ── */}
+      {/* ── 10. Essentials vs complex care ── */}
       <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
         <div className="max-w-6xl mx-auto">
-          <Reveal>
-            <div className="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
-              <div>
-                <Kicker>{t("marketing.teams.kicker")}</Kicker>
-                <h2 className="text-display-md text-marketing-ink mt-4 mb-6" style={display}>
-                  {t("marketing.teams.title")}
-                </h2>
-                <div className="space-y-4 mb-6">
-                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-                    {t("marketing.teams.body1")}
-                  </p>
-                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-                    {t("marketing.teams.body2")}
-                  </p>
-                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-                    {t("marketing.teams.body3")}
-                  </p>
-                </div>
-                <p className="text-marketing-ink/80 text-base md:text-lg italic leading-[1.7]">
-                  {t("marketing.teams.closing")}
-                </p>
-              </div>
-
-              {/* "First shift" sequence — invite → identity → first task */}
-              <div className="relative">
-                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 rotate-[-1deg]">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold mb-4">
-                    {t("marketing.teamsMock.title")}
-                  </p>
-                  <ol className="relative space-y-4">
-                    <span
-                      aria-hidden
-                      className="absolute left-[11px] top-6 bottom-6 w-px bg-marketing-line"
-                    />
-                    {/* Step 1 — invite accepted */}
-                    <li
-                      className="mk-slide-in relative pl-9"
-                      style={{ ["--mk-delay" as string]: "0ms" }}
-                    >
-                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
-                        1
-                      </span>
-                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
-                        {t("marketing.teamsMock.step1Label")}
-                      </p>
-                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-marketing-surface border border-marketing-line">
-                        <div className="size-8 rounded-lg bg-marketing-sage-soft text-marketing-sage flex items-center justify-center flex-none">
-                          <Mail className="size-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold text-marketing-ink truncate">
-                            {t("marketing.teamsMock.step1Email")}
-                          </p>
-                          <p className="text-[10px] text-marketing-muted">
-                            <span className="font-mono">
-                              {t("marketing.teamsMock.step1Code")}
-                            </span>
-                            {" · "}
-                            {t("marketing.teamsMock.step1Status")}
-                          </p>
-                        </div>
-                        <Check className="size-4 text-marketing-sage flex-none" />
-                      </div>
-                    </li>
-
-                    {/* Step 2 — identity chip row */}
-                    <li
-                      className="mk-slide-in relative pl-9"
-                      style={{ ["--mk-delay" as string]: "150ms" }}
-                    >
-                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
-                        2
-                      </span>
-                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
-                        {t("marketing.teamsMock.step2Label")}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        <IdentityChip name="Maria" color="#E4A15A" />
-                        <IdentityChip name="Ryan" color="#6C63FF" selected />
-                        <IdentityChip name="Anna" color="#5DA490" />
-                      </div>
-                    </li>
-
-                    {/* Step 3 — first task */}
-                    <li
-                      className="mk-slide-in relative pl-9"
-                      style={{ ["--mk-delay" as string]: "300ms" }}
-                    >
-                      <span className="absolute left-0 top-0 size-6 rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage flex items-center justify-center text-[11px] font-bold">
-                        3
-                      </span>
-                      <p className="text-[10px] uppercase tracking-[0.14em] text-marketing-muted font-semibold mb-1.5">
-                        {t("marketing.teamsMock.step3Label")}
-                      </p>
-                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-marketing-surface border border-marketing-line">
-                        <div
-                          className="size-8 rounded-lg flex items-center justify-center flex-none"
-                          style={{
-                            background:
-                              "color-mix(in oklab, var(--primary) 14%, transparent)",
-                            color: "var(--primary)",
-                          }}
-                        >
-                          <Pill className="size-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold text-marketing-ink">
-                            <span className="tabular-nums text-marketing-muted mr-1.5">
-                              {t("marketing.teamsMock.step3Time")}
-                            </span>
-                            {t("marketing.teamsMock.step3Title")}
-                          </p>
-                          <p className="text-[10px] text-marketing-muted">
-                            {t("marketing.teamsMock.step3Note")}
-                          </p>
-                        </div>
-                        <span className="text-[11px] font-semibold text-marketing-sage border border-marketing-sage-line rounded-full px-2.5 py-1 flex-none">
-                          {t("marketing.teamsMock.step3MarkDone")}
-                        </span>
-                      </div>
-                    </li>
-                  </ol>
-                </div>
-              </div>
-            </div>
+          <Reveal className="max-w-2xl mx-auto text-center space-y-4 mb-14">
+            <Kicker>{t("marketing.inside.kicker")}</Kicker>
+            <h2
+              className="text-display-md text-marketing-ink"
+              style={display}
+            >
+              {t("marketing.inside.title")}
+            </h2>
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
+              {t("marketing.inside.sub")}
+            </p>
           </Reveal>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            <ComparisonCard
+              title={t("marketing.essentials.title")}
+              intro={t("marketing.essentials.intro")}
+              rows={[
+                { icon: ListChecks, key: "i1" },
+                { icon: Pill, key: "i2" },
+                { icon: Calendar, key: "i3" },
+                { icon: BookOpen, key: "i4" },
+                { icon: Siren, key: "i5" },
+              ].map((r) => ({ icon: r.icon, label: t(`marketing.essentials.${r.key}`) }))}
+            />
+            <ComparisonCard
+              accent
+              title={t("marketing.complex.title")}
+              intro={t("marketing.complex.intro")}
+              rows={[
+                { icon: Activity, key: "i1" },
+                { icon: Droplet, key: "i2" },
+                { icon: Wrench, key: "i3" },
+                { icon: ShieldCheck, key: "i4" },
+                { icon: RefreshCw, key: "i5" },
+              ].map((r) => ({ icon: r.icon, label: t(`marketing.complex.${r.key}`) }))}
+            />
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <Link
+              to="/features"
+              className="inline-flex items-center gap-2 text-sm font-medium text-marketing-ink border-b border-marketing-ink/30 hover:border-marketing-sage hover:text-marketing-sage transition-colors py-1"
+            >
+              {t("marketing.inside.seeAll")}
+            </Link>
+          </div>
         </div>
       </section>
 

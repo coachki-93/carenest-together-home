@@ -81,8 +81,8 @@ export function useMarkHandoverRead() {
  * Is this handover unread by the viewer (or read only *before* the last edit)?
  *
  * Viewer identity is (userId, activeProfileId). A read receipt matches the
- * viewer only when both match — a receipt from Rusan does NOT count as read
- * for Jinat on the same account. `editedAt` is the handover's `edited_at`;
+ * viewer only when both match — a receipt from Gabriella does NOT count as read
+ * for Ryan on the same account. `editedAt` is the handover's `edited_at`;
  * when null the handover has never been edited and any matching read counts.
  */
 export function isUnreadForViewer(
