@@ -855,28 +855,44 @@
  * softer bottom-right inner rim, faint inner fill glow, and a soft outer drop.
  * Diagonal sheen replaces the shared top specular; no blend mode. */
 .mk-cta-glass--clear {
-  background-color: color-mix(in oklab, white 45%, transparent);
+  background:
+    linear-gradient(
+      color-mix(in oklab, var(--primary) 3%, transparent),
+      color-mix(in oklab, var(--primary) 3%, transparent)
+    ),
+    linear-gradient(
+      color-mix(in oklab, white 40%, transparent),
+      color-mix(in oklab, white 40%, transparent)
+    );
   -webkit-backdrop-filter: blur(12px) saturate(1.5);
   backdrop-filter: blur(12px) saturate(1.5);
   color: var(--color-marketing-ink);
   box-shadow:
     inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 90%, transparent),
-    inset -1px -1.5px 1px -1px color-mix(in oklab, white 65%, transparent),
+    inset 0 -1.5px 1px -1px color-mix(in oklab, var(--color-marketing-ink) 15%, transparent),
     inset 0 0 12px color-mix(in oklab, white 30%, transparent),
-    0 8px 24px -10px color-mix(in oklab, var(--color-marketing-ink) 25%, transparent);
+    0 8px 24px -10px color-mix(in oklab, var(--color-marketing-ink) 30%, transparent);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .mk-cta-glass--clear {
-    background-color: color-mix(in oklab, white 88%, transparent);
+    background:
+      linear-gradient(
+        color-mix(in oklab, var(--primary) 3%, transparent),
+        color-mix(in oklab, var(--primary) 3%, transparent)
+      ),
+      linear-gradient(
+        color-mix(in oklab, white 88%, transparent),
+        color-mix(in oklab, white 88%, transparent)
+      );
   }
 }
 .mk-cta-glass--clear::before {
   background: linear-gradient(
     115deg,
     color-mix(in oklab, white 35%, transparent) 0%,
-    transparent 40%,
-    transparent 60%,
-    color-mix(in oklab, white 18%, transparent) 100%
+    transparent 35%,
+    transparent 70%,
+    color-mix(in oklab, var(--color-marketing-ink) 6%, transparent) 100%
   );
   mix-blend-mode: normal;
 }
@@ -889,13 +905,31 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .mk-cta-glass--clear:hover {
-    background-color: color-mix(in oklab, white 55%, transparent);
+    background:
+      linear-gradient(
+        color-mix(in oklab, var(--primary) 3%, transparent),
+        color-mix(in oklab, var(--primary) 3%, transparent)
+      ),
+      linear-gradient(
+        color-mix(in oklab, white 52%, transparent),
+        color-mix(in oklab, white 52%, transparent)
+      );
     box-shadow:
       inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 100%, transparent),
-      inset -1px -1.5px 1px -1px color-mix(in oklab, white 65%, transparent),
+      inset 0 -1.5px 1px -1px color-mix(in oklab, var(--color-marketing-ink) 15%, transparent),
       inset 0 0 12px color-mix(in oklab, white 30%, transparent),
-      0 8px 24px -10px color-mix(in oklab, var(--color-marketing-ink) 25%, transparent);
+      0 8px 24px -10px color-mix(in oklab, var(--color-marketing-ink) 30%, transparent);
   }
+}
+
+/* CTA row bloom — a static violet pool behind the button pair so the clear
+ * button's translucency + blur have something to work with. */
+.mk-cta-bloom {
+  background: radial-gradient(
+    50% 120% at 50% 50%,
+    color-mix(in oklab, var(--primary) 16%, transparent) 0%,
+    transparent 70%
+  );
 }
 
 /* Hero wash — layered violet sky. Corner radials + a soft mid-glow over a
