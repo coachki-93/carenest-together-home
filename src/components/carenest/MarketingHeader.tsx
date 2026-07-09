@@ -114,7 +114,7 @@ export function MarketingHeader() {
               </Link>
               <Link
                 to="/auth/signup"
-                className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/40 shadow-sm"
+                className="mk-cta-glass mk-cta-glass--primary mk-cta-glass--sm inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/40"
               >
                 {t("splash.getStarted")}
               </Link>
