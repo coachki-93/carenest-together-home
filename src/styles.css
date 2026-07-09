@@ -876,6 +876,7 @@
  * vertical fade that lands exactly on the marketing bg. The wash starts at
  * y=0 (hero section is pulled up under the fixed header). */
 .mk-hero-wash {
+  --mk-header-offset: 5rem;
   background:
     radial-gradient(
       110% 75% at 18% 0%,
