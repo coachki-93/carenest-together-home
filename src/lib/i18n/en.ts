@@ -1589,22 +1589,41 @@ export const en = {
       i6: "Shift handovers with prefill, read receipts, and per-caregiver attribution",
     },
     team: {
-      kicker: "Built for rotating teams",
-      title: "Every shift is accounted for.",
-      body:
-        "CareNest works whether care is family-only or shared with a rotating team. Every dose, check and note carries a caregiver's name — trust without having to check up.",
-      b1Title: "Per-caregiver attribution",
-      b1Body: "Every action logged with a name, even on a shared team account.",
-      b2Title: "Handover read receipts",
-      b2Body: "See that the incoming caregiver actually read the notes before their shift began.",
-      b3Title: "Care Place Control",
-      b3Body:
-        "Your checklist at your times. Critical answers alert the family owner the moment a caregiver answers \"no\"; missed checks alert everyone.",
       mockLabel: "Care place check · 14:12",
       mockCheckedBy: "Checked by",
       mockName: "Ryan",
       mockRole: "Care team",
       mockAnswer: "All questions answered · no critical flags",
+    },
+    vitals: {
+      kicker: "Vitals",
+      title: "Ranges that grow with your child.",
+      sub:
+        "Heart rate, SpO₂, respiratory rate and temperature are screened against age-adjusted ranges. Three readings in a row outside the range, and the family gets a quiet nudge — not an alarm.",
+      footnote:
+        "Reference ranges are an aid — your care team's guidance always comes first.",
+      hr: { label: "Heart rate" },
+      spo2: { label: "SpO₂" },
+      breathing: { label: "Respiratory" },
+      temp: { label: "Temperature" },
+      fluids: { label: "Fluids" },
+      fluidsToday: "today",
+      glucose: {
+        label: "Glucose",
+        planned: "Planned",
+        a11y: "Glucose — planned feature",
+      },
+    },
+    teams: {
+      kicker: "Built for rotating teams",
+      title: "One shared memory for the whole team.",
+      body:
+        "Invite caregivers with single-use codes. On a shared team account, each caregiver picks their profile at the start of a shift, and every dose, check and note is attributed by name. Handovers carry read receipts, so you know the incoming caregiver has actually read the last shift's notes.",
+      chip1: "Single-use invite codes",
+      chip2: "Who's working this shift?",
+      chip3: "Read receipts on handover",
+      closing:
+        "The shared memory between the people who care for your child.",
     },
     trust: {
       s1Value: "2 languages",
