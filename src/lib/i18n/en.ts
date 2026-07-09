@@ -1738,10 +1738,7 @@ export const en = {
       notifChipMissed: "Missed checks",
       subtitle:
         "Add CareNest once and it opens full-screen like an app — with notifications, on iPhone, iPad and Android.",
-      phoneMockLabel: "CareNest",
-      phoneMockAlt: "CareNest icon on a phone home screen",
-      desktopNote:
-        "On a computer? Open this page on the family phone or tablet — or install from your browser menu on desktop Chrome and Edge.",
+      tabletAlt: "CareNest app icon glowing on a tablet screen",
       otherPlatformIos: "On iPhone or iPad instead?",
       otherPlatformAndroid: "On Android instead?",
       iosBrowser: "iPhone & iPad · Safari",
