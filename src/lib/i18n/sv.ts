@@ -1588,22 +1588,41 @@ export const sv = {
       i6: "Passöverlämningar med förifyllning, läskvitton och attribution per vårdgivare",
     },
     team: {
-      kicker: "Byggd för roterande team",
-      title: "Varje pass är dokumenterat.",
-      body:
-        "CareNest fungerar oavsett om vården sköts inom familjen eller delas med ett skiftande team. Varje dos, kontroll och anteckning bär en vårdgivares namn — tillit utan att behöva kolla upp.",
-      b1Title: "Attribution per vårdgivare",
-      b1Body: "Varje handling loggad med ett namn, även på ett delat teamkonto.",
-      b2Title: "Läskvitton på överlämningar",
-      b2Body: "Se att den ankommande vårdgivaren faktiskt läst anteckningarna innan passet började.",
-      b3Title: "Vårdplatskontroll",
-      b3Body:
-        "Er checklista vid era tider. Kritiska svar larmar familjens ägare i samma stund som en vårdgivare svarar \"nej\"; missade kontroller larmar alla.",
       mockLabel: "Vårdplatskontroll · 14:12",
       mockCheckedBy: "Kontrollerad av",
       mockName: "Ryan",
       mockRole: "Vårdteam",
       mockAnswer: "Alla frågor besvarade · inga kritiska flaggor",
+    },
+    vitals: {
+      kicker: "Vitalvärden",
+      title: "Intervall som växer med ditt barn.",
+      sub:
+        "Puls, SpO₂, andningsfrekvens och temperatur screenas mot åldersanpassade intervall. Tre värden i rad utanför intervallet ger familjen en lugn påminnelse — inte ett larm.",
+      footnote:
+        "Referensintervall är hjälpmedel — ert vårdteams anvisningar går alltid först.",
+      hr: { label: "Puls" },
+      spo2: { label: "SpO₂" },
+      breathing: { label: "Andning" },
+      temp: { label: "Temperatur" },
+      fluids: { label: "Vätska" },
+      fluidsToday: "idag",
+      glucose: {
+        label: "Glukos",
+        planned: "Planerad",
+        a11y: "Glukos — planerad funktion",
+      },
+    },
+    teams: {
+      kicker: "Byggd för roterande team",
+      title: "Ett gemensamt minne för hela teamet.",
+      body:
+        "Bjud in assistenter med engångskoder. På ett delat teamkonto väljer varje assistent sin profil när passet börjar, och varje dos, kontroll och anteckning märks med namn. Överlämningar har läskvitton, så du vet att den som tar över faktiskt har läst förra passets anteckningar.",
+      chip1: "Engångskoder",
+      chip2: "Vem jobbar det här passet?",
+      chip3: "Läskvitton på överlämning",
+      closing:
+        "Det gemensamma minnet mellan de som tar hand om ert barn.",
     },
     trust: {
       s1Value: "2 språk",
@@ -1625,11 +1644,6 @@ export const sv = {
       t1: "Installerbar på iPad och Android",
       t2: "Engelska & svenska",
       t3: "Privat för er familj",
-    },
-    not: {
-      kicker: "Vad CareNest inte är",
-      body:
-        "CareNest ger inte medicinska råd — referensintervall och påminnelser är hjälpmedel, och ert vårdteams anvisningar går alltid först. Det är inte ett journalsystem eller en ersättning för klinikens journal. Det är lagret er familj faktiskt lever i varje dag: det gemensamma minnet mellan de som tar hand om ert barn.",
     },
     pricing: {
       kicker: "Priser",
@@ -1673,6 +1687,10 @@ export const sv = {
       q7A: "Ja. Ett teamkonto rymmer flera vårdgivarprofiler — varje vårdgivare väljer sitt namn i början av passet, och allt de gör registreras under det.",
       q8Q: "Finns det en app?",
       q8A: "CareNest installeras från webbläsaren idag — lägg till den på hemskärmen så öppnas den i helskärm som en app. En native-app är planerad. Se installationsguiden för iOS och Android.",
+      q9Q: "Är CareNest ett journalsystem?",
+      q9A: "Nej. CareNest är inte ett journalsystem och ersätter inte klinikens journal. Det är det dagliga koordineringslagret runt kliniken — den gemensamma hemmabasen där familj och assistenter följer det som faktiskt händer mellan besöken: doser som ges, vitalvärden som loggas, frågor som besvaras under passet, anteckningar som lämnas över. Det som hör hemma i journalen hör hemma där.",
+      q10Q: "Ger CareNest medicinsk rådgivning?",
+      q10A: "Nej. De åldersanpassade referensintervallen, varningarna vid upprepade avvikande värden och påminnelserna är screeningshjälpmedel — de hjälper er att se mönster och komma ihåg tider, inte att diagnostisera eller behandla. Ert vårdteams anvisningar går alltid först; om något ser fel ut, kontakta dem.",
     },
     cta: {
       title: "Redo att släppa taget om minneslistan?",

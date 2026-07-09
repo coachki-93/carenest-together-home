@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Reveal } from "@/components/marketing/Reveal";
 import { DayTimeline } from "@/components/marketing/DayTimeline";
 import { OutcomeDeck } from "@/components/marketing/OutcomeDeck";
+import { VitalsBand } from "@/components/marketing/VitalsBand";
 import {
   Pill,
   Wind,
@@ -21,6 +22,7 @@ import {
   Droplet,
   Wrench,
   RefreshCw,
+  UserCheck,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -128,6 +130,11 @@ function Landing() {
       {/* ── 5. Outcomes — fanned deck ── */}
       <OutcomeDeck />
 
+      {/* ── 5b. Vitals — deep-violet band ── */}
+      <VitalsBand />
+
+
+
 
       {/* ── 6. Essentials vs complex care ── */}
       <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
@@ -182,76 +189,6 @@ function Landing() {
         </div>
       </section>
 
-      {/* ── 7. Every shift, accounted for — deep violet card ── */}
-      <section className="px-6 md:px-8 py-20 md:py-28">
-        <Reveal className="max-w-6xl mx-auto">
-          <div
-            className="rounded-3xl p-8 md:p-14 relative overflow-hidden"
-            style={{
-              background:
-                "linear-gradient(135deg, color-mix(in oklab, var(--primary) 92%, black) 0%, color-mix(in oklab, var(--primary) 78%, transparent) 100%)",
-              color: "var(--primary-foreground)",
-            }}
-          >
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none opacity-40"
-              style={{
-                background:
-                  "radial-gradient(30rem 20rem at 90% 10%, color-mix(in oklab, white 20%, transparent), transparent 70%)",
-              }}
-            />
-            <div className="relative grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-14 items-center">
-              <div>
-                <p className="text-[11px] font-medium uppercase tracking-[0.22em] mb-5 opacity-80">
-                  {t("marketing.team.kicker")}
-                </p>
-                <h2
-                  className="text-display-md mb-6"
-                  style={display}
-                >
-                  {t("marketing.team.title")}
-                </h2>
-                <p className="text-base md:text-lg leading-[1.7] opacity-90 max-w-xl mb-8">
-                  {t("marketing.team.body")}
-                </p>
-              </div>
-
-              {/* Mock screenshot: "Checked by Rusan · Kommun" */}
-              <div className="relative">
-                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 space-y-4 rotate-[-1deg]">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold">
-                      {t("marketing.team.mockLabel")}
-                    </p>
-                    <span className="text-[10px] rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 font-semibold">
-                      ✓
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="size-11 rounded-full flex items-center justify-center font-bold text-marketing-bg" style={{ background: "var(--primary)" }}>
-                      R
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
-                        {t("marketing.team.mockCheckedBy")}
-                      </p>
-                      <p className="text-lg text-marketing-ink" style={display}>
-                        {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="h-px bg-marketing-line" />
-                  <div className="flex items-center gap-2 text-sm text-marketing-muted">
-                    <Check className="size-4 text-marketing-sage" />
-                    <span>{t("marketing.team.mockAnswer")}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Reveal>
-      </section>
 
       {/* ── 8. Trust strip ── */}
       <section className="px-6 md:px-8 py-10 md:py-12 border-y border-marketing-line bg-marketing-surface">
@@ -296,15 +233,74 @@ function Landing() {
         </Reveal>
       </section>
 
-      {/* ── 10. What CareNest is not ── */}
-      <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line">
-        <Reveal className="max-w-2xl mx-auto text-center space-y-5">
-          <Kicker>{t("marketing.not.kicker")}</Kicker>
-          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-            {t("marketing.not.body")}
-          </p>
-        </Reveal>
+      {/* ── 10. Built for rotating teams (light) ── */}
+      <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
+        <div className="max-w-6xl mx-auto">
+          <Reveal>
+            <div className="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+              <div>
+                <Kicker>{t("marketing.teams.kicker")}</Kicker>
+                <h2 className="text-display-md text-marketing-ink mt-4 mb-6" style={display}>
+                  {t("marketing.teams.title")}
+                </h2>
+                <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-6">
+                  {t("marketing.teams.body")}
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <PillTag icon={<ShieldCheck className="size-3.5" />}>
+                    {t("marketing.teams.chip1")}
+                  </PillTag>
+                  <PillTag icon={<UserCheck className="size-3.5" />}>
+                    {t("marketing.teams.chip2")}
+                  </PillTag>
+                  <PillTag icon={<Check className="size-3.5" />}>
+                    {t("marketing.teams.chip3")}
+                  </PillTag>
+                </div>
+                <p className="text-marketing-ink/80 text-base md:text-lg italic leading-[1.7]">
+                  {t("marketing.teams.closing")}
+                </p>
+              </div>
+
+              {/* Salvaged "Checked by Ryan · Care team" mock */}
+              <div className="relative">
+                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 space-y-4 rotate-[-1deg]">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold">
+                      {t("marketing.team.mockLabel")}
+                    </p>
+                    <span className="text-[10px] rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 font-semibold">
+                      ✓
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="size-11 rounded-full flex items-center justify-center font-bold text-marketing-bg"
+                      style={{ background: "var(--primary)" }}
+                    >
+                      R
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
+                        {t("marketing.team.mockCheckedBy")}
+                      </p>
+                      <p className="text-lg text-marketing-ink" style={display}>
+                        {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="h-px bg-marketing-line" />
+                  <div className="flex items-center gap-2 text-sm text-marketing-muted">
+                    <Check className="size-4 text-marketing-sage" />
+                    <span>{t("marketing.team.mockAnswer")}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
       </section>
+
 
       {/* ── 11. Pricing ── */}
       <section id="pricing" className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-b border-marketing-line">
@@ -361,7 +357,7 @@ function Landing() {
             defaultValue="q1"
             className="mk-glass rounded-3xl px-5 md:px-7 divide-y divide-marketing-line/60"
           >
-            {["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"].map((k) => (
+            {["q1", "q2", "q4", "q5", "q6", "q7", "q8", "q9", "q10"].map((k) => (
               <AccordionItem key={k} value={k} className="border-0">
                 <AccordionTrigger
                   className="text-left text-lg py-5 hover:no-underline [&[data-state=open]>svg]:hidden text-marketing-ink"

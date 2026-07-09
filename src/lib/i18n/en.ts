@@ -1589,22 +1589,41 @@ export const en = {
       i6: "Shift handovers with prefill, read receipts, and per-caregiver attribution",
     },
     team: {
-      kicker: "Built for rotating teams",
-      title: "Every shift is accounted for.",
-      body:
-        "CareNest works whether care is family-only or shared with a rotating team. Every dose, check and note carries a caregiver's name — trust without having to check up.",
-      b1Title: "Per-caregiver attribution",
-      b1Body: "Every action logged with a name, even on a shared team account.",
-      b2Title: "Handover read receipts",
-      b2Body: "See that the incoming caregiver actually read the notes before their shift began.",
-      b3Title: "Care Place Control",
-      b3Body:
-        "Your checklist at your times. Critical answers alert the family owner the moment a caregiver answers \"no\"; missed checks alert everyone.",
       mockLabel: "Care place check · 14:12",
       mockCheckedBy: "Checked by",
       mockName: "Ryan",
       mockRole: "Care team",
       mockAnswer: "All questions answered · no critical flags",
+    },
+    vitals: {
+      kicker: "Vitals",
+      title: "Ranges that grow with your child.",
+      sub:
+        "Heart rate, SpO₂, respiratory rate and temperature are screened against age-adjusted ranges. Three readings in a row outside the range, and the family gets a quiet nudge — not an alarm.",
+      footnote:
+        "Reference ranges are an aid — your care team's guidance always comes first.",
+      hr: { label: "Heart rate" },
+      spo2: { label: "SpO₂" },
+      breathing: { label: "Respiratory" },
+      temp: { label: "Temperature" },
+      fluids: { label: "Fluids" },
+      fluidsToday: "today",
+      glucose: {
+        label: "Glucose",
+        planned: "Planned",
+        a11y: "Glucose — planned feature",
+      },
+    },
+    teams: {
+      kicker: "Built for rotating teams",
+      title: "One shared memory for the whole team.",
+      body:
+        "Invite caregivers with single-use codes. On a shared team account, each caregiver picks their profile at the start of a shift, and every dose, check and note is attributed by name. Handovers carry read receipts, so you know the incoming caregiver has actually read the last shift's notes.",
+      chip1: "Single-use invite codes",
+      chip2: "Who's working this shift?",
+      chip3: "Read receipts on handover",
+      closing:
+        "The shared memory between the people who care for your child.",
     },
     trust: {
       s1Value: "2 languages",
@@ -1626,11 +1645,6 @@ export const en = {
       t1: "Installable on iPad & Android",
       t2: "English & Swedish",
       t3: "Private to your family",
-    },
-    not: {
-      kicker: "What CareNest is not",
-      body:
-        "CareNest doesn't give medical advice — reference ranges and reminders are screening aids, and your care team's guidance always comes first. It isn't a journal system or a replacement for your clinic's records. It's the layer your family actually lives in every day: the shared memory between the people who care for your child.",
     },
     pricing: {
       kicker: "Pricing",
@@ -1674,6 +1688,10 @@ export const en = {
       q7A: "Yes. A team account holds multiple caregiver profiles — each caregiver picks their name at the start of a shift, and everything they do is recorded under it.",
       q8Q: "Is there an app?",
       q8A: "CareNest installs from the browser today — add it to your home screen and it opens full-screen like an app. A native app is planned. See the install guide for iOS and Android.",
+      q9Q: "Is CareNest a medical record system?",
+      q9A: "No. CareNest isn't a journal system and doesn't replace your clinic's records. It's the daily coordination layer around the clinic — the shared home base where your family and caregivers track what actually happens between appointments: doses given, vitals logged, questions answered on shift, notes handed over. Anything that belongs in the medical record still belongs there.",
+      q10Q: "Does CareNest give medical advice?",
+      q10A: "No. The age-adjusted reference ranges, streak alerts and reminders are screening aids — they help you notice patterns and remember timings, not diagnose or treat. Your care team's instructions always come first; when something looks off, contact them.",
     },
     cta: {
       title: "Ready to get it out of your head?",
