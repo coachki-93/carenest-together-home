@@ -1726,10 +1726,17 @@ export const sv = {
       install: "Installera på din enhet",
     },
     install: {
-      kicker: "CareNest i din ficka",
-      title: "Lägg till CareNest på hemskärmen.",
+      kicker: "CareNest på din enhet",
+      headline1: "Ingen appbutik.",
+      headline2: "Direkt till hemskärmen.",
       subtitle:
-        "Ingen app-butik behövs. Lägg till den en gång så öppnas CareNest i helskärm som en app — med notiser, på iPhone, iPad och Android.",
+        "Lägg till CareNest en gång så öppnas den i helskärm som en app — med aviseringar, på iPhone, iPad och Android.",
+      phoneMockLabel: "CareNest",
+      phoneMockAlt: "CareNest-ikon på en hemskärm",
+      desktopNote:
+        "På dator? Öppna sidan på familjens telefon eller surfplatta — eller installera från webbläsarens meny i Chrome och Edge på datorn.",
+      otherPlatformIos: "På iPhone eller iPad istället?",
+      otherPlatformAndroid: "På Android istället?",
       iosBrowser: "iPhone & iPad · Safari",
       iosTitle: "Installera på iOS",
       iosS1Title: "Tryck på Dela-knappen",
