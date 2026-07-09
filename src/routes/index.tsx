@@ -4,6 +4,7 @@ import { Reveal } from "@/components/marketing/Reveal";
 import { DayTimeline } from "@/components/marketing/DayTimeline";
 import { OutcomeDeck } from "@/components/marketing/OutcomeDeck";
 import { VitalsBand } from "@/components/marketing/VitalsBand";
+import { HeroHeadline } from "@/components/marketing/HeroHeadline";
 import {
   Pill,
   Wind,
