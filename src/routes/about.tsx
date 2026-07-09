@@ -136,7 +136,7 @@ function AboutPage() {
       <section className="px-6 md:px-8 py-20 md:py-24 border-t border-marketing-line bg-marketing-surface">
         <div className="max-w-6xl mx-auto">
           <Reveal>
-            <div className="max-w-2xl mb-12">
+            <div className="max-w-2xl mb-12 mx-auto text-center">
               <Reveal immediate delayMs={0}>
                 <Kicker>{t("marketing.about.dataKicker")}</Kicker>
               </Reveal>
