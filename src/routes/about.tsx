@@ -182,32 +182,36 @@ function AboutPage() {
               <Reveal immediate delayMs={0}>
                 <DataCard
                   Icon={Users}
-                  Composition={CompRing}
-                  title={t("marketing.about.data1Title")}
+                  theme={OUTCOME_DECK_THEME.sage}
+                  eyebrow={t("marketing.about.data1Eyebrow")}
+                  headline={t("marketing.about.data1Headline")}
                   body={t("marketing.about.data1Body")}
                 />
               </Reveal>
               <Reveal immediate delayMs={120}>
                 <DataCard
                   Icon={UserCheck}
-                  Composition={CompTag}
-                  title={t("marketing.about.data2Title")}
+                  theme={OUTCOME_DECK_THEME.amber}
+                  eyebrow={t("marketing.about.data2Eyebrow")}
+                  headline={t("marketing.about.data2Headline")}
                   body={t("marketing.about.data2Body")}
                 />
               </Reveal>
               <Reveal immediate delayMs={240}>
                 <DataCard
                   Icon={Ban}
-                  Composition={CompDissolve}
-                  title={t("marketing.about.data3Title")}
+                  theme={OUTCOME_DECK_THEME.violet}
+                  eyebrow={t("marketing.about.data3Eyebrow")}
+                  headline={t("marketing.about.data3Headline")}
                   body={t("marketing.about.data3Body")}
                 />
               </Reveal>
               <Reveal immediate delayMs={360}>
                 <DataCard
                   Icon={EyeOff}
-                  Composition={CompEyeOff}
-                  title={t("marketing.about.data4Title")}
+                  theme={OUTCOME_DECK_THEME.ink}
+                  eyebrow={t("marketing.about.data4Eyebrow")}
+                  headline={t("marketing.about.data4Headline")}
                   body={t("marketing.about.data4Body")}
                 />
               </Reveal>
