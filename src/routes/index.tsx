@@ -7,6 +7,7 @@ import { VitalsBand } from "@/components/marketing/VitalsBand";
 import { HeroHeadline } from "@/components/marketing/HeroHeadline";
 import { Kicker } from "@/components/marketing/Kicker";
 import { usePlatform } from "@/lib/marketing/use-platform";
+import { useFlashlight } from "@/lib/marketing/use-flashlight";
 import {
   Pill,
   Wind,
