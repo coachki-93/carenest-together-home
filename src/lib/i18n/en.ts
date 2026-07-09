@@ -1626,6 +1626,19 @@ export const en = {
       closing:
         "The shared memory between the people who care for your child.",
     },
+    teamsMock: {
+      title: "First shift",
+      step1Label: "Invited with a one-time code",
+      step1Email: "ryan@example.se",
+      step1Code: "H3K9PQ2M",
+      step1Status: "Accepted",
+      step2Label: "Taps his name",
+      step3Label: "The day is already there",
+      step3Time: "07:15",
+      step3Title: "Morning meds",
+      step3Note: "with breakfast",
+      step3MarkDone: "Mark done",
+    },
     trust: {
       s1Value: "2 languages",
       s1Label: "Every screen, every notification",
