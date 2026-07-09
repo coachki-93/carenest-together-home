@@ -1588,22 +1588,41 @@ export const sv = {
       i6: "Passöverlämningar med förifyllning, läskvitton och attribution per vårdgivare",
     },
     team: {
-      kicker: "Byggd för roterande team",
-      title: "Varje pass är dokumenterat.",
-      body:
-        "CareNest fungerar oavsett om vården sköts inom familjen eller delas med ett skiftande team. Varje dos, kontroll och anteckning bär en vårdgivares namn — tillit utan att behöva kolla upp.",
-      b1Title: "Attribution per vårdgivare",
-      b1Body: "Varje handling loggad med ett namn, även på ett delat teamkonto.",
-      b2Title: "Läskvitton på överlämningar",
-      b2Body: "Se att den ankommande vårdgivaren faktiskt läst anteckningarna innan passet började.",
-      b3Title: "Vårdplatskontroll",
-      b3Body:
-        "Er checklista vid era tider. Kritiska svar larmar familjens ägare i samma stund som en vårdgivare svarar \"nej\"; missade kontroller larmar alla.",
       mockLabel: "Vårdplatskontroll · 14:12",
       mockCheckedBy: "Kontrollerad av",
       mockName: "Ryan",
       mockRole: "Vårdteam",
       mockAnswer: "Alla frågor besvarade · inga kritiska flaggor",
+    },
+    vitals: {
+      kicker: "Vitalvärden",
+      title: "Intervall som växer med ditt barn.",
+      sub:
+        "Puls, SpO₂, andningsfrekvens och temperatur screenas mot åldersanpassade intervall. Tre värden i rad utanför intervallet ger familjen en lugn påminnelse — inte ett larm.",
+      footnote:
+        "Referensintervall är hjälpmedel — ert vårdteams anvisningar går alltid först.",
+      hr: { label: "Puls" },
+      spo2: { label: "SpO₂" },
+      breathing: { label: "Andning" },
+      temp: { label: "Temperatur" },
+      fluids: { label: "Vätska" },
+      fluidsToday: "idag",
+      glucose: {
+        label: "Glukos",
+        planned: "Planerad",
+        a11y: "Glukos — planerad funktion",
+      },
+    },
+    teams: {
+      kicker: "Byggd för roterande team",
+      title: "Ett gemensamt minne för hela teamet.",
+      body:
+        "Bjud in assistenter med engångskoder. På ett delat teamkonto väljer varje assistent sin profil när passet börjar, och varje dos, kontroll och anteckning märks med namn. Överlämningar har läskvitton, så du vet att den som tar över faktiskt har läst förra passets anteckningar.",
+      chip1: "Engångskoder",
+      chip2: "Vem jobbar det här passet?",
+      chip3: "Läskvitton på överlämning",
+      closing:
+        "Det gemensamma minnet mellan de som tar hand om ert barn.",
     },
     trust: {
       s1Value: "2 språk",
