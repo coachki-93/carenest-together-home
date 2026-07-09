@@ -302,17 +302,26 @@ function Landing() {
       <section className="px-6 md:px-8 py-8 md:py-10 border-y border-marketing-line bg-marketing-surface">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x md:divide-marketing-line/60">
           {[
-            { n: 1, Icon: Languages },
-            { n: 2, Icon: Users },
-            { n: 3, Icon: ShieldCheck },
-            { n: 4, Icon: Heart },
-          ].map(({ n, Icon }) => (
+            { n: 1, Icon: Globe, tint: "oklch(0.55 0.16 285)" },
+            { n: 2, Icon: Users, tint: "var(--color-marketing-sage)" },
+            { n: 3, Icon: ShieldCheck, tint: "oklch(0.62 0.16 60)" },
+            { n: 4, Icon: Heart, tint: "oklch(0.55 0.16 285)" },
+          ].map(({ n, Icon, tint }) => (
             <Reveal
               key={n}
               delayMs={n * 60}
               className="text-center md:px-5 flex flex-col items-center"
             >
-              <Icon className="size-4 text-marketing-muted mb-2" aria-hidden />
+              <span
+                className="mb-2 inline-flex size-8 items-center justify-center rounded-lg"
+                style={{
+                  background: `color-mix(in oklab, ${tint} 14%, var(--color-marketing-bg))`,
+                  color: tint,
+                }}
+                aria-hidden
+              >
+                <Icon className="size-4" />
+              </span>
               <p
                 className="text-xl md:text-2xl text-marketing-ink xl:whitespace-nowrap"
                 style={display}
@@ -326,6 +335,7 @@ function Landing() {
           ))}
         </div>
       </section>
+
 
 
       {/* ── 9. Tablet / bilingual band ── */}
