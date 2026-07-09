@@ -495,13 +495,13 @@ function Landing() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Link
               to="/auth/signup"
-              className="inline-flex items-center justify-center rounded-full bg-marketing-sage text-marketing-bg font-semibold px-7 py-3.5 shadow-sm hover:brightness-[1.08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
+              className="mk-cta-glass mk-cta-glass--primary inline-flex items-center justify-center rounded-full font-semibold px-7 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
             >
               {t("marketing.hero.ctaCreate")}
             </Link>
             <Link
               to="/invite"
-              className="inline-flex items-center justify-center rounded-full bg-marketing-bg border border-marketing-line text-marketing-ink font-semibold px-7 py-3.5 hover:border-marketing-sage hover:text-marketing-sage transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marketing-sage"
+              className="mk-cta-glass mk-cta-glass--clear inline-flex items-center justify-center rounded-full text-marketing-ink font-semibold px-7 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-marketing-sage"
             >
               {t("marketing.hero.ctaInvite")}
             </Link>
