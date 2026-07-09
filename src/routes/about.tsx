@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Plus, Users, UserCheck, Ban, EyeOff } from "lucide-react";
-import type { ComponentType, ReactNode, SVGProps } from "react";
+import { Plus, Users, UserCheck, Ban, EyeOff, type LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { Reveal } from "@/components/marketing/Reveal";
+import {
+  OUTCOME_DECK_THEME,
+  type CardTheme,
+} from "@/components/marketing/OutcomeDeck";
 import {
   Accordion,
   AccordionContent,
