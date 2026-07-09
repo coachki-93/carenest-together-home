@@ -1,6 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Share, MoreVertical, Home, Bell, CheckCircle2 } from "lucide-react";
+import {
+  Share,
+  MoreVertical,
+  Home,
+  Bell,
+  CheckCircle2,
+  ChevronRight,
+  Wind,
+  ShieldAlert,
+  BellRing,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
@@ -63,7 +73,9 @@ function InstallPage() {
   const platform = usePlatform();
 
   const iosBlock = (
-    <IosSection
+    <PlatformBlock
+      id="ios"
+      glyph={<AppleGlyph className="size-5 text-marketing-ink" />}
       title={t("marketing.install.iosTitle")}
       browser={t("marketing.install.iosBrowser")}
       steps={[
@@ -88,7 +100,9 @@ function InstallPage() {
   );
 
   const androidBlock = (
-    <AndroidSection
+    <PlatformBlock
+      id="android"
+      glyph={<AndroidGlyph className="size-5 text-marketing-ink" />}
       title={t("marketing.install.androidTitle")}
       browser={t("marketing.install.androidBrowser")}
       steps={[
@@ -112,8 +126,6 @@ function InstallPage() {
     />
   );
 
-  // Rendering order: visitor's platform first, other collapsed below.
-  // Null (SSR + first paint) + desktop: both open, equal weight.
   let primary: ReactNode;
   let secondary: ReactNode = null;
   if (platform === "ios") {
@@ -190,71 +202,17 @@ function InstallPage() {
 
       {/* Platform section(s) */}
       <section className="px-6 md:px-8 pb-16 md:pb-20">
-        <div className="max-w-4xl mx-auto space-y-10">{primary}</div>
+        <div className="max-w-5xl mx-auto space-y-16">{primary}</div>
       </section>
 
       {secondary && (
         <section className="px-6 md:px-8 pb-16 md:pb-20">
-          <div className="max-w-4xl mx-auto">{secondary}</div>
+          <div className="max-w-5xl mx-auto">{secondary}</div>
         </section>
       )}
 
-      {/* Notifications callout — mk-glass card */}
-      <section className="px-6 md:px-8 pb-16 md:pb-20">
-        <div className="max-w-3xl mx-auto">
-          <Reveal className="mk-glass rounded-3xl p-6 md:p-8 flex items-start gap-4">
-            <span className="size-10 rounded-2xl mk-glass border border-marketing-line text-marketing-sage flex items-center justify-center shrink-0">
-              <Bell className="size-5" />
-            </span>
-            <div>
-              <h3
-                className="text-marketing-ink"
-                style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.35rem" }}
-              >
-                {t("marketing.install.notifTitle")}
-              </h3>
-              <p className="text-marketing-muted leading-[1.75] mt-2">
-                {t("marketing.install.notifBody")}
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Closing CTA — glass pair matching landing hero */}
-      <section className="px-6 md:px-8 py-20 md:py-24">
-        <div className="max-w-2xl mx-auto text-center space-y-5">
-          <h2
-            className="tracking-tight text-marketing-ink"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 700,
-              letterSpacing: "-0.025em",
-              fontSize: "clamp(1.5rem, 3vw, 2.25rem)",
-              lineHeight: 1.1,
-            }}
-          >
-            {t("marketing.install.readyTitle")}
-          </h2>
-          <p className="text-marketing-muted leading-[1.7]">
-            {t("marketing.install.readyBody")}
-          </p>
-          <div className="pt-3 flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link
-              to="/auth/signup"
-              className="mk-cta-glass mk-cta-glass--primary inline-flex items-center justify-center rounded-full font-semibold px-7 py-3.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg focus-visible:ring-primary"
-            >
-              {t("marketing.hero.ctaCreate")}
-            </Link>
-            <Link
-              to="/"
-              className="mk-cta-glass mk-cta-glass--clear inline-flex items-center justify-center rounded-full text-marketing-ink font-semibold px-6 py-3.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg focus-visible:ring-marketing-sage"
-            >
-              {t("marketing.install.backHome")}
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Notifications section — real-looking push mock + copy + chips */}
+      <NotificationsSection />
 
       <MarketingFooter />
     </main>
@@ -264,52 +222,6 @@ function InstallPage() {
 const serif = { fontFamily: "var(--font-display)", fontWeight: 700, letterSpacing: "-0.025em" } as const;
 
 type StepData = { icon: ReactNode; title: string; body: string };
-
-function IosSection({
-  title,
-  browser,
-  steps,
-  armed,
-}: {
-  title: string;
-  browser: string;
-  steps: StepData[];
-  armed: boolean;
-}) {
-  return (
-    <PlatformBlock
-      id="ios"
-      glyph={<AppleGlyph className="size-5 text-marketing-ink" />}
-      title={title}
-      browser={browser}
-      steps={steps}
-      armed={armed}
-    />
-  );
-}
-
-function AndroidSection({
-  title,
-  browser,
-  steps,
-  armed,
-}: {
-  title: string;
-  browser: string;
-  steps: StepData[];
-  armed: boolean;
-}) {
-  return (
-    <PlatformBlock
-      id="android"
-      glyph={<AndroidGlyph className="size-5 text-marketing-ink" />}
-      title={title}
-      browser={browser}
-      steps={steps}
-      armed={armed}
-    />
-  );
-}
 
 function PlatformBlock({
   id,
@@ -345,13 +257,30 @@ function PlatformBlock({
         </div>
       </Reveal>
 
-      <ol className="space-y-4">
-        {steps.map((s, i) => (
-          <Reveal key={i} immediate={armed} delayMs={120 + i * 120}>
-            <StepCard n={i + 1} icon={s.icon} title={s.title} body={s.body} />
+      <StepGrid steps={steps} armed={armed} />
+    </div>
+  );
+}
+
+function StepGrid({ steps, armed }: { steps: StepData[]; armed: boolean }) {
+  return (
+    <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      {steps.map((s, i) => (
+        <div key={i} className="relative">
+          <Reveal immediate={armed} delayMs={i * 120}>
+            <StepCard n={i + 1} icon={s.icon} title={s.title} body={s.body} popDelayMs={150} />
           </Reveal>
-        ))}
-      </ol>
+          {/* Chevron connector between cards on md+ */}
+          {i < steps.length - 1 && (
+            <span
+              aria-hidden
+              className="hidden md:flex absolute top-1/2 -right-4 -translate-y-1/2 text-marketing-muted/50"
+            >
+              <ChevronRight className="size-5" />
+            </span>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -361,30 +290,30 @@ function StepCard({
   icon,
   title,
   body,
+  popDelayMs,
 }: {
   n: number;
   icon: ReactNode;
   title: string;
   body: string;
+  popDelayMs: number;
 }) {
   return (
-    <li className="mk-glass rounded-2xl p-6 md:p-7 flex gap-5">
-      <div className="shrink-0 flex flex-col items-center gap-2">
+    <div className="mk-glass rounded-3xl p-6 md:p-7 h-full flex flex-col">
+      <div className="flex items-center gap-3 mb-4">
         <span
           className="mk-check-pop size-10 rounded-full flex items-center justify-center font-bold text-marketing-bg"
-          style={{ background: "var(--primary)" }}
+          style={{ background: "var(--primary)", ["--mk-delay" as string]: `${popDelayMs}ms` }}
         >
           {n}
         </span>
         <span className="text-marketing-muted">{icon}</span>
       </div>
-      <div className="min-w-0">
-        <h3 className="text-marketing-ink mb-1.5" style={{ ...serif, fontSize: "1.15rem" }}>
-          {title}
-        </h3>
-        <p className="text-marketing-muted leading-[1.7] text-[0.98rem]">{body}</p>
-      </div>
-    </li>
+      <h3 className="text-marketing-ink mb-1.5" style={{ ...serif, fontSize: "1.15rem" }}>
+        {title}
+      </h3>
+      <p className="text-marketing-muted leading-[1.7] text-[0.98rem]">{body}</p>
+    </div>
   );
 }
 
@@ -398,7 +327,7 @@ function OtherPlatformDisclosure({
   children: ReactNode;
 }) {
   return (
-    <details className="mk-glass rounded-3xl px-5 md:px-7 py-3 group open:pb-6">
+    <details className="mk-glass rounded-3xl px-5 md:px-7 py-3 group open:pb-8">
       <summary className="cursor-pointer list-none flex items-center gap-3 py-3 text-marketing-muted hover:text-marketing-ink transition-colors">
         <span className="size-8 rounded-xl bg-marketing-bg border border-marketing-line flex items-center justify-center">
           {glyph}
@@ -406,7 +335,100 @@ function OtherPlatformDisclosure({
         <span className="text-sm font-medium">{label}</span>
         <span className="ml-auto text-xs opacity-70 group-open:rotate-180 transition-transform">▾</span>
       </summary>
-      <div className="pt-4">{children}</div>
+      {/* Reveal inside details can miss the IO callback since the collapsed
+       * children have zero layout; children below force immediate on all Reveals. */}
+      <div className="pt-4 [&_[data-visible='false']]:!opacity-100 [&_[data-visible='false']]:!translate-y-0">
+        <DisclosureContent>{children}</DisclosureContent>
+      </div>
     </details>
+  );
+}
+
+/**
+ * Wraps disclosure children and injects `data-force-visible` — combined with
+ * the parent's descendant selectors, all Reveals appear immediately when the
+ * user opens the disclosure. mk-slide-in / mk-check-pop are also released via
+ * `[data-visible="true"]` — we set that on a wrapper to trigger the animations
+ * on open.
+ */
+function DisclosureContent({ children }: { children: ReactNode }) {
+  return (
+    <div data-visible="true">
+      {children}
+    </div>
+  );
+}
+
+function NotificationsSection() {
+  const { t } = useTranslation();
+  const chips = [
+    { Icon: Wind, label: t("marketing.install.notifChipOxygen") },
+    { Icon: ShieldAlert, label: t("marketing.install.notifChipCritical") },
+    { Icon: BellRing, label: t("marketing.install.notifChipMissed") },
+  ];
+  return (
+    <section className="px-6 md:px-8 pb-24 md:pb-32">
+      <div className="max-w-3xl mx-auto">
+        <Reveal className="mk-glass rounded-3xl p-6 md:p-8">
+          {/* Lock-screen style notification mock */}
+          <div
+            className="mk-slide-in mb-6 rounded-2xl bg-white/95 border border-marketing-line px-4 py-3 flex items-start gap-3 shadow-[0_10px_30px_-16px_rgba(60,50,120,0.35)]"
+            style={{ ["--mk-delay" as string]: "80ms" }}
+          >
+            <img
+              src="/landing/carenest-app-icon.webp"
+              alt=""
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-[8px] shrink-0"
+              draggable={false}
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[11px] uppercase tracking-[0.14em] font-semibold text-marketing-ink/70">
+                  {t("marketing.install.notifMockAppName")}
+                </span>
+                <span className="text-[11px] text-marketing-muted">
+                  {t("marketing.install.notifMockNow")}
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-marketing-ink mt-0.5">
+                {t("marketing.install.notifMockTitle")}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <span className="size-10 rounded-2xl mk-glass border border-marketing-line text-marketing-sage flex items-center justify-center shrink-0">
+              <Bell className="size-5" />
+            </span>
+            <div className="min-w-0">
+              <h3
+                className="text-marketing-ink"
+                style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.35rem" }}
+              >
+                {t("marketing.install.notifTitle")}
+              </h3>
+              <p className="text-marketing-muted leading-[1.75] mt-2">
+                {t("marketing.install.notifBody")}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {chips.map(({ Icon, label }, i) => (
+                  <span
+                    key={i}
+                    className="mk-slide-in inline-flex items-center gap-2 rounded-full border border-marketing-line bg-white/70 px-3 py-1.5 text-xs font-medium text-marketing-ink"
+                    style={{ ["--mk-delay" as string]: `${240 + i * 90}ms` }}
+                  >
+                    <Icon className="size-3.5 text-marketing-sage" />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
   );
 }
