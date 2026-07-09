@@ -1727,8 +1727,14 @@ export const sv = {
     },
     install: {
       kicker: "CareNest på din enhet",
-      headline1: "Ingen appbutik.",
+      headline1: "Ingen appbutik behövs — ännu.",
       headline2: "Direkt till hemskärmen.",
+      notifMockAppName: "CareNest",
+      notifMockTitle: "🟧 Syrgastub låg",
+      notifMockNow: "nu",
+      notifChipOxygen: "Syrgas",
+      notifChipCritical: "Kritiska svar",
+      notifChipMissed: "Missade kontroller",
       subtitle:
         "Lägg till CareNest en gång så öppnas den i helskärm som en app — med aviseringar, på iPhone, iPad och Android.",
       phoneMockLabel: "CareNest",
