@@ -591,6 +591,27 @@
   }
 }
 
+/* Gated scaleX-in used by the vitals band segments. Sibling of mk-bar-fill
+ * but drives transform instead of width, and stays paused until an ancestor
+ * `[data-visible="true"]` gate releases it. */
+@keyframes mk-band-scale {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.mk-band-scale-in {
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: mk-band-scale 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--mk-delay, 0ms);
+  animation-play-state: paused;
+}
+[data-visible="true"] .mk-band-scale-in {
+  animation-play-state: running;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-band-scale-in { animation: none; transform: none; }
+}
+
 /* Marketing footer — soft violet gradient band. */
 .mk-footer-panel {
   background:
