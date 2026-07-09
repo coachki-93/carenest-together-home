@@ -621,7 +621,6 @@
       color-mix(in oklab, var(--primary) 10%, transparent) 100%
     ),
     var(--background);
-  border-top: 1px solid color-mix(in oklab, var(--primary) 18%, transparent);
 }
 
 /* Hero — Aave-style layered bloom behind the iPad.
