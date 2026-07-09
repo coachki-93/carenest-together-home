@@ -243,19 +243,16 @@ function Landing() {
                 <h2 className="text-display-md text-marketing-ink mt-4 mb-6" style={display}>
                   {t("marketing.teams.title")}
                 </h2>
-                <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-6">
-                  {t("marketing.teams.body")}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <PillTag icon={<ShieldCheck className="size-3.5" />}>
-                    {t("marketing.teams.chip1")}
-                  </PillTag>
-                  <PillTag icon={<UserCheck className="size-3.5" />}>
-                    {t("marketing.teams.chip2")}
-                  </PillTag>
-                  <PillTag icon={<Check className="size-3.5" />}>
-                    {t("marketing.teams.chip3")}
-                  </PillTag>
+                <div className="space-y-4 mb-6">
+                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
+                    {t("marketing.teams.body1")}
+                  </p>
+                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
+                    {t("marketing.teams.body2")}
+                  </p>
+                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
+                    {t("marketing.teams.body3")}
+                  </p>
                 </div>
                 <p className="text-marketing-ink/80 text-base md:text-lg italic leading-[1.7]">
                   {t("marketing.teams.closing")}
