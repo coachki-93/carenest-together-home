@@ -21,19 +21,14 @@ export function VitalsBand() {
         <div
           className="rounded-3xl p-8 md:p-14 relative overflow-hidden"
           style={{
-            background:
-              "linear-gradient(135deg, color-mix(in oklab, var(--primary) 92%, black) 0%, color-mix(in oklab, var(--primary) 78%, transparent) 100%)",
+            backgroundImage: [
+              "radial-gradient(90% 70% at 50% 100%, color-mix(in oklab, white 16%, var(--primary)) 0%, transparent 65%)",
+              "linear-gradient(180deg, color-mix(in oklab, var(--primary) 88%, black 6%) 0%, var(--primary) 60%)",
+            ].join(", "),
             color: "var(--primary-foreground)",
           }}
         >
-          <div
-            aria-hidden
-            className="absolute inset-0 pointer-events-none opacity-40"
-            style={{
-              background:
-                "radial-gradient(30rem 20rem at 90% 10%, color-mix(in oklab, white 20%, transparent), transparent 70%)",
-            }}
-          />
+
           <div className="relative grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.22em] mb-5 opacity-80">
