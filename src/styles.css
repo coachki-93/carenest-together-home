@@ -629,40 +629,21 @@
  * Layered lavender radials bloom below, behind the device. */
 .mk-hero-bloom {
   background:
-    /* Primary bloom, centered lower — the strongest violet */
+    /* Primary bloom, centered lower — softened; the sky wash owns the
+     * broad tint now, this only concentrates a halo under the device. */
     radial-gradient(
       60rem 34rem at 50% 78%,
-      color-mix(in oklab, var(--primary) 18%, transparent) 0%,
+      color-mix(in oklab, var(--primary) 10%, transparent) 0%,
       transparent 70%
     ),
-    /* Left offset tint */
-    radial-gradient(
-      36rem 22rem at 22% 68%,
-      color-mix(in oklab, var(--primary) 12%, transparent) 0%,
-      transparent 72%
-    ),
-    /* Right offset warm-violet wash */
+    /* Right offset warm-violet halo, kept subtle. */
     radial-gradient(
       40rem 24rem at 82% 72%,
-      color-mix(in oklab, oklch(0.82 0.11 300) 14%, transparent) 0%,
+      color-mix(in oklab, oklch(0.82 0.11 300) 7%, transparent) 0%,
       transparent 74%
-    ),
-    /* Faint CTA-row tint — lets the glass buttons refract violet without
-     * touching the near-white headline zone above. */
-    radial-gradient(
-      26rem 12rem at 50% 52%,
-      color-mix(in oklab, var(--primary) 10%, transparent) 0%,
-      transparent 72%
-    ),
-    /* Top fade — transparent so the mk-hero-wash tint shows through at the
-     * headline zone; radials below still bloom. */
-    linear-gradient(
-      180deg,
-      transparent 0%,
-      transparent 55%,
-      transparent 80%
     );
 }
+
 
 /* iPad wrapper — clips into the section fold via negative margin-bottom.
  * Fixed rem values per breakpoint (percentage margins resolve against width). */
