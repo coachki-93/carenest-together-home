@@ -22,7 +22,6 @@ import {
   Droplet,
   Wrench,
   RefreshCw,
-  UserCheck,
   Users,
   Heart,
   type LucideIcon,
