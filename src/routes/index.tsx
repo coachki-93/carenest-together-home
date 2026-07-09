@@ -130,6 +130,11 @@ function Landing() {
       {/* ── 5. Outcomes — fanned deck ── */}
       <OutcomeDeck />
 
+      {/* ── 5b. Vitals — deep-violet band ── */}
+      <VitalsBand />
+
+
+
 
       {/* ── 6. Essentials vs complex care ── */}
       <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
