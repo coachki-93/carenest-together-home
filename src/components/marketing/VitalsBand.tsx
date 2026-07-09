@@ -51,6 +51,7 @@ export function VitalsBand() {
               <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-4 md:p-5 rotate-[-1deg]">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                   <VitalTile
+                    tileDelayMs={0}
                     icon={<HeartPulse className="size-4 text-marketing-sage" />}
                     label={t("marketing.vitals.hr.label")}
                     value="98"
@@ -61,6 +62,7 @@ export function VitalsBand() {
                     rangeCaption="70 – 115 bpm"
                   />
                   <VitalTile
+                    tileDelayMs={80}
                     icon={<SpO2DropletIcon size={16} />}
                     label={t("marketing.vitals.spo2.label")}
                     value="98"
@@ -71,6 +73,7 @@ export function VitalsBand() {
                     rangeCaption="95 – 100 %"
                   />
                   <VitalTile
+                    tileDelayMs={160}
                     icon={<Wind className="size-4 text-marketing-sage" />}
                     label={t("marketing.vitals.breathing.label")}
                     value="22"
@@ -81,6 +84,7 @@ export function VitalsBand() {
                     rangeCaption="20 – 25 br/min"
                   />
                   <VitalTile
+                    tileDelayMs={240}
                     icon={<Thermometer className="size-4 text-marketing-sage" />}
                     label={t("marketing.vitals.temp.label")}
                     value="37.0"
@@ -91,6 +95,7 @@ export function VitalsBand() {
                     rangeCaption="36.0 – 37.9 °C"
                   />
                   <VitalTile
+                    tileDelayMs={320}
                     icon={<Droplets className="size-4 text-marketing-sage" />}
                     label={t("marketing.vitals.fluids.label")}
                     value="620"
@@ -98,6 +103,7 @@ export function VitalsBand() {
                     runningTotalLabel={t("marketing.vitals.fluidsToday")}
                   />
                   <PlannedTile
+                    tileDelayMs={400}
                     label={t("marketing.vitals.glucose.label")}
                     plannedText={t("marketing.vitals.glucose.planned")}
                     a11y={t("marketing.vitals.glucose.a11y")}
@@ -125,6 +131,7 @@ interface TileProps {
   reading?: number;
   rangeCaption?: string;
   runningTotalLabel?: string;
+  tileDelayMs?: number;
 }
 
 function VitalTile({
@@ -137,11 +144,10 @@ function VitalTile({
   reading,
   rangeCaption,
   runningTotalLabel,
+  tileDelayMs = 0,
 }: TileProps) {
   const hasBand =
     typeof low === "number" && typeof high === "number" && typeof reading === "number";
-  // Rail domain gives a little headroom around the band so the band segment
-  // isn't the full rail width. Domain = [low - 20%, high + 20%] of the band.
   let bandStart = 0;
   let bandEnd = 0;
   let dot = 0;
@@ -156,7 +162,10 @@ function VitalTile({
     dot = scale(reading!);
   }
   return (
-    <div className="rounded-2xl bg-marketing-surface border border-marketing-line p-3.5 md:p-4">
+    <div
+      className="mk-slide-in rounded-2xl bg-marketing-surface border border-marketing-line p-3.5 md:p-4"
+      style={{ ["--mk-delay" as string]: `${tileDelayMs}ms` }}
+    >
       <div className="flex items-center gap-1.5">
         {icon}
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-marketing-muted">
@@ -173,14 +182,21 @@ function VitalTile({
         <div className="mt-3">
           <div className="relative h-1.5 rounded-full bg-marketing-line/70 overflow-hidden">
             <div
-              className="absolute inset-y-0 rounded-full bg-marketing-sage/45"
-              style={{ left: `${bandStart}%`, width: `${bandEnd - bandStart}%` }}
+              className="mk-band-scale-in absolute inset-y-0 rounded-full bg-marketing-sage/45"
+              style={{
+                left: `${bandStart}%`,
+                width: `${bandEnd - bandStart}%`,
+                ["--mk-delay" as string]: `${tileDelayMs + 200}ms`,
+              }}
             />
           </div>
           <div className="relative h-0" aria-hidden>
             <div
-              className="absolute -top-[7px] size-2 rounded-full bg-marketing-sage ring-2 ring-marketing-bg"
-              style={{ left: `calc(${dot}% - 4px)` }}
+              className="mk-check-pop absolute -top-[7px] size-2 rounded-full bg-marketing-sage ring-2 ring-marketing-bg"
+              style={{
+                left: `calc(${dot}% - 4px)`,
+                ["--mk-delay" as string]: `${tileDelayMs + 450}ms`,
+              }}
             />
           </div>
           <p className="mt-2 text-[10px] text-marketing-muted">{rangeCaption}</p>
@@ -199,14 +215,17 @@ function PlannedTile({
   label,
   plannedText,
   a11y,
+  tileDelayMs = 0,
 }: {
   label: string;
   plannedText: string;
   a11y: string;
+  tileDelayMs?: number;
 }) {
   return (
     <div
-      className="rounded-2xl border border-dashed border-marketing-line bg-transparent p-3.5 md:p-4 opacity-80"
+      className="mk-slide-in rounded-2xl border border-dashed border-marketing-line bg-transparent p-3.5 md:p-4 opacity-80"
+      style={{ ["--mk-delay" as string]: `${tileDelayMs}ms` }}
       aria-label={a11y}
       role="group"
     >

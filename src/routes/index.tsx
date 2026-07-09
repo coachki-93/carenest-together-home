@@ -22,7 +22,8 @@ import {
   Droplet,
   Wrench,
   RefreshCw,
-  UserCheck,
+  Users,
+  Heart,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -191,23 +192,34 @@ function Landing() {
 
 
       {/* ── 8. Trust strip ── */}
-      <section className="px-6 md:px-8 py-10 md:py-12 border-y border-marketing-line bg-marketing-surface">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-5">
-          {[1, 2, 3, 4].map((n) => (
-            <Reveal key={n} delayMs={n * 60}>
+      <section className="px-6 md:px-8 py-8 md:py-10 border-y border-marketing-line bg-marketing-surface">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x md:divide-marketing-line/60">
+          {[
+            { n: 1, Icon: Languages },
+            { n: 2, Icon: Users },
+            { n: 3, Icon: ShieldCheck },
+            { n: 4, Icon: Heart },
+          ].map(({ n, Icon }) => (
+            <Reveal
+              key={n}
+              delayMs={n * 60}
+              className="text-center md:px-5 flex flex-col items-center"
+            >
+              <Icon className="size-4 text-marketing-muted mb-2" aria-hidden />
               <p
-                className="text-lg md:text-xl text-marketing-ink xl:whitespace-nowrap"
+                className="text-xl md:text-2xl text-marketing-ink xl:whitespace-nowrap"
                 style={display}
               >
                 {t(`marketing.trust.s${n}Value`)}
               </p>
-              <p className="mt-2 text-sm text-marketing-muted leading-snug">
+              <p className="mt-1.5 text-sm text-marketing-muted leading-snug">
                 {t(`marketing.trust.s${n}Label`)}
               </p>
             </Reveal>
           ))}
         </div>
       </section>
+
 
       {/* ── 9. Tablet / bilingual band ── */}
       <section className="px-6 md:px-8 py-20 md:py-28">
@@ -243,19 +255,16 @@ function Landing() {
                 <h2 className="text-display-md text-marketing-ink mt-4 mb-6" style={display}>
                   {t("marketing.teams.title")}
                 </h2>
-                <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-6">
-                  {t("marketing.teams.body")}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <PillTag icon={<ShieldCheck className="size-3.5" />}>
-                    {t("marketing.teams.chip1")}
-                  </PillTag>
-                  <PillTag icon={<UserCheck className="size-3.5" />}>
-                    {t("marketing.teams.chip2")}
-                  </PillTag>
-                  <PillTag icon={<Check className="size-3.5" />}>
-                    {t("marketing.teams.chip3")}
-                  </PillTag>
+                <div className="space-y-4 mb-6">
+                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
+                    {t("marketing.teams.body1")}
+                  </p>
+                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
+                    {t("marketing.teams.body2")}
+                  </p>
+                  <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
+                    {t("marketing.teams.body3")}
+                  </p>
                 </div>
                 <p className="text-marketing-ink/80 text-base md:text-lg italic leading-[1.7]">
                   {t("marketing.teams.closing")}

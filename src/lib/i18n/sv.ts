@@ -1615,12 +1615,13 @@ export const sv = {
     },
     teams: {
       kicker: "Byggd för roterande team",
-      title: "Ett gemensamt minne för hela teamet.",
-      body:
-        "Bjud in assistenter med engångskoder. På ett delat teamkonto väljer varje assistent sin profil när passet börjar, och varje dos, kontroll och anteckning märks med namn. Överlämningar har läskvitton, så du vet att den som tar över faktiskt har läst förra passets anteckningar.",
-      chip1: "Engångskoder",
-      chip2: "Vem jobbar det här passet?",
-      chip3: "Läskvitton på överlämning",
+      title: "Inget att lära ut. Inget faller mellan stolarna.",
+      body1:
+        "Hela assistentens jobb i CareNest är en lista: nästa uppgift, med sin tid. Kan de följa en lista kan de redan systemet.",
+      body2:
+        "Du behöver aldrig agera IT-support. En engångskod släpper in dem, de trycker på sitt namn och dagen visar själv vad som ska göras — i webbläsaren, inget att installera, inget konto att skapa.",
+      body3:
+        "Och när något ändå missas — en dos blir sen, en tillsyn glöms bort — märker CareNest det och säger till. Du behöver inte kontrollera att alla har kontrollerat.",
       closing:
         "Det gemensamma minnet mellan de som tar hand om ert barn.",
     },

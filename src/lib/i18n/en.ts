@@ -1616,12 +1616,13 @@ export const en = {
     },
     teams: {
       kicker: "Built for rotating teams",
-      title: "One shared memory for the whole team.",
-      body:
-        "Invite caregivers with single-use codes. On a shared team account, each caregiver picks their profile at the start of a shift, and every dose, check and note is attributed by name. Handovers carry read receipts, so you know the incoming caregiver has actually read the last shift's notes.",
-      chip1: "Single-use invite codes",
-      chip2: "Who's working this shift?",
-      chip3: "Read receipts on handover",
+      title: "Nothing to teach. Nothing slips silently.",
+      body1:
+        "A caregiver's whole job in CareNest is a list: the next task, with its time. If they can follow a list, they already know the system.",
+      body2:
+        "You never have to play IT support. A single-use code lets them in, they tap their name, and the day itself shows them what to do — in the browser, nothing to install, no account to create.",
+      body3:
+        "And when something does slip — a dose runs late, a check is forgotten — CareNest notices and tells you. You don't have to check that everyone checked.",
       closing:
         "The shared memory between the people who care for your child.",
     },
