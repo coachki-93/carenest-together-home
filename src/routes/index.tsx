@@ -1057,8 +1057,7 @@ function Hero() {
         </Reveal>
 
         <Reveal immediate delayMs={270}>
-          <div className="mt-9 relative flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <div aria-hidden className="mk-cta-bloom pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10" style={{ width: 700, height: 260 }} />
+          <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
               to="/auth/signup"
               className="mk-cta-glass mk-cta-glass--primary inline-flex items-center justify-center rounded-full font-semibold px-7 py-3.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg focus-visible:ring-primary"

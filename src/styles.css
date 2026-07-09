@@ -922,41 +922,30 @@
   }
 }
 
-/* CTA row bloom — a static violet pool behind the button pair so the clear
- * button's translucency + blur have something to work with. */
-.mk-cta-bloom {
-  background: radial-gradient(
-    50% 120% at 50% 50%,
-    color-mix(in oklab, var(--primary) 16%, transparent) 0%,
-    transparent 70%
-  );
-}
-
 /* Hero wash — layered violet sky. Corner radials + a soft mid-glow over a
- * vertical fade that lands exactly on the marketing bg. The wash starts at
- * y=0 (hero section is pulled up under the fixed header). */
+ * vertical fade that lands exactly on the marketing bg. The linear layer is
+ * the dominant voice (parameterized via --mk-wash-top / --mk-wash-mid); the
+ * radials add depth, not volume. The wash starts at y=0 (hero section is
+ * pulled up under the fixed header). */
 .mk-hero-wash {
   --mk-header-offset: 5rem;
+  --mk-wash-top: 21%;
+  --mk-wash-mid: 10%;
   background:
     radial-gradient(
       110% 75% at 18% 0%,
-      color-mix(in oklab, var(--primary) 14%, white) 0%,
+      color-mix(in oklab, var(--primary) 12%, white) 0%,
       transparent 55%
     ),
     radial-gradient(
       95% 65% at 82% 8%,
-      color-mix(in oklab, var(--primary) 9%, white) 0%,
+      color-mix(in oklab, var(--primary) 7%, white) 0%,
       transparent 58%
-    ),
-    radial-gradient(
-      130% 85% at 50% 35%,
-      color-mix(in oklab, var(--primary) 5%, white) 0%,
-      transparent 70%
     ),
     linear-gradient(
       180deg,
-      color-mix(in oklab, var(--primary) 10%, white) 0%,
-      color-mix(in oklab, var(--primary) 4%, var(--color-marketing-bg)) 60%,
+      color-mix(in oklab, var(--primary) var(--mk-wash-top), white) 0%,
+      color-mix(in oklab, var(--primary) var(--mk-wash-mid), var(--color-marketing-bg)) 55%,
       var(--color-marketing-bg) 100%
     );
 }
