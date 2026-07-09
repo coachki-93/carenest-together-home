@@ -187,16 +187,15 @@ function InstallPage() {
           </Reveal>
 
           <Reveal immediate delayMs={360} className="mt-10">
-            <PhoneMock label={t("marketing.install.phoneMockLabel")} />
+            <img
+              src="/landing/install-tablet.webp"
+              alt={t("marketing.install.tabletAlt")}
+              width={1920}
+              height={1806}
+              draggable={false}
+              className="mx-auto w-full max-w-[420px] md:max-w-[480px] h-auto"
+            />
           </Reveal>
-
-          {platform === "desktop" && (
-            <Reveal immediate delayMs={480}>
-              <p className="mt-8 mx-auto max-w-xl text-sm text-marketing-muted leading-[1.7]">
-                {t("marketing.install.desktopNote")}
-              </p>
-            </Reveal>
-          )}
         </div>
       </section>
 
