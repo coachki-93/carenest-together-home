@@ -1026,7 +1026,7 @@ function Hero() {
   const platform: "ios" | "android" | "desktop" = detected ?? "desktop";
 
   return (
-    <section className="relative px-6 md:px-8 pt-10 md:pt-16 pb-0 overflow-hidden">
+    <section className="mk-hero-wash relative px-6 md:px-8 pt-10 md:pt-16 pb-0 overflow-hidden">
       {/* Layered lavender bloom — near-white top, violet radials below. */}
       <div aria-hidden className="mk-hero-bloom pointer-events-none absolute inset-0 -z-10" />
 
