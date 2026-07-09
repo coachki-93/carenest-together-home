@@ -24,6 +24,7 @@ import {
   RefreshCw,
   Users,
   Heart,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
