@@ -98,7 +98,7 @@ type OutcomeDef = {
   headlineKey: string;
   bodyKey: string;
   icon: LucideIcon;
-  theme: keyof typeof THEME;
+  theme: keyof typeof OUTCOME_DECK_THEME;
   Vignette: () => ReactElement;
 };
 
@@ -439,7 +439,7 @@ export function OutcomeDeck() {
               const scale = !dealt ? 0.98 : isHover ? 1.03 : 1;
               const opacity = !dealt ? 0 : otherHover ? 0.7 : 1;
 
-              const theme = THEME[c.theme];
+              const theme = OUTCOME_DECK_THEME[c.theme];
               const dealDelay = dealt && !reduced ? 0 : i * 60;
 
               return (
@@ -567,7 +567,7 @@ function FallbackGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
       {CARDS.map((c) => {
-        const theme = THEME[c.theme];
+        const theme = OUTCOME_DECK_THEME[c.theme];
         const Icon = c.icon;
         const Vignette = c.Vignette;
         return (
