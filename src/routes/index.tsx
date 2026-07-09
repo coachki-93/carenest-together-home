@@ -5,6 +5,8 @@ import { DayTimeline } from "@/components/marketing/DayTimeline";
 import { OutcomeDeck } from "@/components/marketing/OutcomeDeck";
 import { VitalsBand } from "@/components/marketing/VitalsBand";
 import { HeroHeadline } from "@/components/marketing/HeroHeadline";
+import { Kicker } from "@/components/marketing/Kicker";
+import { usePlatform } from "@/lib/marketing/use-platform";
 import {
   Pill,
   Wind,
@@ -513,13 +515,6 @@ function Landing() {
 
 /* ───────────────── building blocks ───────────────── */
 
-function Kicker({ children }: { children: ReactNode }) {
-  return (
-    <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-sage">
-      {children}
-    </span>
-  );
-}
 
 function PillTag({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
@@ -1055,20 +1050,9 @@ function PriceCard({
 /* ─────────── Hero (Aave-style centered) ─────────── */
 function Hero() {
   const { t } = useTranslation();
-  const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const ua = window.navigator.userAgent || "";
-    // Order matters — iPadOS 13+ reports as Mac, so check touch too.
-    if (/android/i.test(ua)) setPlatform("android");
-    else if (
-      /iPad|iPhone|iPod/.test(ua) ||
-      (/Macintosh/.test(ua) && "ontouchend" in document)
-    )
-      setPlatform("ios");
-    else setPlatform("desktop");
-  }, []);
+  const detected = usePlatform();
+  // Preserve landing's existing behavior: show both glyphs until we know.
+  const platform: "ios" | "android" | "desktop" = detected ?? "desktop";
 
   return (
     <section className="relative px-6 md:px-8 pt-10 md:pt-16 pb-0 overflow-hidden">
