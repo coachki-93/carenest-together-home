@@ -218,61 +218,6 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Beliefs — glass cards */}
-      <section className="relative overflow-hidden px-6 md:px-8 py-20 md:py-24 border-t border-marketing-line">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-0"
-          style={{
-            background:
-              "radial-gradient(60rem 24rem at 20% 0%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 65%), radial-gradient(50rem 22rem at 85% 100%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 70%)",
-          }}
-        />
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <Reveal>
-            <div className="text-center max-w-2xl mx-auto mb-14">
-              <Reveal immediate delayMs={0}>
-                <Kicker>{t("marketing.about.beliefsTitle")}</Kicker>
-              </Reveal>
-              <Reveal immediate delayMs={120}>
-                <h2
-                  className="tracking-tight text-marketing-ink mt-4"
-                  style={{
-                    ...serif,
-                    fontSize: "clamp(1.75rem, 3.6vw, 2.5rem)",
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {t("marketing.about.beliefsTitle")}
-                </h2>
-              </Reveal>
-            </div>
-          </Reveal>
-          <Reveal>
-            <div className="grid gap-5 md:gap-6 md:grid-cols-3">
-              <Reveal immediate delayMs={0}>
-                <Belief
-                  title={t("marketing.about.b1Title")}
-                  body={t("marketing.about.b1Body")}
-                />
-              </Reveal>
-              <Reveal immediate delayMs={140}>
-                <Belief
-                  title={t("marketing.about.b2Title")}
-                  body={t("marketing.about.b2Body")}
-                />
-              </Reveal>
-              <Reveal immediate delayMs={280}>
-                <Belief
-                  title={t("marketing.about.b3Title")}
-                  body={t("marketing.about.b3Body")}
-                />
-              </Reveal>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       {/* About-FAQ */}
       <section className="px-6 md:px-8 py-20 md:py-28 border-t border-marketing-line">
         <div className="max-w-3xl mx-auto">
@@ -317,55 +262,8 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Closing CTA */}
-      <section className="px-6 md:px-8 py-20 md:py-24 border-t border-marketing-line">
-        <div className="max-w-2xl mx-auto text-center space-y-6">
-          <Reveal immediate delayMs={0}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                to="/auth/signup"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:brightness-[1.08] transition-all"
-              >
-                {t("splash.ctaCreate")}
-              </Link>
-              <Link
-                to="/invite"
-                className="inline-flex items-center justify-center rounded-full border border-marketing-line bg-marketing-bg px-6 py-3 text-sm font-semibold text-marketing-ink hover:bg-marketing-surface transition-colors"
-              >
-                {t("splash.ctaInvite")}
-              </Link>
-            </div>
-          </Reveal>
-
-          <div className="pt-4">
-            <Link
-              to="/"
-              className="text-sm text-marketing-muted hover:text-marketing-sage transition-colors"
-            >
-              ← {t("marketing.install.backHome")}
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <MarketingFooter />
     </main>
-  );
-}
-
-function Belief({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="mk-glass rounded-3xl p-6 md:p-7 h-full">
-      <h3
-        className="text-marketing-ink mb-2"
-        style={{ ...serif, fontSize: "1.15rem", lineHeight: 1.25 }}
-      >
-        {title}
-      </h3>
-      <p className="text-marketing-muted leading-[1.75] text-sm md:text-[0.95rem]">
-        {body}
-      </p>
-    </div>
   );
 }
 
@@ -383,173 +281,236 @@ function DataCard({
   return (
     <div
       className={
-        "mk-glass rounded-2xl p-6 h-full transition-all duration-200 " +
+        "mk-glass rounded-2xl overflow-hidden h-full flex flex-col transition-all duration-200 " +
         "hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-14px_color-mix(in_oklab,var(--primary)_35%,transparent)] " +
         "motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
       }
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="inline-flex items-center justify-center size-9 rounded-full bg-marketing-sage/10 text-marketing-sage">
-              <Icon className="size-[18px]" strokeWidth={1.8} />
-            </span>
-            <h3
-              className="text-marketing-ink"
-              style={{ ...serif, fontSize: "1.05rem", lineHeight: 1.25 }}
-            >
-              {title}
-            </h3>
-          </div>
-          <p className="text-marketing-muted leading-[1.7] text-sm">{body}</p>
+      <div
+        className="relative h-32 md:h-36 text-marketing-sage flex items-center justify-center"
+        style={{
+          background:
+            "linear-gradient(180deg, color-mix(in oklab, var(--primary) 8%, transparent) 0%, color-mix(in oklab, var(--primary) 3%, transparent) 100%)",
+        }}
+        aria-hidden
+      >
+        <Composition />
+      </div>
+      <div className="p-6 flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center justify-center size-9 rounded-full bg-marketing-sage/10 text-marketing-sage shrink-0">
+            <Icon className="size-[18px]" strokeWidth={1.8} />
+          </span>
+          <h3
+            className="text-marketing-ink"
+            style={{ ...serif, fontSize: "1.05rem", lineHeight: 1.25 }}
+          >
+            {title}
+          </h3>
         </div>
-        <div className="shrink-0 hidden sm:block text-marketing-sage" aria-hidden>
-          <Composition />
-        </div>
+        <p className="text-marketing-muted leading-[1.7] text-sm">{body}</p>
       </div>
     </div>
   );
 }
 
 /* ────────── Decorative compositions ──────────
-   All aria-hidden, currentColor-driven, no numbers/text. */
+   All aria-hidden via parent, currentColor-driven (text-marketing-sage).
+   Three tints from a single hue via opacity: 1.0 (solid), 0.55 (mid),
+   0.22 (soft). Regular grids, stacks, rows — no scattered elements. */
 
-const COMP_SIZE = 76;
+const TINT_HI = 1;
+const TINT_MID = 0.55;
+const TINT_LO = 0.22;
 
+/** Invite-only — rounded-square boundary containing a 3×3 dot grid;
+ *  two faded dots sit outside the boundary. */
 function CompRing() {
-  // Ring of muted dots on a circle, three filled dots inside — invite-only boundary.
-  const r = 30;
-  const cx = COMP_SIZE / 2;
-  const cy = COMP_SIZE / 2;
-  const outer = Array.from({ length: 10 }, (_, i) => {
-    const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
-    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
-  });
-  return (
-    <svg width={COMP_SIZE} height={COMP_SIZE} viewBox={`0 0 ${COMP_SIZE} ${COMP_SIZE}`}>
-      {outer.map((p, i) => (
-        <circle
-          key={i}
-          cx={p.x}
-          cy={p.y}
-          r={2.4}
-          fill="currentColor"
-          opacity={0.28}
-        />
-      ))}
-      <circle cx={cx - 6} cy={cy} r={3.2} fill="currentColor" />
-      <circle cx={cx + 6} cy={cy - 3} r={3.2} fill="currentColor" />
-      <circle cx={cx + 2} cy={cy + 7} r={3.2} fill="currentColor" />
-    </svg>
-  );
-}
-
-function CompTag() {
-  // Row of dots — one carries a small tag (thin stem + rounded square).
-  const y = COMP_SIZE / 2 + 4;
-  const dots = [10, 22, 34, 46, 58];
-  return (
-    <svg width={COMP_SIZE} height={COMP_SIZE} viewBox={`0 0 ${COMP_SIZE} ${COMP_SIZE}`}>
-      {dots.map((x, i) => (
-        <circle
-          key={i}
-          cx={x}
-          cy={y}
-          r={3}
-          fill="currentColor"
-          opacity={i === 2 ? 1 : 0.3}
-        />
-      ))}
-      {/* tag stem + label attached to the middle dot */}
-      <line
-        x1={34}
-        y1={y - 3}
-        x2={34}
-        y2={y - 18}
-        stroke="currentColor"
-        strokeWidth={1}
-        opacity={0.65}
-      />
-      <rect
-        x={28}
-        y={y - 30}
-        width={20}
-        height={12}
-        rx={3}
-        fill="currentColor"
-        opacity={0.85}
-      />
-    </svg>
-  );
-}
-
-function CompDissolve() {
-  // 5x5 dot grid, opacity fades toward the edges (no ads / no selling — nothing leaves).
-  const cols = 5;
-  const rows = 5;
-  const step = 13;
-  const start = (COMP_SIZE - (cols - 1) * step) / 2;
-  const cx = (cols - 1) / 2;
-  const cy = (rows - 1) / 2;
-  const nodes = [];
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const d = Math.hypot(c - cx, r - cy);
-      const op = Math.max(0.06, 1 - d / 3.2);
-      nodes.push(
-        <circle
-          key={`${r}-${c}`}
-          cx={start + c * step}
-          cy={start + r * step}
-          r={2.2}
-          fill="currentColor"
-          opacity={op}
-        />,
-      );
+  const W = 200;
+  const H = 110;
+  // Boundary rect
+  const bx = 62;
+  const by = 12;
+  const bw = 76;
+  const bh = 86;
+  // 3×3 dot grid centered inside boundary
+  const step = 22;
+  const dotR = 8;
+  const gridCX = bx + bw / 2;
+  const gridCY = by + bh / 2;
+  const dots: [number, number][] = [];
+  for (let r = -1; r <= 1; r++) {
+    for (let c = -1; c <= 1; c++) {
+      dots.push([gridCX + c * step, gridCY + r * step]);
     }
   }
   return (
-    <svg width={COMP_SIZE} height={COMP_SIZE} viewBox={`0 0 ${COMP_SIZE} ${COMP_SIZE}`}>
-      {nodes}
-    </svg>
-  );
-}
-
-function CompEyeOff() {
-  // Sparse dot field + a diagonal slash — subtle "not watched" motif.
-  const dots = [
-    [16, 20],
-    [30, 16],
-    [46, 22],
-    [58, 18],
-    [20, 36],
-    [38, 40],
-    [56, 38],
-    [18, 54],
-    [34, 58],
-    [52, 56],
-  ] as const;
-  return (
-    <svg width={COMP_SIZE} height={COMP_SIZE} viewBox={`0 0 ${COMP_SIZE} ${COMP_SIZE}`}>
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-[86%] h-[86%]"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {/* boundary */}
+      <rect
+        x={bx}
+        y={by}
+        width={bw}
+        height={bh}
+        rx={16}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.5}
+        opacity={TINT_MID}
+      />
+      {/* interior grid */}
       {dots.map(([x, y], i) => (
         <circle
           key={i}
           cx={x}
           cy={y}
-          r={2.2}
+          r={dotR}
           fill="currentColor"
-          opacity={0.35}
+          opacity={i === 4 ? TINT_HI : TINT_MID}
         />
       ))}
-      <line
-        x1={12}
-        y1={64}
-        x2={64}
-        y2={12}
-        stroke="currentColor"
-        strokeWidth={1.6}
-        strokeLinecap="round"
-      />
+      {/* outsiders */}
+      <circle cx={20} cy={55} r={dotR} fill="currentColor" opacity={TINT_LO} />
+      <circle cx={180} cy={55} r={dotR} fill="currentColor" opacity={TINT_LO} />
     </svg>
   );
 }
+
+/** Every action has a name — three horizontal rounded bars, each ending in
+ *  a solid square "tag"; middle bar's tag is the strongest tone. */
+function CompTag() {
+  const W = 200;
+  const H = 110;
+  const rows = [
+    { y: 18, opacity: TINT_MID },
+    { y: 50, opacity: TINT_HI },
+    { y: 82, opacity: TINT_MID },
+  ];
+  const barX = 20;
+  const barW = 118;
+  const barH = 12;
+  const tagX = barX + barW + 8;
+  const tagS = 18;
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-[86%] h-[86%]"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {rows.map((r, i) => (
+        <g key={i}>
+          <rect
+            x={barX}
+            y={r.y}
+            width={barW}
+            height={barH}
+            rx={barH / 2}
+            fill="currentColor"
+            opacity={r.opacity * 0.6}
+          />
+          <rect
+            x={tagX}
+            y={r.y - 3}
+            width={tagS}
+            height={tagS}
+            rx={4}
+            fill="currentColor"
+            opacity={r.opacity}
+          />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** No ads, no selling — 5×4 dot grid whose opacity dissolves toward the
+ *  outer bottom-right corner. Regular grid, nothing scattered. */
+function CompDissolve() {
+  const W = 200;
+  const H = 110;
+  const cols = 5;
+  const rows = 4;
+  const stepX = 30;
+  const stepY = 26;
+  const gridW = (cols - 1) * stepX;
+  const gridH = (rows - 1) * stepY;
+  const startX = (W - gridW) / 2;
+  const startY = (H - gridH) / 2;
+  const dotR = 8;
+  const nodes: ReactNode[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      // distance from top-left corner (opposite of dissolve target)
+      const d = Math.hypot(c / (cols - 1), r / (rows - 1)); // 0..sqrt(2)
+      const t = d / Math.SQRT2; // 0 top-left → 1 bottom-right
+      const op = TINT_HI * (1 - t) + TINT_LO * t * 0.35;
+      nodes.push(
+        <circle
+          key={`${r}-${c}`}
+          cx={startX + c * stepX}
+          cy={startY + r * stepY}
+          r={dotR}
+          fill="currentColor"
+          opacity={Math.max(0.08, op)}
+        />,
+      );
+    }
+  }
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-[86%] h-[86%]"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {nodes}
+    </svg>
+  );
+}
+
+/** No trackers — a triangle dot-grid whose top rows fade to transparent.
+ *  Nothing looking down. Rows widen toward the base. */
+function CompEyeOff() {
+  const W = 200;
+  const H = 110;
+  const rows = 5; // top row 1 dot, bottom row 5 dots
+  const stepX = 24;
+  const stepY = 20;
+  const gridH = (rows - 1) * stepY;
+  const startY = (H - gridH) / 2;
+  const dotR = 8;
+  const nodes: ReactNode[] = [];
+  for (let r = 0; r < rows; r++) {
+    const count = r + 1;
+    const rowW = (count - 1) * stepX;
+    const rowStartX = (W - rowW) / 2;
+    // opacity: top row very faded, base row full
+    const tier = r / (rows - 1); // 0..1
+    const op = TINT_LO * (1 - tier) + TINT_HI * tier;
+    for (let c = 0; c < count; c++) {
+      nodes.push(
+        <circle
+          key={`${r}-${c}`}
+          cx={rowStartX + c * stepX}
+          cy={startY + r * stepY}
+          r={dotR}
+          fill="currentColor"
+          opacity={op < 0.12 ? 0.12 : op}
+        />,
+      );
+    }
+  }
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-[86%] h-[86%]"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {nodes}
+    </svg>
+  );
+}
+
