@@ -14,6 +14,7 @@ import {
   Bell,
   ShieldCheck,
   Languages,
+  Globe,
   Tablet,
   Check,
   Plus,
