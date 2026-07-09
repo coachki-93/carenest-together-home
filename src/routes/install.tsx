@@ -188,7 +188,7 @@ function InstallPage() {
 
         </div>
 
-        <Reveal immediate delayMs={360} className="relative mt-10">
+        <Reveal immediate delayMs={360} className="relative mt-8 md:mt-12">
           <div className="relative mx-auto w-full max-w-[1080px]">
             <img
               src="/landing/install-tablet.webp"
