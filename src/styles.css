@@ -632,7 +632,7 @@
     /* Primary bloom, centered lower — the strongest violet */
     radial-gradient(
       60rem 34rem at 50% 78%,
-      color-mix(in oklab, var(--primary) 22%, transparent) 0%,
+      color-mix(in oklab, var(--primary) 18%, transparent) 0%,
       transparent 70%
     ),
     /* Left offset tint */
