@@ -1646,11 +1646,6 @@ export const en = {
       t2: "English & Swedish",
       t3: "Private to your family",
     },
-    not: {
-      kicker: "What CareNest is not",
-      body:
-        "CareNest doesn't give medical advice — reference ranges and reminders are screening aids, and your care team's guidance always comes first. It isn't a journal system or a replacement for your clinic's records. It's the layer your family actually lives in every day: the shared memory between the people who care for your child.",
-    },
     pricing: {
       kicker: "Pricing",
       title: "Free while we build it together.",
