@@ -17,9 +17,12 @@ export function AppleGlyph(props: SVGProps<SVGSVGElement>) {
 }
 
 export function AndroidGlyph(props: SVGProps<SVGSVGElement>) {
+  // Tightened viewBox around the robot-head silhouette so it reads at
+  // ~90% of the Apple mark's rendered height in the same size box
+  // (optical size equalization — Apple mark visually ~110% of Android).
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 3 24 16"
       fill="currentColor"
       aria-hidden="true"
       {...props}
