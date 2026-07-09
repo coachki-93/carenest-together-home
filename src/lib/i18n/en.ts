@@ -1727,10 +1727,17 @@ export const en = {
       install: "Install on your device",
     },
     install: {
-      kicker: "CareNest on your phone",
-      title: "Add CareNest to your home screen.",
+      kicker: "CareNest on your device",
+      headline1: "No app store.",
+      headline2: "Straight to your home screen.",
       subtitle:
-        "No app store needed. Add it once and CareNest opens full-screen like an app — with notifications, on iPhone, iPad and Android.",
+        "Add CareNest once and it opens full-screen like an app — with notifications, on iPhone, iPad and Android.",
+      phoneMockLabel: "CareNest",
+      phoneMockAlt: "CareNest icon on a phone home screen",
+      desktopNote:
+        "On a computer? Open this page on the family phone or tablet — or install from your browser menu on desktop Chrome and Edge.",
+      otherPlatformIos: "On iPhone or iPad instead?",
+      otherPlatformAndroid: "On Android instead?",
       iosBrowser: "iPhone & iPad · Safari",
       iosTitle: "Install on iOS",
       iosS1Title: "Tap the Share button",
