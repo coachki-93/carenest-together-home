@@ -30,8 +30,8 @@ export async function setI18nLanguage(lang: Lang) {
  *  render never disagree. A stickier localStorage preference is applied
  *  post-hydration by detectClientLanguage (see __root.tsx). */
 export function resolveClientLanguage(): Lang {
-  if (typeof window === "undefined") return "en";
-  return readLangCookieClient() ?? "en";
+  if (typeof window === "undefined") return "sv";
+  return readLangCookieClient() ?? "sv";
 }
 
 /** Detect a language preference from localStorage or navigator.
