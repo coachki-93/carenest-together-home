@@ -169,7 +169,7 @@ function AboutPage() {
                   <span className="block">
                     {t("marketing.about.dataTitleA")}
                   </span>
-                  <span className="block text-marketing-sage">
+                  <span className="block mk-headline-gradient">
                     {t("marketing.about.dataTitleB")}
                   </span>
                 </h2>
