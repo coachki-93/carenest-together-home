@@ -74,26 +74,30 @@ export function PhoneMock({ label }: { label: string }) {
           {cells.map((c, i) => {
             if (c === "care") {
               return (
-                <div
-                  key={i}
-                  className="relative flex flex-col items-center z-10"
-                  style={{ ["--mk-delay" as string]: "420ms" }}
-                >
-                  <span className="mk-check-pop">
-                    <img
-                      src="/landing/carenest-app-icon.webp"
-                      alt=""
-                      width={62}
-                      height={62}
-                      className="h-[54px] w-[54px] md:h-[62px] md:w-[62px] rounded-[14px] shadow-[0_10px_30px_-8px_color-mix(in_oklab,var(--primary)_55%,transparent)] ring-1 ring-black/5"
-                      draggable={false}
-                      style={{
-                        boxShadow:
-                          "0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent), 0 12px 30px -10px color-mix(in oklab, var(--primary) 55%, transparent)",
-                      }}
-                    />
+                <div key={i} className="relative flex flex-col items-center z-10">
+                  <span
+                    className="mk-check-pop inline-flex"
+                    style={{ ["--mk-delay" as string]: "420ms" }}
+                  >
+                    <span
+                      className="block"
+                      style={{ transform: "scale(1.55)", transformOrigin: "center" }}
+                    >
+                      <img
+                        src="/landing/carenest-app-icon.webp"
+                        alt=""
+                        width={38}
+                        height={38}
+                        className="h-[38px] w-[38px] rounded-[10px] ring-1 ring-black/5"
+                        draggable={false}
+                        style={{
+                          boxShadow:
+                            "0 0 0 2px color-mix(in oklab, var(--primary) 22%, transparent), 0 8px 20px -6px color-mix(in oklab, var(--primary) 55%, transparent)",
+                        }}
+                      />
+                    </span>
                   </span>
-                  <span className="mt-1 text-[9px] font-semibold text-marketing-ink/90">
+                  <span className="mt-3 text-[9px] font-semibold text-marketing-ink/90">
                     {label}
                   </span>
                 </div>
