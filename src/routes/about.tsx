@@ -114,10 +114,8 @@ function AboutPage() {
         <Reveal>
           <div className="max-w-5xl mx-auto grid gap-10 md:gap-16 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)]">
             <div>
-              <Reveal immediate delayMs={0}>
-                <Kicker>{t("marketing.about.beliefsTitle")}</Kicker>
-              </Reveal>
               <Reveal immediate delayMs={120}>
+
                 <h2
                   className="tracking-tight text-marketing-ink mt-4"
                   style={{
