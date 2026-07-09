@@ -812,6 +812,7 @@
     inset -1px -1.5px 1px -1px color-mix(in oklab, white 25%, transparent),
     0 1px 4px -2px color-mix(in oklab, var(--primary) 40%, transparent),
     0 4px 12px -6px color-mix(in oklab, var(--primary) 50%, transparent);
+}
 /* Kill the shared specular sheen and hairline border on primary — the
  * lit-from-within look + tinted glass rim own those roles now. */
 .mk-cta-glass--primary::before,
