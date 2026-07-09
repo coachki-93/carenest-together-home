@@ -29,7 +29,7 @@ import { Reveal } from "@/components/marketing/Reveal";
 
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 
-type CardTheme = {
+export type CardTheme = {
   bg: string;
   border: string;
   chipBg: string;
@@ -41,7 +41,7 @@ type CardTheme = {
   ringShadow: string;
 };
 
-const THEME: Record<"sage" | "amber" | "violet" | "ink", CardTheme> = {
+export const OUTCOME_DECK_THEME: Record<"sage" | "amber" | "violet" | "ink", CardTheme> = {
   sage: {
     bg: "color-mix(in oklab, var(--color-marketing-sage) 12%, var(--color-marketing-bg))",
     border: "color-mix(in oklab, var(--color-marketing-sage) 40%, transparent)",
