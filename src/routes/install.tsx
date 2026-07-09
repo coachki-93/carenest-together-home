@@ -18,8 +18,8 @@ import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
 import { Kicker } from "@/components/marketing/Kicker";
 import { HeroHeadline } from "@/components/marketing/HeroHeadline";
 import { Reveal } from "@/components/marketing/Reveal";
-import { PhoneMock } from "@/components/marketing/PhoneMock";
 import { usePlatform } from "@/lib/marketing/use-platform";
+import { useFlashlight } from "@/lib/marketing/use-flashlight";
 
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
