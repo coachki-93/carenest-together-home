@@ -796,12 +796,16 @@
     );
   color: #fff;
   text-shadow: 0 1px 2px color-mix(in oklab, var(--primary) 60%, black);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.4);
   box-shadow:
+    inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 55%, transparent),
+    inset -1px -1.5px 1px -1px color-mix(in oklab, white 25%, transparent),
     0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent),
     0 8px 24px -6px color-mix(in oklab, var(--primary) 50%, transparent);
 }
 /* Kill the shared specular sheen and hairline border on primary — the
- * lit-from-within look owns those roles now. */
+ * lit-from-within look + tinted glass rim own those roles now. */
 .mk-cta-glass--primary::before,
 .mk-cta-glass--primary::after {
   content: none;
@@ -822,6 +826,8 @@
         var(--primary) 60%
       );
     box-shadow:
+      inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 55%, transparent),
+      inset -1px -1.5px 1px -1px color-mix(in oklab, white 25%, transparent),
       0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent),
       0 12px 30px -8px color-mix(in oklab, var(--primary) 60%, transparent);
   }
@@ -838,37 +844,57 @@
         var(--primary) 60%
       );
     box-shadow:
+      inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 55%, transparent),
+      inset -1px -1.5px 1px -1px color-mix(in oklab, white 25%, transparent),
       0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent),
       0 8px 24px -6px color-mix(in oklab, var(--primary) 50%, transparent);
   }
 }
 
-/* Clear — solid-ish frosted white pill with a quiet neutral shadow and
- * hairline border. Reduced specular so the top edge doesn't wash the fill. */
+/* Clear — the star: thick-glass-slab pill with a bright top-left inner rim,
+ * softer bottom-right inner rim, faint inner fill glow, and a soft outer drop.
+ * Diagonal sheen replaces the shared top specular; no blend mode. */
 .mk-cta-glass--clear {
-  background-color: color-mix(in oklab, white 82%, transparent);
+  background-color: color-mix(in oklab, white 45%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  backdrop-filter: blur(12px) saturate(1.5);
+  color: var(--color-marketing-ink);
   box-shadow:
-    0 6px 16px -8px color-mix(in oklab, var(--color-marketing-ink) 20%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 85%, transparent),
-    inset 0 -1px 0 color-mix(in oklab, var(--primary) 8%, transparent);
+    inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 90%, transparent),
+    inset -1px -1.5px 1px -1px color-mix(in oklab, white 65%, transparent),
+    inset 0 0 12px color-mix(in oklab, white 30%, transparent),
+    0 8px 24px -10px color-mix(in oklab, var(--color-marketing-ink) 25%, transparent);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .mk-cta-glass--clear {
+    background-color: color-mix(in oklab, white 88%, transparent);
+  }
 }
 .mk-cta-glass--clear::before {
   background: linear-gradient(
-    180deg,
-    color-mix(in oklab, white 20%, transparent) 0%,
-    color-mix(in oklab, white 0%, transparent) 55%
+    115deg,
+    color-mix(in oklab, white 35%, transparent) 0%,
+    transparent 40%,
+    transparent 60%,
+    color-mix(in oklab, white 18%, transparent) 100%
   );
+  mix-blend-mode: normal;
 }
 .mk-cta-glass--clear::after {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, white 28%, transparent) 0%,
-    transparent 45%
+    color-mix(in oklab, white 50%, transparent) 0%,
+    color-mix(in oklab, white 10%, transparent) 100%
   );
 }
 @media (prefers-reduced-motion: no-preference) {
   .mk-cta-glass--clear:hover {
-    background-color: color-mix(in oklab, white 92%, transparent);
+    background-color: color-mix(in oklab, white 55%, transparent);
+    box-shadow:
+      inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 100%, transparent),
+      inset -1px -1.5px 1px -1px color-mix(in oklab, white 65%, transparent),
+      inset 0 0 12px color-mix(in oklab, white 30%, transparent),
+      0 8px 24px -10px color-mix(in oklab, var(--color-marketing-ink) 25%, transparent);
   }
 }
 
