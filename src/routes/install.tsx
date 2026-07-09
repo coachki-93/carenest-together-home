@@ -186,17 +186,20 @@ function InstallPage() {
             </p>
           </Reveal>
 
-          <Reveal immediate delayMs={360} className="mt-10">
+        </div>
+
+        <Reveal immediate delayMs={360} className="relative mt-10">
+          <div className="relative mx-auto w-full max-w-[1080px]">
             <img
               src="/landing/install-tablet.webp"
               alt={t("marketing.install.tabletAlt")}
               width={1920}
               height={1806}
               draggable={false}
-              className="mx-auto w-full max-w-[420px] md:max-w-[480px] h-auto"
+              className="relative block w-full h-auto select-none"
             />
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* Platform section(s) */}
