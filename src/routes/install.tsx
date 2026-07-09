@@ -18,8 +18,8 @@ import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
 import { Kicker } from "@/components/marketing/Kicker";
 import { HeroHeadline } from "@/components/marketing/HeroHeadline";
 import { Reveal } from "@/components/marketing/Reveal";
-import { PhoneMock } from "@/components/marketing/PhoneMock";
 import { usePlatform } from "@/lib/marketing/use-platform";
+import { useFlashlight } from "@/lib/marketing/use-flashlight";
 
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
@@ -187,16 +187,15 @@ function InstallPage() {
           </Reveal>
 
           <Reveal immediate delayMs={360} className="mt-10">
-            <PhoneMock label={t("marketing.install.phoneMockLabel")} />
+            <img
+              src="/landing/install-tablet.webp"
+              alt={t("marketing.install.tabletAlt")}
+              width={1920}
+              height={1806}
+              draggable={false}
+              className="mx-auto w-full max-w-[420px] md:max-w-[480px] h-auto"
+            />
           </Reveal>
-
-          {platform === "desktop" && (
-            <Reveal immediate delayMs={480}>
-              <p className="mt-8 mx-auto max-w-xl text-sm text-marketing-muted leading-[1.7]">
-                {t("marketing.install.desktopNote")}
-              </p>
-            </Reveal>
-          )}
         </div>
       </section>
 
@@ -264,17 +263,17 @@ function PlatformBlock({
 
 function StepGrid({ steps, armed }: { steps: StepData[]; armed: boolean }) {
   return (
-    <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+    <div className="relative grid grid-cols-1 md:grid-cols-3 items-stretch gap-4 md:gap-6">
       {steps.map((s, i) => (
-        <div key={i} className="relative">
-          <Reveal immediate={armed} delayMs={i * 120}>
+        <div key={i} className="relative h-full">
+          <Reveal immediate={armed} delayMs={i * 120} className="h-full">
             <StepCard n={i + 1} icon={s.icon} title={s.title} body={s.body} popDelayMs={150} />
           </Reveal>
           {/* Chevron connector between cards on md+ */}
           {i < steps.length - 1 && (
             <span
               aria-hidden
-              className="hidden md:flex absolute top-1/2 -right-4 -translate-y-1/2 text-marketing-muted/50"
+              className="hidden md:flex absolute top-1/2 -right-4 -translate-y-1/2 text-marketing-muted/50 z-10"
             >
               <ChevronRight className="size-5" />
             </span>
@@ -298,8 +297,12 @@ function StepCard({
   body: string;
   popDelayMs: number;
 }) {
+  const flashRef = useFlashlight<HTMLDivElement>();
   return (
-    <div className="mk-glass rounded-3xl p-6 md:p-7 h-full flex flex-col">
+    <div
+      ref={flashRef}
+      className="relative h-full mk-glass mk-glass-border mk-flashlight rounded-3xl p-6 md:p-7 flex flex-col"
+    >
       <div className="flex items-center gap-3 mb-4">
         <span
           className="mk-check-pop size-10 rounded-full flex items-center justify-center font-bold text-marketing-bg"
