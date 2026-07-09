@@ -900,6 +900,10 @@
       var(--color-marketing-bg) 100%
     );
 }
+@media (min-width: 768px) {
+  .mk-hero-wash { --mk-header-offset: 6rem; }
+}
+
 
 /* DayTimeline: short-viewport compression — hide the sub-copy and tighten
  * padding so card 4's read-receipt row still clears the fold on ~700px
