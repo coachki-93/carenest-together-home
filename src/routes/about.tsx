@@ -209,7 +209,7 @@ function AboutPage() {
           </div>
 
           <Reveal immediate delayMs={600}>
-            <p className="mt-10 text-xs md:text-sm text-marketing-muted leading-[1.75] max-w-3xl">
+            <p className="mt-10 text-xs md:text-sm text-marketing-muted leading-[1.75] max-w-2xl mx-auto text-center">
               {t("marketing.about.dataFootnote")}
             </p>
           </Reveal>
