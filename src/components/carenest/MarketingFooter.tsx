@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Logo } from "@/components/carenest/Logo";
+
 
 const CONTACT_EMAIL = "hello@carenest.app";
 
-const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
+
 
 export function MarketingFooter() {
   const { t } = useTranslation();
@@ -33,15 +33,12 @@ export function MarketingFooter() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           {/* Brand column */}
           <div className="space-y-5">
-            <div className="flex items-center gap-2.5">
-              <Logo size={32} />
-              <span
-                className="text-xl tracking-tight text-marketing-ink"
-                style={{ ...display, letterSpacing: "-0.02em" }}
-              >
-                CareNest
-              </span>
-            </div>
+            <img
+              src="/landing/carenest-wordmark.png"
+              alt="CareNest"
+              className="h-7 md:h-8 w-auto select-none"
+              draggable={false}
+            />
             <p className="text-sm text-marketing-muted max-w-sm leading-relaxed">
               {t("marketing.footer.tagline")}
             </p>
