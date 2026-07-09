@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 const CONTACT_EMAIL = "hello@carenest.app";
 
-const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
+
 
 export function MarketingFooter() {
   const { t } = useTranslation();
