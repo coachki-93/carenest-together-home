@@ -4,8 +4,8 @@ import { parseLangFromCookieHeader, type Lang } from "./cookie";
 export function resolveLanguageServer(): Lang {
   try {
     const cookieHeader = getRequestHeader("cookie") ?? null;
-    return parseLangFromCookieHeader(cookieHeader) ?? "en";
+    return parseLangFromCookieHeader(cookieHeader) ?? "sv";
   } catch {
-    return "en";
+    return "sv";
   }
 }
