@@ -233,15 +233,74 @@ function Landing() {
         </Reveal>
       </section>
 
-      {/* ── 10. What CareNest is not ── */}
-      <section className="px-6 md:px-8 py-16 md:py-20 border-y border-marketing-line">
-        <Reveal className="max-w-2xl mx-auto text-center space-y-5">
-          <Kicker>{t("marketing.not.kicker")}</Kicker>
-          <p className="text-marketing-muted text-base md:text-lg leading-[1.7]">
-            {t("marketing.not.body")}
-          </p>
-        </Reveal>
+      {/* ── 10. Built for rotating teams (light) ── */}
+      <section className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-y border-marketing-line">
+        <div className="max-w-6xl mx-auto">
+          <Reveal>
+            <div className="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+              <div>
+                <Kicker>{t("marketing.teams.kicker")}</Kicker>
+                <h2 className="text-display-md text-marketing-ink mt-4 mb-6" style={display}>
+                  {t("marketing.teams.title")}
+                </h2>
+                <p className="text-marketing-muted text-base md:text-lg leading-[1.7] mb-6">
+                  {t("marketing.teams.body")}
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <PillTag icon={<ShieldCheck className="size-3.5" />}>
+                    {t("marketing.teams.chip1")}
+                  </PillTag>
+                  <PillTag icon={<UserCheck className="size-3.5" />}>
+                    {t("marketing.teams.chip2")}
+                  </PillTag>
+                  <PillTag icon={<Check className="size-3.5" />}>
+                    {t("marketing.teams.chip3")}
+                  </PillTag>
+                </div>
+                <p className="text-marketing-ink/80 text-base md:text-lg italic leading-[1.7]">
+                  {t("marketing.teams.closing")}
+                </p>
+              </div>
+
+              {/* Salvaged "Checked by Ryan · Care team" mock */}
+              <div className="relative">
+                <div className="rounded-2xl bg-marketing-bg text-marketing-ink shadow-2xl border border-marketing-line p-5 space-y-4 rotate-[-1deg]">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-marketing-muted font-semibold">
+                      {t("marketing.team.mockLabel")}
+                    </p>
+                    <span className="text-[10px] rounded-full bg-marketing-sage-soft border border-marketing-sage-line text-marketing-sage px-2 py-0.5 font-semibold">
+                      ✓
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="size-11 rounded-full flex items-center justify-center font-bold text-marketing-bg"
+                      style={{ background: "var(--primary)" }}
+                    >
+                      R
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-marketing-muted uppercase tracking-wider">
+                        {t("marketing.team.mockCheckedBy")}
+                      </p>
+                      <p className="text-lg text-marketing-ink" style={display}>
+                        {t("marketing.team.mockName")} · {t("marketing.team.mockRole")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="h-px bg-marketing-line" />
+                  <div className="flex items-center gap-2 text-sm text-marketing-muted">
+                    <Check className="size-4 text-marketing-sage" />
+                    <span>{t("marketing.team.mockAnswer")}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
       </section>
+
 
       {/* ── 11. Pricing ── */}
       <section id="pricing" className="px-6 md:px-8 py-20 md:py-28 bg-marketing-surface border-b border-marketing-line">
