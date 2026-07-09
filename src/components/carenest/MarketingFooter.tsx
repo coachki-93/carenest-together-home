@@ -26,7 +26,7 @@ export function MarketingFooter() {
       {/* Fold — dissolves the previous section's surface into the footer wash */}
       <div
         aria-hidden
-        className="mk-footer-fold pointer-events-none absolute top-0 left-0 right-0 h-16 md:h-24"
+        className="mk-footer-fold pointer-events-none absolute top-0 left-0 right-0 h-24 md:h-32"
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 pt-16 pb-10">
