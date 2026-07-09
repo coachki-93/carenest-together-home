@@ -507,6 +507,35 @@ function PillTag({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   );
 }
 
+function IdentityChip({
+  name,
+  color,
+  selected = false,
+}: {
+  name: string;
+  color: string;
+  selected?: boolean;
+}) {
+  return (
+    <span
+      className={
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border " +
+        (selected
+          ? "bg-marketing-sage-soft border-marketing-sage-line text-marketing-sage"
+          : "bg-marketing-surface border-marketing-line text-marketing-muted")
+      }
+    >
+      <span
+        className="inline-block size-2 rounded-full"
+        style={{ background: color }}
+        aria-hidden
+      />
+      {name}
+    </span>
+  );
+}
+
+
 /* Mouse-following radial highlight on cards. Desktop-hover only. */
 function useFlashlight<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
