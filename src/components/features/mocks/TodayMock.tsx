@@ -143,8 +143,11 @@ export function TodayMockLeft() {
             </div>
             <div className="h-1.5 rounded-full bg-marketing-line overflow-hidden">
               <div
-                className="h-full rounded-full"
-                style={{ width: `${PCT}%`, background: "oklch(0.55 0.16 285)" }}
+                className="mk-bar-fill h-full rounded-full"
+                style={{
+                  ["--fill" as never]: `${PCT}%`,
+                  background: "oklch(0.55 0.16 285)",
+                }}
               />
             </div>
           </div>
