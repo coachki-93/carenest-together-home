@@ -2105,7 +2105,7 @@ export const sv = {
     vitals: {
       kicker: "VITALVÄRDEN",
       headline: "Värden du läser med en blick.",
-      sub: "Pulsvärden du kan växla mellan 24 timmar, 7 dagar eller 30 dagar — med ett referensintervall som passar barnet, inte en vuxen i en lärobok.",
+      sub: "Diagram du snabbt kan läsa av, med växling mellan 24 timmar, 7 dagar eller 30 dagar — med ett referensintervall som passar barnet, inte en vuxen i en lärobok.",
       b1: "Logga med sammanhang: vaken, sover, feber, hade ont",
       b2: "Referensintervall per barn som ägaren kan justera",
       b3: "24 timmar, 7 dagar, 30 dagar med ett tryck",
