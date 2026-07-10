@@ -2095,7 +2095,7 @@ export const en = {
     today: {
       kicker: "TODAY",
       headline: "Today, decided for you.",
-      sub: "Everyone opens the app to the same short list — what's due, who's on, and what changed.",
+      sub: "Everyone opens the app to the same list — what's due, who's on, and what changed.",
       b1: "Repeating patterns: daily, weekly, specific times of day",
       b2: "Who's on shift right now, without asking",
       b3: "Hospital mode pauses care-place checks and oxygen tracking",
