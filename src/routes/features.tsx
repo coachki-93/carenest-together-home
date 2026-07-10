@@ -212,7 +212,7 @@ function FeaturesPage() {
       />
 
       {/* "Always there" mosaic */}
-      <MosaicRow />
+      <MosaicDeck />
 
       {/* Closing CTA — glass pair (mirrors landing hero recipe) */}
       <section className="relative px-6 md:px-8 py-24 md:py-32 border-t border-marketing-line">
