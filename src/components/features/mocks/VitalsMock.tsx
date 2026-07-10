@@ -41,14 +41,14 @@ const DATA: Record<PeriodKey, Dataset> = {
       { t: 0.153, v: 92, time: "12:40" },
       { t: 0.271, v: 90, time: "15:20" },
       { t: 0.394, v: 95, time: "18:05" },
-      { t: 0.547, v: 89, time: "21:30" },
-      { t: 0.651, v: 84, time: "23:50" },
-      { t: 0.803, v: 91, time: "03:15" },
-      { t: 1.000, v: 93, time: "07:40" },
+      { t: 0.547, v: 68, time: "21:30" },
+      { t: 0.651, v: 65, time: "23:50" },
+      { t: 0.803, v: 66, time: "03:15" },
+      { t: 1.000, v: 91, time: "07:40" },
     ],
-    avg: 90, min: 84, max: 95, outOfRange: 0, latest: 93,
+    avg: 82, min: 65, max: 95, outOfRange: 3, latest: 91,
     rel: { en: "1 h ago", sv: "1 h sedan" },
-    summary: { en: "Last 24 hours · avg 90 bpm", sv: "Senaste 24 timmar · snitt 90 bpm" },
+    summary: { en: "Last 24 hours · avg 82 bpm", sv: "Senaste 24 timmar · snitt 82 bpm" },
   },
   "7d": {
     readings: [
@@ -68,16 +68,16 @@ const DATA: Record<PeriodKey, Dataset> = {
       { t: 13 / 21, v: 92, time: "" },
       { t: 14 / 21, v: 90, time: "" },
       { t: 15 / 21, v: 86, time: "Sat" },
-      { t: 16 / 21, v: 96, time: "" },
-      { t: 17 / 21, v: 89, time: "" },
-      { t: 18 / 21, v: 91, time: "Sun" },
-      { t: 19 / 21, v: 93, time: "" },
-      { t: 20 / 21, v: 88, time: "" },
+      { t: 16 / 21, v: 67, time: "" },
+      { t: 17 / 21, v: 64, time: "" },
+      { t: 18 / 21, v: 66, time: "Sun" },
+      { t: 19 / 21, v: 89, time: "" },
+      { t: 20 / 21, v: 91, time: "" },
       { t: 1.000, v: 92, time: "" },
     ],
-    avg: 90, min: 84, max: 96, outOfRange: 0, latest: 92,
+    avg: 86, min: 64, max: 95, outOfRange: 3, latest: 92,
     rel: { en: "today", sv: "idag" },
-    summary: { en: "Last 7 days · avg 90 bpm", sv: "Senaste 7 dagar · snitt 90 bpm" },
+    summary: { en: "Last 7 days · avg 86 bpm", sv: "Senaste 7 dagar · snitt 86 bpm" },
   },
   "30d": {
     readings: [
@@ -95,19 +95,20 @@ const DATA: Record<PeriodKey, Dataset> = {
       { t: 11 / 21, v: 89, time: "Wk 3" },
       { t: 12 / 21, v: 93, time: "" },
       { t: 13 / 21, v: 85, time: "" },
-      { t: 14 / 21, v: 91, time: "" },
-      { t: 15 / 21, v: 96, time: "" },
-      { t: 16 / 21, v: 88, time: "" },
+      { t: 14 / 21, v: 68, time: "" },
+      { t: 15 / 21, v: 65, time: "" },
+      { t: 16 / 21, v: 67, time: "" },
       { t: 17 / 21, v: 92, time: "Wk 4" },
       { t: 18 / 21, v: 87, time: "" },
       { t: 19 / 21, v: 94, time: "" },
       { t: 20 / 21, v: 90, time: "" },
       { t: 1.000, v: 93, time: "now" },
     ],
-    avg: 91, min: 85, max: 97, outOfRange: 0, latest: 93,
+    avg: 88, min: 65, max: 97, outOfRange: 3, latest: 93,
     rel: { en: "this week", sv: "denna vecka" },
-    summary: { en: "Last 30 days · avg 91 bpm", sv: "Senaste 30 dagar · snitt 91 bpm" },
+    summary: { en: "Last 30 days · avg 88 bpm", sv: "Senaste 30 dagar · snitt 88 bpm" },
   },
+
 };
 
 const SV_DAYS: Record<string, string> = {
@@ -130,12 +131,11 @@ export function VitalsMock() {
 
   const title = sv ? "Puls" : "Pulse";
   const outLabel = sv ? "utanför intervall" : "out of range";
-  const minmax = `min ${ds.min} · max ${ds.max} · ${ds.outOfRange} ${outLabel}`;
   const summary = sv ? ds.summary.sv : ds.summary.en;
   const rel = sv ? ds.rel.sv : ds.rel.en;
   const aria = sv
-    ? `${title} ${summary}. Min ${ds.min}, max ${ds.max}, alla värden inom intervallet 70 till 115.`
-    : `${title}. ${summary}. Min ${ds.min}, max ${ds.max}, all readings within the 70 to 115 range.`;
+    ? `${title} ${summary}. Min ${ds.min}, max ${ds.max}, ${ds.outOfRange} värden utanför intervallet 70 till 115.`
+    : `${title}. ${summary}. Min ${ds.min}, max ${ds.max}, ${ds.outOfRange} readings outside the 70 to 115 range.`;
 
   // SVG geometry
   const W = 640;
@@ -287,7 +287,12 @@ export function VitalsMock() {
                 </span>
               </div>
               <p className="text-[12px] text-marketing-muted mt-1.5">{summary}</p>
-              <p className="text-[12px] text-marketing-muted">{minmax}</p>
+              <p className="text-[12px] text-marketing-muted">
+                min {ds.min} · max {ds.max} ·{" "}
+                <span className={ds.outOfRange > 0 ? "text-red-600 font-semibold" : ""}>
+                  {ds.outOfRange} {outLabel}
+                </span>
+              </p>
             </div>
           </div>
 
