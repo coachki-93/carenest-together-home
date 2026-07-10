@@ -270,6 +270,7 @@ function TodayBand() {
     t("featuresV2.today.b3"),
     t("featuresV2.today.b4"),
     t("featuresV2.today.b5"),
+    t("featuresV2.today.b6"),
   ];
   return (
     <section

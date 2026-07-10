@@ -2100,6 +2100,7 @@ export const sv = {
       b3: "Sjukhusläget pausar vårdplatskontroller och syrgasspårning",
       b4: "Underhållsuppgifter dyker upp den dag de behövs",
       b5: "Snabblogg och akutsteg är ett tryck bort",
+      b6: "Se historiken över allt som redan är gjort",
     },
     vitals: {
       kicker: "VITALVÄRDEN",
