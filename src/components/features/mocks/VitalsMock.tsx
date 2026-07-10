@@ -287,7 +287,12 @@ export function VitalsMock() {
                 </span>
               </div>
               <p className="text-[12px] text-marketing-muted mt-1.5">{summary}</p>
-              <p className="text-[12px] text-marketing-muted">{minmax}</p>
+              <p className="text-[12px] text-marketing-muted">
+                min {ds.min} · max {ds.max} ·{" "}
+                <span className={ds.outOfRange > 0 ? "text-red-600 font-semibold" : ""}>
+                  {ds.outOfRange} {outLabel}
+                </span>
+              </p>
             </div>
           </div>
 
