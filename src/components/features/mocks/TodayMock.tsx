@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Reveal } from "@/components/marketing/Reveal";
 
 /**
  * TodayMock — genuine mirror of the authenticated /home dashboard, split into
@@ -143,8 +144,11 @@ export function TodayMockLeft() {
             </div>
             <div className="h-1.5 rounded-full bg-marketing-line overflow-hidden">
               <div
-                className="h-full rounded-full"
-                style={{ width: `${PCT}%`, background: "oklch(0.55 0.16 285)" }}
+                className="mk-bar-fill h-full rounded-full"
+                style={{
+                  ["--fill" as never]: `${PCT}%`,
+                  background: "oklch(0.55 0.16 285)",
+                }}
               />
             </div>
           </div>
@@ -292,46 +296,47 @@ export function TodayMockRight() {
         </div>
         <ul className="space-y-1.5">
           {rows.map((r, i) => (
-            <li
-              key={i}
-              className="flex items-center gap-2.5 rounded-xl border border-marketing-line/70 bg-marketing-surface/50 px-2.5 py-2"
-            >
-              <span className="font-mono text-[10.5px] text-marketing-muted w-9 shrink-0">
-                {r.time}
-              </span>
-              <span
-                className="size-7 rounded-full grid place-items-center flex-none"
-                style={{ background: r.tint, color: r.fg }}
-                aria-hidden
+            <Reveal key={i} delayMs={140 + i * 60}>
+              <li
+                className="flex items-center gap-2.5 rounded-xl border border-marketing-line/70 bg-marketing-surface/50 px-2.5 py-2"
               >
-                <r.Icon className="size-3.5" strokeWidth={2} />
-              </span>
-              <span className="flex-1 text-[12.5px] font-semibold text-marketing-ink truncate">
-                {taskTitles[i]}
-              </span>
-              <span
-                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white"
-                style={{ background: "oklch(0.52 0.16 285)" }}
-              >
-                {t("dashboard.markDone")}
-              </span>
-              <button
-                type="button"
-                aria-label="skip"
-                tabIndex={-1}
-                className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
-              >
-                <X className="size-3" />
-              </button>
-              <button
-                type="button"
-                aria-label="calendar"
-                tabIndex={-1}
-                className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
-              >
-                <Calendar className="size-3" />
-              </button>
-            </li>
+                <span className="font-mono text-[10.5px] text-marketing-muted w-9 shrink-0">
+                  {r.time}
+                </span>
+                <span
+                  className="size-7 rounded-full grid place-items-center flex-none"
+                  style={{ background: r.tint, color: r.fg }}
+                  aria-hidden
+                >
+                  <r.Icon className="size-3.5" strokeWidth={2} />
+                </span>
+                <span className="flex-1 text-[12.5px] font-semibold text-marketing-ink truncate">
+                  {taskTitles[i]}
+                </span>
+                <span
+                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white"
+                  style={{ background: "oklch(0.52 0.16 285)" }}
+                >
+                  {t("dashboard.markDone")}
+                </span>
+                <button
+                  type="button"
+                  aria-label="skip"
+                  tabIndex={-1}
+                  className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
+                >
+                  <X className="size-3" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="calendar"
+                  tabIndex={-1}
+                  className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
+                >
+                  <Calendar className="size-3" />
+                </button>
+              </li>
+            </Reveal>
           ))}
         </ul>
       </div>
