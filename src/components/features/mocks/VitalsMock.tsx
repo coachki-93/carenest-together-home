@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * VitalsMock — two side-by-side TrendCard mirrors (Puls + SpO₂), both in
