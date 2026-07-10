@@ -152,6 +152,16 @@ function HandoverPage() {
       tidySkipped: t("handoverPage.prefill.tidySkipped"),
       maintenanceDone: t("handoverPage.prefill.maintenanceDone"),
       maintenanceOverdue: t("handoverPage.prefill.maintenanceOverdue"),
+      vitalTypeLabels: {
+        heart_rate: t("vitals.heartRate"),
+        spo2: t("vitals.spo2"),
+        temperature: t("vitals.temp"),
+        weight: t("vitals.weight"),
+        seizure: t("vitals.seizure"),
+        fluids: t("vitals.fluids"),
+        breathing: t("vitals.breathing"),
+        other: t("vitals.other"),
+      },
     }),
     [t],
   );
