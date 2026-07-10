@@ -2082,6 +2082,55 @@ export const en = {
     saved: "Saved.",
     deleted: "Deleted.",
   },
+  featuresV2: {
+    hero: {
+      kicker: "FEATURES",
+      line1: "Everything CareNest does,",
+      line2: "in one place.",
+      sub: "Today's tasks, vitals, medications, oxygen, handovers, the team, and the household — one app, two languages, quiet when it can be.",
+      metaTitle: "Features — everything CareNest does, in one place",
+      metaDescription:
+        "Today's tasks, vitals, medications, oxygen, handovers, team and household — every part of the day on one calm page.",
+    },
+    today: {
+      kicker: "TODAY",
+      headline: "Today, decided for you.",
+      sub: "Everyone opens the app to the same short list — what's due, who's on, and what changed.",
+      b1: "Repeating patterns: daily, weekly, specific times of day",
+      b2: "Who's on shift right now, without asking",
+      b3: "Hospital mode pauses care-place checks and oxygen tracking",
+      b4: "Maintenance items surface on the day they're due",
+      b5: "Quick log and emergency steps are one tap away",
+    },
+    vitals: {
+      kicker: "VITALS",
+      headline: "Numbers you can read at a glance.",
+      sub: "Two weeks of pulse and oxygen in one look — with a reference band that fits the child, not a textbook adult.",
+      b1: "Log with context: awake, asleep, fever, in pain",
+      b2: "Per-child reference ranges the owner can tune",
+      b3: "24 hours, 7 days, 30 days at a tap",
+      b4: "Alerts after repeated out-of-range readings",
+      b5: "Weight, seizures, fluids and breathing tracked too",
+    },
+    meds: {
+      kicker: "MEDICATIONS",
+      headline: "Every dose, who gave it, and when.",
+      sub: "The whole day of medications on one card, with a name on every line.",
+      b1: "Daily schedule built automatically from each medication",
+      b2: "Skip with a reason, or postpone to later",
+      b3: "Inhalations, oral and injected medications side by side",
+      b4: "Full history per medication, with who gave each dose",
+    },
+    oxygen: {
+      kicker: "OXYGEN",
+      headline: "A tank countdown that knows you're at hospital.",
+      sub: "Time remaining based on flow and the manufacturer's own duration table — paused the moment you flip the hospital toggle.",
+      b1: "Start, swap and finish a tank with one tap",
+      b2: "Duration matched to the manufacturer's own table",
+      b3: "Early warnings you set yourself (defaults 60 and 20 minutes)",
+      b4: "Hospital mode pauses the countdown for you",
+    },
+  },
 };
 
 
