@@ -1,9 +1,12 @@
 import {
+  Baby,
   Calendar,
   Check,
   ChevronRight,
   ClipboardCheck,
   Droplet,
+  GlassWater,
+  Move,
   Pill,
   Sparkles,
   Utensils,
