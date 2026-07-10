@@ -583,6 +583,11 @@
 .mk-bar-fill {
   width: var(--fill, 50%);
   animation: mk-bar-fill 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-play-state: paused;
+}
+[data-visible="true"] .mk-bar-fill,
+[data-visible="true"].mk-bar-fill {
+  animation-play-state: running;
 }
 @media (prefers-reduced-motion: reduce) {
   .mk-bar-fill {
