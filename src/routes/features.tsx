@@ -167,8 +167,7 @@ function FeaturesPage() {
       <section className="px-6 md:px-8 py-20 md:py-24 border-t border-marketing-line">
         <div className="max-w-3xl mx-auto text-center card-soft p-10 bg-gradient-to-br from-lavender to-primary-soft border-0 space-y-4">
           <p className="text-sm text-muted-foreground">
-            {/* Pass-2 placeholder; not translated on purpose. */}
-            More coming: handovers, the team, and the household.
+            {t("featuresV2.comingSoon")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Button
