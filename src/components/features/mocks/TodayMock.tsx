@@ -108,10 +108,10 @@ function useTaskDetails() {
 export function TodayMockLeft() {
   const { t, i18n } = useTranslation();
   const sv = i18n.language?.startsWith("sv");
-  const taskTitles = useTaskTitles();
-  const nextIdx = 3;
+  const taskDetails = useTaskDetails();
+  const nextIdx = 2;
   const nextRow = rows[nextIdx];
-  const nextTitle = taskTitles[nextIdx];
+  const nextTitle = taskDetails[nextIdx].title;
 
   const maintTitle = sv
     ? "Rengör svart filter — Trilogy Evo"
