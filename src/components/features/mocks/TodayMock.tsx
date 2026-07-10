@@ -33,7 +33,7 @@ import { Reveal } from "@/components/marketing/Reveal";
 const HERO_NAME = "Adam";
 const GREETING_NAME = "Gabriella";
 const HANDOVER_AUTHOR = "Ryan";
-const DONE = 3;
+const DONE = 2;
 const TOTAL = 8;
 const PCT = Math.round((DONE / TOTAL) * 100);
 
@@ -48,6 +48,12 @@ interface RowSpec {
 }
 
 const rows: RowSpec[] = [
+  {
+    time: "07:30",
+    Icon: Baby,
+    tint: "color-mix(in oklab, oklch(0.80 0.10 340) 26%, var(--color-marketing-bg))",
+    fg: "oklch(0.46 0.14 340)",
+  },
   {
     time: "08:00",
     Icon: Pill,
@@ -84,6 +90,18 @@ const rows: RowSpec[] = [
     tint: "color-mix(in oklab, oklch(0.55 0.16 285) 20%, var(--color-marketing-bg))",
     fg: "oklch(0.42 0.16 285)",
   },
+  {
+    time: "13:00",
+    Icon: Move,
+    tint: "color-mix(in oklab, oklch(0.75 0.12 145) 24%, var(--color-marketing-bg))",
+    fg: "oklch(0.42 0.14 145)",
+  },
+  {
+    time: "15:00",
+    Icon: GlassWater,
+    tint: "color-mix(in oklab, oklch(0.78 0.12 220) 26%, var(--color-marketing-bg))",
+    fg: "oklch(0.42 0.14 220)",
+  },
 ];
 
 function useTaskDetails() {
@@ -91,18 +109,24 @@ function useTaskDetails() {
   const sv = i18n.language?.startsWith("sv");
   return sv
     ? [
+        { title: "Blöjbyte", detail: null },
         { title: "Morgonmedicin", detail: "2 tabletter" },
         { title: "Mata", detail: "64 ml" },
         { title: "Kontrollera satration", detail: null },
         { title: "Byt plats på prob", detail: null },
         { title: "Inhalation 2 ml NaCl", detail: null },
+        { title: "Förflyttning & positionering", detail: null },
+        { title: "Vätska", detail: "64 ml" },
       ]
     : [
+        { title: "Diaper change", detail: null },
         { title: "Morning meds", detail: "2 tablets" },
         { title: "Feed", detail: "64 ml" },
         { title: "Check saturation", detail: null },
         { title: "Change probe site", detail: null },
         { title: "Inhalation 2 ml NaCl", detail: null },
+        { title: "Repositioning", detail: null },
+        { title: "Fluids", detail: "64 ml" },
       ];
 }
 
@@ -110,9 +134,10 @@ export function TodayMockLeft() {
   const { t, i18n } = useTranslation();
   const sv = i18n.language?.startsWith("sv");
   const taskDetails = useTaskDetails();
-  const nextIdx = 2;
+  const nextIdx = rows.findIndex((r) => !r.done);
   const nextRow = rows[nextIdx];
   const nextTitle = taskDetails[nextIdx].title;
+
 
   const maintTitle = sv
     ? "Rengör svart filter — Trilogy Evo"
