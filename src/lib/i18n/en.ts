@@ -2111,7 +2111,7 @@ export const en = {
       b2: "Per-child reference ranges the owner can tune",
       b3: "24 hours, 7 days, 30 days at a tap",
       b4: "Alerts after repeated out-of-range readings",
-      b5: "Weight, seizures, fluids and breathing tracked too",
+      b5: "Heart rate, SpO₂, temperature, weight, seizures, fluids and breathing rate — all tracked",
       b6: "More measurement types planned — glucose and others",
     },
     meds: {

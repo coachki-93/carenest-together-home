@@ -2110,7 +2110,7 @@ export const sv = {
       b2: "Referensintervall per barn som ägaren kan justera",
       b3: "24 timmar, 7 dagar, 30 dagar med ett tryck",
       b4: "Varningar vid upprepade värden utanför intervall",
-      b5: "Vikt, anfall, vätska och andning loggas också",
+      b5: "Puls, SpO₂, temperatur, vikt, anfall, vätska och andningsfrekvens — allt loggas",
       b6: "Fler mätvärden planerade — blodsocker med flera",
     },
     meds: {
