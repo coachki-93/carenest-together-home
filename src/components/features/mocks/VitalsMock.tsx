@@ -131,12 +131,11 @@ export function VitalsMock() {
 
   const title = sv ? "Puls" : "Pulse";
   const outLabel = sv ? "utanför intervall" : "out of range";
-  const minmax = `min ${ds.min} · max ${ds.max} · ${ds.outOfRange} ${outLabel}`;
   const summary = sv ? ds.summary.sv : ds.summary.en;
   const rel = sv ? ds.rel.sv : ds.rel.en;
   const aria = sv
-    ? `${title} ${summary}. Min ${ds.min}, max ${ds.max}, alla värden inom intervallet 70 till 115.`
-    : `${title}. ${summary}. Min ${ds.min}, max ${ds.max}, all readings within the 70 to 115 range.`;
+    ? `${title} ${summary}. Min ${ds.min}, max ${ds.max}, ${ds.outOfRange} värden utanför intervallet 70 till 115.`
+    : `${title}. ${summary}. Min ${ds.min}, max ${ds.max}, ${ds.outOfRange} readings outside the 70 to 115 range.`;
 
   // SVG geometry
   const W = 640;
