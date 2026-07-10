@@ -336,7 +336,7 @@ export function TodayMockRight() {
                     </p>
                     {r.done && r.by && r.atTime ? (
                       <p className="text-[10.5px] text-marketing-muted truncate mt-0.5 no-underline">
-                        {t("meds.givenBy", { name: r.by })} · {r.atTime}
+                        {t("schedule.givenBy", { name: r.by })} · {r.atTime}
                       </p>
                     ) : null}
                   </div>
@@ -344,7 +344,7 @@ export function TodayMockRight() {
                     <span
                       className="inline-flex items-center gap-1 rounded-full border border-marketing-line px-2.5 py-1 text-[10.5px] font-semibold text-marketing-muted bg-marketing-bg"
                     >
-                      {t("meds.undo")}
+                      {t("schedule.undo")}
                     </span>
                   ) : (
                     <span
