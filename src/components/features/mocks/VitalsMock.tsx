@@ -182,6 +182,26 @@ function TrendCard({
 }
 
 export function VitalsMock() {
+  const { i18n } = useTranslation();
+  const sv = i18n.language?.startsWith("sv");
+  const labels: TrendLabels = sv
+    ? {
+        avg: "Snitt",
+        min: "min",
+        max: "max",
+        last: "Senast",
+        aria: (r) => `7 dagar, alla värden inom ${r}`,
+      }
+    : {
+        avg: "Avg",
+        min: "min",
+        max: "max",
+        last: "Latest",
+        aria: (r) => `7 days, all readings within ${r}`,
+      };
+  const pulseLabel = sv ? "Puls" : "Pulse";
+  const pulseUnit = sv ? "slag/min" : "bpm";
+
   const ref = useRef<HTMLDivElement>(null);
   const [drawn, setDrawn] = useState(false);
   useEffect(() => {
@@ -215,13 +235,13 @@ export function VitalsMock() {
       className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl grid gap-4 sm:grid-cols-2"
     >
       <TrendCard
-        label="Puls"
+        label={pulseLabel}
         rangeLabel="70–115"
         rangeLow={70}
         rangeHigh={115}
         yMin={62}
         yMax={122}
-        unit="slag/min"
+        unit={pulseUnit}
         avg={96}
         min={88}
         max={104}
@@ -230,6 +250,7 @@ export function VitalsMock() {
         readings={HR_READINGS}
         drawn={drawn}
         tint="oklch(0.55 0.16 285)"
+        labels={labels}
       />
       <TrendCard
         label="SpO₂"
@@ -247,6 +268,7 @@ export function VitalsMock() {
         readings={SPO2_READINGS}
         drawn={drawn}
         tint="var(--color-marketing-sage)"
+        labels={labels}
       />
     </div>
   );
