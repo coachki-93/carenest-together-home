@@ -2106,7 +2106,7 @@ export const en = {
     vitals: {
       kicker: "VITALS",
       headline: "Numbers you can read at a glance.",
-      sub: "Pulse readings you can switch between 24 hours, 7 days, or 30 days — with a reference band that fits the child, not a textbook adult.",
+      sub: "Charts you can read at a glance, switching between 24 hours, 7 days, or 30 days — with a reference band that fits the child, not a textbook adult.",
       b1: "Log with context: awake, asleep, fever, in pain",
       b2: "Per-child reference ranges the owner can tune",
       b3: "24 hours, 7 days, 30 days at a tap",
