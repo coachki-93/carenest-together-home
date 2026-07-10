@@ -56,6 +56,7 @@ export interface FeatureBandProps {
   tint: BandTint;
   reverse?: boolean;
   surface?: boolean;
+  compact?: boolean;
   id?: string;
 }
 
@@ -69,6 +70,7 @@ export function FeatureBand({
   tint,
   reverse = false,
   surface = false,
+  compact = false,
   id,
 }: FeatureBandProps) {
   const t = TINT[tint];
@@ -76,7 +78,8 @@ export function FeatureBand({
     <section
       id={id}
       className={
-        "relative px-6 md:px-8 py-20 md:py-28 border-t border-marketing-line " +
+        "relative px-6 md:px-8 border-t border-marketing-line " +
+        (compact ? "py-14 md:py-20 " : "py-20 md:py-28 ") +
         (surface ? "bg-marketing-surface" : "")
       }
     >

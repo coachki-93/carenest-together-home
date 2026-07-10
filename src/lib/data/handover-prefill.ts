@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { VITAL_RANGES, type VitalType } from "@/lib/data/vitals";
 import { buildTodaysDoses, type Medication } from "@/lib/data/medications";
+import { TANKS, formatFlow, type TankType } from "@/lib/oxygen/tanks";
 
 type MedLog = Database["public"]["Tables"]["med_logs"]["Row"];
 type Vital = Database["public"]["Tables"]["vitals"]["Row"];
@@ -40,6 +41,7 @@ interface Labels {
   tidySkipped: string;
   maintenanceDone: string;
   maintenanceOverdue: string;
+  vitalTypeLabels?: Partial<Record<string, string>>;
 }
 
 
@@ -310,25 +312,30 @@ export function useHandoverPrefill(
         if (!Number.isFinite(val)) continue;
         if (val < range.low || val > range.high) {
           const t = fmtTime(new Date(v.logged_at));
+          const typeLabel =
+            labels.vitalTypeLabels?.[v.vital_type] ?? v.vital_type;
           noteLines.push(
-            `• ${t} ${labels.vitalAbnormal}: ${v.vital_type} ${val}${v.unit ?? ""}`,
+            `• ${t} ${labels.vitalAbnormal}: ${typeLabel} ${val}${v.unit ?? ""}`,
           );
         }
       }
 
       // Oxygen tank events during the shift
       for (const tank of oxyTanks) {
+        const tankLabel =
+          TANKS[tank.tank_type as TankType]?.label ?? tank.tank_type;
+        const flowStr = formatFlow(Number(tank.flow_lpm));
         const startedAt = new Date(tank.started_at);
         if (startedAt >= shiftStart && startedAt < shiftEnd) {
           noteLines.push(
-            `• ${fmtTime(startedAt)} ${labels.oxygenStarted} — ${tank.tank_type} @ ${tank.flow_lpm} L/min`,
+            `• ${fmtTime(startedAt)} ${labels.oxygenStarted} — ${tankLabel} @ ${flowStr}`,
           );
         }
         if (tank.replaced_at) {
           const replacedAt = new Date(tank.replaced_at);
           if (replacedAt >= shiftStart && replacedAt < shiftEnd) {
             noteLines.push(
-              `• ${fmtTime(replacedAt)} ${labels.oxygenReplaced} — ${tank.tank_type}`,
+              `• ${fmtTime(replacedAt)} ${labels.oxygenReplaced} — ${tankLabel}`,
             );
           }
         }
