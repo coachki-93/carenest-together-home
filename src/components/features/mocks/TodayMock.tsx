@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Reveal } from "@/components/marketing/Reveal";
 
 /**
  * TodayMock — genuine mirror of the authenticated /home dashboard, split into
