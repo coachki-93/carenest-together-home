@@ -16,7 +16,9 @@ import { Reveal } from "@/components/marketing/Reveal";
 import { Kicker } from "@/components/marketing/Kicker";
 import { HeroHeadline } from "@/components/marketing/HeroHeadline";
 import { FeatureBand } from "@/components/features/FeatureBand";
-import { TodayMock } from "@/components/features/mocks/TodayMock";
+import { TodayMockLeft, TodayMockRight } from "@/components/features/mocks/TodayMock";
+import { Check } from "lucide-react";
+import { bandTint } from "@/components/features/FeatureBand";
 import { VitalsMock } from "@/components/features/mocks/VitalsMock";
 import { MedsMock } from "@/components/features/mocks/MedsMock";
 import { OxygenMock } from "@/components/features/mocks/OxygenMock";
@@ -94,23 +96,9 @@ function FeaturesPage() {
         </div>
       </section>
 
-      {/* Band 1 — TODAY (visual right, sage) */}
-      <FeatureBand
-        id="today"
-        kicker={t("featuresV2.today.kicker")}
-        headline={t("featuresV2.today.headline")}
-        sub={t("featuresV2.today.sub")}
-        bullets={[
-          t("featuresV2.today.b1"),
-          t("featuresV2.today.b2"),
-          t("featuresV2.today.b3"),
-          t("featuresV2.today.b4"),
-          t("featuresV2.today.b5"),
-        ]}
-        Icon={CalendarCheck}
-        tint="sage"
-        visual={<TodayMock />}
-      />
+      {/* Band 1 — TODAY (bespoke: full-width intro, then two cards side by side) */}
+      <TodayBand />
+
 
       {/* Band 2 — VITALS (visual left, violet, surface) */}
       <FeatureBand
@@ -272,3 +260,81 @@ function FeaturesPage() {
     </main>
   );
 }
+
+function TodayBand() {
+  const { t } = useTranslation();
+  const tint = bandTint("sage");
+  const bullets = [
+    t("featuresV2.today.b1"),
+    t("featuresV2.today.b2"),
+    t("featuresV2.today.b3"),
+    t("featuresV2.today.b4"),
+    t("featuresV2.today.b5"),
+  ];
+  return (
+    <section
+      id="today"
+      className="relative px-6 md:px-8 border-t border-marketing-line py-20 md:py-28"
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Full-width intro */}
+        <div className="max-w-3xl">
+          <Reveal>
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                className="size-10 rounded-xl grid place-items-center"
+                style={{ background: tint.chipBg, color: tint.chipFg }}
+                aria-hidden
+              >
+                <CalendarCheck className="size-5" strokeWidth={1.8} />
+              </span>
+              <Kicker>{t("featuresV2.today.kicker")}</Kicker>
+            </div>
+            <h2
+              className="text-display-md text-marketing-ink mb-5"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                textWrap: "balance" as never,
+              }}
+            >
+              {t("featuresV2.today.headline")}
+            </h2>
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.75] mb-7">
+              {t("featuresV2.today.sub")}
+            </p>
+          </Reveal>
+          <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3 mb-12 md:mb-16">
+            {bullets.map((b, i) => (
+              <Reveal key={i} delayMs={140 + i * 60}>
+                <li className="flex items-start gap-3">
+                  <span
+                    className="mt-1 size-5 rounded-full grid place-items-center flex-none"
+                    style={{ background: tint.chipBg, color: tint.check }}
+                    aria-hidden
+                  >
+                    <Check className="size-3.5" strokeWidth={2.5} />
+                  </span>
+                  <span className="text-marketing-ink text-[15px] md:text-base leading-[1.6]">
+                    {b}
+                  </span>
+                </li>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+
+        {/* Two cards side by side */}
+        <div className="grid gap-6 lg:gap-8 lg:grid-cols-2 items-start">
+          <Reveal delayMs={140}>
+            <TodayMockLeft />
+          </Reveal>
+          <Reveal delayMs={220}>
+            <TodayMockRight />
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+

@@ -1,11 +1,11 @@
 import {
   Activity,
+  Calendar,
   Check,
   ChevronRight,
   ClipboardCheck,
   Droplet,
   Heart,
-  Settings,
   Sparkles,
   Wind,
   Wrench,
@@ -15,10 +15,15 @@ import {
 import { useTranslation } from "react-i18next";
 
 /**
- * TodayMock — genuine mirror of the authenticated /home dashboard.
- * Bilingual via real i18n keys (dashboard.*, inventory.*, maintenance.*).
- * Only user-typed task titles branch on i18n.language.
- * Demo cast: Gabriella (on shift), Adam (profile), Ryan (handover author).
+ * TodayMock — genuine mirror of the authenticated /home dashboard, split into
+ * two side-by-side cards for the bespoke TODAY band on /features.
+ *
+ * Left card: greeting/progress hero + Heads-up + Handover + Maintenance.
+ * Right card: today's schedule list.
+ *
+ * Marketing simplification: every row's "Mark done" chip renders in the same
+ * filled violet style regardless of the 3/8 progress count — the real
+ * dashboard is unaffected. Row trailing icons: X (skip) + calendar.
  */
 
 const HERO_NAME = "Adam";
@@ -33,7 +38,6 @@ interface RowSpec {
   Icon: LucideIcon;
   tint: string;
   fg: string;
-  done: boolean;
 }
 
 const rows: RowSpec[] = [
@@ -42,43 +46,37 @@ const rows: RowSpec[] = [
     Icon: Activity,
     tint: "color-mix(in oklab, oklch(0.78 0.10 190) 26%, var(--color-marketing-bg))",
     fg: "oklch(0.42 0.10 200)",
-    done: true,
   },
   {
     time: "11:00",
     Icon: Heart,
     tint: "color-mix(in oklab, oklch(0.78 0.14 15) 22%, var(--color-marketing-bg))",
     fg: "oklch(0.46 0.16 15)",
-    done: true,
   },
   {
     time: "11:00",
     Icon: Droplet,
     tint: "color-mix(in oklab, oklch(0.78 0.14 30) 22%, var(--color-marketing-bg))",
     fg: "oklch(0.46 0.16 30)",
-    done: true,
   },
   {
     time: "11:30",
     Icon: ClipboardCheck,
     tint: "color-mix(in oklab, var(--color-marketing-sage) 22%, var(--color-marketing-bg))",
     fg: "var(--color-marketing-sage)",
-    done: false,
   },
   {
     time: "12:00",
     Icon: Wind,
     tint: "color-mix(in oklab, oklch(0.55 0.16 285) 20%, var(--color-marketing-bg))",
     fg: "oklch(0.42 0.16 285)",
-    done: false,
   },
 ];
 
-export function TodayMock() {
-  const { t, i18n } = useTranslation();
+function useTaskTitles() {
+  const { i18n } = useTranslation();
   const sv = i18n.language?.startsWith("sv");
-
-  const taskTitles = sv
+  return sv
     ? [
         "Räkna andningsfrekvens",
         "Kontrollera puls",
@@ -93,23 +91,32 @@ export function TodayMock() {
         "Change probe site",
         "Inhalation 2 ml NaCl",
       ];
+}
+
+export function TodayMockLeft() {
+  const { t, i18n } = useTranslation();
+  const sv = i18n.language?.startsWith("sv");
+  const taskTitles = useTaskTitles();
+  const nextIdx = 3;
+  const nextRow = rows[nextIdx];
+  const nextTitle = taskTitles[nextIdx];
 
   const maintTitle = sv
     ? "Rengör svart filter — Trilogy Evo"
     : "Clean black filter — Trilogy Evo";
 
-  // Next-up = first pending row
-  const nextIdx = rows.findIndex((r) => !r.done);
-  const nextRow = rows[nextIdx];
-  const nextTitle = taskTitles[nextIdx];
-
   return (
-    <div className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl space-y-4">
+    <div className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl space-y-4 h-full">
       {/* Hero card */}
       <div className="rounded-2xl border border-marketing-line bg-marketing-bg p-4 md:p-5">
-        <div className="flex items-center gap-1.5 mb-2 text-[11px] font-semibold" style={{ color: "oklch(0.48 0.16 285)" }}>
+        <div
+          className="flex items-center gap-1.5 mb-2 text-[11px] font-semibold"
+          style={{ color: "oklch(0.48 0.16 285)" }}
+        >
           <Sparkles className="size-3.5" strokeWidth={2.2} />
-          <span>{t("dashboard.morning")}, {GREETING_NAME}</span>
+          <span>
+            {t("dashboard.morning")}, {GREETING_NAME}
+          </span>
         </div>
         <p
           className="text-lg md:text-xl font-bold text-marketing-ink mb-4"
@@ -118,7 +125,6 @@ export function TodayMock() {
           {t("dashboard.heroLine", { name: HERO_NAME })}
         </p>
 
-        {/* Progress row */}
         <div className="flex items-center gap-4">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-marketing-muted mb-1">
@@ -153,40 +159,52 @@ export function TodayMock() {
         </div>
       </div>
 
-      {/* Inventory alert (amber) */}
+      {/* Inventory alert */}
       <div
         className="flex items-center gap-3 rounded-2xl border px-4 py-3"
         style={{
-          background: "color-mix(in oklab, oklch(0.86 0.13 85) 26%, var(--color-marketing-bg))",
-          borderColor: "color-mix(in oklab, oklch(0.72 0.14 75) 45%, var(--color-marketing-bg))",
+          background:
+            "color-mix(in oklab, oklch(0.86 0.13 85) 26%, var(--color-marketing-bg))",
+          borderColor:
+            "color-mix(in oklab, oklch(0.72 0.14 75) 45%, var(--color-marketing-bg))",
           color: "oklch(0.40 0.10 65)",
         }}
       >
         <span
           className="size-8 rounded-full grid place-items-center flex-none"
-          style={{ background: "color-mix(in oklab, oklch(0.78 0.14 75) 32%, transparent)" }}
+          style={{
+            background:
+              "color-mix(in oklab, oklch(0.78 0.14 75) 32%, transparent)",
+          }}
         >
           <Wrench className="size-4" strokeWidth={2} />
         </span>
         <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-bold leading-tight">{t("inventory.alertTitle")}</p>
-          <p className="text-[11px] opacity-85">{t("inventory.lowCount", { count: 2 })}</p>
+          <p className="text-[13px] font-bold leading-tight">
+            {t("inventory.alertTitle")}
+          </p>
+          <p className="text-[11px] opacity-85">
+            {t("inventory.lowCount", { count: 2 })}
+          </p>
         </div>
         <ChevronRight className="size-4 opacity-70" />
       </div>
 
-      {/* Handover unread (violet) */}
+      {/* Handover unread */}
       <div
         className="flex items-center gap-3 rounded-2xl border px-4 py-3"
         style={{
-          background: "color-mix(in oklab, oklch(0.55 0.16 285) 12%, var(--color-marketing-bg))",
-          borderColor: "color-mix(in oklab, oklch(0.55 0.16 285) 28%, var(--color-marketing-bg))",
+          background:
+            "color-mix(in oklab, oklch(0.55 0.16 285) 12%, var(--color-marketing-bg))",
+          borderColor:
+            "color-mix(in oklab, oklch(0.55 0.16 285) 28%, var(--color-marketing-bg))",
         }}
       >
         <span
           className="size-8 rounded-full grid place-items-center flex-none"
           style={{
-            background: "color-mix(in oklab, oklch(0.55 0.16 285) 22%, transparent)",
+            background:
+              "color-mix(in oklab, oklch(0.55 0.16 285) 22%, transparent)",
             color: "oklch(0.42 0.16 285)",
           }}
         >
@@ -208,23 +226,31 @@ export function TodayMock() {
         </span>
       </div>
 
-      {/* Maintenance section */}
+      {/* Maintenance */}
       <div className="rounded-2xl border border-marketing-line bg-marketing-bg p-4">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2">
-            <Wrench className="size-4" style={{ color: "oklch(0.48 0.14 30)" }} strokeWidth={2} />
+            <Wrench
+              className="size-4"
+              style={{ color: "oklch(0.48 0.14 30)" }}
+              strokeWidth={2}
+            />
             <p className="text-[13px] font-bold text-marketing-ink">
               {t("maintenance.dashboard.title")}
             </p>
           </div>
-          <span className="text-[11px] font-semibold" style={{ color: "oklch(0.48 0.16 285)" }}>
+          <span
+            className="text-[11px] font-semibold"
+            style={{ color: "oklch(0.48 0.16 285)" }}
+          >
             {t("maintenance.dashboard.viewAll")}
           </span>
         </div>
         <div
           className="flex items-center gap-3 rounded-xl px-3 py-2"
           style={{
-            background: "color-mix(in oklab, oklch(0.86 0.13 85) 22%, var(--color-marketing-bg))",
+            background:
+              "color-mix(in oklab, oklch(0.86 0.13 85) 22%, var(--color-marketing-bg))",
           }}
         >
           <span className="flex-1 text-[12.5px] font-semibold text-marketing-ink truncate">
@@ -232,10 +258,7 @@ export function TodayMock() {
           </span>
           <span
             className="text-[9px] font-bold uppercase tracking-[0.14em] px-1.5 py-0.5 rounded"
-            style={{
-              background: "oklch(0.62 0.16 30)",
-              color: "white",
-            }}
+            style={{ background: "oklch(0.62 0.16 30)", color: "white" }}
           >
             {t("maintenance.dueToday")}
           </span>
@@ -245,14 +268,25 @@ export function TodayMock() {
           </span>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Schedule */}
-      <div className="rounded-2xl border border-marketing-line bg-marketing-bg p-4">
+export function TodayMockRight() {
+  const { t } = useTranslation();
+  const taskTitles = useTaskTitles();
+
+  return (
+    <div className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl h-full">
+      <div className="rounded-2xl border border-marketing-line bg-marketing-bg p-4 h-full">
         <div className="flex items-center justify-between mb-2.5">
           <p className="text-[13px] font-bold text-marketing-ink">
             {t("dashboard.todaysSchedule")}
           </p>
-          <span className="text-[11px] font-semibold" style={{ color: "oklch(0.48 0.16 285)" }}>
+          <span
+            className="text-[11px] font-semibold"
+            style={{ color: "oklch(0.48 0.16 285)" }}
+          >
             {t("dashboard.viewFull")}
           </span>
         </div>
@@ -276,19 +310,9 @@ export function TodayMock() {
                 {taskTitles[i]}
               </span>
               <span
-                className={
-                  "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold " +
-                  (r.done
-                    ? "text-marketing-muted"
-                    : "text-white")
-                }
-                style={
-                  r.done
-                    ? { background: "color-mix(in oklab, var(--color-marketing-line) 60%, transparent)" }
-                    : { background: "oklch(0.52 0.16 285)" }
-                }
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white"
+                style={{ background: "oklch(0.52 0.16 285)" }}
               >
-                {r.done && <Check className="size-2.5" strokeWidth={3} />}
                 {t("dashboard.markDone")}
               </span>
               <button
@@ -301,16 +325,26 @@ export function TodayMock() {
               </button>
               <button
                 type="button"
-                aria-label="settings"
+                aria-label="calendar"
                 tabIndex={-1}
                 className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
               >
-                <Settings className="size-3" />
+                <Calendar className="size-3" />
               </button>
             </li>
           ))}
         </ul>
       </div>
+    </div>
+  );
+}
+
+/** Legacy single-column variant, retained for compatibility. */
+export function TodayMock() {
+  return (
+    <div className="space-y-4">
+      <TodayMockLeft />
+      <TodayMockRight />
     </div>
   );
 }
