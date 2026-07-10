@@ -25,7 +25,7 @@ import { OxygenMock } from "@/components/features/mocks/OxygenMock";
 import { HandoversMock } from "@/components/features/mocks/HandoversMock";
 import { TeamMock } from "@/components/features/mocks/TeamMock";
 import { HouseholdMock } from "@/components/features/mocks/HouseholdMock";
-import { MosaicRow } from "@/components/features/MosaicRow";
+import { MosaicDeck } from "@/components/features/MosaicDeck";
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
 const SITE = "https://carenest-together-home.lovable.app";
@@ -212,7 +212,7 @@ function FeaturesPage() {
       />
 
       {/* "Always there" mosaic */}
-      <MosaicRow />
+      <MosaicDeck />
 
       {/* Closing CTA — glass pair (mirrors landing hero recipe) */}
       <section className="relative px-6 md:px-8 py-24 md:py-32 border-t border-marketing-line">
