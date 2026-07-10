@@ -289,7 +289,7 @@ export function TodayMockLeft() {
 
 export function TodayMockRight() {
   const { t } = useTranslation();
-  const taskTitles = useTaskTitles();
+  const taskDetails = useTaskDetails();
 
   return (
     <div className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl h-full">
@@ -306,49 +306,76 @@ export function TodayMockRight() {
           </span>
         </div>
         <ul className="space-y-1.5">
-          {rows.map((r, i) => (
-            <Reveal key={i} delayMs={140 + i * 60}>
-              <li
-                className="flex items-center gap-2.5 rounded-xl border border-marketing-line/70 bg-marketing-surface/50 px-2.5 py-2"
-              >
-                <span className="font-mono text-[10.5px] text-marketing-muted w-9 shrink-0">
-                  {r.time}
-                </span>
-                <span
-                  className="size-7 rounded-full grid place-items-center flex-none"
-                  style={{ background: r.tint, color: r.fg }}
-                  aria-hidden
+          {rows.map((r, i) => {
+            const td = taskDetails[i];
+            return (
+              <Reveal key={i} delayMs={140 + i * 60}>
+                <li
+                  className="flex items-center gap-2.5 rounded-xl border border-marketing-line/70 bg-marketing-surface/50 px-2.5 py-2"
                 >
-                  <r.Icon className="size-3.5" strokeWidth={2} />
-                </span>
-                <span className="flex-1 text-[12.5px] font-semibold text-marketing-ink truncate">
-                  {taskTitles[i]}
-                </span>
-                <span
-                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white"
-                  style={{ background: "oklch(0.52 0.16 285)" }}
-                >
-                  {t("dashboard.markDone")}
-                </span>
-                <button
-                  type="button"
-                  aria-label="skip"
-                  tabIndex={-1}
-                  className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
-                >
-                  <X className="size-3" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="calendar"
-                  tabIndex={-1}
-                  className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
-                >
-                  <Calendar className="size-3" />
-                </button>
-              </li>
-            </Reveal>
-          ))}
+                  <span className="font-mono text-[10.5px] text-marketing-muted w-9 shrink-0">
+                    {r.time}
+                  </span>
+                  <span
+                    className="size-7 rounded-full grid place-items-center flex-none"
+                    style={{
+                      background: r.tint,
+                      color: r.fg,
+                      opacity: r.done ? 0.55 : 1,
+                    }}
+                    aria-hidden
+                  >
+                    <r.Icon className="size-3.5" strokeWidth={2} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-[12.5px] font-semibold truncate ${r.done ? "text-marketing-muted line-through" : "text-marketing-ink"}`}
+                    >
+                      {td.title}
+                      {r.done && td.detail ? (
+                        <span className="ml-1.5 font-normal">· {td.detail}</span>
+                      ) : null}
+                    </p>
+                    {r.done && r.by && r.atTime ? (
+                      <p className="text-[10.5px] text-marketing-muted truncate mt-0.5 no-underline">
+                        {t("meds.givenBy", { name: r.by })} · {r.atTime}
+                      </p>
+                    ) : null}
+                  </div>
+                  {r.done ? (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full border border-marketing-line px-2.5 py-1 text-[10.5px] font-semibold text-marketing-muted bg-marketing-bg"
+                    >
+                      {t("meds.undo")}
+                    </span>
+                  ) : (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white"
+                      style={{ background: "oklch(0.52 0.16 285)" }}
+                    >
+                      {t("dashboard.markDone")}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    aria-label="skip"
+                    tabIndex={-1}
+                    className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
+                  >
+                    <X className="size-3" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="calendar"
+                    tabIndex={-1}
+                    className="size-6 rounded-full border border-marketing-line grid place-items-center text-marketing-muted"
+                  >
+                    <Calendar className="size-3" />
+                  </button>
+                </li>
+              </Reveal>
+            );
+          })}
         </ul>
       </div>
     </div>
