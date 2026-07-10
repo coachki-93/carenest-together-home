@@ -31,6 +31,14 @@ const SPO2_READINGS: Reading[] = [
   { t: 0.98, v: 98 },
 ];
 
+type TrendLabels = {
+  avg: string;
+  min: string;
+  max: string;
+  last: string;
+  aria: (rangeLabel: string) => string;
+};
+
 function TrendCard({
   label,
   rangeLabel,
@@ -47,6 +55,7 @@ function TrendCard({
   readings,
   drawn,
   tint,
+  labels,
 }: {
   label: string;
   rangeLabel: string;
@@ -63,6 +72,7 @@ function TrendCard({
   readings: Reading[];
   drawn: boolean;
   tint: string;
+  labels: TrendLabels;
 }) {
   // Viewport coords
   const W = 340;
