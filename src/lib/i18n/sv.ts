@@ -2081,6 +2081,55 @@ export const sv = {
     saved: "Sparat.",
     deleted: "Borttaget.",
   },
+  featuresV2: {
+    hero: {
+      kicker: "FUNKTIONER",
+      line1: "Allt CareNest gör,",
+      line2: "på ett ställe.",
+      sub: "Dagens uppgifter, vitalvärden, mediciner, syrgas, överlämningar, teamet och hushållet — en app, två språk, tyst när det går.",
+      metaTitle: "Funktioner — allt CareNest gör, på ett ställe",
+      metaDescription:
+        "Dagens uppgifter, vitalvärden, mediciner, syrgas, överlämningar, team och hushåll — hela dagen på en lugn sida.",
+    },
+    today: {
+      kicker: "IDAG",
+      headline: "Idag, redan planerat.",
+      sub: "Alla öppnar appen till samma korta lista — vad som är på tur, vem som jobbar och vad som ändrats.",
+      b1: "Återkommande mönster: dagligen, veckovis, vid bestämda tider",
+      b2: "Vem som jobbar just nu, utan att fråga",
+      b3: "Sjukhusläget pausar vårdplatskontroller och syrgasspårning",
+      b4: "Underhållsuppgifter dyker upp den dag de behövs",
+      b5: "Snabblogg och akutsteg är ett tryck bort",
+    },
+    vitals: {
+      kicker: "VITALVÄRDEN",
+      headline: "Värden du läser med en blick.",
+      sub: "Två veckor med puls och syremättnad i en enda vy — med referensintervall som passar barnet, inte en vuxen i en lärobok.",
+      b1: "Logga med sammanhang: vaken, sover, feber, hade ont",
+      b2: "Referensintervall per barn som ägaren kan justera",
+      b3: "24 timmar, 7 dagar, 30 dagar med ett tryck",
+      b4: "Varningar vid upprepade värden utanför intervall",
+      b5: "Vikt, anfall, vätska och andning loggas också",
+    },
+    meds: {
+      kicker: "MEDICINER",
+      headline: "Varje dos — vem, vad, när.",
+      sub: "Hela dagens mediciner på ett kort, med ett namn på varje rad.",
+      b1: "Dagsschema byggs automatiskt från varje medicin",
+      b2: "Hoppa över med anledning, eller senarelägg",
+      b3: "Inhalationer, mediciner via munnen och injektioner sida vid sida",
+      b4: "Full historik per medicin, med vem som gav varje dos",
+    },
+    oxygen: {
+      kicker: "SYRGAS",
+      headline: "En tubberäkning som vet att ni är på sjukhus.",
+      sub: "Återstående tid från flödet och tillverkarens egen tabell — pausad i samma stund som ni slår på sjukhusläget.",
+      b1: "Starta, byt och avsluta en tub med ett tryck",
+      b2: "Tid matchad mot tillverkarens egen tabell",
+      b3: "Tidiga varningar du sätter själv (standard 60 och 20 minuter)",
+      b4: "Sjukhusläget pausar räknaren åt dig",
+    },
+  },
 };
 
 
