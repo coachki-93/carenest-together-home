@@ -34,7 +34,7 @@ import { Reveal } from "@/components/marketing/Reveal";
 const HERO_NAME = "Adam";
 const GREETING_NAME = "Gabriella";
 const HANDOVER_AUTHOR = "Ryan";
-const DONE = 2;
+const DONE = 3;
 const TOTAL = 8;
 const PCT = Math.round((DONE / TOTAL) * 100);
 
@@ -54,6 +54,9 @@ const rows: RowSpec[] = [
     Icon: Baby,
     tint: "color-mix(in oklab, oklch(0.80 0.10 340) 26%, var(--color-marketing-bg))",
     fg: "oklch(0.46 0.14 340)",
+    done: true,
+    by: "Ryan",
+    atTime: "07:34",
   },
   {
     time: "08:00",
