@@ -157,9 +157,52 @@ export function VitalsMock() {
   const bandTop = y(RANGE_HIGH);
   const bandBottom = y(RANGE_LOW);
 
-  const path = ds.readings
-    .map((r, i) => `${i === 0 ? "M" : "L"} ${x(r.t).toFixed(1)} ${y(r.v).toFixed(1)}`)
-    .join(" ");
+  // Monotone cubic spline (Fritsch–Carlson) for a smooth, overshoot-free
+  // curve through the same points as the straight-line path.
+  const path = (() => {
+    const pts = ds.readings.map((r) => ({ x: x(r.t), y: y(r.v) }));
+    const n = pts.length;
+    if (n < 2) return "";
+    const dx: number[] = [];
+    const dy: number[] = [];
+    const slope: number[] = [];
+    for (let i = 0; i < n - 1; i++) {
+      dx[i] = pts[i + 1].x - pts[i].x;
+      dy[i] = pts[i + 1].y - pts[i].y;
+      slope[i] = dy[i] / dx[i];
+    }
+    const m: number[] = new Array(n);
+    m[0] = slope[0];
+    m[n - 1] = slope[n - 2];
+    for (let i = 1; i < n - 1; i++) {
+      if (slope[i - 1] * slope[i] <= 0) m[i] = 0;
+      else m[i] = (slope[i - 1] + slope[i]) / 2;
+    }
+    for (let i = 0; i < n - 1; i++) {
+      if (slope[i] === 0) {
+        m[i] = 0;
+        m[i + 1] = 0;
+      } else {
+        const a = m[i] / slope[i];
+        const b = m[i + 1] / slope[i];
+        const h = a * a + b * b;
+        if (h > 9) {
+          const t = 3 / Math.sqrt(h);
+          m[i] = t * a * slope[i];
+          m[i + 1] = t * b * slope[i];
+        }
+      }
+    }
+    let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 0; i < n - 1; i++) {
+      const c1x = pts[i].x + dx[i] / 3;
+      const c1y = pts[i].y + (m[i] * dx[i]) / 3;
+      const c2x = pts[i + 1].x - dx[i] / 3;
+      const c2y = pts[i + 1].y - (m[i + 1] * dx[i]) / 3;
+      d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${pts[i + 1].x.toFixed(1)} ${pts[i + 1].y.toFixed(1)}`;
+    }
+    return d;
+  })();
 
   const ref = useRef<HTMLDivElement>(null);
   const [reduced, setReduced] = useState(false);
