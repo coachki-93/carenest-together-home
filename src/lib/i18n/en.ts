@@ -2112,6 +2112,7 @@ export const en = {
       b3: "24 hours, 7 days, 30 days at a tap",
       b4: "Alerts after repeated out-of-range readings",
       b5: "Weight, seizures, fluids and breathing tracked too",
+      b6: "More measurement types planned — glucose and others",
     },
     meds: {
       kicker: "MEDICATIONS",

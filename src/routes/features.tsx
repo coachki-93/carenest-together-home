@@ -112,6 +112,7 @@ function FeaturesPage() {
           t("featuresV2.vitals.b3"),
           t("featuresV2.vitals.b4"),
           t("featuresV2.vitals.b5"),
+          t("featuresV2.vitals.b6"),
         ]}
         Icon={Activity}
         tint="violet"

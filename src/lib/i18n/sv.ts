@@ -2111,6 +2111,7 @@ export const sv = {
       b3: "24 timmar, 7 dagar, 30 dagar med ett tryck",
       b4: "Varningar vid upprepade värden utanför intervall",
       b5: "Vikt, anfall, vätska och andning loggas också",
+      b6: "Fler mätvärden planerade — blodsocker med flera",
     },
     meds: {
       kicker: "MEDICINER",
