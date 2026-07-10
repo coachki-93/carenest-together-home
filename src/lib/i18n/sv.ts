@@ -2091,7 +2091,6 @@ export const sv = {
       metaDescription:
         "Dagens uppgifter, vitalvärden, mediciner, syrgas, överlämningar, team och hushåll — hela dagen på en lugn sida.",
     },
-    comingSoon: "Mer på väg: överlämningar, teamet och hushållet.",
     today: {
       kicker: "IDAG",
       headline: "Idag, redan planerat.",
