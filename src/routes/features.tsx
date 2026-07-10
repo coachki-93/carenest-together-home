@@ -96,23 +96,9 @@ function FeaturesPage() {
         </div>
       </section>
 
-      {/* Band 1 — TODAY (visual right, sage) */}
-      <FeatureBand
-        id="today"
-        kicker={t("featuresV2.today.kicker")}
-        headline={t("featuresV2.today.headline")}
-        sub={t("featuresV2.today.sub")}
-        bullets={[
-          t("featuresV2.today.b1"),
-          t("featuresV2.today.b2"),
-          t("featuresV2.today.b3"),
-          t("featuresV2.today.b4"),
-          t("featuresV2.today.b5"),
-        ]}
-        Icon={CalendarCheck}
-        tint="sage"
-        visual={<TodayMock />}
-      />
+      {/* Band 1 — TODAY (bespoke: full-width intro, then two cards side by side) */}
+      <TodayBand />
+
 
       {/* Band 2 — VITALS (visual left, violet, surface) */}
       <FeatureBand
