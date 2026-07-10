@@ -39,20 +39,29 @@ interface RowSpec {
   Icon: LucideIcon;
   tint: string;
   fg: string;
+  done?: boolean;
+  by?: string;
+  atTime?: string;
 }
 
 const rows: RowSpec[] = [
   {
-    time: "11:00",
-    Icon: Activity,
-    tint: "color-mix(in oklab, oklch(0.78 0.10 190) 26%, var(--color-marketing-bg))",
-    fg: "oklch(0.42 0.10 200)",
+    time: "08:00",
+    Icon: Pill,
+    tint: "color-mix(in oklab, oklch(0.78 0.14 75) 26%, var(--color-marketing-bg))",
+    fg: "oklch(0.44 0.14 75)",
+    done: true,
+    by: "Kim",
+    atTime: "08:04",
   },
   {
-    time: "11:00",
-    Icon: Heart,
-    tint: "color-mix(in oklab, oklch(0.78 0.14 15) 22%, var(--color-marketing-bg))",
-    fg: "oklch(0.46 0.16 15)",
+    time: "09:30",
+    Icon: Utensils,
+    tint: "color-mix(in oklab, oklch(0.78 0.10 190) 26%, var(--color-marketing-bg))",
+    fg: "oklch(0.42 0.10 200)",
+    done: true,
+    by: "Gabriella",
+    atTime: "09:32",
   },
   {
     time: "11:00",
@@ -74,23 +83,23 @@ const rows: RowSpec[] = [
   },
 ];
 
-function useTaskTitles() {
+function useTaskDetails() {
   const { i18n } = useTranslation();
   const sv = i18n.language?.startsWith("sv");
   return sv
     ? [
-        "Räkna andningsfrekvens",
-        "Kontrollera puls",
-        "Kontrollera satration",
-        "Byt plats på prob",
-        "Inhalation 2 ml NaCl",
+        { title: "Morgonmedicin", detail: "2 tabletter" },
+        { title: "Mata", detail: "64 ml" },
+        { title: "Kontrollera satration", detail: null },
+        { title: "Byt plats på prob", detail: null },
+        { title: "Inhalation 2 ml NaCl", detail: null },
       ]
     : [
-        "Count breathing rate",
-        "Check pulse",
-        "Check saturation",
-        "Change probe site",
-        "Inhalation 2 ml NaCl",
+        { title: "Morning meds", detail: "2 tablets" },
+        { title: "Feed", detail: "64 ml" },
+        { title: "Check saturation", detail: null },
+        { title: "Change probe site", detail: null },
+        { title: "Inhalation 2 ml NaCl", detail: null },
       ];
 }
 
