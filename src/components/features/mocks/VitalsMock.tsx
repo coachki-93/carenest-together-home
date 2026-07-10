@@ -100,7 +100,7 @@ function TrendCard({
         </span>
       </div>
       <p className="text-[11px] text-marketing-muted mb-2">
-        Snitt {avg} · min {min} · max {max} {unit}
+        {labels.avg} {avg} · {labels.min} {min} · {labels.max} {max} {unit}
       </p>
 
       {/* Chart */}
@@ -108,7 +108,7 @@ function TrendCard({
         viewBox={`0 0 ${W} ${H}`}
         className="w-full h-[130px]"
         role="img"
-        aria-label={`${label} — 7 dagar, alla värden inom ${rangeLabel}`}
+        aria-label={`${label} — ${labels.aria(rangeLabel)}`}
       >
         {/* Range band */}
         <rect
@@ -165,7 +165,7 @@ function TrendCard({
 
       {/* Last */}
       <p className="text-[11px] text-marketing-muted mt-1">
-        Senast {last} {unit} · {lastTime}
+        {labels.last} {last} {unit} · {lastTime}
       </p>
     </div>
   );
