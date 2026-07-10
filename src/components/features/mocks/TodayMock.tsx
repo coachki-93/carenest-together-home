@@ -1,11 +1,9 @@
 import {
-  Activity,
   Calendar,
   Check,
   ChevronRight,
   ClipboardCheck,
   Droplet,
-  Heart,
   Pill,
   Sparkles,
   Utensils,
