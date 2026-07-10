@@ -5,9 +5,11 @@ import {
   Activity,
   Pill,
   Wind,
+  FileText,
+  Users,
+  Home,
   ArrowRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { Reveal } from "@/components/marketing/Reveal";
@@ -18,6 +20,10 @@ import { TodayMock } from "@/components/features/mocks/TodayMock";
 import { VitalsMock } from "@/components/features/mocks/VitalsMock";
 import { MedsMock } from "@/components/features/mocks/MedsMock";
 import { OxygenMock } from "@/components/features/mocks/OxygenMock";
+import { HandoversMock } from "@/components/features/mocks/HandoversMock";
+import { TeamMock } from "@/components/features/mocks/TeamMock";
+import { HouseholdMock } from "@/components/features/mocks/HouseholdMock";
+import { MosaicRow } from "@/components/features/MosaicRow";
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
 const SITE = "https://carenest-together-home.lovable.app";
@@ -162,32 +168,103 @@ function FeaturesPage() {
         visual={<OxygenMock />}
       />
 
-      {/* Placeholder tail — bands 5–7, mosaic, and glass-CTA land in pass 2.
-          A minimal transient CTA keeps the page terminating cleanly for now. */}
-      <section className="px-6 md:px-8 py-20 md:py-24 border-t border-marketing-line">
-        <div className="max-w-3xl mx-auto text-center card-soft p-10 bg-gradient-to-br from-lavender to-primary-soft border-0 space-y-4">
-          <p className="text-sm text-muted-foreground">
-            {t("featuresV2.comingSoon")}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-            <Button
-              asChild
-              size="lg"
-              className="rounded-full px-8 h-14 text-base font-bold"
+      {/* Band 5 — HANDOVERS (visual right, sage) */}
+      <FeatureBand
+        id="handovers"
+        kicker={t("featuresV2.handovers.kicker")}
+        headline={t("featuresV2.handovers.headline")}
+        sub={t("featuresV2.handovers.sub")}
+        bullets={[
+          t("featuresV2.handovers.b1"),
+          t("featuresV2.handovers.b2"),
+          t("featuresV2.handovers.b3"),
+          t("featuresV2.handovers.b4"),
+        ]}
+        Icon={FileText}
+        tint="sage"
+        visual={<HandoversMock />}
+      />
+
+      {/* Band 6 — TEAM (visual left, violet, surface) */}
+      <FeatureBand
+        id="team"
+        kicker={t("featuresV2.team.kicker")}
+        headline={t("featuresV2.team.headline")}
+        sub={t("featuresV2.team.sub")}
+        bullets={[
+          t("featuresV2.team.b1"),
+          t("featuresV2.team.b2"),
+          t("featuresV2.team.b3"),
+          t("featuresV2.team.b4"),
+        ]}
+        Icon={Users}
+        tint="violet"
+        reverse
+        surface
+        visual={<TeamMock />}
+      />
+
+      {/* Band 7 — HOUSEHOLD (compact, visual right, amber) */}
+      <FeatureBand
+        id="household"
+        kicker={t("featuresV2.household.kicker")}
+        headline={t("featuresV2.household.headline")}
+        sub={t("featuresV2.household.sub")}
+        bullets={[
+          t("featuresV2.household.b1"),
+          t("featuresV2.household.b2"),
+          t("featuresV2.household.b3"),
+          t("featuresV2.household.b4"),
+        ]}
+        Icon={Home}
+        tint="amber"
+        compact
+        visual={<HouseholdMock />}
+      />
+
+      {/* "Always there" mosaic */}
+      <MosaicRow />
+
+      {/* Closing CTA — glass pair (mirrors landing hero recipe) */}
+      <section className="relative px-6 md:px-8 py-24 md:py-32 border-t border-marketing-line">
+        <div className="max-w-3xl mx-auto text-center">
+          <Reveal>
+            <Kicker>{t("featuresV2.cta.kicker")}</Kicker>
+          </Reveal>
+          <Reveal delayMs={120}>
+            <h2
+              className="mt-5 text-display-md text-marketing-ink"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                textWrap: "balance" as never,
+              }}
             >
-              <Link to="/auth/signup">
-                {t("splash.ctaCreate")} <ArrowRight className="size-4" />
+              {t("featuresV2.cta.headline")}
+            </h2>
+          </Reveal>
+          <Reveal delayMs={200}>
+            <p className="mt-5 text-marketing-muted text-base md:text-lg leading-[1.75] max-w-xl mx-auto">
+              {t("featuresV2.cta.sub")}
+            </p>
+          </Reveal>
+          <Reveal delayMs={280}>
+            <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <Link
+                to="/auth/signup"
+                className="mk-cta-glass mk-cta-glass--primary inline-flex items-center justify-center gap-2 rounded-full font-semibold px-7 py-3.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg focus-visible:ring-primary"
+              >
+                {t("marketing.hero.ctaCreate")}
+                <ArrowRight className="size-4" />
               </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="rounded-full px-8 h-14 text-base border-2 bg-card"
-            >
-              <Link to="/">{t("features.cta.backHome")}</Link>
-            </Button>
-          </div>
+              <Link
+                to="/invite"
+                className="mk-cta-glass mk-cta-glass--clear inline-flex items-center justify-center rounded-full text-marketing-ink font-semibold px-7 py-3.5 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-marketing-bg focus-visible:ring-marketing-sage"
+              >
+                {t("invite.haveInvite")}
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </section>
 
