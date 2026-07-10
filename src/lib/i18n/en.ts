@@ -2101,6 +2101,7 @@ export const en = {
       b3: "Hospital mode pauses care-place checks and oxygen tracking",
       b4: "Maintenance items surface on the day they're due",
       b5: "Quick log and emergency steps are one tap away",
+      b6: "See the history of everything already done",
     },
     vitals: {
       kicker: "VITALS",
