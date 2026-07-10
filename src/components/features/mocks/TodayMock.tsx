@@ -321,9 +321,80 @@ export function TodayMockRight() {
   const { t } = useTranslation();
   const taskDetails = useTaskDetails();
 
+  // Scripted completion sequence: the 3 done rows first render pending, then
+  // — once the card intersects — animate a brief button "press" per row on
+  // staggered timers and flip to done state. Fires once. Reduced-motion users
+  // get the final done state immediately.
+  const doneIndices = rows
+    .map((r, i) => (r.done ? i : -1))
+    .filter((i) => i >= 0);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [reduced, setReduced] = useState(false);
+  const [triggered, setTriggered] = useState(false);
+  const [doneShown, setDoneShown] = useState<Set<number>>(() => new Set());
+  const [pressing, setPressing] = useState<Set<number>>(() => new Set());
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) {
+      setReduced(true);
+      setDoneShown(new Set(doneIndices));
+      setTriggered(true);
+      return;
+    }
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setTriggered(true);
+            io.disconnect();
+          }
+        }
+      },
+      { threshold: 0.25, rootMargin: "0px 0px -8% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!triggered || reduced) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    doneIndices.forEach((idx, k) => {
+      const base = 600 + k * 300;
+      timers.push(
+        setTimeout(() => {
+          setPressing((prev) => new Set(prev).add(idx));
+        }, base),
+      );
+      timers.push(
+        setTimeout(() => {
+          setPressing((prev) => {
+            const n = new Set(prev);
+            n.delete(idx);
+            return n;
+          });
+          setDoneShown((prev) => new Set(prev).add(idx));
+        }, base + 160),
+      );
+    });
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggered, reduced]);
+
   return (
     <div className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl h-full">
-      <div className="rounded-2xl border border-marketing-line bg-marketing-bg p-4 h-full">
+      <div
+        ref={containerRef}
+        className="rounded-2xl border border-marketing-line bg-marketing-bg p-4 h-full"
+      >
         <div className="flex items-center justify-between mb-2.5">
           <p className="text-[13px] font-bold text-marketing-ink">
             {t("dashboard.todaysSchedule")}
@@ -338,6 +409,9 @@ export function TodayMockRight() {
         <ul className="space-y-1.5">
           {rows.map((r, i) => {
             const td = taskDetails[i];
+            const isDoneRow = !!r.done;
+            const showAsDone = isDoneRow && doneShown.has(i);
+            const isPressing = pressing.has(i);
             return (
               <Reveal key={i} delayMs={140 + i * 60}>
                 <li
@@ -351,7 +425,8 @@ export function TodayMockRight() {
                     style={{
                       background: r.tint,
                       color: r.fg,
-                      opacity: r.done ? 0.55 : 1,
+                      opacity: showAsDone ? 0.55 : 1,
+                      transition: "opacity 240ms ease-out",
                     }}
                     aria-hidden
                   >
@@ -359,20 +434,30 @@ export function TodayMockRight() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-[12.5px] font-semibold truncate ${r.done ? "text-marketing-muted line-through" : "text-marketing-ink"}`}
+                      className={`text-[12.5px] font-semibold truncate ${showAsDone ? "text-marketing-muted line-through" : "text-marketing-ink"}`}
+                      style={{ transition: "color 240ms ease-out" }}
                     >
                       {td.title}
-                      {r.done && td.detail ? (
+                      {showAsDone && td.detail ? (
                         <span className="ml-1.5 font-normal">· {td.detail}</span>
                       ) : null}
                     </p>
-                    {r.done && r.by && r.atTime ? (
-                      <p className="text-[10.5px] text-marketing-muted truncate mt-0.5 no-underline">
+                    {isDoneRow && r.by && r.atTime ? (
+                      <p
+                        className="text-[10.5px] text-marketing-muted truncate mt-0.5 no-underline"
+                        style={{
+                          opacity: showAsDone ? 1 : 0,
+                          maxHeight: showAsDone ? 20 : 0,
+                          transition:
+                            "opacity 260ms ease-out, max-height 260ms ease-out",
+                          overflow: "hidden",
+                        }}
+                      >
                         {t("schedule.givenBy", { name: r.by })} · {r.atTime}
                       </p>
                     ) : null}
                   </div>
-                  {r.done ? (
+                  {showAsDone ? (
                     <span
                       className="inline-flex items-center gap-1 rounded-full border border-marketing-line px-2.5 py-1 text-[10.5px] font-semibold text-marketing-muted bg-marketing-bg"
                     >
@@ -381,7 +466,12 @@ export function TodayMockRight() {
                   ) : (
                     <span
                       className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-bold text-white"
-                      style={{ background: "oklch(0.52 0.16 285)" }}
+                      style={{
+                        background: "oklch(0.52 0.16 285)",
+                        transform: isPressing ? "scale(0.9)" : "scale(1)",
+                        transition:
+                          "transform 140ms cubic-bezier(0.4, 0, 0.2, 1)",
+                      }}
                     >
                       {t("dashboard.markDone")}
                     </span>
