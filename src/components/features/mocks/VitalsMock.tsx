@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * VitalsMock — two side-by-side TrendCard mirrors (Puls + SpO₂), both in
@@ -30,6 +31,14 @@ const SPO2_READINGS: Reading[] = [
   { t: 0.98, v: 98 },
 ];
 
+type TrendLabels = {
+  avg: string;
+  min: string;
+  max: string;
+  last: string;
+  aria: (rangeLabel: string) => string;
+};
+
 function TrendCard({
   label,
   rangeLabel,
@@ -46,6 +55,7 @@ function TrendCard({
   readings,
   drawn,
   tint,
+  labels,
 }: {
   label: string;
   rangeLabel: string;
@@ -62,6 +72,7 @@ function TrendCard({
   readings: Reading[];
   drawn: boolean;
   tint: string;
+  labels: TrendLabels;
 }) {
   // Viewport coords
   const W = 340;
@@ -99,7 +110,7 @@ function TrendCard({
         </span>
       </div>
       <p className="text-[11px] text-marketing-muted mb-2">
-        Snitt {avg} · min {min} · max {max} {unit}
+        {labels.avg} {avg} · {labels.min} {min} · {labels.max} {max} {unit}
       </p>
 
       {/* Chart */}
@@ -107,7 +118,7 @@ function TrendCard({
         viewBox={`0 0 ${W} ${H}`}
         className="w-full h-[130px]"
         role="img"
-        aria-label={`${label} — 7 dagar, alla värden inom ${rangeLabel}`}
+        aria-label={`${label} — ${labels.aria(rangeLabel)}`}
       >
         {/* Range band */}
         <rect
@@ -164,13 +175,33 @@ function TrendCard({
 
       {/* Last */}
       <p className="text-[11px] text-marketing-muted mt-1">
-        Senast {last} {unit} · {lastTime}
+        {labels.last} {last} {unit} · {lastTime}
       </p>
     </div>
   );
 }
 
 export function VitalsMock() {
+  const { i18n } = useTranslation();
+  const sv = i18n.language?.startsWith("sv");
+  const labels: TrendLabels = sv
+    ? {
+        avg: "Snitt",
+        min: "min",
+        max: "max",
+        last: "Senast",
+        aria: (r) => `7 dagar, alla värden inom ${r}`,
+      }
+    : {
+        avg: "Avg",
+        min: "min",
+        max: "max",
+        last: "Latest",
+        aria: (r) => `7 days, all readings within ${r}`,
+      };
+  const pulseLabel = sv ? "Puls" : "Pulse";
+  const pulseUnit = sv ? "slag/min" : "bpm";
+
   const ref = useRef<HTMLDivElement>(null);
   const [drawn, setDrawn] = useState(false);
   useEffect(() => {
@@ -204,13 +235,13 @@ export function VitalsMock() {
       className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl grid gap-4 sm:grid-cols-2"
     >
       <TrendCard
-        label="Puls"
+        label={pulseLabel}
         rangeLabel="70–115"
         rangeLow={70}
         rangeHigh={115}
         yMin={62}
         yMax={122}
-        unit="slag/min"
+        unit={pulseUnit}
         avg={96}
         min={88}
         max={104}
@@ -219,6 +250,7 @@ export function VitalsMock() {
         readings={HR_READINGS}
         drawn={drawn}
         tint="oklch(0.55 0.16 285)"
+        labels={labels}
       />
       <TrendCard
         label="SpO₂"
@@ -236,6 +268,7 @@ export function VitalsMock() {
         readings={SPO2_READINGS}
         drawn={drawn}
         tint="var(--color-marketing-sage)"
+        labels={labels}
       />
     </div>
   );

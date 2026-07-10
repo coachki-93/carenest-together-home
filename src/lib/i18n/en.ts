@@ -2092,6 +2092,7 @@ export const en = {
       metaDescription:
         "Today's tasks, vitals, medications, oxygen, handovers, team and household — every part of the day on one calm page.",
     },
+    comingSoon: "More coming: handovers, the team, and the household.",
     today: {
       kicker: "TODAY",
       headline: "Today, decided for you.",
