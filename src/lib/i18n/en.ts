@@ -1374,9 +1374,9 @@ export const en = {
       kicker: "Care, together",
       headline: "Everything about your child's care — out of your head, into one calm place.",
       headline1: "Everything about your child's care.",
-      headline2: "Out of your head, into one calm place.",
+      headline2: "In one place, so nothing is forgotten.",
       subline:
-        "The shared home base for families of children with special needs — so the day no longer depends on your memory.",
+        "The shared home base for families of children with special needs — one calm place for the whole team.",
       ctaCreate: "Create your family space",
       ctaInvite: "I have an invite",
       ctaInstall: "Add CareNest to your device",
