@@ -54,6 +54,7 @@ export const sv = {
     orSignInWith: "Eller logga in med",
     showPassword: "Visa lösenord",
     hidePassword: "Dölj lösenord",
+    genericError: "Något gick fel — försök igen.",
     newHere: "Ny på CareNest?",
     createAccount: "Skapa ett konto",
     signupTitleFamily: "Skapa ditt familjekonto",
