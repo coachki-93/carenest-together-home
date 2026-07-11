@@ -1520,10 +1520,10 @@ export const sv = {
       c3Chip2: "Skyddsnät",
       c3Chip3: "Läskvitton",
       c4Eyebrow: "Tillsyn",
-      c4Headline: "Missade tillsyner tystnar aldrig.",
+      c4Headline: "En missad tillsyn passerar aldrig tyst.",
       c4Title: "När något behöver dig får du veta. Annars är det tyst.",
       c4Body:
-        "Larm bara för det som spelar roll: ett kritiskt svar, en missad tillsyn, en låg tub.",
+        "Larm bara för det som spelar roll: ett kritiskt svar, en missad tillsyn, en tub som börjar ta slut.",
       c4Chip1: "Push-notiser",
       c4Chip2: "Skyddsnät",
       vignette: {
