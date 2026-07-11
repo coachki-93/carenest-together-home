@@ -24,7 +24,7 @@ import { MedsMock } from "@/components/features/mocks/MedsMock";
 import { OxygenMock } from "@/components/features/mocks/OxygenMock";
 import { HandoversMock } from "@/components/features/mocks/HandoversMock";
 import { TeamMock } from "@/components/features/mocks/TeamMock";
-import { HouseholdMock } from "@/components/features/mocks/HouseholdMock";
+import { ShoppingMock, TidyMock, MaintenanceMock } from "@/components/features/mocks/HouseholdMock";
 import { MosaicDeck } from "@/components/features/MosaicDeck";
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
