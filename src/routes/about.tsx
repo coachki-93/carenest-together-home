@@ -119,16 +119,13 @@ function AboutPage() {
             line2={t("marketing.about.titleB")}
           />
           <div className="space-y-6 text-[1.05rem] leading-[1.85] text-marketing-muted pt-2">
-            <Reveal immediate delayMs={520}>
-              <p>{t("marketing.about.p1")}</p>
-            </Reveal>
-            <Reveal immediate delayMs={640}>
-              <p>{t("marketing.about.p2")}</p>
-            </Reveal>
-            <Reveal immediate delayMs={760}>
-              <p>{t("marketing.about.p3")}</p>
-            </Reveal>
+            {([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((n, i) => (
+              <Reveal key={n} immediate delayMs={520 + i * 120}>
+                <p>{t(`marketing.about.p${n}`)}</p>
+              </Reveal>
+            ))}
           </div>
+
         </div>
       </section>
 
