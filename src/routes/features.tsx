@@ -178,23 +178,9 @@ function FeaturesPage() {
       <TeamBand />
 
 
-      {/* Band 7 — HOUSEHOLD (compact, visual right, amber) */}
-      <FeatureBand
-        id="household"
-        kicker={t("featuresV2.household.kicker")}
-        headline={t("featuresV2.household.headline")}
-        sub={t("featuresV2.household.sub")}
-        bullets={[
-          t("featuresV2.household.b1"),
-          t("featuresV2.household.b2"),
-          t("featuresV2.household.b3"),
-          t("featuresV2.household.b4"),
-        ]}
-        Icon={Home}
-        tint="amber"
-        compact
-        visual={<HouseholdMock />}
-      />
+      {/* Band 7 — HOUSEHOLD (centered intro + 3-up cards, TodayBand pattern) */}
+      <HouseholdBand />
+
 
       {/* "Always there" mosaic */}
       <MosaicDeck />
