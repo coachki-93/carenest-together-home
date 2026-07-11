@@ -88,6 +88,7 @@ function FeaturesPage() {
           <HeroHeadline
             line1={t("featuresV2.hero.line1")}
             line2={t("featuresV2.hero.line2")}
+            sizeClassName="text-display-lg xl:text-display-xl"
           />
           <Reveal immediate delayMs={520}>
             <p className="text-marketing-muted text-base md:text-lg leading-[1.75] max-w-2xl mx-auto">
