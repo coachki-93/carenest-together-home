@@ -157,22 +157,9 @@ function FeaturesPage() {
         visual={<OxygenMock />}
       />
 
-      {/* Band 5 — HANDOVERS (visual right, sage) */}
-      <FeatureBand
-        id="handovers"
-        kicker={t("featuresV2.handovers.kicker")}
-        headline={t("featuresV2.handovers.headline")}
-        sub={t("featuresV2.handovers.sub")}
-        bullets={[
-          t("featuresV2.handovers.b1"),
-          t("featuresV2.handovers.b2"),
-          t("featuresV2.handovers.b3"),
-          t("featuresV2.handovers.b4"),
-        ]}
-        Icon={FileText}
-        tint="sage"
-        visual={<HandoversMock />}
-      />
+      {/* Band 5 — HANDOVERS (bento: centered intro + 1/3 receipt · 2/3 sheet) */}
+      <HandoversBand />
+
 
       {/* Band 6 — TEAM (dark treatment, mirrors landing VitalsBand recipe) */}
       <TeamBand />
