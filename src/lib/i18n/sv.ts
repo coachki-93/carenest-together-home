@@ -2124,12 +2124,12 @@ export const sv = {
     },
     oxygen: {
       kicker: "SYRGAS",
-      headline: "En tubberäkning som vet att ni är på sjukhus.",
-      sub: "Återstående tid från flödet och tillverkarens egen tabell — pausad i samma stund som ni slår på sjukhusläget.",
+      headline: "En nedräkning som vet att ni är på sjukhus.",
+      sub: "Återstående tid utifrån flödet och tillverkarens egen tabell — pausad i samma stund som ni slår på sjukhusläget.",
       b1: "Starta, byt och avsluta en tub med ett tryck",
-      b2: "Tid matchad mot tillverkarens egen tabell",
-      b3: "Tidiga varningar du sätter själv (standard 60 och 20 minuter)",
-      b4: "Sjukhusläget pausar räknaren åt dig",
+      b2: "Tiden hämtas ur tillverkarens egen tabell",
+      b3: "Tidiga varningar ni ställer in själva (standard 60 och 20 minuter)",
+      b4: "Sjukhusläget pausar räknaren åt er",
     },
     handovers: {
       kicker: "ÖVERLÄMNINGAR",
