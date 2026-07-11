@@ -174,24 +174,9 @@ function FeaturesPage() {
         visual={<HandoversMock />}
       />
 
-      {/* Band 6 — TEAM (visual left, violet, surface) */}
-      <FeatureBand
-        id="team"
-        kicker={t("featuresV2.team.kicker")}
-        headline={t("featuresV2.team.headline")}
-        sub={t("featuresV2.team.sub")}
-        bullets={[
-          t("featuresV2.team.b1"),
-          t("featuresV2.team.b2"),
-          t("featuresV2.team.b3"),
-          t("featuresV2.team.b4"),
-        ]}
-        Icon={Users}
-        tint="violet"
-        reverse
-        surface
-        visual={<TeamMock />}
-      />
+      {/* Band 6 — TEAM (dark treatment, mirrors landing VitalsBand recipe) */}
+      <TeamBand />
+
 
       {/* Band 7 — HOUSEHOLD (compact, visual right, amber) */}
       <FeatureBand
