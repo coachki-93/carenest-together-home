@@ -1,6 +1,8 @@
 import { Hospital, Bell } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 /**
  * OxygenMock — tank countdown card that plays a short "pause happening"
@@ -8,13 +10,15 @@ import { useTranslation } from "react-i18next";
  *
  * Numbers: LIV Mini 2 L @ 0.10 l/min = 3856 min total (see
  * src/lib/oxygen/tanks.ts). Demo remaining starts at 18h 24m (1104 min,
- * ~29% of tank), ticks 24 → 23 → 22 min in the visible portion, then a
- * PAUSED chip pops in and the "Resumes automatically" line fades in —
- * ticking stops on pause. One-shot; reduced motion renders the final
- * paused state instantly with no scene.
+ * ~29% of tank), ticks 24 → 23 → 22 min in the visible portion, then the
+ * hospital toggle visibly flips ON (mirrors HospitalToggle.tsx exactly:
+ * neutral pill → red-tinted on-state), then a PAUSED chip pops in and
+ * the "Resumes automatically" line fades in — ticking stops on pause.
+ * One-shot; reduced motion renders the final paused state (toggle on)
+ * instantly with no scene.
  */
 export function OxygenMock() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sv = i18n.language?.startsWith("sv");
 
   const s = sv
@@ -40,6 +44,7 @@ export function OxygenMock() {
       };
 
   const [minutes, setMinutes] = useState(24);
+  const [toggleOn, setToggleOn] = useState(false);
   const [paused, setPaused] = useState(false);
   const [started, setStarted] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -51,6 +56,7 @@ export function OxygenMock() {
     if (mq.matches) {
       setReduced(true);
       setMinutes(22);
+      setToggleOn(true);
       setPaused(true);
       setStarted(true);
       return;
@@ -77,7 +83,8 @@ export function OxygenMock() {
     const timers: ReturnType<typeof setTimeout>[] = [];
     timers.push(setTimeout(() => setMinutes(23), 1100));
     timers.push(setTimeout(() => setMinutes(22), 2300));
-    timers.push(setTimeout(() => setPaused(true), 3500));
+    timers.push(setTimeout(() => setToggleOn(true), 2900));
+    timers.push(setTimeout(() => setPaused(true), 3700));
     return () => timers.forEach(clearTimeout);
   }, [started, reduced]);
 
@@ -117,6 +124,25 @@ export function OxygenMock() {
         >
           <Hospital className="size-3.5" />
           {s.paused}
+        </span>
+      </div>
+
+      {/* Hospital toggle row — mirrors HospitalToggle.tsx styling */}
+      <div className="mb-4">
+        <span
+          className={cn(
+            "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold w-fit",
+            toggleOn
+              ? "border-red-400 bg-red-50 text-red-900"
+              : "border-marketing-line bg-marketing-bg text-marketing-ink",
+          )}
+          style={{
+            transition: reduced ? "none" : "background-color 260ms ease-out, border-color 260ms ease-out, color 260ms ease-out",
+          }}
+        >
+          <Hospital className="size-4" />
+          <span>{t("dashboard.atHospital")}</span>
+          <Switch checked={toggleOn} tabIndex={-1} aria-hidden />
         </span>
       </div>
 
