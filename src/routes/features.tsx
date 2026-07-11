@@ -24,7 +24,7 @@ import { MedsMock } from "@/components/features/mocks/MedsMock";
 import { OxygenMock } from "@/components/features/mocks/OxygenMock";
 import { HandoversMock } from "@/components/features/mocks/HandoversMock";
 import { TeamMock } from "@/components/features/mocks/TeamMock";
-import { HouseholdMock } from "@/components/features/mocks/HouseholdMock";
+import { ShoppingMock, TidyMock, MaintenanceMock } from "@/components/features/mocks/HouseholdMock";
 import { MosaicDeck } from "@/components/features/MosaicDeck";
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
@@ -178,23 +178,9 @@ function FeaturesPage() {
       <TeamBand />
 
 
-      {/* Band 7 — HOUSEHOLD (compact, visual right, amber) */}
-      <FeatureBand
-        id="household"
-        kicker={t("featuresV2.household.kicker")}
-        headline={t("featuresV2.household.headline")}
-        sub={t("featuresV2.household.sub")}
-        bullets={[
-          t("featuresV2.household.b1"),
-          t("featuresV2.household.b2"),
-          t("featuresV2.household.b3"),
-          t("featuresV2.household.b4"),
-        ]}
-        Icon={Home}
-        tint="amber"
-        compact
-        visual={<HouseholdMock />}
-      />
+      {/* Band 7 — HOUSEHOLD (centered intro + 3-up cards, TodayBand pattern) */}
+      <HouseholdBand />
+
 
       {/* "Always there" mosaic */}
       <MosaicDeck />
@@ -411,5 +397,90 @@ function TeamBand() {
     </section>
   );
 }
+
+function HouseholdBand() {
+  const { t } = useTranslation();
+  const tint = bandTint("amber");
+  const cards: Array<{ title: string; body: string; mock: React.ReactNode }> = [
+    {
+      title: t("featuresV2.household.card1t"),
+      body: t("featuresV2.household.card1b"),
+      mock: <ShoppingMock />,
+    },
+    {
+      title: t("featuresV2.household.card2t"),
+      body: t("featuresV2.household.card2b"),
+      mock: <TidyMock />,
+    },
+    {
+      title: t("featuresV2.household.card3t"),
+      body: t("featuresV2.household.card3b"),
+      mock: <MaintenanceMock />,
+    },
+  ];
+  return (
+    <section
+      id="household"
+      className="relative px-6 md:px-8 border-t border-marketing-line py-20 md:py-28"
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Full-width intro (centered) */}
+        <div className="max-w-3xl mx-auto text-center">
+          <Reveal>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span
+                className="size-10 rounded-xl grid place-items-center"
+                style={{ background: tint.chipBg, color: tint.chipFg }}
+                aria-hidden
+              >
+                <Home className="size-5" strokeWidth={1.8} />
+              </span>
+              <Kicker>{t("featuresV2.household.kicker")}</Kicker>
+            </div>
+            <h2
+              className="text-display-md text-marketing-ink mb-5"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                textWrap: "balance" as never,
+              }}
+            >
+              {t("featuresV2.household.headline")}
+            </h2>
+            <p className="text-marketing-muted text-base md:text-lg leading-[1.75] mb-12 md:mb-16">
+              {t("featuresV2.household.sub")}
+            </p>
+          </Reveal>
+        </div>
+
+        {/* Three cards side by side */}
+        <div className="grid gap-6 lg:gap-8 md:grid-cols-3 items-stretch">
+          {cards.map((c, i) => (
+            <Reveal key={i} delayMs={140 + i * 100} className="h-full">
+              <article className="mk-glass mk-glass-border rounded-3xl p-5 md:p-6 shadow-2xl h-full flex flex-col">
+                <div className="flex-none">{c.mock}</div>
+                <div className="mt-5 md:mt-6">
+                  <h3
+                    className="text-marketing-ink text-lg md:text-xl mb-2"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {c.title}
+                  </h3>
+                  <p className="text-marketing-muted text-[14px] md:text-[15px] leading-[1.65]">
+                    {c.body}
+                  </p>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 

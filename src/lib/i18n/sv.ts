@@ -2183,6 +2183,12 @@ export const sv = {
       b2: "Städrundor vid skiftslut — snabba chips, inga formulär",
       b3: "Underhåll på maskinerna som håller ert barn hemma — filterbyten, serviceintervall",
       b4: "Förfallna saker dyker upp lugnt på Idag, inte som röda larm",
+      card1t: "Inköpslista",
+      card1b: "En delad inköpslista kopplad till förbrukningen ni faktiskt har.",
+      card2t: "Städning vid skiftslut",
+      card2b: "Snabba val vid skiftslut — inga formulär.",
+      card3t: "Underhåll",
+      card3b: "Filterbyten och serviceintervall på maskinerna som håller ert barn hemma. Försenade punkter dyker lugnt upp på Idag — inte som röda larm.",
       mock: {
         shopHeader: "Inköp",
         shop1: "Blöjor stl 4",
