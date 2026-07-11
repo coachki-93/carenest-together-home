@@ -146,7 +146,8 @@ function SignUpPage() {
           <div className="relative">
             <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)}
+              id="fullName" value={fullName}
+              onChange={(e) => { setFullName(e.target.value); if (formError) setFormError(null); }}
               placeholder="Sam" className="h-12 rounded-xl pl-10" autoComplete="given-name" required
             />
           </div>
@@ -156,7 +157,8 @@ function SignUpPage() {
           <div className="relative">
             <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              id="email" type="email" autoFocus value={email}
+              onChange={(e) => { setEmail(e.target.value); if (formError) setFormError(null); }}
               placeholder="you@example.com" className="h-12 rounded-xl pl-10" autoComplete="email" required
             />
           </div>
@@ -166,7 +168,8 @@ function SignUpPage() {
           <div className="relative">
             <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="password" type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+              id="password" type={showPw ? "text" : "password"} value={password}
+              onChange={(e) => { setPassword(e.target.value); if (formError) setFormError(null); }}
               placeholder={t("auth.atLeast8")} className="h-12 rounded-xl pl-10 pr-10" autoComplete="new-password" required
             />
             <button
@@ -184,7 +187,8 @@ function SignUpPage() {
           <div className="relative">
             <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="confirm" type={showConfirm ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)}
+              id="confirm" type={showConfirm ? "text" : "password"} value={confirm}
+              onChange={(e) => { setConfirm(e.target.value); if (formError) setFormError(null); }}
               className="h-12 rounded-xl pl-10 pr-10" autoComplete="new-password" required
             />
             <button
@@ -198,9 +202,14 @@ function SignUpPage() {
           </div>
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
-          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(!!v)} className="mt-0.5" />
+          <Checkbox checked={agree} onCheckedChange={(v) => { setAgree(!!v); if (formError) setFormError(null); }} className="mt-0.5" />
           <span className="text-muted-foreground">{t("auth.agreeTerms")}</span>
         </label>
+        <div aria-live="polite" className="min-h-[1.25rem]">
+          {formError && (
+            <p className="text-sm text-destructive text-center">{formError}</p>
+          )}
+        </div>
         <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold">
           {submitting && <Loader2 className="size-4 animate-spin" />}
           {submitting ? t("auth.creatingAccount") : t("auth.create")}
@@ -208,9 +217,9 @@ function SignUpPage() {
       </form>
 
       <div className="relative">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-black/10" /></div>
         <div className="relative flex justify-center text-xs uppercase tracking-wider">
-          <span className="bg-card px-3 text-muted-foreground">{t("auth.orSignInWith")}</span>
+          <span className="px-3 text-muted-foreground">{t("auth.orSignInWith")}</span>
         </div>
       </div>
 
@@ -223,11 +232,12 @@ function SignUpPage() {
         </Button>
       </div>
 
-      <p className="text-center text-sm text-muted-foreground">
-        {t("auth.alreadyAccount")}{" "}
-        <Link to="/auth/login" className="text-primary font-semibold hover:underline">
-          {t("auth.logIn")}
-        </Link>
+      <div className="text-center space-y-1.5">
+        <p className="text-sm text-muted-foreground">
+          {t("auth.alreadyAccount")}{" "}
+          <Link to="/auth/login" className="text-primary font-semibold hover:underline">
+            {t("auth.logIn")}
+          </Link>
       </p>
     </div>
   );
