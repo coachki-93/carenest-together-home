@@ -2149,7 +2149,7 @@ export const en = {
         notesHeader: "Notes",
         l1: "• 10:00 Paracetamol · 250 mg — skipped (headache gone)",
         l2: "• 14:00 Inhalation · 2 puffs — postponed → 15:00",
-        l3: "All other doses given (3/5)",
+        l3: "All scheduled meds given (3/5)",
         n1: "• 09:12 Out-of-range reading: SpO₂ 91%",
         n2: "• 11:40 New oxygen tank started — LIV Mini 2 L (lågflödesväljare) @ 0,10 l/min",
         n3: "• 13:20 Care-place check flagged: suction unit warm",
