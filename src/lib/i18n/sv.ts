@@ -1677,7 +1677,7 @@ export const sv = {
       f2: "Pediatriska vitaldiagram med åldersanpassade intervall",
       f3: "Syrgasuppföljning matchad mot tillverkarens spec-blad",
       f4: "Förifyllda passöverlämningar med läskvitton",
-      f5: "Vårdplatskontroll-checklistor med direkt kritiskt larm",
+      f5: "Vårdplatskontroller med larm direkt vid kritiska svar",
       f6: "Lager, varningar vid låg nivå & delad inköpslista",
       f7: "Attribution per vårdgivare — vem gjorde vad, när",
       f8: "Obegränsat med vårdgivare, inbjudningskoder, svenska & engelska",
