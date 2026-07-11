@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
  * continuations align under the line's text after the leading "• ", not
  * under the bullet itself.
  */
-export function HandoversMock() {
+export function HandoversMock({ hideFooter = false }: { hideFooter?: boolean } = {}) {
   const { t } = useTranslation();
   const K = "featuresV2.handovers.mock";
 
@@ -102,17 +102,19 @@ export function HandoversMock() {
         </ul>
       </div>
 
-      {/* Read receipt footer */}
-      <div
-        className="mk-slide-in flex items-center gap-2 text-[11px] text-marketing-muted"
-        style={{ ["--mk-delay" as string]: "950ms" }}
-      >
-        <CheckCheck
-          className="size-3.5"
-          style={{ color: "var(--color-marketing-sage)" }}
-        />
-        <span>{t(`${K}.footer`)}</span>
-      </div>
+      {/* Read receipt footer — hidden when the receipt is shown elsewhere. */}
+      {hideFooter ? null : (
+        <div
+          className="mk-slide-in flex items-center gap-2 text-[11px] text-marketing-muted"
+          style={{ ["--mk-delay" as string]: "950ms" }}
+        >
+          <CheckCheck
+            className="size-3.5"
+            style={{ color: "var(--color-marketing-sage)" }}
+          />
+          <span>{t(`${K}.footer`)}</span>
+        </div>
+      )}
     </div>
   );
 }

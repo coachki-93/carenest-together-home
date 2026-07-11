@@ -9,6 +9,7 @@ import {
   Users,
   Home,
   ArrowRight,
+  CheckCheck,
 } from "lucide-react";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
@@ -157,22 +158,9 @@ function FeaturesPage() {
         visual={<OxygenMock />}
       />
 
-      {/* Band 5 — HANDOVERS (visual right, sage) */}
-      <FeatureBand
-        id="handovers"
-        kicker={t("featuresV2.handovers.kicker")}
-        headline={t("featuresV2.handovers.headline")}
-        sub={t("featuresV2.handovers.sub")}
-        bullets={[
-          t("featuresV2.handovers.b1"),
-          t("featuresV2.handovers.b2"),
-          t("featuresV2.handovers.b3"),
-          t("featuresV2.handovers.b4"),
-        ]}
-        Icon={FileText}
-        tint="sage"
-        visual={<HandoversMock />}
-      />
+      {/* Band 5 — HANDOVERS (bento: centered intro + 1/3 receipt · 2/3 sheet) */}
+      <HandoversBand />
+
 
       {/* Band 6 — TEAM (dark treatment, mirrors landing VitalsBand recipe) */}
       <TeamBand />
@@ -481,6 +469,106 @@ function HouseholdBand() {
     </section>
   );
 }
+
+function HandoversBand() {
+  const { t } = useTranslation();
+  const tint = bandTint("sage");
+  const line2Words = t("featuresV2.handovers.miniLine2").split(" ");
+  return (
+    <section
+      id="handovers"
+      className="relative px-6 md:px-8 border-t border-marketing-line py-20 md:py-28"
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Centered intro: kicker + headline only */}
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+          <Reveal>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span
+                className="size-10 rounded-xl grid place-items-center"
+                style={{ background: tint.chipBg, color: tint.chipFg }}
+                aria-hidden
+              >
+                <FileText className="size-5" strokeWidth={1.8} />
+              </span>
+              <Kicker>{t("featuresV2.handovers.kicker")}</Kicker>
+            </div>
+            <h2
+              className="text-display-md text-marketing-ink"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                textWrap: "balance" as never,
+              }}
+            >
+              {t("featuresV2.handovers.headline")}
+            </h2>
+          </Reveal>
+        </div>
+
+        {/* Asymmetric bento: 1/3 hook · 2/3 feature */}
+        <div className="grid gap-6 lg:gap-8 lg:grid-cols-3 items-stretch">
+          {/* Left — read-receipt focal */}
+          <Reveal delayMs={120} className="h-full lg:col-span-1">
+            <article className="mk-glass mk-glass-border rounded-3xl p-6 md:p-8 shadow-2xl h-full flex flex-col items-center justify-center text-center">
+              <div
+                className="mk-check-pop inline-flex items-center gap-3 rounded-full px-5 py-3.5 shadow-lg"
+                style={{
+                  background:
+                    "color-mix(in oklab, var(--color-marketing-sage) 22%, var(--color-marketing-bg))",
+                  color: "var(--color-marketing-sage)",
+                  ["--mk-delay" as string]: "260ms",
+                }}
+              >
+                <CheckCheck className="size-6 md:size-7" strokeWidth={2.5} />
+                <span
+                  className="text-lg md:text-xl font-bold tracking-tight"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {t("featuresV2.handovers.mock.footer")}
+                </span>
+              </div>
+              <p className="mt-6 text-marketing-muted text-[14px] md:text-[15px] leading-[1.65] max-w-xs">
+                {t("featuresV2.handovers.receiptSupport")}
+              </p>
+            </article>
+          </Reveal>
+
+          {/* Right — feature card */}
+          <Reveal delayMs={260} className="h-full lg:col-span-2">
+            <article className="mk-glass mk-glass-border rounded-3xl p-6 md:p-8 shadow-2xl h-full flex flex-col">
+              <h3
+                className="text-display-sm md:text-display-md text-marketing-ink mb-4"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 600,
+                  textWrap: "balance" as never,
+                }}
+              >
+                <span className="block">{t("featuresV2.handovers.miniLine1")}</span>
+                <span className="block">
+                  {line2Words.map((w, i) => (
+                    <span key={i} className="mk-headline-gradient inline-block">
+                      {w}
+                      {i < line2Words.length - 1 ? "\u00A0" : ""}
+                    </span>
+                  ))}
+                </span>
+              </h3>
+              <p className="text-marketing-muted text-base leading-[1.7] mb-6 max-w-2xl">
+                {t("featuresV2.handovers.sub")}
+              </p>
+              <div className="mt-auto">
+                <HandoversMock hideFooter />
+              </div>
+            </article>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 
 
