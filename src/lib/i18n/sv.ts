@@ -2158,9 +2158,9 @@ export const sv = {
     team: {
       kicker: "TEAMET",
       headline: "Alla som hjälper till, i en kod.",
-      sub: "Bjud in en partner, en nattsköterska eller en mormor med en åttatecknad kod. Rollerna är enkla — ägare eller vårdgivare — och inbjudan går ut av sig själv.",
-      b1: "Två roller, hållna enkla: ägare och vårdgivare",
-      b2: "Åtta-teckenskoder utan förväxlingsbara bokstäver",
+      sub: "Bjud in en partner, en nattsköterska eller en mormor med en kod på åtta tecken. Rollerna är enkla — ägare eller vårdgivare — och inbjudan går ut av sig själv.",
+      b1: "Två enkla roller: ägare och vårdgivare",
+      b2: "Koder på åtta tecken, utan förväxlingsbara bokstäver",
       b3: "Inbjudningar går ut efter 14 dagar och kan återkallas när som helst",
       b4: "Varje vårdgivare får en egen profil — namn, avatar, färg",
       mock: {
