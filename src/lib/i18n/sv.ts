@@ -2094,7 +2094,7 @@ export const sv = {
     today: {
       kicker: "IDAG",
       headline: "Idag, redan planerat.",
-      sub: "Alla öppnar appen till samma lista — vad som är på tur, vem som jobbar och vad som ändrats.",
+      sub: "Alla öppnar appen och möts av samma lista — vad som är på tur, vem som jobbar och vad som ändrats.",
       b1: "Återkommande mönster: dagligen, veckovis, vid bestämda tider",
       b2: "Vem som jobbar just nu, utan att fråga",
       b3: "Sjukhusläget pausar vårdplatskontroller och syrgasspårning",
