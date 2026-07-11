@@ -2184,6 +2184,12 @@ export const en = {
       b2: "End-of-shift tidy rounds — quick chips, no forms",
       b3: "Maintenance on the machines that keep your child home — filter changes, service intervals",
       b4: "Overdue items surface calmly on Today, not as red alarms",
+      card1t: "Shopping list",
+      card1b: "A shared shopping list connected to the supplies you actually use.",
+      card2t: "End-of-shift tidy",
+      card2b: "Quick chips at the end of a shift — no forms.",
+      card3t: "Maintenance",
+      card3b: "Filter changes and service intervals on the machines that keep your child home. Overdue items surface calmly on Today — not as red alarms.",
       mock: {
         shopHeader: "Shopping",
         shop1: "Diapers size 4",
