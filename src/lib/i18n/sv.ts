@@ -1598,7 +1598,7 @@ export const sv = {
       kicker: "Vitalvärden",
       title: "Intervall som växer med ditt barn.",
       sub:
-        "Puls, SpO₂, andningsfrekvens och temperatur screenas mot åldersanpassade intervall. Tre värden i rad utanför intervallet ger familjen en lugn påminnelse — inte ett larm.",
+        "Puls, SpO₂, andningsfrekvens och temperatur jämförs mot åldersanpassade intervall. Tre värden i rad utanför intervallet ger familjen en lugn påminnelse — inte ett larm.",
       footnote:
         "Referensintervall är hjälpmedel — ert vårdteams anvisningar går alltid först.",
       hr: { label: "Puls" },
