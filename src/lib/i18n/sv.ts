@@ -2117,10 +2117,10 @@ export const sv = {
       kicker: "MEDICINER",
       headline: "Varje dos — vem, vad, när.",
       sub: "Hela dagens mediciner på ett kort, med ett namn på varje rad.",
-      b1: "Dagsschema byggs automatiskt från varje medicin",
+      b1: "Dagsschemat byggs automatiskt utifrån medicinerna",
       b2: "Hoppa över med anledning, eller senarelägg",
-      b3: "Inhalationer, mediciner via munnen och injektioner sida vid sida",
-      b4: "Full historik per medicin, med vem som gav varje dos",
+      b3: "Inhalationer, orala mediciner och injektioner sida vid sida",
+      b4: "Hela historiken per medicin — och vem som gav varje dos",
     },
     oxygen: {
       kicker: "SYRGAS",
