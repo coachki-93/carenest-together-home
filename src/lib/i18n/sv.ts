@@ -2219,7 +2219,7 @@ export const sv = {
       c4t: "Inställningar",
       c4b: "Intervall, varningstider, tysta timmar — anpassade efter ert barn, inte genomsnittet.",
       c5t: "Fungerar som en app",
-      c5b: "Lägg till på hemskärmen; öppnas i helskärm och klarar offline. Native-app planerad.",
+      c5b: "Lägg till på hemskärmen; öppnas i helskärm och fungerar även utan nät. Native-app planerad.",
       c6t: "Två språk",
       c6b: "Alla skärmar och notiser på svenska och engelska. Växla högst upp.",
     },
