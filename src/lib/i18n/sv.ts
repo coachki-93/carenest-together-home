@@ -1553,7 +1553,7 @@ export const sv = {
     },
     inside: {
       kicker: "Vad ingår",
-      title: "Grunderna — och lagret för avancerad omvårdnad när ni behöver det.",
+      title: "Grunderna — och allt för avancerad omvårdnad när ni behöver det.",
       sub: "Riktiga funktioner, byggda kring det familjer berättat att de saknat.",
       f1Title: "Dagens uppgifter & schema",
       f2Title: "Vitalvärden",
