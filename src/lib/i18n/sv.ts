@@ -2225,8 +2225,8 @@ export const sv = {
     },
     cta: {
       kicker: "REDO?",
-      headline: "Ta in alla i samma lugna rum.",
-      sub: "Två minuter att sätta upp, bjuda in dem som hjälper till, och öppna samma Idag från varje telefon.",
+      headline: "Samla alla i samma lugna rum.",
+      sub: "Två minuter att komma igång: bjud in dem som hjälper till och öppna samma Idag från varje telefon.",
     },
   },
 };
