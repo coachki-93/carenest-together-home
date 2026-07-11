@@ -238,7 +238,13 @@ function SignUpPage() {
           <Link to="/auth/login" className="text-primary font-semibold hover:underline">
             {t("auth.logIn")}
           </Link>
-      </p>
+        </p>
+        <p className="text-xs">
+          <Link to="/invite" className="text-muted-foreground hover:text-primary hover:underline">
+            {t("invite.haveInvite")}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
