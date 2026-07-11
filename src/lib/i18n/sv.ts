@@ -1374,9 +1374,9 @@ export const sv = {
       kicker: "Omsorg, tillsammans",
       headline: "Allt om ditt barns omsorg — ur ditt huvud, till en lugn plats.",
       headline1: "Allt om ditt barns omsorg.",
-      headline2: "Ur ditt huvud, till en lugn plats.",
+      headline2: "På ett ställe, så att inget glöms bort.",
       subline:
-        "Det gemensamma navet för familjer med barn med särskilda behov — så att dagen inte hänger på ditt minne.",
+        "Det gemensamma navet för familjer som har barn med särskilda behov — en lugn plats för hela teamet.",
       ctaCreate: "Skapa er familjeplats",
       ctaInvite: "Jag har en inbjudan",
       ctaInstall: "Lägg till CareNest på din enhet",
@@ -1394,11 +1394,11 @@ export const sv = {
     problem: {
       kicker: "Vi vet hur det är",
       title: "Just nu är du systemet.",
-      sub: "Samma morgon, två gånger: en gång i huvuden och i hallen, en gång nedskriven där alla kan se den.",
+      sub: "Samma morgon, två gånger: en gång i minnet och i hallen, en gång nedskriven där alla ser den.",
       oldEyebrow: "I morse",
       oldHeadline: "Tre sms och en lapp på kylen.",
       oldChatPeer: "Ryan",
-      oldChat1: "Fick han 06-medicinen?",
+      oldChat1: "Fick han medicinen kl 06?",
       oldChat1Time: "07:38",
       oldChat2: "Osäker — kolla lappen på kylen",
       oldChat2Time: "07:41",
@@ -1459,7 +1459,7 @@ export const sv = {
           eyebrow: "07:10",
           title: "Dagen är redan planerad.",
           body:
-            "Varje dos, kontroll och besök står i dagens lista med sin tid. Inget samtal, ingen upprepning.",
+            "Varje dos, kontroll och besök står i dagens lista med klockslag. Ingen behöver ringa. Ingen behöver fråga om.",
           row1Time: "07:15",
           row1Task: "Morgonmediciner",
           row1Sub: "till frukost",
@@ -1515,15 +1515,15 @@ export const sv = {
       c3Headline: "Tyst tills det spelar roll.",
       c3Title: "Tyst tills det spelar roll.",
       c3Body:
-        "Inga nyheter betyder att allt är bra — CareNest hör av sig bara när något behöver dig.",
+        "Inga nyheter betyder att allt är bra — CareNest hör av sig bara när du behövs.",
       c3Chip1: "Push-notiser",
       c3Chip2: "Skyddsnät",
       c3Chip3: "Läskvitton",
       c4Eyebrow: "Tillsyn",
-      c4Headline: "Missade tillsyner tystnar aldrig.",
+      c4Headline: "En missad tillsyn passerar aldrig tyst.",
       c4Title: "När något behöver dig får du veta. Annars är det tyst.",
       c4Body:
-        "Larm bara för det som spelar roll: ett kritiskt svar, en missad tillsyn, en låg tub.",
+        "Larm bara för det som spelar roll: ett kritiskt svar, en missad tillsyn, en tub som börjar ta slut.",
       c4Chip1: "Push-notiser",
       c4Chip2: "Skyddsnät",
       vignette: {
@@ -1553,7 +1553,7 @@ export const sv = {
     },
     inside: {
       kicker: "Vad ingår",
-      title: "Grunderna — och lagret för avancerad omvårdnad när ni behöver det.",
+      title: "Grunderna — och allt för avancerad omvårdnad när ni behöver det.",
       sub: "Riktiga funktioner, byggda kring det familjer berättat att de saknat.",
       f1Title: "Dagens uppgifter & schema",
       f2Title: "Vitalvärden",
@@ -1598,7 +1598,7 @@ export const sv = {
       kicker: "Vitalvärden",
       title: "Intervall som växer med ditt barn.",
       sub:
-        "Puls, SpO₂, andningsfrekvens och temperatur screenas mot åldersanpassade intervall. Tre värden i rad utanför intervallet ger familjen en lugn påminnelse — inte ett larm.",
+        "Puls, SpO₂, andningsfrekvens och temperatur jämförs mot åldersanpassade intervall. Tre värden i rad utanför intervallet ger familjen en lugn påminnelse — inte ett larm.",
       footnote:
         "Referensintervall är hjälpmedel — ert vårdteams anvisningar går alltid först.",
       hr: { label: "Puls" },
@@ -1617,7 +1617,7 @@ export const sv = {
       kicker: "Byggd för roterande team",
       title: "Inget att lära ut. Inget faller mellan stolarna.",
       body1:
-        "Hela assistentens jobb i CareNest är en lista: nästa uppgift, med sin tid. Kan de följa en lista kan de redan systemet.",
+        "Hela assistentens jobb i CareNest är en lista: nästa uppgift, med klockslag. Kan de följa en lista kan de redan systemet.",
       body2:
         "Du behöver aldrig agera IT-support. En engångskod släpper in dem, de trycker på sitt namn och dagen visar själv vad som ska göras — i webbläsaren, inget att installera, inget konto att skapa.",
       body3:
@@ -1646,7 +1646,7 @@ export const sv = {
       s3Value: "Bara er familj",
       s3Label: "Åtkomst via inbjudningskod, inget delas eller säljs",
       s4Value: "Byggt med familjer",
-      s4Label: "I daglig användning, formad av verklig omsorg",
+      s4Label: "I daglig användning, format av verklig omsorg",
     },
     tablet: {
       kicker: "Designad för familjens surfplatta",
@@ -1677,7 +1677,7 @@ export const sv = {
       f2: "Pediatriska vitaldiagram med åldersanpassade intervall",
       f3: "Syrgasuppföljning matchad mot tillverkarens spec-blad",
       f4: "Förifyllda passöverlämningar med läskvitton",
-      f5: "Vårdplatskontroll-checklistor med direkt kritiskt larm",
+      f5: "Vårdplatskontroller med larm direkt vid kritiska svar",
       f6: "Lager, varningar vid låg nivå & delad inköpslista",
       f7: "Attribution per vårdgivare — vem gjorde vad, när",
       f8: "Obegränsat med vårdgivare, inbjudningskoder, svenska & engelska",
