@@ -1515,7 +1515,7 @@ export const sv = {
       c3Headline: "Tyst tills det spelar roll.",
       c3Title: "Tyst tills det spelar roll.",
       c3Body:
-        "Inga nyheter betyder att allt är bra — CareNest hör av sig bara när något behöver dig.",
+        "Inga nyheter betyder att allt är bra — CareNest hör av sig bara när du behövs.",
       c3Chip1: "Push-notiser",
       c3Chip2: "Skyddsnät",
       c3Chip3: "Läskvitton",
