@@ -54,6 +54,7 @@ export const en = {
     orSignInWith: "Or sign in with",
     showPassword: "Show password",
     hidePassword: "Hide password",
+    genericError: "Something went wrong — please try again.",
     newHere: "New to CareNest?",
     createAccount: "Create an account",
     signupTitleFamily: "Create your family account",
