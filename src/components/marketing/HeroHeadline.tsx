@@ -11,7 +11,15 @@ import { useEffect, useState } from "react";
 
 const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 
-export function HeroHeadline({ line1, line2 }: { line1: string; line2: string }) {
+export function HeroHeadline({
+  line1,
+  line2,
+  sizeClassName = "text-display-md xl:text-display-lg",
+}: {
+  line1: string;
+  line2: string;
+  sizeClassName?: string;
+}) {
   const [visible, setVisible] = useState(false);
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -30,7 +38,7 @@ export function HeroHeadline({ line1, line2 }: { line1: string; line2: string })
   let idx = 0;
   return (
     <h1
-      className="text-display-md xl:text-display-lg mx-auto text-center text-primary"
+      className={`${sizeClassName} mx-auto text-center text-primary`}
       style={display}
     >
       {words.map((ws, li) => (
