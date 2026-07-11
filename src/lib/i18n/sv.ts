@@ -1398,7 +1398,7 @@ export const sv = {
       oldEyebrow: "I morse",
       oldHeadline: "Tre sms och en lapp på kylen.",
       oldChatPeer: "Ryan",
-      oldChat1: "Fick han 06-medicinen?",
+      oldChat1: "Fick han medicinen kl 06?",
       oldChat1Time: "07:38",
       oldChat2: "Osäker — kolla lappen på kylen",
       oldChat2Time: "07:41",
