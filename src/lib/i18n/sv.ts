@@ -2139,6 +2139,9 @@ export const sv = {
       b2: "Avvikande värden med det faktiska mätvärdet, inte bara en flagga",
       b3: "Syrgas — starter och byten — och sjukhusdagar tas med automatiskt",
       b4: "Vårdplats-flaggor och överhoppade städuppgifter dyker upp vid skiftslut",
+      receiptSupport: "Läst markeras med ett tryck — aldrig automatiskt.",
+      miniLine1: "Ett skift slutar.",
+      miniLine2: "Nästa vet redan.",
       mock: {
         title: "Överlämning · Adam · ons 07–15",
         medsHeader: "Mediciner",
