@@ -174,24 +174,9 @@ function FeaturesPage() {
         visual={<HandoversMock />}
       />
 
-      {/* Band 6 — TEAM (visual left, violet, surface) */}
-      <FeatureBand
-        id="team"
-        kicker={t("featuresV2.team.kicker")}
-        headline={t("featuresV2.team.headline")}
-        sub={t("featuresV2.team.sub")}
-        bullets={[
-          t("featuresV2.team.b1"),
-          t("featuresV2.team.b2"),
-          t("featuresV2.team.b3"),
-          t("featuresV2.team.b4"),
-        ]}
-        Icon={Users}
-        tint="violet"
-        reverse
-        surface
-        visual={<TeamMock />}
-      />
+      {/* Band 6 — TEAM (dark treatment, mirrors landing VitalsBand recipe) */}
+      <TeamBand />
+
 
       {/* Band 7 — HOUSEHOLD (compact, visual right, amber) */}
       <FeatureBand
@@ -339,4 +324,92 @@ function TodayBand() {
     </section>
   );
 }
+
+function TeamBand() {
+  const { t } = useTranslation();
+  const bullets = [
+    t("featuresV2.team.b1"),
+    t("featuresV2.team.b2"),
+    t("featuresV2.team.b3"),
+    t("featuresV2.team.b4"),
+  ];
+  return (
+    <section
+      id="team"
+      className="relative px-6 md:px-8 py-20 md:py-28 border-t border-marketing-line"
+    >
+      <Reveal className="max-w-6xl mx-auto">
+        <div
+          className="rounded-3xl p-8 md:p-14 relative overflow-hidden"
+          style={{
+            backgroundImage: [
+              "radial-gradient(90% 70% at 50% 100%, color-mix(in oklab, white 16%, var(--primary)) 0%, transparent 65%)",
+              "linear-gradient(180deg, color-mix(in oklab, var(--primary) 88%, black 6%) 0%, var(--primary) 60%)",
+            ].join(", "),
+            color: "var(--primary-foreground)",
+          }}
+        >
+          <div className="relative grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <span
+                  className="size-10 rounded-xl grid place-items-center"
+                  style={{
+                    background: "color-mix(in oklab, white 18%, transparent)",
+                    color: "var(--primary-foreground)",
+                  }}
+                  aria-hidden
+                >
+                  <Users className="size-5" strokeWidth={1.8} />
+                </span>
+                <p className="text-[11px] font-medium uppercase tracking-[0.22em] opacity-80">
+                  {t("featuresV2.team.kicker")}
+                </p>
+              </div>
+              <h2
+                className="text-display-md mb-5"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 600,
+                  textWrap: "balance" as never,
+                }}
+              >
+                {t("featuresV2.team.headline")}
+              </h2>
+              <p className="text-base md:text-lg leading-[1.7] opacity-90 max-w-xl mb-7">
+                {t("featuresV2.team.sub")}
+              </p>
+              <ul className="space-y-3">
+                {bullets.map((b, i) => (
+                  <Reveal key={i} delayMs={140 + i * 60}>
+                    <li className="flex items-start gap-3">
+                      <span
+                        className="mt-1 size-5 rounded-full grid place-items-center flex-none"
+                        style={{
+                          background: "color-mix(in oklab, white 22%, transparent)",
+                          color: "var(--primary-foreground)",
+                        }}
+                        aria-hidden
+                      >
+                        <Check className="size-3.5" strokeWidth={2.5} />
+                      </span>
+                      <span className="text-[15px] md:text-base leading-[1.6] opacity-95">
+                        {b}
+                      </span>
+                    </li>
+                  </Reveal>
+                ))}
+              </ul>
+            </div>
+
+            <div className="relative">
+              <TeamMock />
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
 
