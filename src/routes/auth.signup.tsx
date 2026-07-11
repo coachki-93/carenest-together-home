@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
-import { Loader2, Mail } from "lucide-react";
+import { Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -32,6 +32,8 @@ function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [agree, setAgree] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -92,7 +94,7 @@ function SignUpPage() {
 
   if (sentTo) {
     return (
-      <div className="card-soft p-8 text-center space-y-5">
+      <div className="text-center space-y-5">
         <div className="mx-auto rounded-full bg-primary-soft size-14 flex items-center justify-center">
           <Mail className="size-6 text-primary" />
         </div>
@@ -112,9 +114,9 @@ function SignUpPage() {
   }
 
   return (
-    <div className="card-soft p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-center">
-        <Logo size={120} />
+        <Logo size={96} />
       </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">
@@ -125,50 +127,62 @@ function SignUpPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("google")}>
-          <GoogleIcon /> {t("common.google")}
-        </Button>
-        <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("apple")}>
-          <AppleIcon /> {t("common.apple")}
-        </Button>
-      </div>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
-        <div className="relative flex justify-center text-xs uppercase tracking-wider">
-          <span className="bg-card px-3 text-muted-foreground">{t("common.orWithEmail")}</span>
-        </div>
-      </div>
-
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="fullName">{t("common.firstName")}</Label>
-          <Input
-            id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)}
-            placeholder="Sam" className="h-12 rounded-xl" autoComplete="given-name" required
-          />
+          <div className="relative">
+            <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)}
+              placeholder="Sam" className="h-12 rounded-xl pl-10" autoComplete="given-name" required
+            />
+          </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="email">{t("common.email")}</Label>
-          <Input
-            id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com" className="h-12 rounded-xl" autoComplete="email" required
-          />
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com" className="h-12 rounded-xl pl-10" autoComplete="email" required
+            />
+          </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">{t("common.password")}</Label>
-          <Input
-            id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-            placeholder={t("auth.atLeast8")} className="h-12 rounded-xl" autoComplete="new-password" required
-          />
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="password" type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder={t("auth.atLeast8")} className="h-12 rounded-xl pl-10 pr-10" autoComplete="new-password" required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              aria-label={showPw ? t("auth.hidePassword") : t("auth.showPassword")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
-          <Input
-            id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)}
-            className="h-12 rounded-xl" autoComplete="new-password" required
-          />
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="confirm" type={showConfirm ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)}
+              className="h-12 rounded-xl pl-10 pr-10" autoComplete="new-password" required
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirm((v) => !v)}
+              aria-label={showConfirm ? t("auth.hidePassword") : t("auth.showPassword")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox checked={agree} onCheckedChange={(v) => setAgree(!!v)} className="mt-0.5" />
@@ -179,6 +193,22 @@ function SignUpPage() {
           {submitting ? t("auth.creatingAccount") : t("auth.create")}
         </Button>
       </form>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
+        <div className="relative flex justify-center text-xs uppercase tracking-wider">
+          <span className="bg-card px-3 text-muted-foreground">{t("auth.orSignInWith")}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Button type="button" variant="outline" className="rounded-xl h-11" onClick={() => oauth("google")}>
+          <GoogleIcon /> {t("common.google")}
+        </Button>
+        <Button type="button" variant="outline" className="rounded-xl h-11" onClick={() => oauth("apple")}>
+          <AppleIcon /> {t("common.apple")}
+        </Button>
+      </div>
 
       <p className="text-center text-sm text-muted-foreground">
         {t("auth.alreadyAccount")}{" "}
