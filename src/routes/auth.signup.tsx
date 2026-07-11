@@ -37,6 +37,7 @@ function SignUpPage() {
   const [agree, setAgree] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (invite) localStorage.setItem("carenest:pending_invite", invite);
@@ -53,11 +54,23 @@ function SignUpPage() {
     .refine((v) => v.password === v.confirm, { path: ["confirm"], message: t("auth.passwordMismatch") })
     .refine((v) => v.agree, { path: ["agree"], message: t("auth.pleaseAgree") });
 
+  function mapSignupError(message: string | undefined): string {
+    if (!message) return t("auth.genericError");
+    const m = message.toLowerCase();
+    if (m.includes("already registered") || m.includes("already exists") || m.includes("user already")) {
+      return t("auth.alreadyAccount");
+    }
+    if (m.includes("password")) return t("auth.use8");
+    if (m.includes("email") && m.includes("invalid")) return t("auth.invalidEmail");
+    return t("auth.genericError");
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError(null);
     const parsed = formSchema.safeParse({ fullName, email, password, confirm, agree });
     if (!parsed.success) {
-      toast.error(parsed.error.errors[0]?.message ?? "");
+      setFormError(parsed.error.errors[0]?.message ?? "");
       return;
     }
     setSubmitting(true);
@@ -74,7 +87,7 @@ function SignUpPage() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      setFormError(mapSignupError(error.message));
       return;
     }
     setSentTo(parsed.data.email);
