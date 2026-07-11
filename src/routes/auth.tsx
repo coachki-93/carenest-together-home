@@ -60,7 +60,7 @@ function AuthLayout() {
 
       {/* Centered card */}
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[440px] rounded-3xl bg-card text-card-foreground shadow-[0_30px_80px_-30px_rgba(60,20,90,0.35),0_10px_30px_-15px_rgba(60,20,90,0.25)] ring-1 ring-black/[0.04] p-7 sm:p-9">
+        <div className="mk-auth-glass w-full max-w-[440px] rounded-3xl text-card-foreground p-7 sm:p-9">
           <Outlet />
         </div>
       </main>

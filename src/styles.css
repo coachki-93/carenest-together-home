@@ -985,3 +985,42 @@
   .mk-day-header-sub { display: none; }
   .mk-day-header-wrap { padding-bottom: 0.75rem !important; }
 }
+
+/* Auth card — clear-glass adaptation of mk-cta-glass--clear, scaled up
+ * for form legibility. Alpha is parameterized (--auth-glass-alpha) so it
+ * can be live-tuned. No diagonal sheen at card size — it reads as a smear
+ * rather than glass. Safari-safe CSS only, no SVG displacement. */
+.mk-auth-glass {
+  --auth-glass-alpha: 70%;
+  position: relative;
+  background:
+    linear-gradient(
+      color-mix(in oklab, var(--primary) 3%, transparent),
+      color-mix(in oklab, var(--primary) 3%, transparent)
+    ),
+    linear-gradient(
+      color-mix(in oklab, white var(--auth-glass-alpha), transparent),
+      color-mix(in oklab, white var(--auth-glass-alpha), transparent)
+    );
+  backdrop-filter: blur(12px) saturate(1.5);
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px color-mix(in oklab, white 90%, transparent),
+    inset 0 -1.5px 1px -1px color-mix(in oklab, var(--color-marketing-ink) 15%, transparent),
+    inset 0 0 24px color-mix(in oklab, white 25%, transparent),
+    0 30px 80px -30px rgba(60, 20, 90, 0.35),
+    0 10px 30px -15px rgba(60, 20, 90, 0.25);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .mk-auth-glass {
+    background:
+      linear-gradient(
+        color-mix(in oklab, var(--primary) 3%, transparent),
+        color-mix(in oklab, var(--primary) 3%, transparent)
+      ),
+      linear-gradient(
+        color-mix(in oklab, white 92%, transparent),
+        color-mix(in oklab, white 92%, transparent)
+      );
+  }
+}
+

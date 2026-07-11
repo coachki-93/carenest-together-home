@@ -16,6 +16,23 @@ export const Route = createFileRoute("/auth/login")({
   component: LoginPage,
 });
 
+/** Map a Supabase auth error to an i18n key. Invalid-credential errors are the
+ * only ones that should read as "wrong email or password"; anything else
+ * (network, rate limit, server) gets a generic message. */
+function mapAuthError(t: (k: string) => string, message: string | undefined): string {
+  if (!message) return t("auth.genericError");
+  const m = message.toLowerCase();
+  if (m === "email not confirmed") return t("auth.confirmFirst");
+  if (
+    m.includes("invalid login credentials") ||
+    m.includes("invalid_credentials") ||
+    m.includes("invalid grant")
+  ) {
+    return t("auth.badCreds");
+  }
+  return t("auth.genericError");
+}
+
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -23,6 +40,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const schema = z.object({
     email: z.string().trim().email(t("auth.invalidEmail")),
@@ -31,24 +49,24 @@ function LoginPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError(null);
     const parsed = schema.safeParse({ email, password });
     if (!parsed.success) {
-      toast.error(parsed.error.errors[0]?.message ?? "");
+      setFormError(parsed.error.errors[0]?.message ?? "");
       return;
     }
     setSubmitting(true);
     const { error } = await supabase.auth.signInWithPassword(parsed.data);
     setSubmitting(false);
     if (error) {
-      toast.error(
-        error.message === "Email not confirmed" ? t("auth.confirmFirst") : t("auth.badCreds"),
-      );
+      setFormError(mapAuthError(t, error.message));
       return;
     }
     navigate({ to: "/home" });
   }
 
   async function oauth(provider: "google" | "apple") {
+    setFormError(null);
     const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin + "/auth/login",
     });
@@ -59,6 +77,7 @@ function LoginPage() {
     if (result.redirected) return;
     navigate({ to: "/home" });
   }
+
 
   return (
     <div className="space-y-6">
@@ -76,8 +95,9 @@ function LoginPage() {
           <div className="relative">
             <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="email" type="email" autoComplete="email" required
-              value={email} onChange={(e) => setEmail(e.target.value)}
+              id="email" type="email" autoComplete="email" required autoFocus
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); if (formError) setFormError(null); }}
               placeholder="you@example.com" className="h-12 rounded-xl pl-10"
             />
           </div>
@@ -93,7 +113,8 @@ function LoginPage() {
             <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="password" type={showPw ? "text" : "password"} autoComplete="current-password" required
-              value={password} onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); if (formError) setFormError(null); }}
               className="h-12 rounded-xl pl-10 pr-10"
             />
             <button
@@ -106,6 +127,11 @@ function LoginPage() {
             </button>
           </div>
         </div>
+        <div aria-live="polite" className="min-h-[1.25rem]">
+          {formError && (
+            <p className="text-sm text-destructive text-center">{formError}</p>
+          )}
+        </div>
         <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold">
           {submitting && <Loader2 className="size-4 animate-spin" />}
           {submitting ? t("auth.loggingIn") : t("auth.logIn")}
@@ -113,9 +139,9 @@ function LoginPage() {
       </form>
 
       <div className="relative">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-black/10" /></div>
         <div className="relative flex justify-center text-xs uppercase tracking-wider">
-          <span className="bg-card px-3 text-muted-foreground">{t("auth.orSignInWith")}</span>
+          <span className="px-3 text-muted-foreground">{t("auth.orSignInWith")}</span>
         </div>
       </div>
 
@@ -128,12 +154,19 @@ function LoginPage() {
         </Button>
       </div>
 
-      <p className="text-center text-sm text-muted-foreground">
-        {t("auth.newHere")}{" "}
-        <Link to="/auth/signup" className="text-primary font-semibold hover:underline">
-          {t("auth.createAccount")}
-        </Link>
-      </p>
+      <div className="text-center space-y-1.5">
+        <p className="text-sm text-muted-foreground">
+          {t("auth.newHere")}{" "}
+          <Link to="/auth/signup" className="text-primary font-semibold hover:underline">
+            {t("auth.createAccount")}
+          </Link>
+        </p>
+        <p className="text-xs">
+          <Link to="/invite" className="text-muted-foreground hover:text-primary hover:underline">
+            {t("invite.haveInvite")}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
