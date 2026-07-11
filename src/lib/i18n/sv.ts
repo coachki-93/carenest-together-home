@@ -1617,7 +1617,7 @@ export const sv = {
       kicker: "Byggd för roterande team",
       title: "Inget att lära ut. Inget faller mellan stolarna.",
       body1:
-        "Hela assistentens jobb i CareNest är en lista: nästa uppgift, med sin tid. Kan de följa en lista kan de redan systemet.",
+        "Hela assistentens jobb i CareNest är en lista: nästa uppgift, med klockslag. Kan de följa en lista kan de redan systemet.",
       body2:
         "Du behöver aldrig agera IT-support. En engångskod släpper in dem, de trycker på sitt namn och dagen visar själv vad som ska göras — i webbläsaren, inget att installera, inget konto att skapa.",
       body3:
