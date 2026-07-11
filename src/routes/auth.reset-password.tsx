@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ function ResetPage() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -43,9 +45,9 @@ function ResetPage() {
   }
 
   return (
-    <div className="card-soft p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-center">
-        <Logo size={120} />
+        <Logo size={96} />
       </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">{t("auth.setNewPassword")}</h1>
@@ -54,19 +56,41 @@ function ResetPage() {
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="password">{t("auth.newPassword")}</Label>
-          <Input
-            id="password" type="password" required autoComplete="new-password"
-            value={password} onChange={(e) => setPassword(e.target.value)}
-            className="h-12 rounded-xl" placeholder={t("auth.atLeast8")}
-          />
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="password" type={showPw ? "text" : "password"} required autoComplete="new-password"
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              className="h-12 rounded-xl pl-10 pr-10" placeholder={t("auth.atLeast8")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              aria-label={showPw ? t("auth.hidePassword") : t("auth.showPassword")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
-          <Input
-            id="confirm" type="password" required autoComplete="new-password"
-            value={confirm} onChange={(e) => setConfirm(e.target.value)}
-            className="h-12 rounded-xl"
-          />
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="confirm" type={showConfirm ? "text" : "password"} required autoComplete="new-password"
+              value={confirm} onChange={(e) => setConfirm(e.target.value)}
+              className="h-12 rounded-xl pl-10 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirm((v) => !v)}
+              aria-label={showConfirm ? t("auth.hidePassword") : t("auth.showPassword")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
         <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold">
           {submitting && <Loader2 className="size-4 animate-spin" />}

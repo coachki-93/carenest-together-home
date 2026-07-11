@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -21,6 +21,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const schema = z.object({
@@ -60,39 +61,26 @@ function LoginPage() {
   }
 
   return (
-    <div className="card-soft p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-center">
-        <Logo size={120} />
+        <Logo size={96} />
       </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">{t("auth.welcomeBack")}</h1>
         <p className="text-sm text-muted-foreground">{t("auth.loginSubtitle")}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("google")}>
-          <GoogleIcon /> {t("common.google")}
-        </Button>
-        <Button type="button" variant="outline" className="rounded-full h-11" onClick={() => oauth("apple")}>
-          <AppleIcon /> {t("common.apple")}
-        </Button>
-      </div>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
-        <div className="relative flex justify-center text-xs uppercase tracking-wider">
-          <span className="bg-card px-3 text-muted-foreground">{t("common.orWithEmail")}</span>
-        </div>
-      </div>
-
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">{t("common.email")}</Label>
-          <Input
-            id="email" type="email" autoComplete="email" required
-            value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com" className="h-12 rounded-xl"
-          />
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="email" type="email" autoComplete="email" required
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com" className="h-12 rounded-xl pl-10"
+            />
+          </div>
         </div>
         <div className="space-y-1.5">
           <div className="flex items-baseline justify-between">
@@ -101,17 +89,44 @@ function LoginPage() {
               {t("auth.forgot")}
             </Link>
           </div>
-          <Input
-            id="password" type="password" autoComplete="current-password" required
-            value={password} onChange={(e) => setPassword(e.target.value)}
-            className="h-12 rounded-xl"
-          />
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="password" type={showPw ? "text" : "password"} autoComplete="current-password" required
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              className="h-12 rounded-xl pl-10 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              aria-label={showPw ? t("auth.hidePassword") : t("auth.showPassword")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
         <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold">
           {submitting && <Loader2 className="size-4 animate-spin" />}
           {submitting ? t("auth.loggingIn") : t("auth.logIn")}
         </Button>
       </form>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
+        <div className="relative flex justify-center text-xs uppercase tracking-wider">
+          <span className="bg-card px-3 text-muted-foreground">{t("auth.orSignInWith")}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Button type="button" variant="outline" className="rounded-xl h-11" onClick={() => oauth("google")}>
+          <GoogleIcon /> {t("common.google")}
+        </Button>
+        <Button type="button" variant="outline" className="rounded-xl h-11" onClick={() => oauth("apple")}>
+          <AppleIcon /> {t("common.apple")}
+        </Button>
+      </div>
 
       <p className="text-center text-sm text-muted-foreground">
         {t("auth.newHere")}{" "}

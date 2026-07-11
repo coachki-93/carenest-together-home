@@ -42,7 +42,7 @@ function ForgotPage() {
 
   if (sent) {
     return (
-      <div className="card-soft p-8 text-center space-y-5">
+      <div className="text-center space-y-5">
         <div className="mx-auto rounded-full bg-primary-soft size-14 flex items-center justify-center">
           <Mail className="size-6 text-primary" />
         </div>
@@ -62,9 +62,9 @@ function ForgotPage() {
   }
 
   return (
-    <div className="card-soft p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-center">
-        <Logo size={120} />
+        <Logo size={96} />
       </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">{t("auth.forgotTitle")}</h1>
@@ -73,11 +73,14 @@ function ForgotPage() {
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">{t("common.email")}</Label>
-          <Input
-            id="email" type="email" required autoComplete="email"
-            value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com" className="h-12 rounded-xl"
-          />
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="email" type="email" required autoComplete="email"
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com" className="h-12 rounded-xl pl-10"
+            />
+          </div>
         </div>
         <Button type="submit" disabled={sending} className="w-full rounded-full h-12 text-base font-semibold">
           {sending && <Loader2 className="size-4 animate-spin" />}
