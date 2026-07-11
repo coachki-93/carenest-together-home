@@ -1459,7 +1459,7 @@ export const sv = {
           eyebrow: "07:10",
           title: "Dagen är redan planerad.",
           body:
-            "Varje dos, kontroll och besök står i dagens lista med sin tid. Inget samtal, ingen upprepning.",
+            "Varje dos, kontroll och besök står i dagens lista med klockslag. Ingen behöver ringa. Ingen behöver fråga om.",
           row1Time: "07:15",
           row1Task: "Morgonmediciner",
           row1Sub: "till frukost",
