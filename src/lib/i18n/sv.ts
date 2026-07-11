@@ -1394,7 +1394,7 @@ export const sv = {
     problem: {
       kicker: "Vi vet hur det är",
       title: "Just nu är du systemet.",
-      sub: "Samma morgon, två gånger: en gång i minnet och i hallen, en gång nedskriven där alla ser den.",
+      sub: "Samma morgon, samma missade dos. Skillnaden är var informationen finns.",
       oldEyebrow: "I morse",
       oldHeadline: "Tre sms och en lapp på kylen.",
       oldChatPeer: "Ryan",

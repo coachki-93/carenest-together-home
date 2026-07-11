@@ -1394,7 +1394,7 @@ export const en = {
     problem: {
       kicker: "We know how it is",
       title: "Right now, you are the system.",
-      sub: "The same morning, twice: once held in heads and hallways, once written down where everyone can see it.",
+      sub: "Same morning, same missed dose. The only difference is where the information lives.",
       oldEyebrow: "This morning",
       oldHeadline: "Three texts and a post-it on the fridge.",
       oldChatPeer: "Ryan",
