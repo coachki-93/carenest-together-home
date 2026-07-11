@@ -2140,6 +2140,9 @@ export const en = {
       b2: "Abnormal vitals with the actual reading, not just a flag",
       b3: "Oxygen start and replace events, and hospital days, included automatically",
       b4: "Care-place issues and skipped tidy items surface at end-of-shift",
+      receiptSupport: "Read is marked with a tap — never automatically.",
+      miniLine1: "One shift ends.",
+      miniLine2: "The next one already knows.",
       mock: {
         title: "Handover · Adam · Wed 07–15",
         medsHeader: "Meds",
