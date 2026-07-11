@@ -210,17 +210,16 @@ function SignUpPage() {
             <p className="text-sm text-destructive text-center">{formError}</p>
           )}
         </div>
-        <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold">
+        <Button type="submit" disabled={submitting} className="w-full rounded-full h-12 text-base font-semibold mk-cta-glass mk-cta-glass--primary">
           {submitting && <Loader2 className="size-4 animate-spin" />}
           {submitting ? t("auth.creatingAccount") : t("auth.create")}
         </Button>
       </form>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-black/10" /></div>
-        <div className="relative flex justify-center text-xs uppercase tracking-wider">
-          <span className="px-3 text-muted-foreground">{t("auth.orSignInWith")}</span>
-        </div>
+      <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
+        <span className="flex-1 border-t border-black/10" />
+        <span>{t("auth.orSignInWith")}</span>
+        <span className="flex-1 border-t border-black/10" />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
