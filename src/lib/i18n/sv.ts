@@ -1646,7 +1646,7 @@ export const sv = {
       s3Value: "Bara er familj",
       s3Label: "Åtkomst via inbjudningskod, inget delas eller säljs",
       s4Value: "Byggt med familjer",
-      s4Label: "I daglig användning, formad av verklig omsorg",
+      s4Label: "I daglig användning, format av verklig omsorg",
     },
     tablet: {
       kicker: "Designad för familjens surfplatta",
