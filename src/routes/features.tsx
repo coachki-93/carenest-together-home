@@ -9,6 +9,7 @@ import {
   Users,
   Home,
   ArrowRight,
+  CheckCheck,
 } from "lucide-react";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
