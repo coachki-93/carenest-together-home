@@ -102,17 +102,19 @@ export function HandoversMock({ hideFooter = false }: { hideFooter?: boolean } =
         </ul>
       </div>
 
-      {/* Read receipt footer */}
-      <div
-        className="mk-slide-in flex items-center gap-2 text-[11px] text-marketing-muted"
-        style={{ ["--mk-delay" as string]: "950ms" }}
-      >
-        <CheckCheck
-          className="size-3.5"
-          style={{ color: "var(--color-marketing-sage)" }}
-        />
-        <span>{t(`${K}.footer`)}</span>
-      </div>
+      {/* Read receipt footer — hidden when the receipt is shown elsewhere. */}
+      {hideFooter ? null : (
+        <div
+          className="mk-slide-in flex items-center gap-2 text-[11px] text-marketing-muted"
+          style={{ ["--mk-delay" as string]: "950ms" }}
+        >
+          <CheckCheck
+            className="size-3.5"
+            style={{ color: "var(--color-marketing-sage)" }}
+          />
+          <span>{t(`${K}.footer`)}</span>
+        </div>
+      )}
     </div>
   );
 }
