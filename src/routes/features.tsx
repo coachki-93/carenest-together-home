@@ -401,7 +401,7 @@ function TeamBand() {
 function HouseholdBand() {
   const { t } = useTranslation();
   const tint = bandTint("amber");
-  const cards: Array<{ title: string; body: string; mock: JSX.Element }> = [
+  const cards: Array<{ title: string; body: string; mock: React.ReactNode }> = [
     {
       title: t("featuresV2.household.card1t"),
       body: t("featuresV2.household.card1b"),
