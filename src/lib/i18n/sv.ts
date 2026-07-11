@@ -2181,7 +2181,7 @@ export const sv = {
     household: {
       kicker: "HUSHÅLLET",
       headline: "De små sakerna som håller dagen igång.",
-      sub: "Handling, städrundor och det underhåll som ett hem som ert faktiskt behöver — tyst spårat så ingen behöver komma ihåg.",
+      sub: "Handling, städrundor och det underhåll som ett hem som ert faktiskt behöver — allt följs upp i det tysta, så ingen behöver komma ihåg.",
       b1: "En delad inköpslista kopplad till de förråd ni faktiskt använder",
       b2: "Städrundor vid skiftslut — snabba chips, inga formulär",
       b3: "Underhåll på maskinerna som håller ert barn hemma — filterbyten, serviceintervall",
