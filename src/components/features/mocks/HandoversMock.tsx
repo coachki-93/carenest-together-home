@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
  * continuations align under the line's text after the leading "• ", not
  * under the bullet itself.
  */
-export function HandoversMock() {
+export function HandoversMock({ hideFooter = false }: { hideFooter?: boolean } = {}) {
   const { t } = useTranslation();
   const K = "featuresV2.handovers.mock";
 
