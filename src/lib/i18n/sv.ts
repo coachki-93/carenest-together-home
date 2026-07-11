@@ -1374,9 +1374,9 @@ export const sv = {
       kicker: "Omsorg, tillsammans",
       headline: "Allt om ditt barns omsorg — ur ditt huvud, till en lugn plats.",
       headline1: "Allt om ditt barns omsorg.",
-      headline2: "Ur ditt huvud, till en lugn plats.",
+      headline2: "På ett ställe, så att inget glöms bort.",
       subline:
-        "Det gemensamma navet för familjer med barn med särskilda behov — så att dagen inte hänger på ditt minne.",
+        "Det gemensamma navet för familjer som har barn med särskilda behov — en lugn plats för hela teamet.",
       ctaCreate: "Skapa er familjeplats",
       ctaInvite: "Jag har en inbjudan",
       ctaInstall: "Lägg till CareNest på din enhet",
