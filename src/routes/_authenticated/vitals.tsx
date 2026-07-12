@@ -892,7 +892,7 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
                     { year: "numeric", month: "short", day: "numeric" },
                   )
                 }
-                formatter={(v) => [`${nf.format(v as number)} ${unit}`, t("vitals.weight")]}
+                formatter={(v) => [`${nf.format(toDisplay(v as number))} ${unit}`, t("vitals.weight")]}
               />
               <Line
                 type="monotone"
