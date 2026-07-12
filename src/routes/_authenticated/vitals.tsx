@@ -720,6 +720,190 @@ function TrendCard({
 }
 
 
+const WEIGHT_RANGE_HOURS: Record<"3m" | "6m" | "1y" | "all", number | undefined> = {
+  "3m": 24 * 90,
+  "6m": 24 * 180,
+  "1y": 24 * 365,
+  all: undefined,
+};
+
+function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void }) {
+  const { t, i18n } = useTranslation();
+  const tone = TYPE_TONES.weight;
+  const [wRange, setWRange] = useState<"3m" | "6m" | "1y" | "all">("6m");
+  const sinceHours = WEIGHT_RANGE_HOURS[wRange];
+  const { data: rows = [] } = useVitals(familyId, {
+    types: ["weight"],
+    sinceHours,
+    limit: 500,
+  });
+
+  const points = useMemo(
+    () =>
+      rows
+        .map((v) => ({ ts: new Date(v.logged_at).getTime(), value: Number(v.value) }))
+        .sort((a, b) => a.ts - b.ts),
+    [rows],
+  );
+
+  const last = points[points.length - 1];
+  const prev = points[points.length - 2];
+  const nf = useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
+        maximumFractionDigits: 1,
+        minimumFractionDigits: 0,
+      }),
+    [i18n.language],
+  );
+  const nfDelta = useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
+        maximumFractionDigits: 1,
+        minimumFractionDigits: 0,
+        signDisplay: "always",
+      }),
+    [i18n.language],
+  );
+
+  const dateFmt = (v: number) =>
+    new Date(v).toLocaleDateString(i18n.language === "sv" ? "sv-SE" : "en-US", {
+      month: "short",
+      day: "numeric",
+      year: wRange === "1y" || wRange === "all" ? "2-digit" : undefined,
+    });
+
+  const RANGE_KEYS: Array<"3m" | "6m" | "1y" | "all"> = ["3m", "6m", "1y", "all"];
+
+  const delta = last && prev ? last.value - prev.value : null;
+  const unit = DEFAULT_UNIT.weight;
+
+  return (
+    <section className="card-soft p-5">
+      <div className="flex items-start justify-between mb-4 gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className={cn("size-9 rounded-xl flex items-center justify-center shrink-0", tone.bg)}>
+            <Scale className={cn("size-4.5", tone.fg)} />
+          </div>
+          <div className="min-w-0">
+            <div className="font-extrabold">{t("vitals.weightChart.title")}</div>
+            {last && (
+              <div className="text-xs text-muted-foreground">
+                {nf.format(last.value)} {unit}
+                {delta != null && delta !== 0 && (
+                  <>
+                    {" · "}
+                    <span className="text-muted-foreground">
+                      {nfDelta.format(delta)} {unit} {t("vitals.weightChart.sinceLast")}
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="inline-flex rounded-full bg-muted p-1 text-xs">
+          {RANGE_KEYS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setWRange(k)}
+              className={cn(
+                "px-3 py-1 rounded-full font-bold transition-colors",
+                wRange === k ? "bg-background text-foreground shadow-sm" : "text-muted-foreground",
+              )}
+            >
+              {t(`vitals.weightChart.range.${k}` as const)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="h-56">
+        {points.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-center gap-2">
+            <p className="font-bold">{t("vitals.weightChart.emptyTitle")}</p>
+            <p className="text-sm text-muted-foreground">{t("vitals.weightChart.emptyBody")}</p>
+            <Button size="sm" className="rounded-full mt-1" onClick={onLog}>
+              <Plus className="size-4 mr-1.5" /> {t("vitals.weightChart.logWeight")}
+            </Button>
+          </div>
+        ) : points.length === 1 ? (
+          <div className="h-full flex flex-col items-center justify-center text-center gap-2">
+            <p className="text-sm text-muted-foreground">{t("vitals.weightChart.needMore")}</p>
+            <Button size="sm" variant="outline" className="rounded-full" onClick={onLog}>
+              <Plus className="size-4 mr-1.5" /> {t("vitals.weightChart.logWeight")}
+            </Button>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={points} margin={{ top: 8, right: 12, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis
+                dataKey="ts"
+                type="number"
+                domain={["dataMin", "dataMax"]}
+                scale="time"
+                tickFormatter={dateFmt}
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                stroke="var(--border)"
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                stroke="var(--border)"
+                domain={[
+                  (dataMin: number) => {
+                    const vals = points.map((p) => p.value);
+                    const min = Math.min(...vals);
+                    const max = Math.max(...vals);
+                    const pad = Math.max((max - min) * 0.1, 0.2);
+                    return Number((dataMin - pad).toFixed(2));
+                  },
+                  (dataMax: number) => {
+                    const vals = points.map((p) => p.value);
+                    const min = Math.min(...vals);
+                    const max = Math.max(...vals);
+                    const pad = Math.max((max - min) * 0.1, 0.2);
+                    return Number((dataMax + pad).toFixed(2));
+                  },
+                ]}
+                tickFormatter={(v) => nf.format(v as number)}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "var(--card)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "12px",
+                  fontSize: "12px",
+                }}
+                labelFormatter={(v) =>
+                  new Date(v as number).toLocaleDateString(
+                    i18n.language === "sv" ? "sv-SE" : "en-US",
+                    { year: "numeric", month: "short", day: "numeric" },
+                  )
+                }
+                formatter={(v) => [`${nf.format(v as number)} ${unit}`, t("vitals.weight")]}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={tone.stroke}
+                strokeWidth={2.5}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+    </section>
+  );
+}
+
+
+
+
+
 
 
 function FluidsChart({
