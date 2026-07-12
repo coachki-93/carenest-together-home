@@ -536,6 +536,15 @@ export const sv = {
     yesterday: "Igår",
     sevenDayAvg: "7-dagars snitt",
     rangeInfoTooltip: "Referensintervall är informativa och anpassade efter barnets ålder. Ägare kan ange egna värden i barnprofilen.",
+    weightChart: {
+      title: "Viktkurva",
+      range: { "3m": "3 mån", "6m": "6 mån", "1y": "1 år", all: "Allt" },
+      sinceLast: "sedan förra",
+      emptyTitle: "Inga viktmätningar än",
+      emptyBody: "Logga vikt för att starta kurvan.",
+      needMore: "Logga en till mätning för att se kurvan.",
+      logWeight: "Logga vikt",
+    },
     disclaimer: "Detta är screening-/referensvärden, inte diagnosregler. Ett barn som gråter, har feber, är uttorkat, sover, tränar, har ont eller är oroligt kan ligga utanför dessa.",
     contextLabel: "Sammanhang (valfritt)",
     context: {
