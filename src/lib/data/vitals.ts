@@ -65,18 +65,26 @@ export function useLatestVitals(familyId: string | undefined | null) {
     queryKey: ["vitals-latest", familyId],
     enabled: !!familyId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("vitals")
-        .select("*")
-        .eq("family_id", familyId!)
-        .order("logged_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      const rows = data as Vital[];
-      // Pick the most-recent row per type
+      // Fetch the newest row per vital type in parallel. A single 50-row
+      // scan drops rarely-measured types (e.g. weight) out of the window
+      // for families that log frequent vitals, leaving those tiles empty.
+      const results = await Promise.all(
+        VITAL_TYPES.map(async (type) => {
+          const { data, error } = await supabase
+            .from("vitals")
+            .select("*")
+            .eq("family_id", familyId!)
+            .eq("vital_type", type)
+            .order("logged_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (error) throw error;
+          return data as Vital | null;
+        }),
+      );
       const map = new Map<VitalType, Vital>();
-      for (const r of rows) {
-        if (!map.has(r.vital_type)) map.set(r.vital_type, r);
+      for (const row of results) {
+        if (row) map.set(row.vital_type, row);
       }
       return map;
     },
