@@ -738,32 +738,43 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
     limit: 500,
   });
 
+  // Normalize every row to grams so mixed 'g' / 'kg' data plots consistently.
   const points = useMemo(
     () =>
       rows
-        .map((v) => ({ ts: new Date(v.logged_at).getTime(), value: Number(v.value) }))
+        .map((v) => {
+          const raw = Number(v.value);
+          const grams = v.unit === "kg" ? raw * 1000 : raw;
+          return { ts: new Date(v.logged_at).getTime(), value: grams };
+        })
         .sort((a, b) => a.ts - b.ts),
     [rows],
   );
 
   const last = points[points.length - 1];
   const prev = points[points.length - 2];
+
+  // One unit per render, chosen from the latest normalized reading.
+  const displayInKg = !!last && last.value >= 10_000;
+  const unit = displayInKg ? "kg" : "g";
+  const toDisplay = (grams: number) => (displayInKg ? grams / 1000 : grams);
+
   const nf = useMemo(
     () =>
       new Intl.NumberFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
-        maximumFractionDigits: 1,
+        maximumFractionDigits: displayInKg ? 1 : 0,
         minimumFractionDigits: 0,
       }),
-    [i18n.language],
+    [i18n.language, displayInKg],
   );
   const nfDelta = useMemo(
     () =>
       new Intl.NumberFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
-        maximumFractionDigits: 1,
+        maximumFractionDigits: displayInKg ? 1 : 0,
         minimumFractionDigits: 0,
         signDisplay: "always",
       }),
-    [i18n.language],
+    [i18n.language, displayInKg],
   );
 
   const dateFmt = (v: number) =>
@@ -776,7 +787,6 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
   const RANGE_KEYS: Array<"3m" | "6m" | "1y" | "all"> = ["3m", "6m", "1y", "all"];
 
   const delta = last && prev ? last.value - prev.value : null;
-  const unit = DEFAULT_UNIT.weight;
 
   return (
     <section className="card-soft p-5">
