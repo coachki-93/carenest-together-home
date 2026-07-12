@@ -847,7 +847,7 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={points} margin={{ top: 8, right: 12, left: -10, bottom: 0 }}>
+            <LineChart data={points} margin={{ top: 8, right: 12, left: 8, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="ts"
