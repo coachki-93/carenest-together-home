@@ -1173,12 +1173,24 @@ function LogReadingDialog({
               >
                 {t("vitals.unit")}
               </Label>
-              <Input
-                id="vital-unit"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-                className="rounded-xl h-11 mt-1.5"
-              />
+              {type === "weight" ? (
+                <Select value={unit} onValueChange={setUnit}>
+                  <SelectTrigger id="vital-unit" className="rounded-xl h-11 mt-1.5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="g">g</SelectItem>
+                    <SelectItem value="kg">kg</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="vital-unit"
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                  className="rounded-xl h-11 mt-1.5"
+                />
+              )}
             </div>
           </div>
           <div>
