@@ -877,7 +877,7 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
                     return Number((dataMax + pad).toFixed(2));
                   },
                 ]}
-                tickFormatter={(v) => nf.format(v as number)}
+                tickFormatter={(v) => nf.format(toDisplay(v as number))}
               />
               <Tooltip
                 contentStyle={{
