@@ -536,6 +536,15 @@ export const en = {
     yesterday: "Yesterday",
     sevenDayAvg: "7-day avg",
     rangeInfoTooltip: "Reference ranges are informational and adjusted for your child's age. Owners can set custom values from the child profile.",
+    weightChart: {
+      title: "Weight curve",
+      range: { "3m": "3 months", "6m": "6 months", "1y": "1 year", all: "All" },
+      sinceLast: "since last",
+      emptyTitle: "No weight readings yet",
+      emptyBody: "Log weight to start the curve.",
+      needMore: "Log one more reading to see the curve.",
+      logWeight: "Log weight",
+    },
     disclaimer: "These are screening/reference ranges, not diagnosis rules. A child who is crying, febrile, dehydrated, asleep, exercising, in pain, or anxious may fall outside these.",
     contextLabel: "Context (optional)",
     context: {
