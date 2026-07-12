@@ -271,6 +271,9 @@ function VitalsPage() {
           <FluidsChart vitals={vitals} range={range} />
         </section>
 
+        <WeightChart familyId={familyId} onLog={() => openLogFor("weight")} />
+
+
 
         {/* Pediatric reference table */}
         <PediatricRangesTable />
