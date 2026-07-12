@@ -859,6 +859,8 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
                 stroke="var(--border)"
               />
               <YAxis
+                width={56}
+                tickMargin={4}
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 stroke="var(--border)"
                 domain={[
