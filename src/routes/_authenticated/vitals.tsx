@@ -799,12 +799,12 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
             <div className="font-extrabold">{t("vitals.weightChart.title")}</div>
             {last && (
               <div className="text-xs text-muted-foreground">
-                {nf.format(last.value)} {unit}
+                {nf.format(toDisplay(last.value))} {unit}
                 {delta != null && delta !== 0 && (
                   <>
                     {" · "}
                     <span className="text-muted-foreground">
-                      {nfDelta.format(delta)} {unit} {t("vitals.weightChart.sinceLast")}
+                      {nfDelta.format(toDisplay(delta))} {unit} {t("vitals.weightChart.sinceLast")}
                     </span>
                   </>
                 )}
