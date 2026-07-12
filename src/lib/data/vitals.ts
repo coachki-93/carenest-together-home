@@ -22,7 +22,7 @@ export const DEFAULT_UNIT: Record<VitalType, string> = {
   heart_rate: "bpm",
   spo2: "%",
   temperature: "°C",
-  weight: "kg",
+  weight: "g",
   seizure: "min",
   fluids: "ml",
   breathing: "br/min",

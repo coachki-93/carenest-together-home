@@ -738,32 +738,43 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
     limit: 500,
   });
 
+  // Normalize every row to grams so mixed 'g' / 'kg' data plots consistently.
   const points = useMemo(
     () =>
       rows
-        .map((v) => ({ ts: new Date(v.logged_at).getTime(), value: Number(v.value) }))
+        .map((v) => {
+          const raw = Number(v.value);
+          const grams = v.unit === "kg" ? raw * 1000 : raw;
+          return { ts: new Date(v.logged_at).getTime(), value: grams };
+        })
         .sort((a, b) => a.ts - b.ts),
     [rows],
   );
 
   const last = points[points.length - 1];
   const prev = points[points.length - 2];
+
+  // One unit per render, chosen from the latest normalized reading.
+  const displayInKg = !!last && last.value >= 10_000;
+  const unit = displayInKg ? "kg" : "g";
+  const toDisplay = (grams: number) => (displayInKg ? grams / 1000 : grams);
+
   const nf = useMemo(
     () =>
       new Intl.NumberFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
-        maximumFractionDigits: 1,
+        maximumFractionDigits: displayInKg ? 1 : 0,
         minimumFractionDigits: 0,
       }),
-    [i18n.language],
+    [i18n.language, displayInKg],
   );
   const nfDelta = useMemo(
     () =>
       new Intl.NumberFormat(i18n.language === "sv" ? "sv-SE" : "en-US", {
-        maximumFractionDigits: 1,
+        maximumFractionDigits: displayInKg ? 1 : 0,
         minimumFractionDigits: 0,
         signDisplay: "always",
       }),
-    [i18n.language],
+    [i18n.language, displayInKg],
   );
 
   const dateFmt = (v: number) =>
@@ -776,7 +787,6 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
   const RANGE_KEYS: Array<"3m" | "6m" | "1y" | "all"> = ["3m", "6m", "1y", "all"];
 
   const delta = last && prev ? last.value - prev.value : null;
-  const unit = DEFAULT_UNIT.weight;
 
   return (
     <section className="card-soft p-5">
@@ -789,12 +799,12 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
             <div className="font-extrabold">{t("vitals.weightChart.title")}</div>
             {last && (
               <div className="text-xs text-muted-foreground">
-                {nf.format(last.value)} {unit}
+                {nf.format(toDisplay(last.value))} {unit}
                 {delta != null && delta !== 0 && (
                   <>
                     {" · "}
                     <span className="text-muted-foreground">
-                      {nfDelta.format(delta)} {unit} {t("vitals.weightChart.sinceLast")}
+                      {nfDelta.format(toDisplay(delta))} {unit} {t("vitals.weightChart.sinceLast")}
                     </span>
                   </>
                 )}
@@ -837,7 +847,7 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={points} margin={{ top: 8, right: 12, left: -10, bottom: 0 }}>
+            <LineChart data={points} margin={{ top: 8, right: 12, left: 8, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="ts"
@@ -849,6 +859,8 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
                 stroke="var(--border)"
               />
               <YAxis
+                width={56}
+                tickMargin={4}
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 stroke="var(--border)"
                 domain={[
@@ -867,7 +879,7 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
                     return Number((dataMax + pad).toFixed(2));
                   },
                 ]}
-                tickFormatter={(v) => nf.format(v as number)}
+                tickFormatter={(v) => nf.format(toDisplay(v as number))}
               />
               <Tooltip
                 contentStyle={{
@@ -882,7 +894,7 @@ function WeightChart({ familyId, onLog }: { familyId: string; onLog: () => void 
                     { year: "numeric", month: "short", day: "numeric" },
                   )
                 }
-                formatter={(v) => [`${nf.format(v as number)} ${unit}`, t("vitals.weight")]}
+                formatter={(v) => [`${nf.format(toDisplay(v as number))} ${unit}`, t("vitals.weight")]}
               />
               <Line
                 type="monotone"
@@ -1173,12 +1185,24 @@ function LogReadingDialog({
               >
                 {t("vitals.unit")}
               </Label>
-              <Input
-                id="vital-unit"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-                className="rounded-xl h-11 mt-1.5"
-              />
+              {type === "weight" ? (
+                <Select value={unit} onValueChange={setUnit}>
+                  <SelectTrigger id="vital-unit" className="rounded-xl h-11 mt-1.5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="g">g</SelectItem>
+                    <SelectItem value="kg">kg</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="vital-unit"
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                  className="rounded-xl h-11 mt-1.5"
+                />
+              )}
             </div>
           </div>
           <div>
