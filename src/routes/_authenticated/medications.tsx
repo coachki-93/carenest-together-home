@@ -181,21 +181,79 @@ function MedicationsPage() {
   );
 }
 
+type MedWithCourse = Medication & {
+  starts_on?: string | null;
+  ends_on?: string | null;
+};
+
+/**
+ * Derive the "course status" of a medication at `todayStr` (family-tz date).
+ * Returns null when the med has no course window (ongoing / "Tills vidare").
+ */
+function courseStatus(
+  med: MedWithCourse,
+  todayStr: string,
+): { kind: "before" | "during" | "after"; day?: number; total?: number; date: string } | null {
+  const startsOn = med.starts_on ?? null;
+  const endsOn = med.ends_on ?? null;
+  if (!startsOn && !endsOn) return null;
+  const diffDays = (a: string, b: string) => {
+    const [ay, am, ad] = a.split("-").map(Number);
+    const [by, bm, bd] = b.split("-").map(Number);
+    return Math.round(
+      (Date.UTC(ay, am - 1, ad) - Date.UTC(by, bm - 1, bd)) / 86_400_000,
+    );
+  };
+  if (startsOn && todayStr < startsOn) {
+    return { kind: "before", date: startsOn };
+  }
+  if (endsOn && todayStr > endsOn) {
+    return { kind: "after", date: endsOn };
+  }
+  if (startsOn && endsOn) {
+    return {
+      kind: "during",
+      day: diffDays(todayStr, startsOn) + 1,
+      total: diffDays(endsOn, startsOn) + 1,
+      date: endsOn,
+    };
+  }
+  return null;
+}
+
+function formatDateIn(dateStr: string, locale: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(locale, {
+    day: "numeric",
+    month: "long",
+  });
+}
+
 function MedicationCard({
   med,
+  tz,
   canEdit,
   onEdit,
   onDelete,
 }: {
   med: Medication;
+  tz: string;
   canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
+  const todayStr = wallClockIn(new Date(), tz).todayStr;
+  const status = courseStatus(med as MedWithCourse, todayStr);
+  const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
   return (
-    <div className={cn("card-soft p-5", !med.active && "opacity-60")}>
+    <div
+      className={cn(
+        "card-soft p-5",
+        (!med.active || status?.kind === "after") && "opacity-60",
+      )}
+    >
       <div className="flex items-start gap-3">
         <div
           className="size-12 rounded-2xl flex items-center justify-center shrink-0"
@@ -224,6 +282,23 @@ function MedicationCard({
           </div>
           {med.instructions && (
             <p className="text-sm text-muted-foreground mt-2">{med.instructions}</p>
+          )}
+          {status && (
+            <div className="mt-2">
+              {status.kind === "during" ? (
+                <span className="inline-flex items-center text-xs font-semibold rounded-full bg-primary-soft text-primary px-2.5 py-1">
+                  {t("meds.courseDayOf", { n: status.day, total: status.total })}
+                </span>
+              ) : status.kind === "before" ? (
+                <span className="inline-flex items-center text-xs font-semibold rounded-full bg-muted text-muted-foreground px-2.5 py-1">
+                  {t("meds.courseStartsOn", { date: formatDateIn(status.date, locale) })}
+                </span>
+              ) : (
+                <span className="inline-flex items-center text-xs font-semibold rounded-full bg-muted text-muted-foreground px-2.5 py-1">
+                  {t("meds.courseFinished", { date: formatDateIn(status.date, locale) })}
+                </span>
+              )}
+            </div>
           )}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {(med.times ?? []).map((tm) => (
