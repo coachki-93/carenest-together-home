@@ -984,6 +984,7 @@ function DashboardPage() {
           )}
           <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
           <EndOfShiftTidyBanner familyId={familyId} userId={user?.id} />
+          <AppointmentsTodayBanner familyId={familyId} />
           {(lowStock.lowCount > 0 ||
             lowStock.expiringCount > 0 ||
             lowStock.expiredCount > 0) && (
