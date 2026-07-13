@@ -753,11 +753,11 @@ function EventDialog({
       return { ok: false };
     }
     const startDt = values.allDay
-      ? toLocalDateTime(values.date, "00:00")
-      : toLocalDateTime(values.date, values.time || "00:00");
+      ? zonedWallClockToDate(values.date, "00:00", tz)
+      : zonedWallClockToDate(values.date, values.time || "00:00", tz);
     const endDt =
       !values.allDay && values.endTime
-        ? toLocalDateTime(values.date, values.endTime)
+        ? zonedWallClockToDate(values.date, values.endTime, tz)
         : null;
     if (endDt && endDt <= startDt) {
       toast.error(t("appointments.validation.endAfterStart"));
