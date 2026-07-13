@@ -316,6 +316,7 @@ function ShiftsPage() {
           existing={editing}
           initialProfileId={creating?.profileId}
           initialDate={creating?.date}
+          tz={tz}
         />
       )}
     </DashboardLayout>
