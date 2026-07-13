@@ -81,6 +81,7 @@ import {
 import { useHandoverTimes } from "@/lib/data/handover-times";
 import { HandoverUnreadBanner } from "@/components/carenest/HandoverUnreadBanner";
 import { AppointmentsTodayBanner } from "@/components/carenest/AppointmentsTodayBanner";
+import { AppointmentsReminderBanner } from "@/components/carenest/AppointmentsReminderBanner";
 import { ClipboardCheck } from "lucide-react";
 import {
   TaskActionDialog,
