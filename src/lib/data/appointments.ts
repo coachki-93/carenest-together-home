@@ -57,6 +57,10 @@ export type AppointmentUpdate = Database["public"]["Tables"]["appointments"]["Up
 export type AppointmentKind =
   | "appointment"
   | "therapy"
+  | "meeting"
+  | "lab"
+  | "dental"
+  | "hospital_stay"
   | "task"
   | "other"
   | "meal"
@@ -87,6 +91,10 @@ export type ExpandedAppointment = Appointment & {
 export const APPOINTMENT_KINDS: AppointmentKind[] = [
   "appointment",
   "therapy",
+  "meeting",
+  "lab",
+  "dental",
+  "hospital_stay",
   "task",
   "meal",
   "sleep",
@@ -101,6 +109,21 @@ export const APPOINTMENT_KINDS: AppointmentKind[] = [
   "note",
   "other",
 ];
+
+/** The six "visit" kinds shown on the /appointments calendar. */
+export const VISIT_KINDS = [
+  "appointment",
+  "therapy",
+  "meeting",
+  "lab",
+  "dental",
+  "hospital_stay",
+] as const;
+export type VisitKind = (typeof VISIT_KINDS)[number];
+export function isVisitKind(k: AppointmentKind): k is VisitKind {
+  return (VISIT_KINDS as readonly string[]).includes(k);
+}
+
 
 // ---------------------------------------------------------------------------
 // Recurrence expansion
