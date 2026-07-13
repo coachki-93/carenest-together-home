@@ -313,9 +313,14 @@ function AppointmentsPage() {
                       </div>
                       <div className="flex flex-col gap-1 min-w-0">
                         {events.slice(0, 3).map((e) => (
-                          <div
+                          <button
                             key={e.id}
-                            className="truncate text-[10px] md:text-[11px] font-semibold rounded-md px-1 md:px-1.5 py-0.5"
+                            type="button"
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              openPreview(e);
+                            }}
+                            className="truncate text-[10px] md:text-[11px] font-semibold rounded-md px-1 md:px-1.5 py-0.5 text-left hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                             style={{
                               background: chipColor(e) + "26",
                               color: chipColor(e),
@@ -328,7 +333,7 @@ function AppointmentsPage() {
                               </span>
                             )}
                             {e.title}
-                          </div>
+                          </button>
                         ))}
                         {events.length > 3 && (
                           <div className="text-[10px] font-semibold text-muted-foreground pl-1">
