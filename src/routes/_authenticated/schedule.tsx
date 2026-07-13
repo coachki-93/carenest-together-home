@@ -30,6 +30,10 @@ import {
   Baby,
   Zap,
   StickyNote,
+  Users,
+  TestTube,
+  Smile,
+  Hospital,
 } from "lucide-react";
 import { SpO2DropletIcon } from "@/components/icons/SpO2DropletIcon";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
