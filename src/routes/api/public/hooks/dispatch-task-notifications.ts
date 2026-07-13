@@ -254,7 +254,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             )
             .gte("recurrence_override_at", windowStartIso)
             .lte("recurrence_override_at", nowIso);
-          slmOverrides = (ov ?? []).filter(
+          slmOverrides = ((ov ?? []) as unknown as SLMRow[]).filter(
             (r): r is SLMOverride =>
               !!r.recurrence_parent_id && !!r.recurrence_override_at,
           );
