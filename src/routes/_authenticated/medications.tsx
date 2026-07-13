@@ -443,6 +443,27 @@ function MedicationDialog({
       toast.error(t("meds.nameRequired"));
       return;
     }
+    let courseFirstIso: string | null = null;
+    let courseTotal: number | null = null;
+    if (isCourse) {
+      const n = parseInt(totalDoses, 10);
+      if (!Number.isFinite(n) || n < 1) {
+        toast.error(t("meds.totalDosesRequired"));
+        return;
+      }
+      if (!times.length) {
+        toast.error(t("meds.timesRequiredForCourse"));
+        return;
+      }
+      const [dateStr, timeStr] = (firstDoseLocal || "T").split("T");
+      const first = zonedWallClockToDate(dateStr ?? "", timeStr ?? "", tz);
+      if (!Number.isFinite(first.getTime())) {
+        toast.error(t("meds.firstDoseRequired"));
+        return;
+      }
+      courseFirstIso = first.toISOString();
+      courseTotal = n;
+    }
     try {
       await saveMed.mutateAsync({
         id: medication?.id,
@@ -460,8 +481,8 @@ function MedicationDialog({
         missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
         allow_ongoing: allowOngoing,
         timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
-        starts_on: isCourse ? startsOn : null,
-        ends_on: isCourse ? endsOn : null,
+        course_first_dose_at: courseFirstIso,
+        course_total_doses: courseTotal,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
@@ -469,6 +490,7 @@ function MedicationDialog({
       toast.error((err as Error).message);
     }
   };
+
 
 
   return (
