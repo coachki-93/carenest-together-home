@@ -4,18 +4,31 @@ import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
-// anon `apikey` header. Runs three passes per call:
+// anon `apikey` header. Runs four passes per call, all deduped per-occurrence
+// via insert-if-absent into `public.appointment_notifications`
+// (PK: appointment_id, occurrence_at, pass):
 //
-//   1. START   — appointments whose start time just arrived
-//   2. LATE    — appointments still pending past `late_after_minutes`
-//   3. MISSED  — appointments still pending past `missed_after_minutes`
+//   1. START     — occurrence time just arrived (within START_GRACE_MINUTES)
+//   2. LATE      — now ≥ occurrence + late_after_minutes
+//   3. MISSED    — now ≥ occurrence + missed_after_minutes
+//   4. REMINDER  — now ≥ occurrence − reminder_minutes (look-ahead)
 //
-// Each pass stamps a `*_notified_at` column on the row so we never push twice
-// for the same transition, and skips any appointment that already has a
-// completion (done/skipped/postponed) recorded for that occurrence.
+// Recurring masters are expanded into occurrences and each occurrence dedupes
+// independently. Non-cancelled override child rows contribute their own
+// occurrence (shifted time / thresholds). LATE and MISSED skip occurrences
+// that already have a completion recorded.
 //
 // Times are rendered in the family's timezone; body copy in the family's
 // notification_language (sv | en). Both live on `public.families`.
+
+/**
+ * START catch-up window. If cron lags or the endpoint recovers late, START
+ * can still fire up to this many minutes after an occurrence time. Beyond
+ * this window LATE takes over — the two never overlap for the same
+ * occurrence, so no double-push. Also naturally bounds any first-run burst
+ * after deploy: only occurrences within the last 15 min can produce START.
+ */
+const START_GRACE_MINUTES = 15;
 
 type Appt = {
   id: string;
