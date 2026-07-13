@@ -2345,6 +2345,10 @@ export const sv = {
       endAfterStart: "Sluttiden måste vara efter starttiden.",
       weekdaysRequired: "Välj minst en veckodag.",
     },
+    preview: {
+      repeats: "Upprepas",
+      close: "Stäng",
+    },
   },
 };
 
