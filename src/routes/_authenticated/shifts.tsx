@@ -70,6 +70,8 @@ function ShiftsPage() {
   const isOwner = membership?.role === "owner";
 
   const { data: members } = useFamilyMembers(familyId);
+  const { data: family } = useFamily(familyId);
+  const tz = family?.timezone ?? "Europe/Stockholm";
   const { data: profiles } = useCaregiverProfiles(familyId);
   const { data: shifts } = useShifts(familyId);
 
