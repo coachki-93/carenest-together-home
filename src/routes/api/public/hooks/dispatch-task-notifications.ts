@@ -30,15 +30,6 @@ import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
  */
 const START_GRACE_MINUTES = 15;
 
-type Appt = {
-  id: string;
-  family_id: string;
-  title: string | null;
-  kind: string | null;
-  starts_at: string;
-  late_after_minutes?: number | null;
-  missed_after_minutes?: number | null;
-};
 
 type Sub = { endpoint: string; p256dh: string; auth: string };
 
