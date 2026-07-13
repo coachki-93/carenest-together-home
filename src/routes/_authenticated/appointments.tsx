@@ -647,6 +647,7 @@ type DialogValues = {
   repeat: "none" | "daily" | "weekly" | "monthly";
   interval: number;
   weekdays: number[];
+  reminder: "none" | "60" | "120" | "1440";
 };
 
 function EventDialog({
@@ -704,6 +705,14 @@ function EventDialog({
             : "none",
         interval: Math.max(1, editing.recurrence_interval ?? 1),
         weekdays: editing.recurrence_byweekday ?? [],
+        reminder:
+          editing.reminder_minutes === 60
+            ? "60"
+            : editing.reminder_minutes === 120
+              ? "120"
+              : editing.reminder_minutes === 1440
+                ? "1440"
+                : "none",
       });
       setRepeatOpen(!!freq && freq !== "hourly");
     } else {
@@ -727,6 +736,7 @@ function EventDialog({
       kind: AppointmentKind;
       all_day: boolean;
       color: string;
+      reminder_minutes: number | null;
     };
     recurrence: {
       recurrence_freq: RecurrenceFreq | null;
@@ -763,6 +773,8 @@ function EventDialog({
       : values.repeat === "none"
         ? null
         : values.repeat;
+    const reminderMin =
+      values.reminder === "none" ? null : Number(values.reminder);
     return {
       ok: true,
       starts_at: startDt.toISOString(),
@@ -774,6 +786,7 @@ function EventDialog({
         kind: values.kind as AppointmentKind,
         all_day: values.allDay,
         color: values.color,
+        reminder_minutes: reminderMin,
       },
       recurrence: {
         recurrence_freq: persistedFreq,
@@ -1050,7 +1063,37 @@ function EventDialog({
               )}
             </div>
 
-            {/* Color palette */}
+            {/* Reminder */}
+            <div>
+              <Label className="font-semibold">
+                {t("appointments.field.reminder")}
+              </Label>
+              <Select
+                value={values.reminder}
+                onValueChange={(v) =>
+                  update("reminder", v as DialogValues["reminder"])
+                }
+              >
+                <SelectTrigger className="rounded-xl mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    {t("appointments.reminderChoice.none")}
+                  </SelectItem>
+                  <SelectItem value="60">
+                    {t("appointments.reminderChoice.hour1")}
+                  </SelectItem>
+                  <SelectItem value="120">
+                    {t("appointments.reminderChoice.hours2")}
+                  </SelectItem>
+                  <SelectItem value="1440">
+                    {t("appointments.reminderChoice.day1")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label className="font-semibold">
                 {t("appointments.field.color")}
@@ -1336,6 +1379,7 @@ function blankValues(dayStr: string): DialogValues {
     repeat: "none",
     interval: 1,
     weekdays: [],
+    reminder: "none",
   };
 }
 

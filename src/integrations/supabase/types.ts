@@ -103,6 +103,35 @@ export type Database = {
           },
         ]
       }
+      appointment_notifications: {
+        Row: {
+          appointment_id: string
+          notified_at: string
+          occurrence_at: string
+          pass: string
+        }
+        Insert: {
+          appointment_id: string
+          notified_at?: string
+          occurrence_at: string
+          pass: string
+        }
+        Update: {
+          appointment_id?: string
+          notified_at?: string
+          occurrence_at?: string
+          pass?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           all_day: boolean

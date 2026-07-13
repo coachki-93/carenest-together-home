@@ -81,6 +81,7 @@ import {
 import { useHandoverTimes } from "@/lib/data/handover-times";
 import { HandoverUnreadBanner } from "@/components/carenest/HandoverUnreadBanner";
 import { AppointmentsTodayBanner } from "@/components/carenest/AppointmentsTodayBanner";
+import { AppointmentsReminderBanner } from "@/components/carenest/AppointmentsReminderBanner";
 import { ClipboardCheck } from "lucide-react";
 import {
   TaskActionDialog,
@@ -985,6 +986,7 @@ function DashboardPage() {
           <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
           <EndOfShiftTidyBanner familyId={familyId} userId={user?.id} />
           <AppointmentsTodayBanner familyId={familyId} />
+          <AppointmentsReminderBanner familyId={familyId} />
           {(lowStock.lowCount > 0 ||
             lowStock.expiringCount > 0 ||
             lowStock.expiredCount > 0) && (

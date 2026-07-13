@@ -2298,6 +2298,18 @@ export const en = {
       color: "Color",
       kind: "Type",
       repeat: "Repeat",
+      reminder: "Reminder",
+    },
+    reminderChoice: {
+      none: "No reminder",
+      hour1: "1 hour before",
+      hours2: "2 hours before",
+      day1: "1 day before",
+    },
+    reminder_banner: {
+      singularTomorrow: "Reminder: {{title}} · tomorrow {{time}}",
+      singularToday: "Reminder: {{title}} · today {{time}}",
+      plural: "{{count}} upcoming appointments",
     },
     placeholder: {
       title: "Pediatric follow-up",
