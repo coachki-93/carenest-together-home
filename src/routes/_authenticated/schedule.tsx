@@ -179,6 +179,7 @@ function SchedulePage() {
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
   const { data: family } = useFamily(familyId);
+  const tz = family?.timezone ?? "Europe/Stockholm";
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
