@@ -390,8 +390,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 4: reminder --------
         // Look ahead 2 days (matches max reminder = 1440 min = 1 day, with slack).
-        // Per-occurrence dedupe lives in `appointment_notifications`; NOT gated on
-        // the *_notified_at columns used by the older passes.
+        // Same per-occurrence dedupe pattern as passes 1-3.
         const lookAheadEnd = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
         const lookAheadIso = lookAheadEnd.toISOString();
 
