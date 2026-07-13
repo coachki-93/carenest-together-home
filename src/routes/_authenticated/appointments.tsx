@@ -705,6 +705,14 @@ function EventDialog({
             : "none",
         interval: Math.max(1, editing.recurrence_interval ?? 1),
         weekdays: editing.recurrence_byweekday ?? [],
+        reminder:
+          editing.reminder_minutes === 60
+            ? "60"
+            : editing.reminder_minutes === 120
+              ? "120"
+              : editing.reminder_minutes === 1440
+                ? "1440"
+                : "none",
       });
       setRepeatOpen(!!freq && freq !== "hourly");
     } else {
