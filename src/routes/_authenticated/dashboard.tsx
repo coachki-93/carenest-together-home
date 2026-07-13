@@ -543,7 +543,7 @@ function DashboardPage() {
 
   const tasks: TaskItem[] = useMemo(() => {
     const items: TaskItem[] = [];
-    const doses = buildTodaysDoses(meds, logs);
+    const doses = buildTodaysDoses(meds, logs, family?.timezone ?? "Europe/Stockholm");
     const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
     const fmtTime = (d: Date) =>
       d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });

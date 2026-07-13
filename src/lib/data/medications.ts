@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { wallClockIn } from "@/lib/time/family-tz";
 
 export type Medication = Database["public"]["Tables"]["medications"]["Row"];
 export type MedicationInsert = Database["public"]["Tables"]["medications"]["Insert"];
@@ -164,12 +165,24 @@ export interface ScheduledDose {
   log?: MedLog;
 }
 
+/**
+ * Build today's scheduled doses in the family's timezone.
+ *
+ * `familyTimezone` is required — "today" is the wall-clock date in the
+ * family's zone, not device or server local. Course window
+ * (medications.starts_on / ends_on) is enforced here with an inclusive,
+ * null-safe YYYY-MM-DD string compare against that same wall-clock date, so
+ * every downstream consumer (dashboard, schedule, ForYourShiftCard,
+ * handover prefill) inherits the gate.
+ */
 export function buildTodaysDoses(
   meds: Medication[],
   logs: MedLog[],
+  familyTimezone: string,
   day: Date = new Date(),
 ): ScheduledDose[] {
   const out: ScheduledDose[] = [];
+  const { todayStr } = wallClockIn(day, familyTimezone);
   const dayStart = new Date(day);
   dayStart.setHours(0, 0, 0, 0);
   const logByKey = new Map<string, MedLog>();
@@ -178,6 +191,11 @@ export function buildTodaysDoses(
   }
   for (const m of meds) {
     if (!m.active) continue;
+    // Course window gate — nulls mean "unbounded on that side".
+    const startsOn = (m as { starts_on?: string | null }).starts_on ?? null;
+    const endsOn = (m as { ends_on?: string | null }).ends_on ?? null;
+    if (startsOn && todayStr < startsOn) continue;
+    if (endsOn && todayStr > endsOn) continue;
     for (const t of m.times ?? []) {
       const [hh, mm] = t.split(":").map((n) => parseInt(n, 10));
       if (Number.isNaN(hh) || Number.isNaN(mm)) continue;
