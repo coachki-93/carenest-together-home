@@ -796,33 +796,52 @@ function EventDialog({
               <Label className="font-semibold">
                 {t("appointments.field.kind")}
               </Label>
-              <div className="mt-1.5 inline-flex rounded-full border border-border p-1 bg-muted/50">
-                {(["appointment", "therapy"] as VisitKind[]).map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => {
-                      update("kind", k);
-                      // Bump default color when user hasn't customized yet.
-                      if (
-                        values.color === DEFAULT_COLOR.appointment ||
-                        values.color === DEFAULT_COLOR.therapy
-                      ) {
-                        update("color", DEFAULT_COLOR[k]);
+              <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {VISIT_KINDS.map((k) => {
+                  const KI = KIND_ICON[k];
+                  const active = values.kind === k;
+                  const swatch = DEFAULT_COLOR[k];
+                  return (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => {
+                        update("kind", k);
+                        // Bump default color when user hasn't customized yet.
+                        if (isDefaultColor(values.color)) {
+                          update("color", DEFAULT_COLOR[k]);
+                        }
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 rounded-full border-2 px-3 py-2 text-sm font-bold transition-colors",
+                        active
+                          ? "border-foreground bg-muted"
+                          : "border-border/60 hover:bg-muted/50",
+                      )}
+                      style={
+                        active
+                          ? undefined
+                          : { borderColor: swatch + "55" }
                       }
-                    }}
-                    className={cn(
-                      "px-4 py-1.5 rounded-full text-sm font-bold transition-colors",
-                      values.kind === k
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {t(`appointments.kind.${k}`)}
-                  </button>
-                ))}
+                    >
+                      <span
+                        className="size-6 rounded-full flex items-center justify-center shrink-0"
+                        style={{
+                          backgroundColor: swatch + "33",
+                          color: swatch,
+                        }}
+                      >
+                        <KI className="size-3.5" />
+                      </span>
+                      <span className="truncate">
+                        {t(`appointments.kind.${k}`)}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
 
             {/* All-day + date/time */}
             <div className="flex items-center gap-2">
