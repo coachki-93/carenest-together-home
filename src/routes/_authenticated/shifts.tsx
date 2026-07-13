@@ -540,8 +540,11 @@ function ShiftDialog({
       toast.error(t("shiftsPage.errorProfile"));
       return;
     }
-    const sa = new Date(startAt);
-    const ea = new Date(endAt);
+    // datetime-local values are YYYY-MM-DDTHH:MM wall clock; interpret in tz.
+    const [saDate, saTime] = startAt.split("T");
+    const [eaDate, eaTime] = endAt.split("T");
+    const sa = zonedWallClockToDate(saDate, saTime ?? "00:00", tz);
+    const ea = zonedWallClockToDate(eaDate, eaTime ?? "00:00", tz);
     if (!(ea > sa)) {
       toast.error(t("shiftsPage.errorTime"));
       return;
@@ -558,7 +561,12 @@ function ShiftDialog({
       recurrence_interval: repeatMode === "none" ? null : Math.max(1, interval),
       recurrence_days_of_week:
         repeatMode === "weekly" && daysOfWeek.length > 0 ? daysOfWeek : null,
-      recurrence_until: repeatMode === "none" || !until ? null : new Date(until).toISOString(),
+      // `until` is a date-only <input type="date"> value; interpret end-of-day
+      // in the family's tz so the last covered day matches the picker.
+      recurrence_until:
+        repeatMode === "none" || !until
+          ? null
+          : zonedWallClockToDate(until, "23:59", tz).toISOString(),
     };
     try {
       if (existing) {
