@@ -68,7 +68,7 @@ import {
   type RecurrenceFreq,
   type VisitKind,
 } from "@/lib/data/appointments";
-import { wallClockIn, formatTimeIn } from "@/lib/time/family-tz";
+import { wallClockIn, formatTimeIn, dateInputIn, zonedWallClockToDate } from "@/lib/time/family-tz";
 
 export const Route = createFileRoute("/_authenticated/appointments")({
   head: () => ({ meta: [{ title: "Appointments — CareNest" }] }),
