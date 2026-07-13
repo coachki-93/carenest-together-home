@@ -68,7 +68,7 @@ import {
   type RecurrenceFreq,
   type VisitKind,
 } from "@/lib/data/appointments";
-import { wallClockIn, formatTimeIn } from "@/lib/time/family-tz";
+import { wallClockIn, formatTimeIn, dateInputIn, zonedWallClockToDate } from "@/lib/time/family-tz";
 
 export const Route = createFileRoute("/_authenticated/appointments")({
   head: () => ({ meta: [{ title: "Appointments — CareNest" }] }),
@@ -399,6 +399,7 @@ function AppointmentsPage() {
           userId={user.id}
           defaultDay={defaultDay ?? selectedDay}
           editing={editing}
+          tz={tz}
         />
       )}
 
@@ -657,6 +658,7 @@ function EventDialog({
   userId,
   defaultDay,
   editing,
+  tz,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -664,6 +666,7 @@ function EventDialog({
   userId: string;
   defaultDay: string;
   editing: ExpandedAppointment | null;
+  tz: string;
 }) {
   const { t } = useTranslation();
   const create = useCreateAppointment();
@@ -692,9 +695,9 @@ function EventDialog({
       setValues({
         title: editing.title,
         kind,
-        date: toDateInput(s),
-        time: toTimeInput(s),
-        endTime: e ? toTimeInput(e) : "",
+        date: dateInputIn(s, tz),
+        time: formatTimeIn(editing.starts_at, tz),
+        endTime: e && editing.ends_at ? formatTimeIn(editing.ends_at, tz) : "",
         allDay: editing.all_day,
         location: editing.location ?? "",
         notes: editing.notes ?? "",
@@ -750,11 +753,11 @@ function EventDialog({
       return { ok: false };
     }
     const startDt = values.allDay
-      ? toLocalDateTime(values.date, "00:00")
-      : toLocalDateTime(values.date, values.time || "00:00");
+      ? zonedWallClockToDate(values.date, "00:00", tz)
+      : zonedWallClockToDate(values.date, values.time || "00:00", tz);
     const endDt =
       !values.allDay && values.endTime
-        ? toLocalDateTime(values.date, values.endTime)
+        ? zonedWallClockToDate(values.date, values.endTime, tz)
         : null;
     if (endDt && endDt <= startDt) {
       toast.error(t("appointments.validation.endAfterStart"));
@@ -1383,24 +1386,10 @@ function blankValues(dayStr: string): DialogValues {
   };
 }
 
-function toDateInput(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+// toDateInput / toTimeInput / toLocalDateTime were device-local; write and
+// read paths now go through zonedWallClockToDate / dateInputIn / formatTimeIn
+// with the family timezone.
 
-function toTimeInput(d: Date): string {
-  const h = String(d.getHours()).padStart(2, "0");
-  const m = String(d.getMinutes()).padStart(2, "0");
-  return `${h}:${m}`;
-}
-
-function toLocalDateTime(dateStr: string, timeStr: string): Date {
-  // Interpret as browser-local time — matches the existing schedule dialog's
-  // write convention. Display uses family tz via wallClockIn/formatTimeIn.
-  return new Date(`${dateStr}T${timeStr}`);
-}
 
 /**
  * Advance the given anchor by N calendar months, staying inside the same

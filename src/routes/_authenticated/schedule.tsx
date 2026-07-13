@@ -85,6 +85,11 @@ import {
 } from "@/lib/data/medications";
 import { useFamily } from "@/lib/data/family";
 import {
+  dateInputIn,
+  formatTimeIn,
+  zonedWallClockToDate,
+} from "@/lib/time/family-tz";
+import {
   APPOINTMENT_KINDS,
   useAppointments,
   useCreateAppointment,
@@ -144,20 +149,10 @@ function addDays(d: Date, n: number) {
   x.setDate(x.getDate() + n);
   return x;
 }
-function toDateInput(d: Date) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-function toTimeInput(d: Date) {
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-function toLocalDateTime(date: string, time: string) {
-  const [y, m, d] = date.split("-").map(Number);
-  const [hh, mm] = time.split(":").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1, hh ?? 0, mm ?? 0, 0, 0);
-}
+// toDateInput / toTimeInput / toLocalDateTime were device-local; write and
+// read paths now go through zonedWallClockToDate / dateInputIn / formatTimeIn
+// with the family timezone (see AppointmentDialog).
+
 function isSameDay(a: Date, b: Date) {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -184,6 +179,7 @@ function SchedulePage() {
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
   const { data: family } = useFamily(familyId);
+  const tz = family?.timezone ?? "Europe/Stockholm";
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
@@ -514,6 +510,7 @@ function SchedulePage() {
         childId={child?.id ?? null}
         userId={user?.id ?? null}
         editing={editing}
+        tz={tz}
         onSave={async (values, scope) => {
           if (!familyId || !user) return;
           try {
@@ -914,6 +911,7 @@ function AppointmentDialog({
   childId,
   userId,
   editing,
+  tz,
   onSave,
   saving,
 }: {
@@ -924,6 +922,7 @@ function AppointmentDialog({
   childId: string | null;
   userId: string | null;
   editing: ExpandedAppointment | null;
+  tz: string;
   onSave: (values: SavePayload, scope: "this" | "series") => void | Promise<void>;
   saving: boolean;
 }) {
@@ -931,7 +930,7 @@ function AppointmentDialog({
 
   const [title, setTitle] = useState("");
   const [kind, setKind] = useState<AppointmentKind>("appointment");
-  const [date, setDate] = useState(toDateInput(defaultDay));
+  const [date, setDate] = useState(dateInputIn(defaultDay, tz));
   const [time, setTime] = useState("09:00");
   const [endTime, setEndTime] = useState("");
   const [allDay, setAllDay] = useState(false);
@@ -959,9 +958,9 @@ function AppointmentDialog({
       const e = editing.ends_at ? new Date(editing.ends_at) : null;
       setTitle(editing.title);
       setKind(editing.kind);
-      setDate(toDateInput(s));
-      setTime(toTimeInput(s));
-      setEndTime(e ? toTimeInput(e) : "");
+      setDate(dateInputIn(s, tz));
+      setTime(formatTimeIn(editing.starts_at, tz));
+      setEndTime(e && editing.ends_at ? formatTimeIn(editing.ends_at, tz) : "");
       setAllDay(editing.all_day);
       setLocation(editing.location ?? "");
       setNotes(editing.notes ?? "");
@@ -982,7 +981,7 @@ function AppointmentDialog({
     } else {
       setTitle("");
       setKind("appointment");
-      setDate(toDateInput(defaultDay));
+      setDate(dateInputIn(defaultDay, tz));
       setTime("09:00");
       setEndTime("");
       setAllDay(false);
@@ -1008,9 +1007,9 @@ function AppointmentDialog({
       return null;
     }
     const startDt = allDay
-      ? toLocalDateTime(date, "00:00")
-      : toLocalDateTime(date, time || "00:00");
-    const endDt = !allDay && endTime ? toLocalDateTime(date, endTime) : null;
+      ? zonedWallClockToDate(date, "00:00", tz)
+      : zonedWallClockToDate(date, time || "00:00", tz);
+    const endDt = !allDay && endTime ? zonedWallClockToDate(date, endTime, tz) : null;
     if (endDt && endDt <= startDt) {
       toast.error(t("scheduleEvents.endAfterStart"));
       return null;

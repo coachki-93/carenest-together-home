@@ -24,7 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMyMembership, useProfile } from "@/lib/auth/use-profile";
-import { useFamilyMembers } from "@/lib/data/family";
+import { useFamily, useFamilyMembers } from "@/lib/data/family";
+import { dateInputIn, dateTimeInputIn, zonedWallClockToDate } from "@/lib/time/family-tz";
 import { useCaregiverProfiles, type CaregiverProfile } from "@/lib/data/caregiver-profiles";
 import {
   expandShifts,
@@ -55,15 +56,11 @@ const SHIFT_COLORS = [
 
 const UNASSIGNED_KEY = "__unassigned__";
 
-function toLocalDateTimeInput(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+// The previous device-local toLocalDateTimeInput / toLocalDateInput helpers
+// were removed — they showed the browser's wall clock instead of the family's.
+// ShiftDialog now renders and parses input values through the family timezone
+// via dateTimeInputIn / dateInputIn / zonedWallClockToDate.
 
-function toLocalDateInput(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
 
 function ShiftsPage() {
   const { t, i18n } = useTranslation();
@@ -73,6 +70,8 @@ function ShiftsPage() {
   const isOwner = membership?.role === "owner";
 
   const { data: members } = useFamilyMembers(familyId);
+  const { data: family } = useFamily(familyId);
+  const tz = family?.timezone ?? "Europe/Stockholm";
   const { data: profiles } = useCaregiverProfiles(familyId);
   const { data: shifts } = useShifts(familyId);
 
@@ -317,6 +316,7 @@ function ShiftsPage() {
           existing={editing}
           initialProfileId={creating?.profileId}
           initialDate={creating?.date}
+          tz={tz}
         />
       )}
     </DashboardLayout>
@@ -479,6 +479,7 @@ function ShiftDialog({
   existing,
   initialProfileId,
   initialDate,
+  tz,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -489,30 +490,31 @@ function ShiftDialog({
   existing: ShiftRow | null;
   initialProfileId?: string;
   initialDate?: Date;
+  tz: string;
 }) {
   const { t } = useTranslation();
   const createShift = useCreateShift();
   const updateShift = useUpdateShift();
   const deleteShift = useDeleteShift();
 
-  const defaultStart = useMemo(() => {
-    if (existing) return new Date(existing.start_at);
-    const d = initialDate ? new Date(initialDate) : new Date();
-    d.setHours(9, 0, 0, 0);
-    return d;
-  }, [existing, initialDate]);
-  const defaultEnd = useMemo(() => {
-    if (existing) return new Date(existing.end_at);
-    const d = new Date(defaultStart);
-    d.setHours(d.getHours() + 4);
-    return d;
-  }, [existing, defaultStart]);
+  // Compute default start/end as datetime-local strings in the family's tz.
+  // For existing rows: format the stored instant in tz.
+  // For new rows: anchor to the requested day (or today), 09:00 wall clock in tz,
+  // 4h duration.
+  const [startAt, setStartAt] = useState<string>(() => {
+    if (existing) return dateTimeInputIn(new Date(existing.start_at), tz);
+    const anchor = initialDate ? new Date(initialDate) : new Date();
+    return `${dateInputIn(anchor, tz)}T09:00`;
+  });
+  const [endAt, setEndAt] = useState<string>(() => {
+    if (existing) return dateTimeInputIn(new Date(existing.end_at), tz);
+    const anchor = initialDate ? new Date(initialDate) : new Date();
+    return `${dateInputIn(anchor, tz)}T13:00`;
+  });
 
   const [profileId, setProfileId] = useState<string>(
     existing?.caregiver_profile_id ?? initialProfileId ?? profiles[0]?.id ?? "",
   );
-  const [startAt, setStartAt] = useState<string>(toLocalDateTimeInput(defaultStart));
-  const [endAt, setEndAt] = useState<string>(toLocalDateTimeInput(defaultEnd));
   const [color, setColor] = useState<string>(existing?.color ?? SHIFT_COLORS[0]);
   const [category, setCategory] = useState<string>(existing?.category ?? "");
   const [repeatMode, setRepeatMode] = useState<"none" | "daily" | "weekly">(
@@ -523,7 +525,7 @@ function ShiftDialog({
     existing?.recurrence_days_of_week ?? [],
   );
   const [until, setUntil] = useState<string>(
-    existing?.recurrence_until ? toLocalDateInput(new Date(existing.recurrence_until)) : "",
+    existing?.recurrence_until ? dateInputIn(new Date(existing.recurrence_until), tz) : "",
   );
 
   function toggleDay(dow: number) {
@@ -538,8 +540,11 @@ function ShiftDialog({
       toast.error(t("shiftsPage.errorProfile"));
       return;
     }
-    const sa = new Date(startAt);
-    const ea = new Date(endAt);
+    // datetime-local values are YYYY-MM-DDTHH:MM wall clock; interpret in tz.
+    const [saDate, saTime] = startAt.split("T");
+    const [eaDate, eaTime] = endAt.split("T");
+    const sa = zonedWallClockToDate(saDate, saTime ?? "00:00", tz);
+    const ea = zonedWallClockToDate(eaDate, eaTime ?? "00:00", tz);
     if (!(ea > sa)) {
       toast.error(t("shiftsPage.errorTime"));
       return;
@@ -556,7 +561,12 @@ function ShiftDialog({
       recurrence_interval: repeatMode === "none" ? null : Math.max(1, interval),
       recurrence_days_of_week:
         repeatMode === "weekly" && daysOfWeek.length > 0 ? daysOfWeek : null,
-      recurrence_until: repeatMode === "none" || !until ? null : new Date(until).toISOString(),
+      // `until` is a date-only <input type="date"> value; interpret end-of-day
+      // in the family's tz so the last covered day matches the picker.
+      recurrence_until:
+        repeatMode === "none" || !until
+          ? null
+          : zonedWallClockToDate(until, "23:59", tz).toISOString(),
     };
     try {
       if (existing) {

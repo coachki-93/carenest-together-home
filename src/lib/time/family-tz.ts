@@ -66,3 +66,67 @@ export function yesterdayStrIn(date: Date, tz: string): string {
   const oneDayMs = 24 * 60 * 60 * 1000;
   return wallClockIn(new Date(date.getTime() - oneDayMs), tz).todayStr;
 }
+
+// ---------------------------------------------------------------------------
+// Read helpers for form inputs: render an absolute Date as the wall-clock
+// value the family's timezone would display, formatted for HTML inputs.
+// ---------------------------------------------------------------------------
+
+/** YYYY-MM-DD in `tz` — feed to <input type="date">. */
+export function dateInputIn(date: Date, tz: string): string {
+  return wallClockIn(date, tz).todayStr;
+}
+
+/** YYYY-MM-DDTHH:MM in `tz` — feed to <input type="datetime-local">. */
+export function dateTimeInputIn(date: Date, tz: string): string {
+  const p = partsOf(date, tz);
+  const hh = p.hour === "24" ? "00" : p.hour;
+  return `${p.year}-${p.month}-${p.day}T${hh}:${p.minute}`;
+}
+
+// ---------------------------------------------------------------------------
+// Write helper: interpret a wall-clock date+time in `tz` and return the
+// absolute UTC instant it represents. Inverse of `wallClockIn`.
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a wall-clock (YYYY-MM-DD, HH:MM) in `tz` to a UTC Date.
+ *
+ * Method: pretend the wall clock is UTC to get a first guess, then format
+ * that guess in `tz` and subtract the resulting offset. IANA offsets are
+ * integer minutes, so one iteration is exact except at the spring-forward
+ * gap — for a nonexistent local time (e.g. 02:30 in a zone that jumps
+ * 02:00→03:00) the result is an approximate instant near the transition,
+ * which is acceptable for this domain (appointments/shifts/schedule).
+ * Falls back to Europe/Stockholm if `tz` is invalid, matching wallClockIn.
+ */
+export function zonedWallClockToDate(
+  dateStr: string,
+  timeStr: string,
+  tz: string,
+): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const [hh, mm] = timeStr.split(":").map(Number);
+  if (
+    !Number.isFinite(y) ||
+    !Number.isFinite(m) ||
+    !Number.isFinite(d) ||
+    !Number.isFinite(hh) ||
+    !Number.isFinite(mm)
+  ) {
+    return new Date(NaN);
+  }
+  const targetUtcMinutes =
+    Date.UTC(y, m - 1, d, hh, mm) / 60000;
+  const guess = new Date(targetUtcMinutes * 60000);
+  const p = partsOf(guess, tz);
+  const seenY = Number(p.year);
+  const seenMo = Number(p.month);
+  const seenD = Number(p.day);
+  const seenH = p.hour === "24" ? 0 : Number(p.hour);
+  const seenMi = Number(p.minute);
+  const seenUtcMinutes =
+    Date.UTC(seenY, seenMo - 1, seenD, seenH, seenMi) / 60000;
+  const offsetMin = seenUtcMinutes - targetUtcMinutes;
+  return new Date((targetUtcMinutes - offsetMin) * 60000);
+}

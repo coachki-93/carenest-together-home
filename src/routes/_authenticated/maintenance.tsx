@@ -1065,6 +1065,10 @@ function ItemDialog({
               }
               let lastDoneIso: string | null = null;
               if (lastDone && lastDone <= today) {
+                // Date-only field: anchor at local noon so the stored instant
+                // lands on the correct calendar day for any browser/family tz
+                // pair (noon ± any real-world offset stays inside that day).
+                // Exempt from the family-tz write helper for that reason.
                 const d = new Date(`${lastDone}T12:00:00`);
                 if (!Number.isNaN(d.getTime())) {
                   lastDoneIso = d.toISOString();
