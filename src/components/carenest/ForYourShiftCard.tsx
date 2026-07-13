@@ -6,6 +6,7 @@ import {
   useMedications,
   useMedLogs,
 } from "@/lib/data/medications";
+import { useFamily } from "@/lib/data/family";
 import { getForwardShiftWindow } from "@/lib/data/handover-shift";
 
 interface Props {
@@ -43,6 +44,8 @@ export function ForYourShiftCard({ familyId }: Props) {
 
   const { data: meds } = useMedications(familyId);
   const { data: medLogs } = useMedLogs(familyId, dayStart, dayEnd);
+  const { data: family } = useFamily(familyId);
+  const tz = family?.timezone ?? "Europe/Stockholm";
 
   const timeFmt = useMemo(
     () =>
@@ -55,7 +58,7 @@ export function ForYourShiftCard({ familyId }: Props) {
 
   const dueMeds = useMemo(() => {
     if (!meds) return [];
-    return buildTodaysDoses(meds, medLogs ?? [], now)
+    return buildTodaysDoses(meds, medLogs ?? [], tz, now)
       .filter((d) => {
         if (d.scheduled_for < window.start) return false;
         if (d.scheduled_for >= window.end) return false;
@@ -64,7 +67,7 @@ export function ForYourShiftCard({ familyId }: Props) {
         return true;
       })
       .slice(0, 8);
-  }, [meds, medLogs, now, window.start, window.end]);
+  }, [meds, medLogs, tz, now, window.start, window.end]);
 
   // TODO: when appointments / maintenance gain an `is_critical` flag,
   // fetch and merge them here alongside meds.

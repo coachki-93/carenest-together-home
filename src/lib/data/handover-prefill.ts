@@ -134,7 +134,7 @@ export function useHandoverPrefill(
             ),
           supabase
             .from("families")
-            .select("at_hospital_since")
+            .select("at_hospital_since, timezone")
             .eq("id", familyId)
             .maybeSingle(),
           supabase
@@ -191,6 +191,7 @@ export function useHandoverPrefill(
       const atHospitalSince = familyRes.data?.at_hospital_since
         ? new Date(familyRes.data.at_hospital_since)
         : null;
+      const tz = familyRes.data?.timezone ?? "Europe/Stockholm";
 
       // Walk every scheduled dose intersecting the shift window for each day.
       const medLines: string[] = [];
@@ -205,7 +206,7 @@ export function useHandoverPrefill(
       dayEnd.setHours(0, 0, 0, 0);
       const seen = new Set<string>();
       while (dayCursor <= dayEnd) {
-        const doses = buildTodaysDoses(meds, logs, new Date(dayCursor));
+        const doses = buildTodaysDoses(meds, logs, tz, new Date(dayCursor));
         for (const d of doses) {
           if (
             d.scheduled_for < shiftStart ||
