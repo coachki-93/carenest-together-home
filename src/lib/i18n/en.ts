@@ -168,6 +168,7 @@ export const en = {
     family: "Family",
     dashboard: "Today",
     schedule: "Schedule",
+    appointments: "Appointments",
     medications: "Medications",
     vitals: "Vitals",
     oxygen: "Oxygen",
