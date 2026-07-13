@@ -61,9 +61,12 @@ import {
   useDeleteAppointmentInstance,
   useUpdateAppointment,
   useUpdateAppointmentInstance,
+  VISIT_KINDS,
+  isVisitKind,
   type AppointmentKind,
   type ExpandedAppointment,
   type RecurrenceFreq,
+  type VisitKind,
 } from "@/lib/data/appointments";
 import { wallClockIn, formatTimeIn } from "@/lib/time/family-tz";
 
@@ -75,8 +78,8 @@ export const Route = createFileRoute("/_authenticated/appointments")({
 // 8-swatch fixed palette. Kept out of theme tokens on purpose — a small,
 // deliberate set for chip differentiation, not a design-system role.
 const PALETTE = [
-  "#7C3AED", // violet (default appointment)
-  "#0EA5E9", // sky (default therapy)
+  "#7C3AED", // violet
+  "#0EA5E9", // sky
   "#10B981", // emerald
   "#F59E0B", // amber
   "#EF4444", // rose
@@ -84,13 +87,31 @@ const PALETTE = [
   "#14B8A6", // teal
   "#64748B", // slate
 ] as const;
-const DEFAULT_COLOR: Record<"appointment" | "therapy", string> = {
-  appointment: PALETTE[0],
-  therapy: PALETTE[1],
+
+// Default palette preselect per kind — user's swatch pick always wins.
+const DEFAULT_COLOR: Record<VisitKind, string> = {
+  appointment: "#7C3AED", // violet
+  therapy: "#0EA5E9", // sky
+  meeting: "#64748B", // slate
+  lab: "#14B8A6", // teal
+  dental: "#EC4899", // pink
+  hospital_stay: "#EF4444", // rose
 };
 
+const KIND_ICON: Record<VisitKind, LucideIcon> = {
+  appointment: Stethoscope,
+  therapy: Sparkles,
+  meeting: Users,
+  lab: TestTube,
+  dental: Smile,
+  hospital_stay: Hospital,
+};
+
+function isDefaultColor(c: string): boolean {
+  return (Object.values(DEFAULT_COLOR) as string[]).includes(c);
+}
+
 const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
-type VisitKind = "appointment" | "therapy";
 
 // ---------------------------------------------------------------------------
 // Page
