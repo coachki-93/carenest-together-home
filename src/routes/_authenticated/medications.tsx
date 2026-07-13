@@ -407,13 +407,8 @@ function MedicationDialog({
       ? dateTimeInputIn(new Date(existingFirstIso), tz)
       : defaultAnchorIso(),
   );
-  // Re-pick a sensible anchor when the user changes daily times and hasn't
-  // customized it yet (only while in course mode and creating a new course).
-  const refreshAnchorFromTimes = (nextTimes: string[]) => {
-    if (!isCourse || existingFirstIso) return;
-    const upcoming = nextUpcomingDoseAt(nextTimes, tz, new Date());
-    if (upcoming) setFirstDoseLocal(dateTimeInputIn(upcoming, tz));
-  };
+
+
 
   // Derived preview for the dialog.
   const previewFirstLast = (() => {
