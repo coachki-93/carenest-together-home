@@ -2275,6 +2275,13 @@ export const en = {
     kind: {
       appointment: "Appointment",
       therapy: "Therapy",
+      meeting: "Meeting",
+      lab: "Lab visit",
+      dental: "Dental",
+      hospital_stay: "Hospital stay",
+    },
+    mobile: {
+      empty: "No upcoming appointments.",
     },
     field: {
       title: "Title",
