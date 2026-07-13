@@ -479,6 +479,7 @@ function ShiftDialog({
   existing,
   initialProfileId,
   initialDate,
+  tz,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -489,30 +490,31 @@ function ShiftDialog({
   existing: ShiftRow | null;
   initialProfileId?: string;
   initialDate?: Date;
+  tz: string;
 }) {
   const { t } = useTranslation();
   const createShift = useCreateShift();
   const updateShift = useUpdateShift();
   const deleteShift = useDeleteShift();
 
-  const defaultStart = useMemo(() => {
-    if (existing) return new Date(existing.start_at);
-    const d = initialDate ? new Date(initialDate) : new Date();
-    d.setHours(9, 0, 0, 0);
-    return d;
-  }, [existing, initialDate]);
-  const defaultEnd = useMemo(() => {
-    if (existing) return new Date(existing.end_at);
-    const d = new Date(defaultStart);
-    d.setHours(d.getHours() + 4);
-    return d;
-  }, [existing, defaultStart]);
+  // Compute default start/end as datetime-local strings in the family's tz.
+  // For existing rows: format the stored instant in tz.
+  // For new rows: anchor to the requested day (or today), 09:00 wall clock in tz,
+  // 4h duration.
+  const [startAt, setStartAt] = useState<string>(() => {
+    if (existing) return dateTimeInputIn(new Date(existing.start_at), tz);
+    const anchor = initialDate ? new Date(initialDate) : new Date();
+    return `${dateInputIn(anchor, tz)}T09:00`;
+  });
+  const [endAt, setEndAt] = useState<string>(() => {
+    if (existing) return dateTimeInputIn(new Date(existing.end_at), tz);
+    const anchor = initialDate ? new Date(initialDate) : new Date();
+    return `${dateInputIn(anchor, tz)}T13:00`;
+  });
 
   const [profileId, setProfileId] = useState<string>(
     existing?.caregiver_profile_id ?? initialProfileId ?? profiles[0]?.id ?? "",
   );
-  const [startAt, setStartAt] = useState<string>(toLocalDateTimeInput(defaultStart));
-  const [endAt, setEndAt] = useState<string>(toLocalDateTimeInput(defaultEnd));
   const [color, setColor] = useState<string>(existing?.color ?? SHIFT_COLORS[0]);
   const [category, setCategory] = useState<string>(existing?.category ?? "");
   const [repeatMode, setRepeatMode] = useState<"none" | "daily" | "weekly">(
@@ -523,7 +525,7 @@ function ShiftDialog({
     existing?.recurrence_days_of_week ?? [],
   );
   const [until, setUntil] = useState<string>(
-    existing?.recurrence_until ? toLocalDateInput(new Date(existing.recurrence_until)) : "",
+    existing?.recurrence_until ? dateInputIn(new Date(existing.recurrence_until), tz) : "",
   );
 
   function toggleDay(dow: number) {
