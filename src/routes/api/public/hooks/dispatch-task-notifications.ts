@@ -181,95 +181,212 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           );
         };
 
-        // -------- PASS 1: start-time --------
-        const startWindow = new Date(now.getTime() - 2 * 60 * 1000).toISOString();
-        const { data: startAppts } = await supabaseAdmin
-          .from("appointments")
-          .select("id, family_id, title, kind, starts_at")
-          .is("notified_at", null)
-          .gte("starts_at", startWindow)
-          .lte("starts_at", nowIso)
-          .limit(200);
+        // ================================================================
+        // PASSES 1-3: START / LATE / MISSED (per-occurrence dedupe)
+        // ----------------------------------------------------------------
+        // Shared expansion. Look back RECENT_WINDOW_DAYS; occurrences beyond
+        // that are cold and won't fire even without a dedupe row (bounded
+        // history walk).
+        const RECENT_WINDOW_DAYS = 7;
+        const windowStart = new Date(
+          now.getTime() - RECENT_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+        );
+        const windowStartIso = windowStart.toISOString();
 
-        for (const a of (startAppts ?? []) as Appt[]) {
-          const { tz, lang } = infoFor(a.family_id);
-          await fanout(a.family_id, {
-            title: a.title || "CareNest",
-            body: `${humanKind(a.kind, lang)} • ${formatTimeIn(a.starts_at, tz)}`,
-            tag: `appt-${a.id}-start`,
-            url: "/dashboard",
-          });
-          await supabaseAdmin
+        type SLMRow = {
+          id: string;
+          family_id: string;
+          title: string | null;
+          kind: string | null;
+          starts_at: string;
+          all_day: boolean;
+          late_after_minutes: number | null;
+          missed_after_minutes: number | null;
+          recurrence_freq: string | null;
+          recurrence_interval: number | null;
+          recurrence_byweekday: number[] | null;
+          recurrence_times_of_day: string[] | null;
+          recurrence_parent_id: string | null;
+          recurrence_override_at: string | null;
+          recurrence_cancelled: boolean | null;
+        };
+
+        const slmSelect =
+          "id, family_id, title, kind, starts_at, all_day, late_after_minutes, missed_after_minutes, recurrence_freq, recurrence_interval, recurrence_byweekday, recurrence_times_of_day, recurrence_parent_id, recurrence_override_at, recurrence_cancelled";
+
+        // Non-recurring, non-override rows whose single occurrence lands in
+        // the window.
+        const { data: slmPlainRows } = await supabaseAdmin
+          .from("appointments")
+          .select(slmSelect)
+          .is("recurrence_freq", null)
+          .is("recurrence_parent_id", null)
+          .eq("all_day", false)
+          .gte("starts_at", windowStartIso)
+          .lte("starts_at", nowIso)
+          .limit(1000);
+
+        // All recurring masters (infinite series — no time filter).
+        const { data: slmMasterRows } = await supabaseAdmin
+          .from("appointments")
+          .select(slmSelect)
+          .not("recurrence_freq", "is", null)
+          .eq("all_day", false)
+          .limit(1000);
+
+        const slmMasters = (slmMasterRows ?? []) as SLMRow[];
+
+        // Overrides for those masters within the window. Non-cancelled
+        // overrides *replace* the master's occurrence at that timestamp
+        // (own title / starts_at / thresholds); cancelled overrides drop it.
+        type SLMOverride = SLMRow & {
+          recurrence_parent_id: string;
+          recurrence_override_at: string;
+        };
+        let slmOverrides: SLMOverride[] = [];
+        if (slmMasters.length > 0) {
+          const { data: ov } = await supabaseAdmin
             .from("appointments")
-            .update({ notified_at: nowIso })
-            .eq("id", a.id);
+            .select(slmSelect)
+            .in(
+              "recurrence_parent_id",
+              slmMasters.map((m) => m.id),
+            )
+            .gte("recurrence_override_at", windowStartIso)
+            .lte("recurrence_override_at", nowIso);
+          slmOverrides = (ov ?? []).filter(
+            (r): r is SLMOverride =>
+              !!r.recurrence_parent_id && !!r.recurrence_override_at,
+          );
+        }
+        const slmCancelled = new Set<string>();
+        const slmOverrideByKey = new Map<string, SLMOverride>();
+        for (const o of slmOverrides) {
+          const key = `${o.recurrence_parent_id}@${new Date(o.recurrence_override_at).toISOString()}`;
+          if (o.recurrence_cancelled) slmCancelled.add(key);
+          else slmOverrideByKey.set(key, o);
         }
 
-        const recentWindow = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        type SLMCandidate = {
+          master_id: string;
+          occurrence_at: string; // ISO
+          occurrence_ms: number;
+          family_id: string;
+          title: string | null;
+          kind: string | null;
+          late_after_minutes: number;
+          missed_after_minutes: number;
+        };
 
-        // -------- PASS 2: late --------
-        const { data: lateCandidates } = await supabaseAdmin
-          .from("appointments")
-          .select(
-            "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
-          )
-          .is("late_notified_at", null)
-          .gte("starts_at", recentWindow)
-          .lte("starts_at", nowIso)
-          .eq("all_day", false)
-          .limit(500);
+        const slmCandidates: SLMCandidate[] = [];
 
-        for (const a of (lateCandidates ?? []) as Appt[]) {
-          const lateMin = a.late_after_minutes ?? 0;
-          const dueAt = new Date(new Date(a.starts_at).getTime() + lateMin * 60_000);
-          if (dueAt > now) continue;
-          if (await hasCompletion(supabaseAdmin, a.id, a.starts_at)) continue;
+        for (const p of (slmPlainRows ?? []) as SLMRow[]) {
+          slmCandidates.push({
+            master_id: p.id,
+            occurrence_at: p.starts_at,
+            occurrence_ms: new Date(p.starts_at).getTime(),
+            family_id: p.family_id,
+            title: p.title,
+            kind: p.kind,
+            late_after_minutes: p.late_after_minutes ?? 0,
+            missed_after_minutes: p.missed_after_minutes ?? 15,
+          });
+        }
 
-          const { tz, lang } = infoFor(a.family_id);
-          const title = a.title || "CareNest";
-          await fanout(a.family_id, {
-            title: COPY[lang].lateTitle(title),
-            body: COPY[lang].lateBody(formatTimeIn(a.starts_at, tz)),
-            tag: `appt-${a.id}-late`,
+        for (const m of slmMasters) {
+          const occs = expandOccurrences(m, windowStart, now);
+          for (const occ of occs) {
+            const iso = occ.toISOString();
+            const key = `${m.id}@${iso}`;
+            if (slmCancelled.has(key)) continue;
+            const ov = slmOverrideByKey.get(key);
+            const src = ov ?? m;
+            slmCandidates.push({
+              master_id: m.id,
+              occurrence_at: ov ? ov.recurrence_override_at : iso,
+              occurrence_ms: new Date(
+                ov ? ov.recurrence_override_at : iso,
+              ).getTime(),
+              family_id: m.family_id,
+              title: src.title,
+              kind: src.kind,
+              late_after_minutes: src.late_after_minutes ?? m.late_after_minutes ?? 0,
+              missed_after_minutes:
+                src.missed_after_minutes ?? m.missed_after_minutes ?? 15,
+            });
+          }
+        }
+
+        // Try to insert the dedupe row first; only fanout on success. On PK
+        // conflict PostgREST returns an error and we skip silently (same
+        // pattern as the REMINDER pass).
+        const tryClaim = async (
+          appointmentId: string,
+          occurrenceAt: string,
+          pass: "start" | "late" | "missed",
+        ): Promise<boolean> => {
+          const { error } = await supabaseAdmin
+            .from("appointment_notifications")
+            .insert({
+              appointment_id: appointmentId,
+              occurrence_at: occurrenceAt,
+              pass,
+            } as never)
+            .select("appointment_id");
+          return !error;
+        };
+
+        // -------- PASS 1: start (within START_GRACE_MINUTES) --------
+        for (const c of slmCandidates) {
+          const diffMin = (now.getTime() - c.occurrence_ms) / 60_000;
+          if (diffMin < 0 || diffMin > START_GRACE_MINUTES) continue;
+          if (!(await tryClaim(c.master_id, c.occurrence_at, "start"))) continue;
+
+          const { tz, lang } = infoFor(c.family_id);
+          await fanout(c.family_id, {
+            title: c.title || "CareNest",
+            body: `${humanKind(c.kind, lang)} • ${formatTimeIn(c.occurrence_at, tz)}`,
+            tag: `appt-${c.master_id}-start-${c.occurrence_at}`,
             url: "/dashboard",
           });
-          await supabaseAdmin
-            .from("appointments")
-            .update({ late_notified_at: nowIso })
-            .eq("id", a.id);
+        }
+
+        // -------- PASS 2: late --------
+        for (const c of slmCandidates) {
+          const dueMs = c.occurrence_ms + c.late_after_minutes * 60_000;
+          if (now.getTime() < dueMs) continue;
+          if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+            continue;
+          if (!(await tryClaim(c.master_id, c.occurrence_at, "late"))) continue;
+
+          const { tz, lang } = infoFor(c.family_id);
+          const title = c.title || "CareNest";
+          await fanout(c.family_id, {
+            title: COPY[lang].lateTitle(title),
+            body: COPY[lang].lateBody(formatTimeIn(c.occurrence_at, tz)),
+            tag: `appt-${c.master_id}-late-${c.occurrence_at}`,
+            url: "/dashboard",
+          });
         }
 
         // -------- PASS 3: missed --------
-        const { data: missedCandidates } = await supabaseAdmin
-          .from("appointments")
-          .select(
-            "id, family_id, title, kind, starts_at, late_after_minutes, missed_after_minutes",
-          )
-          .is("missed_notified_at", null)
-          .gte("starts_at", recentWindow)
-          .lte("starts_at", nowIso)
-          .eq("all_day", false)
-          .limit(500);
+        for (const c of slmCandidates) {
+          const dueMs = c.occurrence_ms + c.missed_after_minutes * 60_000;
+          if (now.getTime() < dueMs) continue;
+          if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+            continue;
+          if (!(await tryClaim(c.master_id, c.occurrence_at, "missed"))) continue;
 
-        for (const a of (missedCandidates ?? []) as Appt[]) {
-          const missedMin = a.missed_after_minutes ?? 15;
-          const dueAt = new Date(new Date(a.starts_at).getTime() + missedMin * 60_000);
-          if (dueAt > now) continue;
-          if (await hasCompletion(supabaseAdmin, a.id, a.starts_at)) continue;
-
-          const { tz, lang } = infoFor(a.family_id);
-          const title = a.title || "CareNest";
-          await fanout(a.family_id, {
+          const { tz, lang } = infoFor(c.family_id);
+          const title = c.title || "CareNest";
+          await fanout(c.family_id, {
             title: COPY[lang].missedTitle(title),
-            body: COPY[lang].missedBody(formatTimeIn(a.starts_at, tz)),
-            tag: `appt-${a.id}-missed`,
+            body: COPY[lang].missedBody(formatTimeIn(c.occurrence_at, tz)),
+            tag: `appt-${c.master_id}-missed-${c.occurrence_at}`,
             url: "/dashboard",
           });
-          await supabaseAdmin
-            .from("appointments")
-            .update({ missed_notified_at: nowIso })
-            .eq("id", a.id);
         }
+
 
         // -------- PASS 4: reminder --------
         // Look ahead 2 days (matches max reminder = 1440 min = 1 day, with slack).
