@@ -340,17 +340,19 @@ function routeKey(r: MedRoute): string {
 function MedicationDialog({
   familyId,
   childId,
+  tz,
   medication,
   open,
   onOpenChange,
 }: {
   familyId: string;
   childId: string;
+  tz: string;
   medication?: Medication;
   open: boolean;
   onOpenChange: (o: boolean) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const saveMed = useSaveMedication();
   const [name, setName] = useState(medication?.name ?? "");
   const [doseAmount, setDoseAmount] = useState(
@@ -375,6 +377,62 @@ function MedicationDialog({
   const initialTimer = (medication as { timer_minutes?: number | null } | undefined)?.timer_minutes ?? null;
   const [enableTimer, setEnableTimer] = useState<boolean>(initialTimer != null);
   const [timerMinutes, setTimerMinutes] = useState<string>(initialTimer != null ? String(initialTimer) : "1");
+
+  // Course window ("Kur"). null starts + null ends = ongoing.
+  const existingStart = (medication as MedWithCourse | undefined)?.starts_on ?? null;
+  const existingEnd = (medication as MedWithCourse | undefined)?.ends_on ?? null;
+  const initialIsCourse = !!(existingStart && existingEnd);
+  const todayStr = dateInputIn(new Date(), tz);
+  const diffDaysInclusive = (start: string, end: string) => {
+    const [ay, am, ad] = start.split("-").map(Number);
+    const [by, bm, bd] = end.split("-").map(Number);
+    return (
+      Math.round(
+        (Date.UTC(by, bm - 1, bd) - Date.UTC(ay, am - 1, ad)) / 86_400_000,
+      ) + 1
+    );
+  };
+  const addDaysInclusive = (start: string, days: number) => {
+    const [ay, am, ad] = start.split("-").map(Number);
+    const t = new Date(Date.UTC(ay, am - 1, ad));
+    t.setUTCDate(t.getUTCDate() + Math.max(1, days) - 1);
+    const y = t.getUTCFullYear();
+    const m = String(t.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(t.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+  const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
+  const [startsOn, setStartsOn] = useState<string>(existingStart ?? todayStr);
+  const [endsOn, setEndsOn] = useState<string>(
+    existingEnd ?? addDaysInclusive(existingStart ?? todayStr, 10),
+  );
+  const [durationDays, setDurationDays] = useState<string>(
+    String(
+      existingStart && existingEnd
+        ? diffDaysInclusive(existingStart, existingEnd)
+        : 10,
+    ),
+  );
+
+  const onDurationChange = (v: string) => {
+    setDurationDays(v);
+    const n = parseInt(v, 10);
+    if (!Number.isFinite(n) || n < 1) return;
+    setEndsOn(addDaysInclusive(startsOn, n));
+  };
+  const onStartChange = (v: string) => {
+    setStartsOn(v);
+    const n = Math.max(1, parseInt(durationDays, 10) || 1);
+    setEndsOn(addDaysInclusive(v, n));
+  };
+  const onEndChange = (v: string) => {
+    setEndsOn(v);
+    if (v < startsOn) return;
+    setDurationDays(String(diffDaysInclusive(startsOn, v)));
+  };
+
+  const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
+  const endPreview = formatDateIn(endsOn, locale);
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
@@ -404,6 +462,8 @@ function MedicationDialog({
         missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
         allow_ongoing: allowOngoing,
         timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
+        starts_on: isCourse ? startsOn : null,
+        ends_on: isCourse ? endsOn : null,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
@@ -411,6 +471,7 @@ function MedicationDialog({
       toast.error((err as Error).message);
     }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
