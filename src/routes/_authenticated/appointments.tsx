@@ -404,10 +404,14 @@ function AgendaRow({
     : formatTimeIn(appt.starts_at, tz);
   const endTxt =
     !appt.all_day && appt.ends_at ? formatTimeIn(appt.ends_at, tz) : null;
+  const KindI = isVisitKind(appt.kind) ? KIND_ICON[appt.kind] : CalendarHeart;
+  const kindLabel = isVisitKind(appt.kind)
+    ? t(`appointments.kind.${appt.kind}`)
+    : (appt.kind as string);
 
   return (
     <li
-      className="card-soft p-3 flex items-center gap-3 cursor-pointer hover:brightness-[0.98]"
+      className="relative card-soft p-3 pl-4 flex items-center gap-3 cursor-pointer hover:brightness-[0.98] overflow-hidden"
       onClick={onEdit}
       role="button"
       tabIndex={0}
@@ -418,6 +422,12 @@ function AgendaRow({
         }
       }}
     >
+      {/* Color bar */}
+      <span
+        className="absolute left-0 top-0 bottom-0 w-1.5"
+        style={{ backgroundColor: color }}
+        aria-hidden
+      />
       <div className="text-center shrink-0 w-16">
         <div className="text-lg font-extrabold tabular-nums">{startTxt}</div>
         {endTxt && (
@@ -430,7 +440,7 @@ function AgendaRow({
         className="size-10 rounded-2xl flex items-center justify-center shrink-0"
         style={{ backgroundColor: color + "33", color }}
       >
-        <CalendarHeart className="size-5" />
+        <KindI className="size-5" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
@@ -439,7 +449,7 @@ function AgendaRow({
             className="text-[10px] font-bold uppercase rounded-full px-2 py-0.5"
             style={{ backgroundColor: color + "33", color }}
           >
-            {t(`appointments.kind.${appt.kind as VisitKind}`)}
+            {kindLabel}
           </span>
           {appt.is_recurring && (
             <span
