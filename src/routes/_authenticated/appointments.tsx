@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -9,7 +9,15 @@ import {
   Repeat,
   Trash2,
   CalendarHeart,
+  Stethoscope,
+  Sparkles,
+  Users,
+  TestTube,
+  Smile,
+  Hospital,
+  type LucideIcon,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { Button } from "@/components/ui/button";
