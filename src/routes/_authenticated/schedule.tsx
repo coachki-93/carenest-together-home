@@ -911,6 +911,7 @@ function AppointmentDialog({
   childId,
   userId,
   editing,
+  tz,
   onSave,
   saving,
 }: {
@@ -921,6 +922,7 @@ function AppointmentDialog({
   childId: string | null;
   userId: string | null;
   editing: ExpandedAppointment | null;
+  tz: string;
   onSave: (values: SavePayload, scope: "this" | "series") => void | Promise<void>;
   saving: boolean;
 }) {
