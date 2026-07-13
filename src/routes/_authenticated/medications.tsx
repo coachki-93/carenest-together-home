@@ -37,7 +37,13 @@ import { toast } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useMyMembership } from "@/lib/auth/use-profile";
 import { useFamily } from "@/lib/data/family";
-import { wallClockIn, dateInputIn } from "@/lib/time/family-tz";
+import {
+  dateTimeInputIn,
+  zonedWallClockToDate,
+  courseLastDoseAt,
+  courseProgressAt,
+  nextUpcomingDoseAt,
+} from "@/lib/time/family-tz";
 import {
   useFamilyChild,
   useMedications,
@@ -182,52 +188,52 @@ function MedicationsPage() {
 }
 
 type MedWithCourse = Medication & {
-  starts_on?: string | null;
-  ends_on?: string | null;
+  course_first_dose_at?: string | null;
+  course_total_doses?: number | null;
 };
 
 /**
- * Derive the "course status" of a medication at `todayStr` (family-tz date).
- * Returns null when the med has no course window (ongoing / "Tills vidare").
+ * Derive the "course status" of a medication at `now` (absolute) using the
+ * family timezone `tz`. Null when the med has no course (ongoing).
  */
 function courseStatus(
   med: MedWithCourse,
-  todayStr: string,
-): { kind: "before" | "during" | "after"; day?: number; total?: number; date: string } | null {
-  const startsOn = med.starts_on ?? null;
-  const endsOn = med.ends_on ?? null;
-  if (!startsOn && !endsOn) return null;
-  const diffDays = (a: string, b: string) => {
-    const [ay, am, ad] = a.split("-").map(Number);
-    const [by, bm, bd] = b.split("-").map(Number);
-    return Math.round(
-      (Date.UTC(ay, am - 1, ad) - Date.UTC(by, bm - 1, bd)) / 86_400_000,
-    );
-  };
-  if (startsOn && todayStr < startsOn) {
-    return { kind: "before", date: startsOn };
-  }
-  if (endsOn && todayStr > endsOn) {
-    return { kind: "after", date: endsOn };
-  }
-  if (startsOn && endsOn) {
-    return {
-      kind: "during",
-      day: diffDays(todayStr, startsOn) + 1,
-      total: diffDays(endsOn, startsOn) + 1,
-      date: endsOn,
-    };
-  }
-  return null;
+  tz: string,
+  now: Date,
+):
+  | { kind: "before"; startAt: Date }
+  | { kind: "during"; n: number; total: number }
+  | { kind: "after"; endAt: Date }
+  | null {
+  const firstIso = med.course_first_dose_at ?? null;
+  const total = med.course_total_doses ?? null;
+  if (!firstIso || !total || total < 1) return null;
+  const first = new Date(firstIso);
+  if (now.getTime() < first.getTime()) return { kind: "before", startAt: first };
+  const last = courseLastDoseAt(first, total, med.times ?? [], tz);
+  if (now.getTime() > last.getTime()) return { kind: "after", endAt: last };
+  const n = Math.max(1, courseProgressAt(first, total, med.times ?? [], tz, now));
+  return { kind: "during", n, total };
 }
 
-function formatDateIn(dateStr: string, locale: string): string {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(locale, {
+function formatDateIn(date: Date, locale: string, tz: string): string {
+  return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "long",
-  });
+    timeZone: tz,
+  }).format(date);
 }
+
+function formatDateTimeIn(date: Date, locale: string, tz: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: tz,
+  }).format(date);
+}
+
 
 function MedicationCard({
   med,
@@ -244,8 +250,8 @@ function MedicationCard({
 }) {
   const { t, i18n } = useTranslation();
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
-  const todayStr = wallClockIn(new Date(), tz).todayStr;
-  const status = courseStatus(med as MedWithCourse, todayStr);
+  const now = new Date();
+  const status = courseStatus(med as MedWithCourse, tz, now);
   const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
   return (
     <div
@@ -287,19 +293,20 @@ function MedicationCard({
             <div className="mt-2">
               {status.kind === "during" ? (
                 <span className="inline-flex items-center text-xs font-semibold rounded-full bg-primary-soft text-primary px-2.5 py-1">
-                  {t("meds.courseDayOf", { n: status.day, total: status.total })}
+                  {t("meds.courseDoseOf", { n: status.n, total: status.total })}
                 </span>
               ) : status.kind === "before" ? (
                 <span className="inline-flex items-center text-xs font-semibold rounded-full bg-muted text-muted-foreground px-2.5 py-1">
-                  {t("meds.courseStartsOn", { date: formatDateIn(status.date, locale) })}
+                  {t("meds.courseStartsOn", { date: formatDateTimeIn(status.startAt, locale, tz) })}
                 </span>
               ) : (
                 <span className="inline-flex items-center text-xs font-semibold rounded-full bg-muted text-muted-foreground px-2.5 py-1">
-                  {t("meds.courseFinished", { date: formatDateIn(status.date, locale) })}
+                  {t("meds.courseFinished", { date: formatDateIn(status.endAt, locale, tz) })}
                 </span>
               )}
             </div>
           )}
+
           <div className="flex flex-wrap gap-1.5 mt-3">
             {(med.times ?? []).map((tm) => (
               <span
@@ -378,61 +385,46 @@ function MedicationDialog({
   const [enableTimer, setEnableTimer] = useState<boolean>(initialTimer != null);
   const [timerMinutes, setTimerMinutes] = useState<string>(initialTimer != null ? String(initialTimer) : "1");
 
-  // Course window ("Kur"). null starts + null ends = ongoing.
-  const existingStart = (medication as MedWithCourse | undefined)?.starts_on ?? null;
-  const existingEnd = (medication as MedWithCourse | undefined)?.ends_on ?? null;
-  const initialIsCourse = !!(existingStart && existingEnd);
-  const todayStr = dateInputIn(new Date(), tz);
-  const diffDaysInclusive = (start: string, end: string) => {
-    const [ay, am, ad] = start.split("-").map(Number);
-    const [by, bm, bd] = end.split("-").map(Number);
-    return (
-      Math.round(
-        (Date.UTC(by, bm - 1, bd) - Date.UTC(ay, am - 1, ad)) / 86_400_000,
-      ) + 1
-    );
-  };
-  const addDaysInclusive = (start: string, days: number) => {
-    const [ay, am, ad] = start.split("-").map(Number);
-    const t = new Date(Date.UTC(ay, am - 1, ad));
-    t.setUTCDate(t.getUTCDate() + Math.max(1, days) - 1);
-    const y = t.getUTCFullYear();
-    const m = String(t.getUTCMonth() + 1).padStart(2, "0");
-    const d = String(t.getUTCDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  };
-  const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
-  const [startsOn, setStartsOn] = useState<string>(existingStart ?? todayStr);
-  const [endsOn, setEndsOn] = useState<string>(
-    existingEnd ?? addDaysInclusive(existingStart ?? todayStr, 10),
-  );
-  const [durationDays, setDurationDays] = useState<string>(
-    String(
-      existingStart && existingEnd
-        ? diffDaysInclusive(existingStart, existingEnd)
-        : 10,
-    ),
-  );
-
-  const onDurationChange = (v: string) => {
-    setDurationDays(v);
-    const n = parseInt(v, 10);
-    if (!Number.isFinite(n) || n < 1) return;
-    setEndsOn(addDaysInclusive(startsOn, n));
-  };
-  const onStartChange = (v: string) => {
-    setStartsOn(v);
-    const n = Math.max(1, parseInt(durationDays, 10) || 1);
-    setEndsOn(addDaysInclusive(v, n));
-  };
-  const onEndChange = (v: string) => {
-    setEndsOn(v);
-    if (v < startsOn) return;
-    setDurationDays(String(diffDaysInclusive(startsOn, v)));
-  };
-
+  // Dose-count course. null anchor + null total = ongoing ("Tills vidare").
+  const existingFirstIso =
+    (medication as MedWithCourse | undefined)?.course_first_dose_at ?? null;
+  const existingTotal =
+    (medication as MedWithCourse | undefined)?.course_total_doses ?? null;
+  const initialIsCourse = !!(existingFirstIso && existingTotal);
   const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
-  const endPreview = formatDateIn(endsOn, locale);
+  const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
+  const [totalDoses, setTotalDoses] = useState<string>(
+    existingTotal ? String(existingTotal) : "10",
+  );
+  const defaultAnchorIso = (): string => {
+    const upcoming =
+      nextUpcomingDoseAt(times.length ? times : ["08:00"], tz, new Date()) ??
+      new Date();
+    return dateTimeInputIn(upcoming, tz);
+  };
+  const [firstDoseLocal, setFirstDoseLocal] = useState<string>(
+    existingFirstIso
+      ? dateTimeInputIn(new Date(existingFirstIso), tz)
+      : defaultAnchorIso(),
+  );
+
+
+
+  // Derived preview for the dialog.
+  const previewFirstLast = (() => {
+    if (!isCourse) return null;
+    const [dateStr, timeStr] = (firstDoseLocal || "T").split("T");
+    if (!dateStr || !timeStr) return null;
+    const first = zonedWallClockToDate(dateStr, timeStr, tz);
+    const n = Math.max(1, parseInt(totalDoses, 10) || 0);
+    if (!times.length || !Number.isFinite(first.getTime())) return null;
+    const last = courseLastDoseAt(first, n, times, tz);
+    return {
+      first: formatDateTimeIn(first, locale, tz),
+      last: formatDateTimeIn(last, locale, tz),
+    };
+  })();
+
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
@@ -444,6 +436,27 @@ function MedicationDialog({
     if (!name.trim()) {
       toast.error(t("meds.nameRequired"));
       return;
+    }
+    let courseFirstIso: string | null = null;
+    let courseTotal: number | null = null;
+    if (isCourse) {
+      const n = parseInt(totalDoses, 10);
+      if (!Number.isFinite(n) || n < 1) {
+        toast.error(t("meds.totalDosesRequired"));
+        return;
+      }
+      if (!times.length) {
+        toast.error(t("meds.timesRequiredForCourse"));
+        return;
+      }
+      const [dateStr, timeStr] = (firstDoseLocal || "T").split("T");
+      const first = zonedWallClockToDate(dateStr ?? "", timeStr ?? "", tz);
+      if (!Number.isFinite(first.getTime())) {
+        toast.error(t("meds.firstDoseRequired"));
+        return;
+      }
+      courseFirstIso = first.toISOString();
+      courseTotal = n;
     }
     try {
       await saveMed.mutateAsync({
@@ -462,8 +475,8 @@ function MedicationDialog({
         missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
         allow_ongoing: allowOngoing,
         timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
-        starts_on: isCourse ? startsOn : null,
-        ends_on: isCourse ? endsOn : null,
+        course_first_dose_at: courseFirstIso,
+        course_total_doses: courseTotal,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
@@ -471,6 +484,7 @@ function MedicationDialog({
       toast.error((err as Error).message);
     }
   };
+
 
 
   return (
@@ -573,50 +587,49 @@ function MedicationDialog({
               <div className="space-y-2 pt-1">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="med-starts-on" className="text-xs text-muted-foreground">
-                      {t("meds.courseStart")}
+                    <Label htmlFor="med-total-doses" className="text-xs text-muted-foreground">
+                      {t("meds.totalDoses")}
                     </Label>
                     <Input
-                      id="med-starts-on"
-                      type="date"
-                      value={startsOn}
-                      onChange={(e) => onStartChange(e.target.value)}
+                      id="med-total-doses"
+                      type="number"
+                      min={1}
+                      value={totalDoses}
+                      onChange={(e) => setTotalDoses(e.target.value)}
                       className="rounded-xl"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="med-duration-days" className="text-xs text-muted-foreground">
-                      {t("meds.courseDurationDays")}
+                    <Label htmlFor="med-first-dose" className="text-xs text-muted-foreground">
+                      {t("meds.firstDoseAt")}
                     </Label>
                     <Input
-                      id="med-duration-days"
-                      type="number"
-                      min={1}
-                      value={durationDays}
-                      onChange={(e) => onDurationChange(e.target.value)}
+                      id="med-first-dose"
+                      type="datetime-local"
+                      value={firstDoseLocal}
+                      onChange={(e) => setFirstDoseLocal(e.target.value)}
                       className="rounded-xl"
                     />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <Label htmlFor="med-ends-on" className="text-xs text-muted-foreground">
-                    {t("meds.courseEnd")}
-                  </Label>
-                  <Input
-                    id="med-ends-on"
-                    type="date"
-                    value={endsOn}
-                    min={startsOn}
-                    onChange={(e) => onEndChange(e.target.value)}
-                    className="rounded-xl"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {t("meds.courseEndsPreview", { date: endPreview })}
-                </p>
+                <p className="text-xs text-muted-foreground">{t("meds.totalDosesHelp")}</p>
+                {previewFirstLast && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("meds.coursePreview", {
+                      first: previewFirstLast.first,
+                      last: previewFirstLast.last,
+                    })}
+                  </p>
+                )}
+                {!times.length && (
+                  <p className="text-xs text-destructive">
+                    {t("meds.timesRequiredForCourse")}
+                  </p>
+                )}
               </div>
             )}
           </div>
+
 
           <div className="space-y-2">
             <Label>{t("meds.times")}</Label>
