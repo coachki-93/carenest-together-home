@@ -147,8 +147,7 @@ function AppointmentsPage() {
 
   const { data: allAppts = [] } = useAppointments(familyId, gridStart, gridEnd);
   const visits = useMemo(
-    () =>
-      allAppts.filter((a) => a.kind === "appointment" || a.kind === "therapy"),
+    () => allAppts.filter((a) => isVisitKind(a.kind)),
     [allAppts],
   );
 
