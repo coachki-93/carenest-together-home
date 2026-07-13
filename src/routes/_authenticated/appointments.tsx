@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -9,7 +9,15 @@ import {
   Repeat,
   Trash2,
   CalendarHeart,
+  Stethoscope,
+  Sparkles,
+  Users,
+  TestTube,
+  Smile,
+  Hospital,
+  type LucideIcon,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { Button } from "@/components/ui/button";
@@ -53,9 +61,12 @@ import {
   useDeleteAppointmentInstance,
   useUpdateAppointment,
   useUpdateAppointmentInstance,
+  VISIT_KINDS,
+  isVisitKind,
   type AppointmentKind,
   type ExpandedAppointment,
   type RecurrenceFreq,
+  type VisitKind,
 } from "@/lib/data/appointments";
 import { wallClockIn, formatTimeIn } from "@/lib/time/family-tz";
 
@@ -67,8 +78,8 @@ export const Route = createFileRoute("/_authenticated/appointments")({
 // 8-swatch fixed palette. Kept out of theme tokens on purpose — a small,
 // deliberate set for chip differentiation, not a design-system role.
 const PALETTE = [
-  "#7C3AED", // violet (default appointment)
-  "#0EA5E9", // sky (default therapy)
+  "#7C3AED", // violet
+  "#0EA5E9", // sky
   "#10B981", // emerald
   "#F59E0B", // amber
   "#EF4444", // rose
@@ -76,13 +87,31 @@ const PALETTE = [
   "#14B8A6", // teal
   "#64748B", // slate
 ] as const;
-const DEFAULT_COLOR: Record<"appointment" | "therapy", string> = {
-  appointment: PALETTE[0],
-  therapy: PALETTE[1],
+
+// Default palette preselect per kind — user's swatch pick always wins.
+const DEFAULT_COLOR: Record<VisitKind, string> = {
+  appointment: "#7C3AED", // violet
+  therapy: "#0EA5E9", // sky
+  meeting: "#64748B", // slate
+  lab: "#14B8A6", // teal
+  dental: "#EC4899", // pink
+  hospital_stay: "#EF4444", // rose
 };
 
+const KIND_ICON: Record<VisitKind, LucideIcon> = {
+  appointment: Stethoscope,
+  therapy: Sparkles,
+  meeting: Users,
+  lab: TestTube,
+  dental: Smile,
+  hospital_stay: Hospital,
+};
+
+function isDefaultColor(c: string): boolean {
+  return (Object.values(DEFAULT_COLOR) as string[]).includes(c);
+}
+
 const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
-type VisitKind = "appointment" | "therapy";
 
 // ---------------------------------------------------------------------------
 // Page
@@ -118,8 +147,7 @@ function AppointmentsPage() {
 
   const { data: allAppts = [] } = useAppointments(familyId, gridStart, gridEnd);
   const visits = useMemo(
-    () =>
-      allAppts.filter((a) => a.kind === "appointment" || a.kind === "therapy"),
+    () => allAppts.filter((a) => isVisitKind(a.kind)),
     [allAppts],
   );
 
@@ -166,181 +194,191 @@ function AppointmentsPage() {
       subtitle={t("appointments.subtitleNoChild")}
       actions={<LanguageToggle />}
     >
-      <div className="max-w-5xl space-y-4">
-        {/* Month header */}
-        <div className="card-soft p-3 md:p-4 flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            aria-label={t("appointments.prevMonth")}
-            onClick={() => setAnchor(shiftMonth(anchor, -1, tz))}
-          >
-            <ChevronLeft className="size-5" />
-          </Button>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg md:text-xl font-extrabold capitalize truncate">
-              {monthLabel}
-            </h2>
-          </div>
-          <Button
-            variant="outline"
-            className="rounded-full font-semibold"
-            onClick={() => {
-              setAnchor(new Date());
-              setSelectedDay(todayStr);
-            }}
-          >
-            {t("appointments.today")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            aria-label={t("appointments.nextMonth")}
-            onClick={() => setAnchor(shiftMonth(anchor, 1, tz))}
-          >
-            <ChevronRight className="size-5" />
-          </Button>
-          <Button
-            className="rounded-full font-bold ml-1"
-            onClick={() => openNew(selectedDay)}
-            disabled={!familyId}
-          >
-            <Plus className="size-4" />
-            <span className="hidden sm:inline">{t("appointments.new")}</span>
-          </Button>
+      <div className="max-w-6xl">
+        {/* ============ Mobile: agenda-first ============ */}
+        <div className="md:hidden">
+          <MobileAppointmentsView
+            monthLabel={monthLabel}
+            tz={tz}
+            anchor={anchor}
+            setAnchor={setAnchor}
+            todayStr={todayStr}
+            selectedDay={selectedDay}
+            setSelectedDay={setSelectedDay}
+            byDay={byDay}
+            openNew={openNew}
+            openEdit={openEdit}
+            familyId={familyId}
+          />
         </div>
 
-        {/* Grid */}
-        <div className="card-soft p-2 md:p-3">
-          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-1">
-            {WEEKDAY_KEYS.map((k) => (
-              <div
-                key={k}
-                className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground text-center py-1"
-              >
-                {t(`appointments.weekdayShort.${k}`)}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-1 md:gap-2">
-            {gridDays.map((d) => {
-              const dayStr = d.dateStr;
-              const inMonth = d.inMonth;
-              const isToday = dayStr === todayStr;
-              const isSelected = dayStr === selectedDay;
-              const events = byDay.get(dayStr) ?? [];
-              return (
-                <button
-                  key={dayStr}
-                  type="button"
-                  onClick={() => setSelectedDay(dayStr)}
-                  onDoubleClick={() => openNew(dayStr)}
-                  className={cn(
-                    "min-h-[62px] md:min-h-[96px] rounded-xl md:rounded-2xl border p-1 md:p-2 text-left transition-colors flex flex-col gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                    inMonth
-                      ? "bg-background border-border/60"
-                      : "bg-muted/30 border-border/40 text-muted-foreground",
-                    isSelected && "ring-2 ring-primary border-primary",
-                    !isSelected && isToday && "border-primary/60",
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={cn(
-                        "text-xs md:text-sm font-bold tabular-nums",
-                        isToday && "text-primary",
-                      )}
-                    >
-                      {d.dayOfMonth}
-                    </span>
-                    {/* Mobile: dots + count */}
-                    <div className="flex md:hidden items-center gap-0.5">
-                      {events.slice(0, 3).map((e, i) => (
-                        <span
-                          key={i}
-                          className="inline-block size-1.5 rounded-full"
-                          style={{ background: chipColor(e) }}
-                        />
-                      ))}
-                      {events.length > 3 && (
-                        <span className="text-[10px] font-bold text-muted-foreground ml-0.5">
-                          +{events.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {/* Desktop: chips */}
-                  <div className="hidden md:flex flex-col gap-1 min-w-0">
-                    {events.slice(0, 3).map((e) => (
-                      <div
-                        key={e.id}
-                        className="truncate text-[11px] font-semibold rounded-md px-1.5 py-0.5"
-                        style={{
-                          background: chipColor(e) + "26",
-                          color: chipColor(e),
-                        }}
-                        title={e.title}
-                      >
-                        {!e.all_day && (
-                          <span className="tabular-nums opacity-80 mr-1">
-                            {formatTimeIn(e.starts_at, tz)}
-                          </span>
-                        )}
-                        {e.title}
-                      </div>
-                    ))}
-                    {events.length > 3 && (
-                      <div className="text-[10px] font-semibold text-muted-foreground pl-1">
-                        {t("appointments.moreCount", {
-                          count: events.length - 3,
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Agenda for selected day */}
-        <div className="card-soft p-4">
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <h3 className="text-base md:text-lg font-extrabold">
-              {formatDayHeading(selectedDay, tz, i18n.language)}
-            </h3>
+        {/* ============ Tablet + desktop ============ */}
+        <div className="hidden md:block space-y-4">
+          {/* Month header */}
+          <div className="card-soft p-3 md:p-4 flex items-center gap-2">
             <Button
-              size="sm"
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label={t("appointments.prevMonth")}
+              onClick={() => setAnchor(shiftMonth(anchor, -1, tz))}
+            >
+              <ChevronLeft className="size-5" />
+            </Button>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg md:text-xl font-extrabold capitalize truncate">
+                {monthLabel}
+              </h2>
+            </div>
+            <Button
               variant="outline"
               className="rounded-full font-semibold"
+              onClick={() => {
+                setAnchor(new Date());
+                setSelectedDay(todayStr);
+              }}
+            >
+              {t("appointments.today")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label={t("appointments.nextMonth")}
+              onClick={() => setAnchor(shiftMonth(anchor, 1, tz))}
+            >
+              <ChevronRight className="size-5" />
+            </Button>
+            <Button
+              className="rounded-full font-bold ml-1"
               onClick={() => openNew(selectedDay)}
               disabled={!familyId}
             >
               <Plus className="size-4" />
-              <span className="hidden sm:inline">{t("appointments.new")}</span>
+              <span>{t("appointments.new")}</span>
             </Button>
           </div>
-          {selectedList.length === 0 ? (
-            <div className="flex items-center gap-3 py-6 text-muted-foreground">
-              <CalendarHeart className="size-5 opacity-60" />
-              <span className="text-sm">{t("appointments.dayEmpty")}</span>
+
+          {/* Grid + (lg) side agenda */}
+          <div className="lg:grid lg:grid-cols-3 lg:gap-4 lg:items-stretch space-y-4 lg:space-y-0">
+            {/* Grid */}
+            <div className="card-soft p-2 md:p-3 lg:col-span-2 h-full">
+              <div className="grid grid-cols-7 gap-1 md:gap-2 mb-1">
+                {WEEKDAY_KEYS.map((k) => (
+                  <div
+                    key={k}
+                    className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground text-center py-1"
+                  >
+                    {t(`appointments.weekdayShort.${k}`)}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1 md:gap-2">
+                {gridDays.map((d) => {
+                  const dayStr = d.dateStr;
+                  const inMonth = d.inMonth;
+                  const isToday = dayStr === todayStr;
+                  const isSelected = dayStr === selectedDay;
+                  const events = byDay.get(dayStr) ?? [];
+                  return (
+                    <button
+                      key={dayStr}
+                      type="button"
+                      onClick={() => setSelectedDay(dayStr)}
+                      onDoubleClick={() => openNew(dayStr)}
+                      className={cn(
+                        "min-h-[96px] md:min-h-[112px] rounded-xl md:rounded-2xl border p-1 md:p-2 text-left transition-colors flex flex-col gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                        inMonth
+                          ? "bg-background border-border/60"
+                          : "bg-muted/30 border-border/40 text-muted-foreground",
+                        isSelected && "ring-2 ring-primary border-primary",
+                        !isSelected && isToday && "border-primary/60",
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={cn(
+                            "text-xs md:text-sm font-bold tabular-nums",
+                            isToday && "text-primary",
+                          )}
+                        >
+                          {d.dayOfMonth}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1 min-w-0">
+                        {events.slice(0, 3).map((e) => (
+                          <div
+                            key={e.id}
+                            className="truncate text-[10px] md:text-[11px] font-semibold rounded-md px-1 md:px-1.5 py-0.5"
+                            style={{
+                              background: chipColor(e) + "26",
+                              color: chipColor(e),
+                            }}
+                            title={e.title}
+                          >
+                            {!e.all_day && (
+                              <span className="tabular-nums opacity-80 mr-1">
+                                {formatTimeIn(e.starts_at, tz)}
+                              </span>
+                            )}
+                            {e.title}
+                          </div>
+                        ))}
+                        {events.length > 3 && (
+                          <div className="text-[10px] font-semibold text-muted-foreground pl-1">
+                            {t("appointments.moreCount", {
+                              count: events.length - 3,
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          ) : (
-            <ul className="space-y-2">
-              {selectedList.map((a) => (
-                <AgendaRow
-                  key={a.id}
-                  appt={a}
-                  tz={tz}
-                  onEdit={() => openEdit(a)}
-                />
-              ))}
-            </ul>
-          )}
+
+            {/* Agenda for selected day (below on md, beside on lg) */}
+            <div className="card-soft p-4 lg:col-span-1 h-full">
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <h3 className="text-base md:text-lg font-extrabold">
+                  {formatDayHeading(selectedDay, tz, i18n.language)}
+                </h3>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full font-semibold"
+                  onClick={() => openNew(selectedDay)}
+                  disabled={!familyId}
+                >
+                  <Plus className="size-4" />
+                  <span className="hidden sm:inline">
+                    {t("appointments.new")}
+                  </span>
+                </Button>
+              </div>
+              {selectedList.length === 0 ? (
+                <div className="flex items-center gap-3 py-6 text-muted-foreground">
+                  <CalendarHeart className="size-5 opacity-60" />
+                  <span className="text-sm">{t("appointments.dayEmpty")}</span>
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {selectedList.map((a) => (
+                    <AgendaRow
+                      key={a.id}
+                      appt={a}
+                      tz={tz}
+                      onEdit={() => openEdit(a)}
+                    />
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
 
       {familyId && user && (
         <EventDialog
@@ -376,10 +414,14 @@ function AgendaRow({
     : formatTimeIn(appt.starts_at, tz);
   const endTxt =
     !appt.all_day && appt.ends_at ? formatTimeIn(appt.ends_at, tz) : null;
+  const KindI = isVisitKind(appt.kind) ? KIND_ICON[appt.kind] : CalendarHeart;
+  const kindLabel = isVisitKind(appt.kind)
+    ? t(`appointments.kind.${appt.kind}`)
+    : (appt.kind as string);
 
   return (
     <li
-      className="card-soft p-3 flex items-center gap-3 cursor-pointer hover:brightness-[0.98]"
+      className="relative card-soft p-3 pl-4 flex items-center gap-3 cursor-pointer hover:brightness-[0.98] overflow-hidden"
       onClick={onEdit}
       role="button"
       tabIndex={0}
@@ -390,6 +432,12 @@ function AgendaRow({
         }
       }}
     >
+      {/* Color bar */}
+      <span
+        className="absolute left-0 top-0 bottom-0 w-1.5"
+        style={{ backgroundColor: color }}
+        aria-hidden
+      />
       <div className="text-center shrink-0 w-16">
         <div className="text-lg font-extrabold tabular-nums">{startTxt}</div>
         {endTxt && (
@@ -402,7 +450,7 @@ function AgendaRow({
         className="size-10 rounded-2xl flex items-center justify-center shrink-0"
         style={{ backgroundColor: color + "33", color }}
       >
-        <CalendarHeart className="size-5" />
+        <KindI className="size-5" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
@@ -411,7 +459,7 @@ function AgendaRow({
             className="text-[10px] font-bold uppercase rounded-full px-2 py-0.5"
             style={{ backgroundColor: color + "33", color }}
           >
-            {t(`appointments.kind.${appt.kind as VisitKind}`)}
+            {kindLabel}
           </span>
           {appt.is_recurring && (
             <span
@@ -491,8 +539,9 @@ function EventDialog({
     if (editing) {
       const s = new Date(editing.starts_at);
       const e = editing.ends_at ? new Date(editing.ends_at) : null;
-      const kind: VisitKind =
-        editing.kind === "therapy" ? "therapy" : "appointment";
+      const kind: VisitKind = isVisitKind(editing.kind)
+        ? editing.kind
+        : "appointment";
       const freq = editing.recurrence_freq;
       setValues({
         title: editing.title,
@@ -758,33 +807,52 @@ function EventDialog({
               <Label className="font-semibold">
                 {t("appointments.field.kind")}
               </Label>
-              <div className="mt-1.5 inline-flex rounded-full border border-border p-1 bg-muted/50">
-                {(["appointment", "therapy"] as VisitKind[]).map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => {
-                      update("kind", k);
-                      // Bump default color when user hasn't customized yet.
-                      if (
-                        values.color === DEFAULT_COLOR.appointment ||
-                        values.color === DEFAULT_COLOR.therapy
-                      ) {
-                        update("color", DEFAULT_COLOR[k]);
+              <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {VISIT_KINDS.map((k) => {
+                  const KI = KIND_ICON[k];
+                  const active = values.kind === k;
+                  const swatch = DEFAULT_COLOR[k];
+                  return (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => {
+                        update("kind", k);
+                        // Bump default color when user hasn't customized yet.
+                        if (isDefaultColor(values.color)) {
+                          update("color", DEFAULT_COLOR[k]);
+                        }
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 rounded-full border-2 px-3 py-2 text-sm font-bold transition-colors",
+                        active
+                          ? "border-foreground bg-muted"
+                          : "border-border/60 hover:bg-muted/50",
+                      )}
+                      style={
+                        active
+                          ? undefined
+                          : { borderColor: swatch + "55" }
                       }
-                    }}
-                    className={cn(
-                      "px-4 py-1.5 rounded-full text-sm font-bold transition-colors",
-                      values.kind === k
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {t(`appointments.kind.${k}`)}
-                  </button>
-                ))}
+                    >
+                      <span
+                        className="size-6 rounded-full flex items-center justify-center shrink-0"
+                        style={{
+                          backgroundColor: swatch + "33",
+                          color: swatch,
+                        }}
+                      >
+                        <KI className="size-3.5" />
+                      </span>
+                      <span className="truncate">
+                        {t(`appointments.kind.${k}`)}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
 
             {/* All-day + date/time */}
             <div className="flex items-center gap-2">
@@ -1104,10 +1172,10 @@ function EventDialog({
 
 function chipColor(a: ExpandedAppointment): string {
   if (a.color) return a.color;
-  return a.kind === "therapy"
-    ? DEFAULT_COLOR.therapy
-    : DEFAULT_COLOR.appointment;
+  if (isVisitKind(a.kind)) return DEFAULT_COLOR[a.kind];
+  return DEFAULT_COLOR.appointment;
 }
+
 
 function blankValues(dayStr: string): DialogValues {
   return {
@@ -1216,4 +1284,253 @@ function formatDayHeading(dayStr: string, tz: string, lang: string): string {
     month: "long",
     timeZone: tz,
   }).format(dt);
+}
+
+// ---------------------------------------------------------------------------
+// Mobile view
+// ---------------------------------------------------------------------------
+
+function MobileAppointmentsView({
+  monthLabel,
+  tz,
+  anchor,
+  setAnchor,
+  todayStr,
+  selectedDay,
+  setSelectedDay,
+  byDay,
+  openNew,
+  openEdit,
+  familyId,
+}: {
+  monthLabel: string;
+  tz: string;
+  anchor: Date;
+  setAnchor: (d: Date) => void;
+  todayStr: string;
+  selectedDay: string;
+  setSelectedDay: (d: string) => void;
+  byDay: Map<string, ExpandedAppointment[]>;
+  openNew: (dayStr: string) => void;
+  openEdit: (a: ExpandedAppointment) => void;
+  familyId: string | null;
+}) {
+  const { t, i18n } = useTranslation();
+
+  // Days of the visible month (family-tz), for the strip.
+  const stripDays = useMemo(() => buildMonthDays(anchor, tz), [anchor, tz]);
+
+  // Grouped agenda — days that have events in the visible month, ascending.
+  // Include today even if empty so the current day is always addressable.
+  const agendaDays = useMemo(() => {
+    const days = stripDays.map((d) => d.dateStr);
+    const withEvents = days.filter(
+      (d) => (byDay.get(d) ?? []).length > 0 || d === todayStr,
+    );
+    return withEvents;
+  }, [stripDays, byDay, todayStr]);
+
+  // Refs to agenda day headings so strip taps can scroll to them.
+  const dayRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const stripRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map());
+
+  // Auto-scroll strip to selected day on mount / month change.
+  useEffect(() => {
+    const el = stripRefs.current.get(selectedDay);
+    if (el) el.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
+  }, [selectedDay, anchor]);
+
+  function jumpToDay(dayStr: string) {
+    setSelectedDay(dayStr);
+    const el = dayRefs.current.get(dayStr);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  const hasAnyEvents = agendaDays.some(
+    (d) => (byDay.get(d) ?? []).length > 0,
+  );
+
+  return (
+    <div>
+      {/* Sticky compact header */}
+      <div className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur border-b border-border/40">
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full size-9"
+            aria-label={t("appointments.prevMonth")}
+            onClick={() => setAnchor(shiftMonth(anchor, -1, tz))}
+          >
+            <ChevronLeft className="size-5" />
+          </Button>
+          <h2 className="flex-1 min-w-0 text-base font-extrabold capitalize truncate text-center">
+            {monthLabel}
+          </h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full size-9"
+            aria-label={t("appointments.nextMonth")}
+            onClick={() => setAnchor(shiftMonth(anchor, 1, tz))}
+          >
+            <ChevronRight className="size-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full font-semibold h-9 px-3"
+            onClick={() => {
+              setAnchor(new Date());
+              setSelectedDay(todayStr);
+            }}
+          >
+            {t("appointments.today")}
+          </Button>
+          <Button
+            size="sm"
+            className="rounded-full font-bold h-9 px-3"
+            onClick={() => openNew(selectedDay)}
+            disabled={!familyId}
+            aria-label={t("appointments.new")}
+          >
+            <Plus className="size-4" />
+          </Button>
+        </div>
+
+        {/* Month strip — horizontally scrollable days */}
+        <div
+          className="mt-2 flex gap-1.5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1"
+          role="list"
+          aria-label={monthLabel}
+        >
+          {stripDays.map((d) => {
+            const events = byDay.get(d.dateStr) ?? [];
+            const isToday = d.dateStr === todayStr;
+            const isSelected = d.dateStr === selectedDay;
+            const weekdayShort = WEEKDAY_KEYS[(d.jsWeekday + 6) % 7];
+            return (
+              <button
+                key={d.dateStr}
+                ref={(el) => {
+                  stripRefs.current.set(d.dateStr, el);
+                }}
+                type="button"
+                onClick={() => jumpToDay(d.dateStr)}
+                className={cn(
+                  "shrink-0 snap-center min-w-[44px] rounded-2xl border px-1.5 py-1.5 flex flex-col items-center gap-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  isSelected
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : isToday
+                      ? "bg-background border-primary/60 text-primary"
+                      : "bg-background border-border/60",
+                )}
+              >
+                <span className="text-[9px] font-bold uppercase opacity-80">
+                  {t(`appointments.weekdayShort.${weekdayShort}`)}
+                </span>
+                <span className="text-sm font-extrabold tabular-nums leading-tight">
+                  {d.dayOfMonth}
+                </span>
+                <span className="flex items-center gap-0.5 h-1.5 mt-0.5">
+                  {events.slice(0, 3).map((e, i) => (
+                    <span
+                      key={i}
+                      className="inline-block size-1.5 rounded-full"
+                      style={{
+                        background: isSelected ? "#ffffff" : chipColor(e),
+                      }}
+                    />
+                  ))}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Agenda body */}
+      <div className="pt-3">
+        {!hasAnyEvents ? (
+          <div className="card-soft p-6 flex flex-col items-center text-center gap-3">
+            <CalendarHeart className="size-8 opacity-60" />
+            <p className="font-semibold">{t("appointments.mobile.empty")}</p>
+            <Button
+              className="rounded-full font-bold"
+              onClick={() => openNew(selectedDay)}
+              disabled={!familyId}
+            >
+              <Plus className="size-4" />
+              {t("appointments.new")}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {agendaDays.map((dayStr) => {
+              const events = byDay.get(dayStr) ?? [];
+              return (
+                <div
+                  key={dayStr}
+                  ref={(el) => {
+                    dayRefs.current.set(dayStr, el);
+                  }}
+                >
+                  <h3
+                    className={cn(
+                      "text-sm font-extrabold capitalize mb-2 px-1",
+                      dayStr === todayStr && "text-primary",
+                    )}
+                  >
+                    {formatDayHeading(dayStr, tz, i18n.language)}
+                  </h3>
+                  {events.length === 0 ? (
+                    <div className="card-soft p-3 text-sm text-muted-foreground flex items-center gap-2">
+                      <CalendarHeart className="size-4 opacity-60" />
+                      {t("appointments.dayEmpty")}
+                    </div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {events.map((a) => (
+                        <AgendaRow
+                          key={a.id}
+                          appt={a}
+                          tz={tz}
+                          onEdit={() => openEdit(a)}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+type MonthDay = {
+  dateStr: string;
+  dayOfMonth: number;
+  jsWeekday: number; // 0=Sun..6=Sat
+};
+
+function buildMonthDays(anchor: Date, tz: string): MonthDay[] {
+  const p = wallClockIn(anchor, tz);
+  const [year, month] = p.todayStr.split("-").map(Number);
+  const first = new Date(year, month - 1, 1, 12, 0, 0, 0);
+  const days: MonthDay[] = [];
+  const cursor = new Date(first);
+  while (cursor.getMonth() === month - 1) {
+    const parts = wallClockIn(cursor, tz);
+    const [, , cd] = parts.todayStr.split("-").map(Number);
+    days.push({
+      dateStr: parts.todayStr,
+      dayOfMonth: cd,
+      jsWeekday: cursor.getDay(),
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return days;
 }

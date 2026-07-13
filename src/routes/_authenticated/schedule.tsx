@@ -30,6 +30,10 @@ import {
   Baby,
   Zap,
   StickyNote,
+  Users,
+  TestTube,
+  Smile,
+  Hospital,
 } from "lucide-react";
 import { SpO2DropletIcon } from "@/components/icons/SpO2DropletIcon";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
@@ -799,7 +803,13 @@ function AppointmentRow({
   // pages stay visually consistent. Other kinds keep the fixed kind palette.
   const apptColor = (appt as { color?: string | null }).color ?? null;
   const useCustomColor =
-    (appt.kind === "appointment" || appt.kind === "therapy") && !!apptColor;
+    (appt.kind === "appointment" ||
+      appt.kind === "therapy" ||
+      appt.kind === "meeting" ||
+      appt.kind === "lab" ||
+      appt.kind === "dental" ||
+      appt.kind === "hospital_stay") &&
+    !!apptColor;
   const tone = useCustomColor
     ? { bg: apptColor! + "33", fg: apptColor! }
     : baseTone;
@@ -1557,6 +1567,14 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
       return <Stethoscope className={className} />;
     case "therapy":
       return <Sparkles className={className} />;
+    case "meeting":
+      return <Users className={className} />;
+    case "lab":
+      return <TestTube className={className} />;
+    case "dental":
+      return <Smile className={className} />;
+    case "hospital_stay":
+      return <Hospital className={className} />;
     case "task":
       return <ClipboardList className={className} />;
     case "meal":
@@ -1592,6 +1610,14 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
       return { bg: "#DBEAFE", fg: "#1D4ED8" };
     case "therapy":
       return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "meeting":
+      return { bg: "#F1F5F9", fg: "#334155" };
+    case "lab":
+      return { bg: "#CCFBF1", fg: "#0F766E" };
+    case "dental":
+      return { bg: "#FCE7F3", fg: "#DB2777" };
+    case "hospital_stay":
+      return { bg: "#FEE2E2", fg: "#DC2626" };
     case "task":
       return { bg: "#DCFCE7", fg: "#15803D" };
     case "meal":
