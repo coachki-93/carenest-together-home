@@ -658,6 +658,7 @@ function EventDialog({
   userId,
   defaultDay,
   editing,
+  tz,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -665,6 +666,7 @@ function EventDialog({
   userId: string;
   defaultDay: string;
   editing: ExpandedAppointment | null;
+  tz: string;
 }) {
   const { t } = useTranslation();
   const create = useCreateAppointment();
