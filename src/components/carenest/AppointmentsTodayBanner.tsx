@@ -52,7 +52,13 @@ export function AppointmentsTodayBanner({ familyId }: Props) {
     const now = new Date();
     const { todayStr } = wallClockIn(now, tz);
     const visits = appts.filter(
-      (a) => a.kind === "appointment" || a.kind === "therapy",
+      (a) =>
+        a.kind === "appointment" ||
+        a.kind === "therapy" ||
+        a.kind === "meeting" ||
+        a.kind === "lab" ||
+        a.kind === "dental" ||
+        a.kind === "hospital_stay",
     );
     return visits
       .filter((a) => {
