@@ -1132,10 +1132,10 @@ function EventDialog({
 
 function chipColor(a: ExpandedAppointment): string {
   if (a.color) return a.color;
-  return a.kind === "therapy"
-    ? DEFAULT_COLOR.therapy
-    : DEFAULT_COLOR.appointment;
+  if (isVisitKind(a.kind)) return DEFAULT_COLOR[a.kind];
+  return DEFAULT_COLOR.appointment;
 }
+
 
 function blankValues(dayStr: string): DialogValues {
   return {
