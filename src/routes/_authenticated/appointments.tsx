@@ -1345,6 +1345,7 @@ function blankValues(dayStr: string): DialogValues {
     repeat: "none",
     interval: 1,
     weekdays: [],
+    reminder: "none",
   };
 }
 
