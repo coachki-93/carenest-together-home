@@ -2274,6 +2274,13 @@ export const sv = {
     kind: {
       appointment: "Besök",
       therapy: "Terapi",
+      meeting: "Möte",
+      lab: "Provtagning",
+      dental: "Tandvård",
+      hospital_stay: "Inläggning",
+    },
+    mobile: {
+      empty: "Inga kommande besök.",
     },
     field: {
       title: "Titel",
