@@ -50,6 +50,7 @@ export function AppSidebar() {
   const items = [
     { title: t("nav.dashboard"), url: "/dashboard", icon: LayoutDashboard },
     { title: t("nav.schedule"), url: "/schedule", icon: CalendarClock },
+    { title: t("nav.appointments"), url: "/appointments", icon: CalendarHeart },
     { title: t("nav.medications"), url: "/medications", icon: Pill },
     { title: t("nav.vitals"), url: "/vitals", icon: Activity },
     { title: t("nav.oxygen"), url: "/oxygen", icon: Wind },
