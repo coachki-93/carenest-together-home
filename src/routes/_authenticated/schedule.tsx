@@ -793,7 +793,16 @@ function AppointmentRow({
   canManage: boolean;
 }) {
   const { t, i18n } = useTranslation();
-  const tone = kindTone(appt.kind);
+  const baseTone = kindTone(appt.kind);
+  // For visit-type rows (appointment/therapy), the /appointments page persists
+  // a caregiver-picked color on the row itself; render it here too so the two
+  // pages stay visually consistent. Other kinds keep the fixed kind palette.
+  const apptColor = (appt as { color?: string | null }).color ?? null;
+  const useCustomColor =
+    (appt.kind === "appointment" || appt.kind === "therapy") && !!apptColor;
+  const tone = useCustomColor
+    ? { bg: apptColor! + "33", fg: apptColor! }
+    : baseTone;
   const start = new Date(appt.starts_at);
   const end = appt.ends_at ? new Date(appt.ends_at) : null;
   const timeFmt = useMemo(

@@ -80,6 +80,7 @@ import {
 } from "@/lib/data/handover-due";
 import { useHandoverTimes } from "@/lib/data/handover-times";
 import { HandoverUnreadBanner } from "@/components/carenest/HandoverUnreadBanner";
+import { AppointmentsTodayBanner } from "@/components/carenest/AppointmentsTodayBanner";
 import { ClipboardCheck } from "lucide-react";
 import {
   TaskActionDialog,
@@ -983,6 +984,7 @@ function DashboardPage() {
           )}
           <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
           <EndOfShiftTidyBanner familyId={familyId} userId={user?.id} />
+          <AppointmentsTodayBanner familyId={familyId} />
           {(lowStock.lowCount > 0 ||
             lowStock.expiringCount > 0 ||
             lowStock.expiredCount > 0) && (
