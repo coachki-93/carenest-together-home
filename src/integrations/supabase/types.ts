@@ -2141,6 +2141,10 @@ export type Database = {
         | "breathing"
         | "note"
         | "inhalation"
+        | "meeting"
+        | "lab"
+        | "dental"
+        | "hospital_stay"
       care_place_item_type:
         | "yesno"
         | "count"
@@ -2328,6 +2332,10 @@ export const Constants = {
         "breathing",
         "note",
         "inhalation",
+        "meeting",
+        "lab",
+        "dental",
+        "hospital_stay",
       ],
       care_place_item_type: [
         "yesno",
