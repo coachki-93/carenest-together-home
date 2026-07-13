@@ -529,8 +529,9 @@ function EventDialog({
     if (editing) {
       const s = new Date(editing.starts_at);
       const e = editing.ends_at ? new Date(editing.ends_at) : null;
-      const kind: VisitKind =
-        editing.kind === "therapy" ? "therapy" : "appointment";
+      const kind: VisitKind = isVisitKind(editing.kind)
+        ? editing.kind
+        : "appointment";
       const freq = editing.recurrence_freq;
       setValues({
         title: editing.title,
