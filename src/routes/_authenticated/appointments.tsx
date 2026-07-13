@@ -1386,24 +1386,10 @@ function blankValues(dayStr: string): DialogValues {
   };
 }
 
-function toDateInput(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+// toDateInput / toTimeInput / toLocalDateTime were device-local; write and
+// read paths now go through zonedWallClockToDate / dateInputIn / formatTimeIn
+// with the family timezone.
 
-function toTimeInput(d: Date): string {
-  const h = String(d.getHours()).padStart(2, "0");
-  const m = String(d.getMinutes()).padStart(2, "0");
-  return `${h}:${m}`;
-}
-
-function toLocalDateTime(dateStr: string, timeStr: string): Date {
-  // Interpret as browser-local time — matches the existing schedule dialog's
-  // write convention. Display uses family tz via wallClockIn/formatTimeIn.
-  return new Date(`${dateStr}T${timeStr}`);
-}
 
 /**
  * Advance the given anchor by N calendar months, staying inside the same
