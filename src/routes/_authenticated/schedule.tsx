@@ -510,6 +510,7 @@ function SchedulePage() {
         childId={child?.id ?? null}
         userId={user?.id ?? null}
         editing={editing}
+        tz={tz}
         onSave={async (values, scope) => {
           if (!familyId || !user) return;
           try {
