@@ -189,52 +189,52 @@ function MedicationsPage() {
 }
 
 type MedWithCourse = Medication & {
-  starts_on?: string | null;
-  ends_on?: string | null;
+  course_first_dose_at?: string | null;
+  course_total_doses?: number | null;
 };
 
 /**
- * Derive the "course status" of a medication at `todayStr` (family-tz date).
- * Returns null when the med has no course window (ongoing / "Tills vidare").
+ * Derive the "course status" of a medication at `now` (absolute) using the
+ * family timezone `tz`. Null when the med has no course (ongoing).
  */
 function courseStatus(
   med: MedWithCourse,
-  todayStr: string,
-): { kind: "before" | "during" | "after"; day?: number; total?: number; date: string } | null {
-  const startsOn = med.starts_on ?? null;
-  const endsOn = med.ends_on ?? null;
-  if (!startsOn && !endsOn) return null;
-  const diffDays = (a: string, b: string) => {
-    const [ay, am, ad] = a.split("-").map(Number);
-    const [by, bm, bd] = b.split("-").map(Number);
-    return Math.round(
-      (Date.UTC(ay, am - 1, ad) - Date.UTC(by, bm - 1, bd)) / 86_400_000,
-    );
-  };
-  if (startsOn && todayStr < startsOn) {
-    return { kind: "before", date: startsOn };
-  }
-  if (endsOn && todayStr > endsOn) {
-    return { kind: "after", date: endsOn };
-  }
-  if (startsOn && endsOn) {
-    return {
-      kind: "during",
-      day: diffDays(todayStr, startsOn) + 1,
-      total: diffDays(endsOn, startsOn) + 1,
-      date: endsOn,
-    };
-  }
-  return null;
+  tz: string,
+  now: Date,
+):
+  | { kind: "before"; startAt: Date }
+  | { kind: "during"; n: number; total: number }
+  | { kind: "after"; endAt: Date }
+  | null {
+  const firstIso = med.course_first_dose_at ?? null;
+  const total = med.course_total_doses ?? null;
+  if (!firstIso || !total || total < 1) return null;
+  const first = new Date(firstIso);
+  if (now.getTime() < first.getTime()) return { kind: "before", startAt: first };
+  const last = courseLastDoseAt(first, total, med.times ?? [], tz);
+  if (now.getTime() > last.getTime()) return { kind: "after", endAt: last };
+  const n = Math.max(1, courseProgressAt(first, total, med.times ?? [], tz, now));
+  return { kind: "during", n, total };
 }
 
-function formatDateIn(dateStr: string, locale: string): string {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(locale, {
+function formatDateIn(date: Date, locale: string, tz: string): string {
+  return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "long",
-  });
+    timeZone: tz,
+  }).format(date);
 }
+
+function formatDateTimeIn(date: Date, locale: string, tz: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: tz,
+  }).format(date);
+}
+
 
 function MedicationCard({
   med,
