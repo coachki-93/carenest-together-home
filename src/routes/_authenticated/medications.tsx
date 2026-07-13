@@ -593,50 +593,49 @@ function MedicationDialog({
               <div className="space-y-2 pt-1">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="med-starts-on" className="text-xs text-muted-foreground">
-                      {t("meds.courseStart")}
+                    <Label htmlFor="med-total-doses" className="text-xs text-muted-foreground">
+                      {t("meds.totalDoses")}
                     </Label>
                     <Input
-                      id="med-starts-on"
-                      type="date"
-                      value={startsOn}
-                      onChange={(e) => onStartChange(e.target.value)}
+                      id="med-total-doses"
+                      type="number"
+                      min={1}
+                      value={totalDoses}
+                      onChange={(e) => setTotalDoses(e.target.value)}
                       className="rounded-xl"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="med-duration-days" className="text-xs text-muted-foreground">
-                      {t("meds.courseDurationDays")}
+                    <Label htmlFor="med-first-dose" className="text-xs text-muted-foreground">
+                      {t("meds.firstDoseAt")}
                     </Label>
                     <Input
-                      id="med-duration-days"
-                      type="number"
-                      min={1}
-                      value={durationDays}
-                      onChange={(e) => onDurationChange(e.target.value)}
+                      id="med-first-dose"
+                      type="datetime-local"
+                      value={firstDoseLocal}
+                      onChange={(e) => setFirstDoseLocal(e.target.value)}
                       className="rounded-xl"
                     />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <Label htmlFor="med-ends-on" className="text-xs text-muted-foreground">
-                    {t("meds.courseEnd")}
-                  </Label>
-                  <Input
-                    id="med-ends-on"
-                    type="date"
-                    value={endsOn}
-                    min={startsOn}
-                    onChange={(e) => onEndChange(e.target.value)}
-                    className="rounded-xl"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {t("meds.courseEndsPreview", { date: endPreview })}
-                </p>
+                <p className="text-xs text-muted-foreground">{t("meds.totalDosesHelp")}</p>
+                {previewFirstLast && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("meds.coursePreview", {
+                      first: previewFirstLast.first,
+                      last: previewFirstLast.last,
+                    })}
+                  </p>
+                )}
+                {!times.length && (
+                  <p className="text-xs text-destructive">
+                    {t("meds.timesRequiredForCourse")}
+                  </p>
+                )}
               </div>
             )}
           </div>
+
 
           <div className="space-y-2">
             <Label>{t("meds.times")}</Label>
