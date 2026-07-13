@@ -1567,6 +1567,14 @@ function KindIcon({ kind, className }: { kind: AppointmentKind; className?: stri
       return <Stethoscope className={className} />;
     case "therapy":
       return <Sparkles className={className} />;
+    case "meeting":
+      return <Users className={className} />;
+    case "lab":
+      return <TestTube className={className} />;
+    case "dental":
+      return <Smile className={className} />;
+    case "hospital_stay":
+      return <Hospital className={className} />;
     case "task":
       return <ClipboardList className={className} />;
     case "meal":
