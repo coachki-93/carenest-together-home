@@ -202,8 +202,8 @@ function SchedulePage() {
   const { data: appointments = [] } = useAppointments(familyId, day, dayEnd);
   const { data: shifts = [] } = useShifts(familyId);
   const doses = useMemo(
-    () => buildTodaysDoses(meds, logs, day),
-    [meds, logs, day],
+    () => buildTodaysDoses(meds, logs, family?.timezone ?? "Europe/Stockholm", day),
+    [meds, logs, family?.timezone, day],
   );
 
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
