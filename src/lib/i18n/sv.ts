@@ -885,6 +885,10 @@ export const sv = {
     kind: {
       appointment: "Besök",
       therapy: "Terapi",
+      meeting: "Möte",
+      lab: "Provtagning",
+      dental: "Tandvård",
+      hospital_stay: "Inläggning",
       task: "Vårdsyssla",
       meal: "Måltid / matning",
       sleep: "Sömn & hygien",
