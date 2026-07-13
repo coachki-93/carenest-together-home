@@ -138,6 +138,7 @@ function AppointmentsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<ExpandedAppointment | null>(null);
   const [defaultDay, setDefaultDay] = useState<string | null>(null);
+  const [previewing, setPreviewing] = useState<ExpandedAppointment | null>(null);
 
   // Range: build a 6-week grid so we always show a stable month view.
   const { gridStart, gridEnd, gridDays, monthStr } = useMemo(
@@ -182,9 +183,14 @@ function AppointmentsPage() {
     setDefaultDay(dayStr);
     setDialogOpen(true);
   }
-  function openEdit(a: ExpandedAppointment) {
-    setEditing(a);
+  function openPreview(a: ExpandedAppointment) {
+    setPreviewing(a);
+  }
+  function openEditFromPreview() {
+    if (!previewing) return;
+    setEditing(previewing);
     setDefaultDay(null);
+    setPreviewing(null);
     setDialogOpen(true);
   }
 
