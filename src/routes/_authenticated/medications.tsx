@@ -541,6 +541,83 @@ function MedicationDialog({
             />
           </div>
 
+          <div className="rounded-2xl border border-border/60 p-3 space-y-3">
+            <Label className="font-semibold">{t("meds.duration")}</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setIsCourse(false)}
+                className={cn(
+                  "rounded-xl border px-3 py-2 text-sm font-semibold transition-colors",
+                  !isCourse
+                    ? "border-primary bg-primary-soft text-primary"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted",
+                )}
+              >
+                {t("meds.ongoing")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsCourse(true)}
+                className={cn(
+                  "rounded-xl border px-3 py-2 text-sm font-semibold transition-colors",
+                  isCourse
+                    ? "border-primary bg-primary-soft text-primary"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted",
+                )}
+              >
+                {t("meds.course")}
+              </button>
+            </div>
+            {isCourse && (
+              <div className="space-y-2 pt-1">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="med-starts-on" className="text-xs text-muted-foreground">
+                      {t("meds.courseStart")}
+                    </Label>
+                    <Input
+                      id="med-starts-on"
+                      type="date"
+                      value={startsOn}
+                      onChange={(e) => onStartChange(e.target.value)}
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="med-duration-days" className="text-xs text-muted-foreground">
+                      {t("meds.courseDurationDays")}
+                    </Label>
+                    <Input
+                      id="med-duration-days"
+                      type="number"
+                      min={1}
+                      value={durationDays}
+                      onChange={(e) => onDurationChange(e.target.value)}
+                      className="rounded-xl"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="med-ends-on" className="text-xs text-muted-foreground">
+                    {t("meds.courseEnd")}
+                  </Label>
+                  <Input
+                    id="med-ends-on"
+                    type="date"
+                    value={endsOn}
+                    min={startsOn}
+                    onChange={(e) => onEndChange(e.target.value)}
+                    className="rounded-xl"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("meds.courseEndsPreview", { date: endPreview })}
+                </p>
+              </div>
+            )}
+          </div>
+
           <div className="space-y-2">
             <Label>{t("meds.times")}</Label>
             <p className="text-xs text-muted-foreground">{t("meds.timesHelp")}</p>
