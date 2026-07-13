@@ -36,6 +36,8 @@ import {
 import { toast } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useMyMembership } from "@/lib/auth/use-profile";
+import { useFamily } from "@/lib/data/family";
+import { wallClockIn, dateInputIn } from "@/lib/time/family-tz";
 import {
   useFamilyChild,
   useMedications,
@@ -59,6 +61,8 @@ function MedicationsPage() {
   const familyId = membership?.family_id;
   const isOwner = membership?.role === "owner";
   const { data: child } = useFamilyChild(familyId);
+  const { data: family } = useFamily(familyId);
+  const tz = family?.timezone ?? "Europe/Stockholm";
   const { data: meds, isLoading } = useMedications(familyId);
 
   const [editing, setEditing] = useState<Medication | null>(null);
