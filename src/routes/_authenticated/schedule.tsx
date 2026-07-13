@@ -799,7 +799,13 @@ function AppointmentRow({
   // pages stay visually consistent. Other kinds keep the fixed kind palette.
   const apptColor = (appt as { color?: string | null }).color ?? null;
   const useCustomColor =
-    (appt.kind === "appointment" || appt.kind === "therapy") && !!apptColor;
+    (appt.kind === "appointment" ||
+      appt.kind === "therapy" ||
+      appt.kind === "meeting" ||
+      appt.kind === "lab" ||
+      appt.kind === "dental" ||
+      appt.kind === "hospital_stay") &&
+    !!apptColor;
   const tone = useCustomColor
     ? { bg: apptColor! + "33", fg: apptColor! }
     : baseTone;
