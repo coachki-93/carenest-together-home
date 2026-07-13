@@ -144,20 +144,10 @@ function addDays(d: Date, n: number) {
   x.setDate(x.getDate() + n);
   return x;
 }
-function toDateInput(d: Date) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-function toTimeInput(d: Date) {
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-function toLocalDateTime(date: string, time: string) {
-  const [y, m, d] = date.split("-").map(Number);
-  const [hh, mm] = time.split(":").map(Number);
-  return new Date(y, (m ?? 1) - 1, d ?? 1, hh ?? 0, mm ?? 0, 0, 0);
-}
+// toDateInput / toTimeInput / toLocalDateTime were device-local; write and
+// read paths now go through zonedWallClockToDate / dateInputIn / formatTimeIn
+// with the family timezone (see AppointmentDialog).
+
 function isSameDay(a: Date, b: Date) {
   return (
     a.getFullYear() === b.getFullYear() &&
