@@ -24,7 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMyMembership, useProfile } from "@/lib/auth/use-profile";
-import { useFamilyMembers } from "@/lib/data/family";
+import { useFamily, useFamilyMembers } from "@/lib/data/family";
+import { dateInputIn, dateTimeInputIn, zonedWallClockToDate } from "@/lib/time/family-tz";
 import { useCaregiverProfiles, type CaregiverProfile } from "@/lib/data/caregiver-profiles";
 import {
   expandShifts,
@@ -55,15 +56,11 @@ const SHIFT_COLORS = [
 
 const UNASSIGNED_KEY = "__unassigned__";
 
-function toLocalDateTimeInput(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+// The previous device-local toLocalDateTimeInput / toLocalDateInput helpers
+// were removed — they showed the browser's wall clock instead of the family's.
+// ShiftDialog now renders and parses input values through the family timezone
+// via dateTimeInputIn / dateInputIn / zonedWallClockToDate.
 
-function toLocalDateInput(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
 
 function ShiftsPage() {
   const { t, i18n } = useTranslation();
