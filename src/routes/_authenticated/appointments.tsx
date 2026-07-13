@@ -695,9 +695,9 @@ function EventDialog({
       setValues({
         title: editing.title,
         kind,
-        date: toDateInput(s),
-        time: toTimeInput(s),
-        endTime: e ? toTimeInput(e) : "",
+        date: dateInputIn(s, tz),
+        time: formatTimeIn(editing.starts_at, tz),
+        endTime: e && editing.ends_at ? formatTimeIn(editing.ends_at, tz) : "",
         allDay: editing.all_day,
         location: editing.location ?? "",
         notes: editing.notes ?? "",
