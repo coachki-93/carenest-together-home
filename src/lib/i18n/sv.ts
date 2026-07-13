@@ -168,6 +168,7 @@ export const sv = {
     family: "Familj",
     dashboard: "Idag",
     schedule: "Schema",
+    appointments: "Besök",
     medications: "Mediciner",
     vitals: "Mätvärden",
     oxygen: "Syrgas",
