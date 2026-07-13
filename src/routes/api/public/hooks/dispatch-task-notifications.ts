@@ -30,15 +30,6 @@ import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
  */
 const START_GRACE_MINUTES = 15;
 
-type Appt = {
-  id: string;
-  family_id: string;
-  title: string | null;
-  kind: string | null;
-  starts_at: string;
-  late_after_minutes?: number | null;
-  missed_after_minutes?: number | null;
-};
 
 type Sub = { endpoint: string; p256dh: string; auth: string };
 
@@ -390,8 +381,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 4: reminder --------
         // Look ahead 2 days (matches max reminder = 1440 min = 1 day, with slack).
-        // Per-occurrence dedupe lives in `appointment_notifications`; NOT gated on
-        // the *_notified_at columns used by the older passes.
+        // Same per-occurrence dedupe pattern as passes 1-3.
         const lookAheadEnd = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
         const lookAheadIso = lookAheadEnd.toISOString();
 

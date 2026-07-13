@@ -146,12 +146,9 @@ export type Database = {
           id: string
           kind: Database["public"]["Enums"]["appointment_kind"]
           late_after_minutes: number
-          late_notified_at: string | null
           location: string | null
           missed_after_minutes: number
-          missed_notified_at: string | null
           notes: string | null
-          notified_at: string | null
           recurrence_byweekday: number[] | null
           recurrence_cancelled: boolean
           recurrence_freq: string | null
@@ -178,12 +175,9 @@ export type Database = {
           id?: string
           kind?: Database["public"]["Enums"]["appointment_kind"]
           late_after_minutes?: number
-          late_notified_at?: string | null
           location?: string | null
           missed_after_minutes?: number
-          missed_notified_at?: string | null
           notes?: string | null
-          notified_at?: string | null
           recurrence_byweekday?: number[] | null
           recurrence_cancelled?: boolean
           recurrence_freq?: string | null
@@ -210,12 +204,9 @@ export type Database = {
           id?: string
           kind?: Database["public"]["Enums"]["appointment_kind"]
           late_after_minutes?: number
-          late_notified_at?: string | null
           location?: string | null
           missed_after_minutes?: number
-          missed_notified_at?: string | null
           notes?: string | null
-          notified_at?: string | null
           recurrence_byweekday?: number[] | null
           recurrence_cancelled?: boolean
           recurrence_freq?: string | null
