@@ -1306,7 +1306,7 @@ function MobileAppointmentsView({
   setSelectedDay,
   byDay,
   openNew,
-  openEdit,
+  openPreview,
   familyId,
 }: {
   monthLabel: string;
@@ -1318,7 +1318,7 @@ function MobileAppointmentsView({
   setSelectedDay: (d: string) => void;
   byDay: Map<string, ExpandedAppointment[]>;
   openNew: (dayStr: string) => void;
-  openEdit: (a: ExpandedAppointment) => void;
+  openPreview: (a: ExpandedAppointment) => void;
   familyId: string | null;
 }) {
   const { t, i18n } = useTranslation();
