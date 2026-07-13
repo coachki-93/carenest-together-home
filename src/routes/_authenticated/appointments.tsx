@@ -504,6 +504,133 @@ function AgendaRow({
 }
 
 // ---------------------------------------------------------------------------
+// PreviewDialog — read-only preview shown before the edit dialog
+// ---------------------------------------------------------------------------
+
+function PreviewDialog({
+  appt,
+  tz,
+  onClose,
+  onEdit,
+}: {
+  appt: ExpandedAppointment | null;
+  tz: string;
+  onClose: () => void;
+  onEdit: () => void;
+}) {
+  const { t, i18n } = useTranslation();
+  if (!appt) {
+    return (
+      <Dialog open={false} onOpenChange={(o) => !o && onClose()}>
+        <DialogContent className="sr-only" />
+      </Dialog>
+    );
+  }
+  const color = chipColor(appt);
+  const KindI = isVisitKind(appt.kind) ? KIND_ICON[appt.kind] : CalendarHeart;
+  const kindLabel = isVisitKind(appt.kind)
+    ? t(`appointments.kind.${appt.kind}`)
+    : (appt.kind as string);
+  const dayStr = wallClockIn(new Date(appt.starts_at), tz).todayStr;
+  const dayHeading = formatDayHeading(dayStr, tz, i18n.language);
+  const timeText = appt.all_day
+    ? t("appointments.today_banner.allDay")
+    : appt.ends_at
+      ? `${formatTimeIn(appt.starts_at, tz)} – ${formatTimeIn(appt.ends_at, tz)}`
+      : formatTimeIn(appt.starts_at, tz);
+
+  const freq = appt.recurrence_freq;
+  const recurrenceText =
+    appt.is_recurring && (freq === "daily" || freq === "weekly" || freq === "monthly")
+      ? `${t("appointments.preview.repeats")} · ${t(`appointments.recurrence.${freq}`)}`
+      : null;
+
+  return (
+    <Dialog open={!!appt} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="rounded-2xl max-w-md p-0 overflow-hidden">
+        {/* Color-tinted header */}
+        <div
+          className="px-6 pt-6 pb-4 border-l-[6px]"
+          style={{
+            borderLeftColor: color,
+            background: `linear-gradient(90deg, ${color}1f, transparent 60%)`,
+          }}
+        >
+          <DialogHeader className="space-y-2 text-left">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="size-8 rounded-2xl flex items-center justify-center shrink-0"
+                style={{ backgroundColor: color + "33", color }}
+              >
+                <KindI className="size-4" />
+              </span>
+              <span
+                className="text-[10px] font-bold uppercase rounded-full px-2 py-0.5"
+                style={{ backgroundColor: color + "33", color }}
+              >
+                {kindLabel}
+              </span>
+              {appt.is_recurring && (
+                <span
+                  className="text-[10px] font-bold uppercase rounded-full px-2 py-0.5 bg-primary-soft text-primary inline-flex items-center gap-1"
+                >
+                  <Repeat className="size-3" />
+                </span>
+              )}
+            </div>
+            <DialogTitle className="text-xl font-extrabold leading-tight break-words">
+              {appt.title}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {kindLabel}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+
+        <div className="px-6 pb-2 space-y-3">
+          {/* Date + time */}
+          <div>
+            <div className="text-sm font-bold capitalize">{dayHeading}</div>
+            <div className="text-sm text-muted-foreground tabular-nums">
+              {timeText}
+            </div>
+          </div>
+
+          {appt.location && (
+            <div className="flex items-start gap-2 text-sm">
+              <MapPin className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
+              <span className="font-semibold break-words">{appt.location}</span>
+            </div>
+          )}
+
+          {recurrenceText && (
+            <div className="flex items-center gap-2 text-sm">
+              <Repeat className="size-4 shrink-0 text-muted-foreground" />
+              <span className="font-semibold">{recurrenceText}</span>
+            </div>
+          )}
+
+          {appt.notes && (
+            <div className="text-sm text-foreground/80 whitespace-pre-wrap break-words border-t border-border/50 pt-3">
+              {appt.notes}
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="px-6 pb-6 pt-2">
+          <Button
+            className="rounded-full font-bold w-full sm:w-auto"
+            onClick={onEdit}
+          >
+            {t("common.edit")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // EventDialog
 // ---------------------------------------------------------------------------
 
