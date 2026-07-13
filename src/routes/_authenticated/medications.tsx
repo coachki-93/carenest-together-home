@@ -123,6 +123,7 @@ function MedicationsPage() {
             <MedicationCard
               key={m.id}
               med={m}
+              tz={tz}
               canEdit={isOwner}
               onEdit={() => setEditing(m)}
               onDelete={() => setDeleting(m)}
@@ -136,6 +137,7 @@ function MedicationsPage() {
         <MedicationDialog
           familyId={familyId}
           childId={child.id}
+          tz={tz}
           medication={editing ?? undefined}
           open
           onOpenChange={(o) => {
