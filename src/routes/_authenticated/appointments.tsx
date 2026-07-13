@@ -1285,3 +1285,252 @@ function formatDayHeading(dayStr: string, tz: string, lang: string): string {
     timeZone: tz,
   }).format(dt);
 }
+
+// ---------------------------------------------------------------------------
+// Mobile view
+// ---------------------------------------------------------------------------
+
+function MobileAppointmentsView({
+  monthLabel,
+  tz,
+  anchor,
+  setAnchor,
+  todayStr,
+  selectedDay,
+  setSelectedDay,
+  byDay,
+  openNew,
+  openEdit,
+  familyId,
+}: {
+  monthLabel: string;
+  tz: string;
+  anchor: Date;
+  setAnchor: (d: Date) => void;
+  todayStr: string;
+  selectedDay: string;
+  setSelectedDay: (d: string) => void;
+  byDay: Map<string, ExpandedAppointment[]>;
+  openNew: (dayStr: string) => void;
+  openEdit: (a: ExpandedAppointment) => void;
+  familyId: string | null;
+}) {
+  const { t, i18n } = useTranslation();
+
+  // Days of the visible month (family-tz), for the strip.
+  const stripDays = useMemo(() => buildMonthDays(anchor, tz), [anchor, tz]);
+
+  // Grouped agenda — days that have events in the visible month, ascending.
+  // Include today even if empty so the current day is always addressable.
+  const agendaDays = useMemo(() => {
+    const days = stripDays.map((d) => d.dateStr);
+    const withEvents = days.filter(
+      (d) => (byDay.get(d) ?? []).length > 0 || d === todayStr,
+    );
+    return withEvents;
+  }, [stripDays, byDay, todayStr]);
+
+  // Refs to agenda day headings so strip taps can scroll to them.
+  const dayRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const stripRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map());
+
+  // Auto-scroll strip to selected day on mount / month change.
+  useEffect(() => {
+    const el = stripRefs.current.get(selectedDay);
+    if (el) el.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
+  }, [selectedDay, anchor]);
+
+  function jumpToDay(dayStr: string) {
+    setSelectedDay(dayStr);
+    const el = dayRefs.current.get(dayStr);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  const hasAnyEvents = agendaDays.some(
+    (d) => (byDay.get(d) ?? []).length > 0,
+  );
+
+  return (
+    <div>
+      {/* Sticky compact header */}
+      <div className="sticky top-0 z-20 -mx-4 px-4 py-2 bg-background/95 backdrop-blur border-b border-border/40">
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full size-9"
+            aria-label={t("appointments.prevMonth")}
+            onClick={() => setAnchor(shiftMonth(anchor, -1, tz))}
+          >
+            <ChevronLeft className="size-5" />
+          </Button>
+          <h2 className="flex-1 min-w-0 text-base font-extrabold capitalize truncate text-center">
+            {monthLabel}
+          </h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full size-9"
+            aria-label={t("appointments.nextMonth")}
+            onClick={() => setAnchor(shiftMonth(anchor, 1, tz))}
+          >
+            <ChevronRight className="size-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full font-semibold h-9 px-3"
+            onClick={() => {
+              setAnchor(new Date());
+              setSelectedDay(todayStr);
+            }}
+          >
+            {t("appointments.today")}
+          </Button>
+          <Button
+            size="sm"
+            className="rounded-full font-bold h-9 px-3"
+            onClick={() => openNew(selectedDay)}
+            disabled={!familyId}
+            aria-label={t("appointments.new")}
+          >
+            <Plus className="size-4" />
+          </Button>
+        </div>
+
+        {/* Month strip — horizontally scrollable days */}
+        <div
+          className="mt-2 flex gap-1.5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1"
+          role="list"
+          aria-label={monthLabel}
+        >
+          {stripDays.map((d) => {
+            const events = byDay.get(d.dateStr) ?? [];
+            const isToday = d.dateStr === todayStr;
+            const isSelected = d.dateStr === selectedDay;
+            const weekdayShort = WEEKDAY_KEYS[(d.jsWeekday + 6) % 7];
+            return (
+              <button
+                key={d.dateStr}
+                ref={(el) => {
+                  stripRefs.current.set(d.dateStr, el);
+                }}
+                type="button"
+                onClick={() => jumpToDay(d.dateStr)}
+                className={cn(
+                  "shrink-0 snap-center min-w-[44px] rounded-2xl border px-1.5 py-1.5 flex flex-col items-center gap-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  isSelected
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : isToday
+                      ? "bg-background border-primary/60 text-primary"
+                      : "bg-background border-border/60",
+                )}
+              >
+                <span className="text-[9px] font-bold uppercase opacity-80">
+                  {t(`appointments.weekdayShort.${weekdayShort}`)}
+                </span>
+                <span className="text-sm font-extrabold tabular-nums leading-tight">
+                  {d.dayOfMonth}
+                </span>
+                <span className="flex items-center gap-0.5 h-1.5 mt-0.5">
+                  {events.slice(0, 3).map((e, i) => (
+                    <span
+                      key={i}
+                      className="inline-block size-1.5 rounded-full"
+                      style={{
+                        background: isSelected ? "#ffffff" : chipColor(e),
+                      }}
+                    />
+                  ))}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Agenda body */}
+      <div className="pt-3">
+        {!hasAnyEvents ? (
+          <div className="card-soft p-6 flex flex-col items-center text-center gap-3">
+            <CalendarHeart className="size-8 opacity-60" />
+            <p className="font-semibold">{t("appointments.mobile.empty")}</p>
+            <Button
+              className="rounded-full font-bold"
+              onClick={() => openNew(selectedDay)}
+              disabled={!familyId}
+            >
+              <Plus className="size-4" />
+              {t("appointments.new")}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {agendaDays.map((dayStr) => {
+              const events = byDay.get(dayStr) ?? [];
+              return (
+                <div
+                  key={dayStr}
+                  ref={(el) => {
+                    dayRefs.current.set(dayStr, el);
+                  }}
+                >
+                  <h3
+                    className={cn(
+                      "text-sm font-extrabold capitalize mb-2 px-1",
+                      dayStr === todayStr && "text-primary",
+                    )}
+                  >
+                    {formatDayHeading(dayStr, tz, i18n.language)}
+                  </h3>
+                  {events.length === 0 ? (
+                    <div className="card-soft p-3 text-sm text-muted-foreground flex items-center gap-2">
+                      <CalendarHeart className="size-4 opacity-60" />
+                      {t("appointments.dayEmpty")}
+                    </div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {events.map((a) => (
+                        <AgendaRow
+                          key={a.id}
+                          appt={a}
+                          tz={tz}
+                          onEdit={() => openEdit(a)}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+type MonthDay = {
+  dateStr: string;
+  dayOfMonth: number;
+  jsWeekday: number; // 0=Sun..6=Sat
+};
+
+function buildMonthDays(anchor: Date, tz: string): MonthDay[] {
+  const p = wallClockIn(anchor, tz);
+  const [year, month] = p.todayStr.split("-").map(Number);
+  const first = new Date(year, month - 1, 1, 12, 0, 0, 0);
+  const days: MonthDay[] = [];
+  const cursor = new Date(first);
+  while (cursor.getMonth() === month - 1) {
+    const parts = wallClockIn(cursor, tz);
+    const [, , cd] = parts.todayStr.split("-").map(Number);
+    days.push({
+      dateStr: parts.todayStr,
+      dayOfMonth: cd,
+      jsWeekday: cursor.getDay(),
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return days;
+}
