@@ -1063,7 +1063,37 @@ function EventDialog({
               )}
             </div>
 
-            {/* Color palette */}
+            {/* Reminder */}
+            <div>
+              <Label className="font-semibold">
+                {t("appointments.field.reminder")}
+              </Label>
+              <Select
+                value={values.reminder}
+                onValueChange={(v) =>
+                  update("reminder", v as DialogValues["reminder"])
+                }
+              >
+                <SelectTrigger className="rounded-xl mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    {t("appointments.reminderChoice.none")}
+                  </SelectItem>
+                  <SelectItem value="60">
+                    {t("appointments.reminderChoice.hour1")}
+                  </SelectItem>
+                  <SelectItem value="120">
+                    {t("appointments.reminderChoice.hours2")}
+                  </SelectItem>
+                  <SelectItem value="1440">
+                    {t("appointments.reminderChoice.day1")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label className="font-semibold">
                 {t("appointments.field.color")}
