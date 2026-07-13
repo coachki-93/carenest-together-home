@@ -194,181 +194,191 @@ function AppointmentsPage() {
       subtitle={t("appointments.subtitleNoChild")}
       actions={<LanguageToggle />}
     >
-      <div className="max-w-5xl space-y-4">
-        {/* Month header */}
-        <div className="card-soft p-3 md:p-4 flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            aria-label={t("appointments.prevMonth")}
-            onClick={() => setAnchor(shiftMonth(anchor, -1, tz))}
-          >
-            <ChevronLeft className="size-5" />
-          </Button>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg md:text-xl font-extrabold capitalize truncate">
-              {monthLabel}
-            </h2>
-          </div>
-          <Button
-            variant="outline"
-            className="rounded-full font-semibold"
-            onClick={() => {
-              setAnchor(new Date());
-              setSelectedDay(todayStr);
-            }}
-          >
-            {t("appointments.today")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            aria-label={t("appointments.nextMonth")}
-            onClick={() => setAnchor(shiftMonth(anchor, 1, tz))}
-          >
-            <ChevronRight className="size-5" />
-          </Button>
-          <Button
-            className="rounded-full font-bold ml-1"
-            onClick={() => openNew(selectedDay)}
-            disabled={!familyId}
-          >
-            <Plus className="size-4" />
-            <span className="hidden sm:inline">{t("appointments.new")}</span>
-          </Button>
+      <div className="max-w-6xl">
+        {/* ============ Mobile: agenda-first ============ */}
+        <div className="md:hidden">
+          <MobileAppointmentsView
+            monthLabel={monthLabel}
+            tz={tz}
+            anchor={anchor}
+            setAnchor={setAnchor}
+            todayStr={todayStr}
+            selectedDay={selectedDay}
+            setSelectedDay={setSelectedDay}
+            byDay={byDay}
+            openNew={openNew}
+            openEdit={openEdit}
+            familyId={familyId}
+          />
         </div>
 
-        {/* Grid */}
-        <div className="card-soft p-2 md:p-3">
-          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-1">
-            {WEEKDAY_KEYS.map((k) => (
-              <div
-                key={k}
-                className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground text-center py-1"
-              >
-                {t(`appointments.weekdayShort.${k}`)}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-1 md:gap-2">
-            {gridDays.map((d) => {
-              const dayStr = d.dateStr;
-              const inMonth = d.inMonth;
-              const isToday = dayStr === todayStr;
-              const isSelected = dayStr === selectedDay;
-              const events = byDay.get(dayStr) ?? [];
-              return (
-                <button
-                  key={dayStr}
-                  type="button"
-                  onClick={() => setSelectedDay(dayStr)}
-                  onDoubleClick={() => openNew(dayStr)}
-                  className={cn(
-                    "min-h-[62px] md:min-h-[96px] rounded-xl md:rounded-2xl border p-1 md:p-2 text-left transition-colors flex flex-col gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                    inMonth
-                      ? "bg-background border-border/60"
-                      : "bg-muted/30 border-border/40 text-muted-foreground",
-                    isSelected && "ring-2 ring-primary border-primary",
-                    !isSelected && isToday && "border-primary/60",
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={cn(
-                        "text-xs md:text-sm font-bold tabular-nums",
-                        isToday && "text-primary",
-                      )}
-                    >
-                      {d.dayOfMonth}
-                    </span>
-                    {/* Mobile: dots + count */}
-                    <div className="flex md:hidden items-center gap-0.5">
-                      {events.slice(0, 3).map((e, i) => (
-                        <span
-                          key={i}
-                          className="inline-block size-1.5 rounded-full"
-                          style={{ background: chipColor(e) }}
-                        />
-                      ))}
-                      {events.length > 3 && (
-                        <span className="text-[10px] font-bold text-muted-foreground ml-0.5">
-                          +{events.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {/* Desktop: chips */}
-                  <div className="hidden md:flex flex-col gap-1 min-w-0">
-                    {events.slice(0, 3).map((e) => (
-                      <div
-                        key={e.id}
-                        className="truncate text-[11px] font-semibold rounded-md px-1.5 py-0.5"
-                        style={{
-                          background: chipColor(e) + "26",
-                          color: chipColor(e),
-                        }}
-                        title={e.title}
-                      >
-                        {!e.all_day && (
-                          <span className="tabular-nums opacity-80 mr-1">
-                            {formatTimeIn(e.starts_at, tz)}
-                          </span>
-                        )}
-                        {e.title}
-                      </div>
-                    ))}
-                    {events.length > 3 && (
-                      <div className="text-[10px] font-semibold text-muted-foreground pl-1">
-                        {t("appointments.moreCount", {
-                          count: events.length - 3,
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Agenda for selected day */}
-        <div className="card-soft p-4">
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <h3 className="text-base md:text-lg font-extrabold">
-              {formatDayHeading(selectedDay, tz, i18n.language)}
-            </h3>
+        {/* ============ Tablet + desktop ============ */}
+        <div className="hidden md:block space-y-4">
+          {/* Month header */}
+          <div className="card-soft p-3 md:p-4 flex items-center gap-2">
             <Button
-              size="sm"
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label={t("appointments.prevMonth")}
+              onClick={() => setAnchor(shiftMonth(anchor, -1, tz))}
+            >
+              <ChevronLeft className="size-5" />
+            </Button>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg md:text-xl font-extrabold capitalize truncate">
+                {monthLabel}
+              </h2>
+            </div>
+            <Button
               variant="outline"
               className="rounded-full font-semibold"
+              onClick={() => {
+                setAnchor(new Date());
+                setSelectedDay(todayStr);
+              }}
+            >
+              {t("appointments.today")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label={t("appointments.nextMonth")}
+              onClick={() => setAnchor(shiftMonth(anchor, 1, tz))}
+            >
+              <ChevronRight className="size-5" />
+            </Button>
+            <Button
+              className="rounded-full font-bold ml-1"
               onClick={() => openNew(selectedDay)}
               disabled={!familyId}
             >
               <Plus className="size-4" />
-              <span className="hidden sm:inline">{t("appointments.new")}</span>
+              <span>{t("appointments.new")}</span>
             </Button>
           </div>
-          {selectedList.length === 0 ? (
-            <div className="flex items-center gap-3 py-6 text-muted-foreground">
-              <CalendarHeart className="size-5 opacity-60" />
-              <span className="text-sm">{t("appointments.dayEmpty")}</span>
+
+          {/* Grid + (lg) side agenda */}
+          <div className="lg:grid lg:grid-cols-3 lg:gap-4 lg:items-stretch space-y-4 lg:space-y-0">
+            {/* Grid */}
+            <div className="card-soft p-2 md:p-3 lg:col-span-2 h-full">
+              <div className="grid grid-cols-7 gap-1 md:gap-2 mb-1">
+                {WEEKDAY_KEYS.map((k) => (
+                  <div
+                    key={k}
+                    className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground text-center py-1"
+                  >
+                    {t(`appointments.weekdayShort.${k}`)}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1 md:gap-2">
+                {gridDays.map((d) => {
+                  const dayStr = d.dateStr;
+                  const inMonth = d.inMonth;
+                  const isToday = dayStr === todayStr;
+                  const isSelected = dayStr === selectedDay;
+                  const events = byDay.get(dayStr) ?? [];
+                  return (
+                    <button
+                      key={dayStr}
+                      type="button"
+                      onClick={() => setSelectedDay(dayStr)}
+                      onDoubleClick={() => openNew(dayStr)}
+                      className={cn(
+                        "min-h-[96px] md:min-h-[112px] rounded-xl md:rounded-2xl border p-1 md:p-2 text-left transition-colors flex flex-col gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                        inMonth
+                          ? "bg-background border-border/60"
+                          : "bg-muted/30 border-border/40 text-muted-foreground",
+                        isSelected && "ring-2 ring-primary border-primary",
+                        !isSelected && isToday && "border-primary/60",
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={cn(
+                            "text-xs md:text-sm font-bold tabular-nums",
+                            isToday && "text-primary",
+                          )}
+                        >
+                          {d.dayOfMonth}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1 min-w-0">
+                        {events.slice(0, 3).map((e) => (
+                          <div
+                            key={e.id}
+                            className="truncate text-[10px] md:text-[11px] font-semibold rounded-md px-1 md:px-1.5 py-0.5"
+                            style={{
+                              background: chipColor(e) + "26",
+                              color: chipColor(e),
+                            }}
+                            title={e.title}
+                          >
+                            {!e.all_day && (
+                              <span className="tabular-nums opacity-80 mr-1">
+                                {formatTimeIn(e.starts_at, tz)}
+                              </span>
+                            )}
+                            {e.title}
+                          </div>
+                        ))}
+                        {events.length > 3 && (
+                          <div className="text-[10px] font-semibold text-muted-foreground pl-1">
+                            {t("appointments.moreCount", {
+                              count: events.length - 3,
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          ) : (
-            <ul className="space-y-2">
-              {selectedList.map((a) => (
-                <AgendaRow
-                  key={a.id}
-                  appt={a}
-                  tz={tz}
-                  onEdit={() => openEdit(a)}
-                />
-              ))}
-            </ul>
-          )}
+
+            {/* Agenda for selected day (below on md, beside on lg) */}
+            <div className="card-soft p-4 lg:col-span-1 h-full">
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <h3 className="text-base md:text-lg font-extrabold">
+                  {formatDayHeading(selectedDay, tz, i18n.language)}
+                </h3>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full font-semibold"
+                  onClick={() => openNew(selectedDay)}
+                  disabled={!familyId}
+                >
+                  <Plus className="size-4" />
+                  <span className="hidden sm:inline">
+                    {t("appointments.new")}
+                  </span>
+                </Button>
+              </div>
+              {selectedList.length === 0 ? (
+                <div className="flex items-center gap-3 py-6 text-muted-foreground">
+                  <CalendarHeart className="size-5 opacity-60" />
+                  <span className="text-sm">{t("appointments.dayEmpty")}</span>
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {selectedList.map((a) => (
+                    <AgendaRow
+                      key={a.id}
+                      appt={a}
+                      tz={tz}
+                      onEdit={() => openEdit(a)}
+                    />
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
 
       {familyId && user && (
         <EventDialog
