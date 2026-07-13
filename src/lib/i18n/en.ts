@@ -2346,6 +2346,10 @@ export const en = {
       endAfterStart: "End time must be after start time.",
       weekdaysRequired: "Pick at least one weekday.",
     },
+    preview: {
+      repeats: "Repeats",
+      close: "Close",
+    },
   },
 };
 
