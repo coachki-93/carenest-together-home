@@ -375,7 +375,7 @@ function AppointmentsPage() {
                       key={a.id}
                       appt={a}
                       tz={tz}
-                      onEdit={() => openEdit(a)}
+                      onEdit={() => openPreview(a)}
                     />
                   ))}
                 </ul>
