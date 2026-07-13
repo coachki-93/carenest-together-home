@@ -213,7 +213,7 @@ function AppointmentsPage() {
             setSelectedDay={setSelectedDay}
             byDay={byDay}
             openNew={openNew}
-            openEdit={openEdit}
+            openPreview={openPreview}
             familyId={familyId}
           />
         </div>
