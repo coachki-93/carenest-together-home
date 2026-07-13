@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
   CalendarClock,
+  CalendarHeart,
   Pill,
   Activity,
   ClipboardList,
