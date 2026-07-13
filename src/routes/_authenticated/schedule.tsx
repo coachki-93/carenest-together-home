@@ -930,7 +930,7 @@ function AppointmentDialog({
 
   const [title, setTitle] = useState("");
   const [kind, setKind] = useState<AppointmentKind>("appointment");
-  const [date, setDate] = useState(toDateInput(defaultDay));
+  const [date, setDate] = useState(dateInputIn(defaultDay, tz));
   const [time, setTime] = useState("09:00");
   const [endTime, setEndTime] = useState("");
   const [allDay, setAllDay] = useState(false);
@@ -958,9 +958,9 @@ function AppointmentDialog({
       const e = editing.ends_at ? new Date(editing.ends_at) : null;
       setTitle(editing.title);
       setKind(editing.kind);
-      setDate(toDateInput(s));
-      setTime(toTimeInput(s));
-      setEndTime(e ? toTimeInput(e) : "");
+      setDate(dateInputIn(s, tz));
+      setTime(formatTimeIn(editing.starts_at, tz));
+      setEndTime(e && editing.ends_at ? formatTimeIn(editing.ends_at, tz) : "");
       setAllDay(editing.all_day);
       setLocation(editing.location ?? "");
       setNotes(editing.notes ?? "");
@@ -981,7 +981,7 @@ function AppointmentDialog({
     } else {
       setTitle("");
       setKind("appointment");
-      setDate(toDateInput(defaultDay));
+      setDate(dateInputIn(defaultDay, tz));
       setTime("09:00");
       setEndTime("");
       setAllDay(false);
@@ -1007,9 +1007,9 @@ function AppointmentDialog({
       return null;
     }
     const startDt = allDay
-      ? toLocalDateTime(date, "00:00")
-      : toLocalDateTime(date, time || "00:00");
-    const endDt = !allDay && endTime ? toLocalDateTime(date, endTime) : null;
+      ? zonedWallClockToDate(date, "00:00", tz)
+      : zonedWallClockToDate(date, time || "00:00", tz);
+    const endDt = !allDay && endTime ? zonedWallClockToDate(date, endTime, tz) : null;
     if (endDt && endDt <= startDt) {
       toast.error(t("scheduleEvents.endAfterStart"));
       return null;
