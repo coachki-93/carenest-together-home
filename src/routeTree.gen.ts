@@ -38,6 +38,7 @@ import { Route as AuthenticatedEmergencyRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedChildRouteImport } from './routes/_authenticated/child'
 import { Route as AuthenticatedCaregiversRouteImport } from './routes/_authenticated/caregivers'
+import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authenticated/appointments'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
 import { Route as ApiPublicHooksOxygenLowSweepRouteImport } from './routes/api/public/hooks/oxygen-low-sweep'
@@ -191,6 +192,12 @@ const AuthenticatedCaregiversRoute = AuthenticatedCaregiversRouteImport.update({
   path: '/caregivers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAppointmentsRoute =
+  AuthenticatedAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOnboardingChildRoute =
   AuthenticatedOnboardingChildRouteImport.update({
     id: '/onboarding/child',
@@ -229,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/appointments': typeof AuthenticatedAppointmentsRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -264,6 +272,7 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/appointments': typeof AuthenticatedAppointmentsRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -301,6 +310,7 @@ export interface FileRoutesById {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/_authenticated/appointments': typeof AuthenticatedAppointmentsRoute
   '/_authenticated/caregivers': typeof AuthenticatedCaregiversRoute
   '/_authenticated/child': typeof AuthenticatedChildRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/appointments'
     | '/caregivers'
     | '/child'
     | '/dashboard'
@@ -373,6 +384,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/appointments'
     | '/caregivers'
     | '/child'
     | '/dashboard'
@@ -409,6 +421,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/_authenticated/appointments'
     | '/_authenticated/caregivers'
     | '/_authenticated/child'
     | '/_authenticated/dashboard'
@@ -658,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaregiversRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/appointments': {
+      id: '/_authenticated/appointments'
+      path: '/appointments'
+      fullPath: '/appointments'
+      preLoaderRoute: typeof AuthenticatedAppointmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding/child': {
       id: '/_authenticated/onboarding/child'
       path: '/onboarding/child'
@@ -697,6 +717,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppointmentsRoute: typeof AuthenticatedAppointmentsRoute
   AuthenticatedCaregiversRoute: typeof AuthenticatedCaregiversRoute
   AuthenticatedChildRoute: typeof AuthenticatedChildRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -718,6 +739,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppointmentsRoute: AuthenticatedAppointmentsRoute,
   AuthenticatedCaregiversRoute: AuthenticatedCaregiversRoute,
   AuthenticatedChildRoute: AuthenticatedChildRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
