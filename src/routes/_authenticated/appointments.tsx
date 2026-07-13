@@ -647,6 +647,7 @@ type DialogValues = {
   repeat: "none" | "daily" | "weekly" | "monthly";
   interval: number;
   weekdays: number[];
+  reminder: "none" | "60" | "120" | "1440";
 };
 
 function EventDialog({
