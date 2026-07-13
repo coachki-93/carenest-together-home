@@ -140,8 +140,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "CareNest" },
       { name: "twitter:description", content: "CareNest Connect is a web app for coordinating care for medically complex children." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/cBl2WZ7i79QvY3RvzaEMrSXg8Q12/social-images/social-1781400597271-CARE.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/cBl2WZ7i79QvY3RvzaEMrSXg8Q12/social-images/social-1781400597271-CARE.webp" },
+      { property: "og:image", content: "https://carenest-together-home.lovable.app/og/og-default.png" },
+      { name: "twitter:image", content: "https://carenest-together-home.lovable.app/og/og-default.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
