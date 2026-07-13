@@ -169,11 +169,12 @@ export interface ScheduledDose {
  * Build today's scheduled doses in the family's timezone.
  *
  * `familyTimezone` is required — "today" is the wall-clock date in the
- * family's zone, not device or server local. Course window
- * (medications.starts_on / ends_on) is enforced here with an inclusive,
- * null-safe YYYY-MM-DD string compare against that same wall-clock date, so
- * every downstream consumer (dashboard, schedule, ForYourShiftCard,
- * handover prefill) inherits the gate.
+ * family's zone. Course window (dose-count model:
+ * medications.course_first_dose_at + course_total_doses) is enforced here
+ * at datetime precision — a partial first day drops already-passed times,
+ * and the final day stops after the Nth counted dose. Every downstream
+ * consumer (dashboard, schedule, ForYourShiftCard, handover prefill)
+ * inherits the gate.
  */
 export function buildTodaysDoses(
   meds: Medication[],
@@ -182,7 +183,6 @@ export function buildTodaysDoses(
   day: Date = new Date(),
 ): ScheduledDose[] {
   const out: ScheduledDose[] = [];
-  const { todayStr } = wallClockIn(day, familyTimezone);
   const dayStart = new Date(day);
   dayStart.setHours(0, 0, 0, 0);
   const logByKey = new Map<string, MedLog>();
@@ -191,16 +191,25 @@ export function buildTodaysDoses(
   }
   for (const m of meds) {
     if (!m.active) continue;
-    // Course window gate — nulls mean "unbounded on that side".
-    const startsOn = (m as { starts_on?: string | null }).starts_on ?? null;
-    const endsOn = (m as { ends_on?: string | null }).ends_on ?? null;
-    if (startsOn && todayStr < startsOn) continue;
-    if (endsOn && todayStr > endsOn) continue;
+    // Dose-count course gate — datetime-precision window on absolute time.
+    const firstIso = (m as { course_first_dose_at?: string | null }).course_first_dose_at ?? null;
+    const total = (m as { course_total_doses?: number | null }).course_total_doses ?? null;
+    let firstMs: number | null = null;
+    let lastMs: number | null = null;
+    if (firstIso && total && total > 0) {
+      const first = new Date(firstIso);
+      firstMs = first.getTime();
+      lastMs = courseLastDoseAt(first, total, m.times ?? [], familyTimezone).getTime();
+    }
     for (const t of m.times ?? []) {
       const [hh, mm] = t.split(":").map((n) => parseInt(n, 10));
       if (Number.isNaN(hh) || Number.isNaN(mm)) continue;
       const scheduled = new Date(dayStart);
       scheduled.setHours(hh, mm, 0, 0);
+      if (firstMs !== null && lastMs !== null) {
+        const ts = scheduled.getTime();
+        if (ts < firstMs || ts > lastMs) continue;
+      }
       const iso = scheduled.toISOString();
       out.push({
         key: `${m.id}|${iso}`,
@@ -214,3 +223,4 @@ export function buildTodaysDoses(
   out.sort((a, b) => a.scheduled_for.getTime() - b.scheduled_for.getTime());
   return out;
 }
+
