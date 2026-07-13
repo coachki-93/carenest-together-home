@@ -399,6 +399,7 @@ function AppointmentsPage() {
           userId={user.id}
           defaultDay={defaultDay ?? selectedDay}
           editing={editing}
+          tz={tz}
         />
       )}
 
