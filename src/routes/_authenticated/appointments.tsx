@@ -401,6 +401,13 @@ function AppointmentsPage() {
           editing={editing}
         />
       )}
+
+      <PreviewDialog
+        appt={previewing}
+        tz={tz}
+        onClose={() => setPreviewing(null)}
+        onEdit={openEditFromPreview}
+      />
     </DashboardLayout>
   );
 }
