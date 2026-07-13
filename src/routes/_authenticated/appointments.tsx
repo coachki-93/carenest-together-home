@@ -736,6 +736,7 @@ function EventDialog({
       kind: AppointmentKind;
       all_day: boolean;
       color: string;
+      reminder_minutes: number | null;
     };
     recurrence: {
       recurrence_freq: RecurrenceFreq | null;
@@ -772,6 +773,8 @@ function EventDialog({
       : values.repeat === "none"
         ? null
         : values.repeat;
+    const reminderMin =
+      values.reminder === "none" ? null : Number(values.reminder);
     return {
       ok: true,
       starts_at: startDt.toISOString(),
@@ -783,6 +786,7 @@ function EventDialog({
         kind: values.kind as AppointmentKind,
         all_day: values.allDay,
         color: values.color,
+        reminder_minutes: reminderMin,
       },
       recurrence: {
         recurrence_freq: persistedFreq,
