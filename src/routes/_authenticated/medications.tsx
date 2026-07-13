@@ -386,61 +386,51 @@ function MedicationDialog({
   const [enableTimer, setEnableTimer] = useState<boolean>(initialTimer != null);
   const [timerMinutes, setTimerMinutes] = useState<string>(initialTimer != null ? String(initialTimer) : "1");
 
-  // Course window ("Kur"). null starts + null ends = ongoing.
-  const existingStart = (medication as MedWithCourse | undefined)?.starts_on ?? null;
-  const existingEnd = (medication as MedWithCourse | undefined)?.ends_on ?? null;
-  const initialIsCourse = !!(existingStart && existingEnd);
-  const todayStr = dateInputIn(new Date(), tz);
-  const diffDaysInclusive = (start: string, end: string) => {
-    const [ay, am, ad] = start.split("-").map(Number);
-    const [by, bm, bd] = end.split("-").map(Number);
-    return (
-      Math.round(
-        (Date.UTC(by, bm - 1, bd) - Date.UTC(ay, am - 1, ad)) / 86_400_000,
-      ) + 1
-    );
-  };
-  const addDaysInclusive = (start: string, days: number) => {
-    const [ay, am, ad] = start.split("-").map(Number);
-    const t = new Date(Date.UTC(ay, am - 1, ad));
-    t.setUTCDate(t.getUTCDate() + Math.max(1, days) - 1);
-    const y = t.getUTCFullYear();
-    const m = String(t.getUTCMonth() + 1).padStart(2, "0");
-    const d = String(t.getUTCDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  };
-  const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
-  const [startsOn, setStartsOn] = useState<string>(existingStart ?? todayStr);
-  const [endsOn, setEndsOn] = useState<string>(
-    existingEnd ?? addDaysInclusive(existingStart ?? todayStr, 10),
-  );
-  const [durationDays, setDurationDays] = useState<string>(
-    String(
-      existingStart && existingEnd
-        ? diffDaysInclusive(existingStart, existingEnd)
-        : 10,
-    ),
-  );
-
-  const onDurationChange = (v: string) => {
-    setDurationDays(v);
-    const n = parseInt(v, 10);
-    if (!Number.isFinite(n) || n < 1) return;
-    setEndsOn(addDaysInclusive(startsOn, n));
-  };
-  const onStartChange = (v: string) => {
-    setStartsOn(v);
-    const n = Math.max(1, parseInt(durationDays, 10) || 1);
-    setEndsOn(addDaysInclusive(v, n));
-  };
-  const onEndChange = (v: string) => {
-    setEndsOn(v);
-    if (v < startsOn) return;
-    setDurationDays(String(diffDaysInclusive(startsOn, v)));
-  };
-
+  // Dose-count course. null anchor + null total = ongoing ("Tills vidare").
+  const existingFirstIso =
+    (medication as MedWithCourse | undefined)?.course_first_dose_at ?? null;
+  const existingTotal =
+    (medication as MedWithCourse | undefined)?.course_total_doses ?? null;
+  const initialIsCourse = !!(existingFirstIso && existingTotal);
   const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
-  const endPreview = formatDateIn(endsOn, locale);
+  const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
+  const [totalDoses, setTotalDoses] = useState<string>(
+    existingTotal ? String(existingTotal) : "10",
+  );
+  const defaultAnchorIso = (): string => {
+    const upcoming =
+      nextUpcomingDoseAt(times.length ? times : ["08:00"], tz, new Date()) ??
+      new Date();
+    return dateTimeInputIn(upcoming, tz);
+  };
+  const [firstDoseLocal, setFirstDoseLocal] = useState<string>(
+    existingFirstIso
+      ? dateTimeInputIn(new Date(existingFirstIso), tz)
+      : defaultAnchorIso(),
+  );
+  // Re-pick a sensible anchor when the user changes daily times and hasn't
+  // customized it yet (only while in course mode and creating a new course).
+  const refreshAnchorFromTimes = (nextTimes: string[]) => {
+    if (!isCourse || existingFirstIso) return;
+    const upcoming = nextUpcomingDoseAt(nextTimes, tz, new Date());
+    if (upcoming) setFirstDoseLocal(dateTimeInputIn(upcoming, tz));
+  };
+
+  // Derived preview for the dialog.
+  const previewFirstLast = (() => {
+    if (!isCourse) return null;
+    const [dateStr, timeStr] = (firstDoseLocal || "T").split("T");
+    if (!dateStr || !timeStr) return null;
+    const first = zonedWallClockToDate(dateStr, timeStr, tz);
+    const n = Math.max(1, parseInt(totalDoses, 10) || 0);
+    if (!times.length || !Number.isFinite(first.getTime())) return null;
+    const last = courseLastDoseAt(first, n, times, tz);
+    return {
+      first: formatDateTimeIn(first, locale, tz),
+      last: formatDateTimeIn(last, locale, tz),
+    };
+  })();
+
 
   const addTime = () => {
     if (!newTime || times.includes(newTime)) return;
