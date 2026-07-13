@@ -1592,6 +1592,8 @@ export type Database = {
           allow_ongoing: boolean
           child_id: string
           color: string | null
+          course_first_dose_at: string | null
+          course_total_doses: number | null
           created_at: string
           created_by: string | null
           dose_amount: number | null
@@ -1612,6 +1614,8 @@ export type Database = {
           allow_ongoing?: boolean
           child_id: string
           color?: string | null
+          course_first_dose_at?: string | null
+          course_total_doses?: number | null
           created_at?: string
           created_by?: string | null
           dose_amount?: number | null
@@ -1632,6 +1636,8 @@ export type Database = {
           allow_ongoing?: boolean
           child_id?: string
           color?: string | null
+          course_first_dose_at?: string | null
+          course_total_doses?: number | null
           created_at?: string
           created_by?: string | null
           dose_amount?: number | null
