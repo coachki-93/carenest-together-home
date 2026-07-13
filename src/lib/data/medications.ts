@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { wallClockIn } from "@/lib/time/family-tz";
+import { courseLastDoseAt } from "@/lib/time/family-tz";
 
 export type Medication = Database["public"]["Tables"]["medications"]["Row"];
 export type MedicationInsert = Database["public"]["Tables"]["medications"]["Insert"];
