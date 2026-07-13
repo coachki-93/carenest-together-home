@@ -1610,6 +1610,14 @@ function kindTone(kind: AppointmentKind): { bg: string; fg: string } {
       return { bg: "#DBEAFE", fg: "#1D4ED8" };
     case "therapy":
       return { bg: "#FCE7F3", fg: "#BE185D" };
+    case "meeting":
+      return { bg: "#F1F5F9", fg: "#334155" };
+    case "lab":
+      return { bg: "#CCFBF1", fg: "#0F766E" };
+    case "dental":
+      return { bg: "#FCE7F3", fg: "#DB2777" };
+    case "hospital_stay":
+      return { bg: "#FEE2E2", fg: "#DC2626" };
     case "task":
       return { bg: "#DCFCE7", fg: "#15803D" };
     case "meal":
