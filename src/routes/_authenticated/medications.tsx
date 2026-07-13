@@ -251,8 +251,8 @@ function MedicationCard({
 }) {
   const { t, i18n } = useTranslation();
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
-  const todayStr = wallClockIn(new Date(), tz).todayStr;
-  const status = courseStatus(med as MedWithCourse, todayStr);
+  const now = new Date();
+  const status = courseStatus(med as MedWithCourse, tz, now);
   const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
   return (
     <div
@@ -294,19 +294,20 @@ function MedicationCard({
             <div className="mt-2">
               {status.kind === "during" ? (
                 <span className="inline-flex items-center text-xs font-semibold rounded-full bg-primary-soft text-primary px-2.5 py-1">
-                  {t("meds.courseDayOf", { n: status.day, total: status.total })}
+                  {t("meds.courseDoseOf", { n: status.n, total: status.total })}
                 </span>
               ) : status.kind === "before" ? (
                 <span className="inline-flex items-center text-xs font-semibold rounded-full bg-muted text-muted-foreground px-2.5 py-1">
-                  {t("meds.courseStartsOn", { date: formatDateIn(status.date, locale) })}
+                  {t("meds.courseStartsOn", { date: formatDateTimeIn(status.startAt, locale, tz) })}
                 </span>
               ) : (
                 <span className="inline-flex items-center text-xs font-semibold rounded-full bg-muted text-muted-foreground px-2.5 py-1">
-                  {t("meds.courseFinished", { date: formatDateIn(status.date, locale) })}
+                  {t("meds.courseFinished", { date: formatDateIn(status.endAt, locale, tz) })}
                 </span>
               )}
             </div>
           )}
+
           <div className="flex flex-wrap gap-1.5 mt-3">
             {(med.times ?? []).map((tm) => (
               <span
