@@ -2297,6 +2297,18 @@ export const sv = {
       color: "Färg",
       kind: "Typ",
       repeat: "Upprepning",
+      reminder: "Påminnelse",
+    },
+    reminderChoice: {
+      none: "Ingen påminnelse",
+      hour1: "1 timme innan",
+      hours2: "2 timmar innan",
+      day1: "1 dag innan",
+    },
+    reminder_banner: {
+      singularTomorrow: "Påminnelse: {{title}} · imorgon {{time}}",
+      singularToday: "Påminnelse: {{title}} · idag {{time}}",
+      plural: "{{count}} kommande besök",
     },
     placeholder: {
       title: "Barnläkarbesök",
