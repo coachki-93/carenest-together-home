@@ -339,7 +339,6 @@ export function useUpsertCarePlaceItem() {
 export function useDeleteCarePlaceItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
       const { error } = await supabase
         .from("care_place_checklist_items")
         .delete()
@@ -354,7 +353,6 @@ export function useDeleteCarePlaceItem() {
 export function useUpsertCarePlaceTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (input: CarePlaceTimeInsert & { id?: string }) => {
         const { id, ...rest } = input;
         const { error } = await supabase
@@ -377,7 +375,6 @@ export function useUpsertCarePlaceTime() {
 export function useDeleteCarePlaceTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .delete()

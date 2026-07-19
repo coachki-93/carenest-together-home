@@ -86,7 +86,6 @@ export function useUpsertTidyItem() {
 export function useDeleteTidyItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
       const { error } = await supabase
         .from("tidy_checklist_items")
         .delete()
@@ -118,7 +117,6 @@ export function useTidyTimes(familyId: string | undefined | null) {
 export function useUpsertTidyTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (input: TidyTimeInsert & { id?: string }) => {
         const { id, ...rest } = input;
         const { error } = await supabase
@@ -138,7 +136,6 @@ export function useUpsertTidyTime() {
 export function useDeleteTidyTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("tidy_times").delete().eq("id", id);
     },
