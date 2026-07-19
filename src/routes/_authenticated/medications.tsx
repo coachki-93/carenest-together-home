@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Pill, Plus, Trash2, Pencil, X, Clock } from "lucide-react";
+import { Pill, Plus, Trash2, Pencil, X, Clock, History } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,15 +43,21 @@ import {
   courseLastDoseAt,
   courseProgressAt,
   nextUpcomingDoseAt,
+  wallClockIn,
+  formatTimeIn,
 } from "@/lib/time/family-tz";
 import {
   useFamilyChild,
   useMedications,
   useSaveMedication,
   useDeleteMedication,
+  useMedLogsFor,
   type Medication,
+  type MedLog,
   type MedRoute,
 } from "@/lib/data/medications";
+import { ByProfile } from "@/components/carenest/ByProfile";
+import { useSession } from "@/lib/auth/use-profile";
 
 export const Route = createFileRoute("/_authenticated/medications")({
   head: () => ({ meta: [{ title: "Medications — CareNest" }] }),
@@ -74,6 +80,7 @@ function MedicationsPage() {
   const [editing, setEditing] = useState<Medication | null>(null);
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<Medication | null>(null);
+  const [historyFor, setHistoryFor] = useState<Medication | null>(null);
   const deleteMed = useDeleteMedication();
 
   if (!child && membership) {
@@ -133,6 +140,7 @@ function MedicationsPage() {
               canEdit={isOwner}
               onEdit={() => setEditing(m)}
               onDelete={() => setDeleting(m)}
+              onHistory={() => setHistoryFor(m)}
             />
           ))}
         </div>
@@ -152,6 +160,15 @@ function MedicationsPage() {
               setEditing(null);
             }
           }}
+        />
+      )}
+
+      {historyFor && familyId && (
+        <MedicationHistoryDialog
+          familyId={familyId}
+          medication={historyFor}
+          tz={tz}
+          onOpenChange={(o) => !o && setHistoryFor(null)}
         />
       )}
 
@@ -241,12 +258,14 @@ function MedicationCard({
   canEdit,
   onEdit,
   onDelete,
+  onHistory,
 }: {
   med: Medication;
   tz: string;
   canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onHistory: () => void;
 }) {
   const { t, i18n } = useTranslation();
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
@@ -275,16 +294,28 @@ function MedicationCard({
                 {dose || "—"} · {t(`meds.route${routeKey(med.route)}`)}
               </p>
             </div>
-            {canEdit && (
-              <div className="flex gap-1">
-                <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
-                  <Pencil className="size-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
-                  <Trash2 className="size-4 text-destructive" />
-                </Button>
-              </div>
-            )}
+            <div className="flex gap-1">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full"
+                onClick={onHistory}
+                aria-label={t("meds.history")}
+                title={t("meds.history")}
+              >
+                <History className="size-4" />
+              </Button>
+              {canEdit && (
+                <>
+                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
           {med.instructions && (
             <p className="text-sm text-muted-foreground mt-2">{med.instructions}</p>
@@ -804,6 +835,153 @@ function MedicationDialog({
             </Button>
           </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// -------- History dialog ----------------------------------------------------
+
+const STATUS_LABEL_KEY: Record<MedLog["status"], string> = {
+  given: "schedule.statusGiven",
+  skipped: "schedule.statusSkipped",
+  missed: "schedule.statusMissed",
+  postponed: "schedule.statusPostponed",
+  ongoing: "schedule.ongoing",
+};
+
+const STATUS_CHIP_CLASS: Record<MedLog["status"], string> = {
+  given: "bg-emerald-100 text-emerald-700",
+  skipped: "bg-muted text-muted-foreground",
+  missed: "bg-red-100 text-red-700",
+  postponed: "bg-amber-100 text-amber-700",
+  ongoing: "bg-blue-100 text-blue-700",
+};
+
+function MedicationHistoryDialog({
+  familyId,
+  medication,
+  tz,
+  onOpenChange,
+}: {
+  familyId: string;
+  medication: Medication;
+  tz: string;
+  onOpenChange: (o: boolean) => void;
+}) {
+  const { t, i18n } = useTranslation();
+  const { user } = useSession();
+  const [limit, setLimit] = useState(50);
+  const { data, isLoading } = useMedLogsFor(medication.id, limit);
+  const rows = data?.rows ?? [];
+  const hasMore = !!data?.hasMore;
+  const locale = i18n.language === "sv" ? "sv-SE" : "en-US";
+
+  // Group rows by wall-clock day in family tz.
+  const groups: { day: string; label: string; items: MedLog[] }[] = [];
+  const dayIndex = new Map<string, number>();
+  for (const r of rows) {
+    const sortKey = r.given_at ?? r.scheduled_for;
+    const { todayStr } = wallClockIn(new Date(sortKey), tz);
+    if (!dayIndex.has(todayStr)) {
+      dayIndex.set(todayStr, groups.length);
+      const label = new Intl.DateTimeFormat(locale, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        timeZone: tz,
+      }).format(new Date(sortKey));
+      groups.push({ day: todayStr, label, items: [] });
+    }
+    groups[dayIndex.get(todayStr)!].items.push(r);
+  }
+
+  return (
+    <Dialog open onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{t("meds.historyTitle")}</DialogTitle>
+          <DialogDescription>{medication.name}</DialogDescription>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="text-muted-foreground py-6">{t("common.loading")}</div>
+        ) : rows.length === 0 ? (
+          <div className="text-center py-10 text-muted-foreground">
+            {t("meds.historyEmpty")}
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {groups.map((g) => (
+              <div key={g.day}>
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                  {g.label}
+                </div>
+                <ul className="space-y-2">
+                  {g.items.map((log) => {
+                    const timeIso = log.given_at ?? log.scheduled_for;
+                    return (
+                      <li
+                        key={log.id}
+                        className="rounded-2xl border border-border p-3 flex flex-col gap-1.5"
+                      >
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="font-semibold tabular-nums">
+                              {formatTimeIn(timeIso, tz)}
+                            </span>
+                            <span
+                              className={cn(
+                                "inline-flex items-center text-xs font-semibold rounded-full px-2 py-0.5",
+                                STATUS_CHIP_CLASS[log.status],
+                              )}
+                            >
+                              {t(STATUS_LABEL_KEY[log.status])}
+                            </span>
+                          </div>
+                          <ByProfile
+                            familyId={familyId}
+                            caregiverProfileId={log.caregiver_profile_id}
+                            authorUserId={log.given_by}
+                            viewerUserId={user?.id ?? null}
+                            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground"
+                          />
+                        </div>
+                        {log.status === "postponed" && log.postponed_to && (
+                          <p className="text-xs text-muted-foreground">
+                            {t("meds.historyPostponedTo", {
+                              time: formatTimeIn(log.postponed_to, tz),
+                            })}
+                          </p>
+                        )}
+                        {log.reason && (
+                          <p className="text-xs text-muted-foreground">
+                            {t("meds.historyReason", { reason: log.reason })}
+                          </p>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+            {hasMore && (
+              <div className="pt-2 flex justify-center">
+                <Button
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => setLimit((n) => n + 50)}
+                >
+                  {t("meds.historyShowMore")}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            {t("common.close", { defaultValue: "Close" })}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

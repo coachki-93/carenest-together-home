@@ -292,6 +292,12 @@ export const en = {
     courseStartsOn: "Starts {{date}}",
     courseDoseOf: "Dose {{n}} of {{total}}",
     courseFinished: "Course finished {{date}}",
+    history: "Show history",
+    historyTitle: "Dose history",
+    historyEmpty: "No doses logged yet",
+    historyShowMore: "Show more",
+    historyPostponedTo: "Postponed to {{time}}",
+    historyReason: "Reason: {{reason}}",
   },
   schedule: {
     title: "Schedule",
