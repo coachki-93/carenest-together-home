@@ -93,6 +93,7 @@ function InstructionsPage() {
       setEditing(null);
     },
     onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
   });
 
   const remove = useMutation({
@@ -106,6 +107,7 @@ function InstructionsPage() {
       setDeleting(null);
     },
     onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
   });
 
   return (
