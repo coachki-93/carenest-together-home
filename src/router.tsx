@@ -9,6 +9,20 @@ import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import i18n from "@/lib/i18n";
 
+declare module "@tanstack/react-query" {
+  interface Register {
+    mutationMeta: {
+      /** When true, MutationCache.onError skips the global error toast. */
+      suppressGlobalError?: boolean;
+    };
+    queryMeta: {
+      /** When true, QueryCache.onError shows a translated load-failed toast. */
+      errorToast?: boolean;
+    };
+  }
+}
+
+
 /** Small helpers so we can import `toast` lazily (client-only) and never
  *  drag the notify module into the SSR render path. */
 function isBrowser() {
