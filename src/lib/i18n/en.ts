@@ -22,6 +22,8 @@ export const en = {
     edit: "Edit",
     delete: "Delete",
     error: "Something went wrong",
+    saveFailed: "Something went wrong — the change wasn't saved. Please try again.",
+    loadFailed: "Couldn't load data — check your connection.",
     close: "Close",
     language: "Language",
     english: "English",
