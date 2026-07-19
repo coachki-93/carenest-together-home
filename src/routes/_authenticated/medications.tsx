@@ -151,24 +151,6 @@ function MedicationsPage() {
           )}
         </div>
       ) : (
-      {isLoading ? (
-        <div className="text-muted-foreground">{t("common.loading")}</div>
-      ) : !meds || meds.length === 0 ? (
-        <div className="card-soft p-10 text-center max-w-md mx-auto">
-          <div className="size-16 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto mb-4">
-            <Pill className="size-7" />
-          </div>
-          <h2 className="text-xl font-extrabold mb-2">{t("meds.noMeds")}</h2>
-          <p className="text-muted-foreground mb-6">
-            {isOwner ? t("meds.noMedsBody") : t("meds.noMedsBodyCaregiver")}
-          </p>
-          {child && isOwner && (
-            <Button onClick={() => setCreating(true)} className="rounded-full">
-              <Plus className="size-4" /> {t("meds.addNew")}
-            </Button>
-          )}
-        </div>
-      ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2">
             {activeMeds.map((m) => (
