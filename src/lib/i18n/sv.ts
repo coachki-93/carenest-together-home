@@ -22,6 +22,8 @@ export const sv = {
     edit: "Redigera",
     delete: "Ta bort",
     error: "Något gick fel",
+    saveFailed: "Något gick fel — ändringen sparades inte. Försök igen.",
+    loadFailed: "Kunde inte hämta data — kontrollera anslutningen.",
     close: "Stäng",
     language: "Språk",
     english: "English",

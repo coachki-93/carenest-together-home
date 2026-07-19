@@ -78,6 +78,7 @@ function SettingsPage() {
       qc.invalidateQueries({ queryKey: ["my-membership"] });
     },
     onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
   });
 
   const [newPassword, setNewPassword] = useState("");
@@ -96,6 +97,7 @@ function SettingsPage() {
       setConfirmPassword("");
     },
     onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
   });
 
   function pickLang(code: Lang) {

@@ -34,6 +34,7 @@ export function useEmergencySteps(familyId: string | null | undefined) {
 export function useSaveEmergencyStep() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (
       input: Partial<EmergencyStep> & { family_id: string; title: string },
     ) => {
@@ -55,6 +56,7 @@ export function useSaveEmergencyStep() {
 export function useDeleteEmergencyStep(familyId: string | null | undefined) {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await table().delete().eq("id", id);
       if (error) throw error;
@@ -68,6 +70,7 @@ export function useDeleteEmergencyStep(familyId: string | null | undefined) {
 export function useReorderEmergencySteps(familyId: string | null | undefined) {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (ordered: { id: string; position: number }[]) => {
       // Update sequentially to keep RLS-friendly single-row writes.
       for (const row of ordered) {

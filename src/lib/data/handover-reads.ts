@@ -49,6 +49,7 @@ export function useHandoverReadsBulk(handoverIds: string[]) {
 export function useMarkHandoverRead() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (args: {
       handoverId: string;
       caregiverProfileId: string | null;

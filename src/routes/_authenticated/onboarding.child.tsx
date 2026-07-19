@@ -323,6 +323,7 @@ function StepChild({
       onContinue();
     },
     onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
   });
 
   return (
@@ -535,6 +536,7 @@ function StepFirstMedication({
       onContinue();
     },
     onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
   });
 
   return (
