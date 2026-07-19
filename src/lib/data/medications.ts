@@ -62,6 +62,32 @@ export function useMedLogs(familyId: string | undefined | null, start: Date, end
   });
 }
 
+/**
+ * Per-medication history: newest first by scheduled_for. Fetches limit+1 rows
+ * so the caller can render a "Show more" affordance without a second query.
+ * Family-scoped RLS on med_logs already restricts rows to the caller's family.
+ */
+export function useMedLogsFor(
+  medicationId: string | undefined | null,
+  limit = 50,
+) {
+  return useQuery({
+    queryKey: ["med-logs-for", medicationId, limit],
+    enabled: !!medicationId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("med_logs")
+        .select("*")
+        .eq("medication_id", medicationId!)
+        .order("scheduled_for", { ascending: false })
+        .limit(limit + 1);
+      if (error) throw error;
+      const rows = (data ?? []) as MedLog[];
+      return { rows: rows.slice(0, limit), hasMore: rows.length > limit };
+    },
+  });
+}
+
 export function useSaveMedication() {
   const qc = useQueryClient();
   return useMutation({
