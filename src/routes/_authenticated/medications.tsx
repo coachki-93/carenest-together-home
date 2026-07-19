@@ -151,19 +151,71 @@ function MedicationsPage() {
           )}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {meds.map((m) => (
-            <MedicationCard
-              key={m.id}
-              med={m}
-              tz={tz}
-              canEdit={isOwner}
-              onEdit={() => setEditing(m)}
-              onDelete={() => setDeleting(m)}
-              onHistory={() => setHistoryFor(m)}
-            />
-          ))}
+      {isLoading ? (
+        <div className="text-muted-foreground">{t("common.loading")}</div>
+      ) : !meds || meds.length === 0 ? (
+        <div className="card-soft p-10 text-center max-w-md mx-auto">
+          <div className="size-16 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto mb-4">
+            <Pill className="size-7" />
+          </div>
+          <h2 className="text-xl font-extrabold mb-2">{t("meds.noMeds")}</h2>
+          <p className="text-muted-foreground mb-6">
+            {isOwner ? t("meds.noMedsBody") : t("meds.noMedsBodyCaregiver")}
+          </p>
+          {child && isOwner && (
+            <Button onClick={() => setCreating(true)} className="rounded-full">
+              <Plus className="size-4" /> {t("meds.addNew")}
+            </Button>
+          )}
         </div>
+      ) : (
+        <>
+          <div className="grid gap-4 md:grid-cols-2">
+            {activeMeds.map((m) => (
+              <MedicationCard
+                key={m.id}
+                med={m}
+                tz={tz}
+                canEdit={isOwner}
+                onEdit={() => setEditing(m)}
+                onDelete={() => setDeleting(m)}
+                onHistory={() => setHistoryFor(m)}
+                onToggleArchive={() => toggleArchive(m)}
+              />
+            ))}
+          </div>
+
+          {archivedMeds.length > 0 && (
+            <div className="mt-8">
+              <button
+                type="button"
+                onClick={() => setShowPrevious((v) => !v)}
+                className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPrevious ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                {showPrevious
+                  ? t("meds.hidePrevious")
+                  : t("meds.showPrevious", { count: archivedMeds.length })}
+              </button>
+              {showPrevious && (
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  {archivedMeds.map((m) => (
+                    <MedicationCard
+                      key={m.id}
+                      med={m}
+                      tz={tz}
+                      canEdit={isOwner}
+                      onEdit={() => setEditing(m)}
+                      onDelete={() => setDeleting(m)}
+                      onHistory={() => setHistoryFor(m)}
+                      onToggleArchive={() => toggleArchive(m)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
 
 
