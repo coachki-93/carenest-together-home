@@ -229,10 +229,10 @@ function MedicationsPage() {
       <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("meds.deleteConfirm")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("meds.deleteBody", { name: deleting?.name })}
-            </AlertDialogDescription>
+            <AlertDialogTitle>
+              {t("meds.deleteConfirm")} {deleting?.name && <>— <span className="font-normal">{deleting.name}</span></>}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{t("meds.deleteBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
