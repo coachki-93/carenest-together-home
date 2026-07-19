@@ -80,6 +80,7 @@ function MedicationsPage() {
   const [editing, setEditing] = useState<Medication | null>(null);
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<Medication | null>(null);
+  const [historyFor, setHistoryFor] = useState<Medication | null>(null);
   const deleteMed = useDeleteMedication();
 
   if (!child && membership) {
