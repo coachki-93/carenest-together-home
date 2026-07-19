@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Pill, Plus, Trash2, Pencil, X, Clock, History } from "lucide-react";
+import { Pill, Plus, Trash2, Pencil, X, Clock, History, Archive, ArchiveRestore, ChevronDown, ChevronUp } from "lucide-react";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,7 +81,27 @@ function MedicationsPage() {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<Medication | null>(null);
   const [historyFor, setHistoryFor] = useState<Medication | null>(null);
+  const [showPrevious, setShowPrevious] = useState(false);
   const deleteMed = useDeleteMedication();
+  const saveMed = useSaveMedication();
+
+  const activeMeds = (meds ?? []).filter((m) => m.active);
+  const archivedMeds = (meds ?? []).filter((m) => !m.active);
+
+  const toggleArchive = async (m: Medication) => {
+    try {
+      await saveMed.mutateAsync({
+        id: m.id,
+        family_id: m.family_id,
+        child_id: m.child_id,
+        name: m.name,
+        active: !m.active,
+      } as never);
+      toast.success(t(m.active ? "meds.archived" : "meds.unarchived"));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   if (!child && membership) {
     return (
@@ -131,19 +151,53 @@ function MedicationsPage() {
           )}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {meds.map((m) => (
-            <MedicationCard
-              key={m.id}
-              med={m}
-              tz={tz}
-              canEdit={isOwner}
-              onEdit={() => setEditing(m)}
-              onDelete={() => setDeleting(m)}
-              onHistory={() => setHistoryFor(m)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 md:grid-cols-2">
+            {activeMeds.map((m) => (
+              <MedicationCard
+                key={m.id}
+                med={m}
+                tz={tz}
+                canEdit={isOwner}
+                onEdit={() => setEditing(m)}
+                onDelete={() => setDeleting(m)}
+                onHistory={() => setHistoryFor(m)}
+                onToggleArchive={() => toggleArchive(m)}
+              />
+            ))}
+          </div>
+
+          {archivedMeds.length > 0 && (
+            <div className="mt-8">
+              <button
+                type="button"
+                onClick={() => setShowPrevious((v) => !v)}
+                className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPrevious ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                {showPrevious
+                  ? t("meds.hidePrevious")
+                  : t("meds.showPrevious", { count: archivedMeds.length })}
+              </button>
+              {showPrevious && (
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  {archivedMeds.map((m) => (
+                    <MedicationCard
+                      key={m.id}
+                      med={m}
+                      tz={tz}
+                      canEdit={isOwner}
+                      onEdit={() => setEditing(m)}
+                      onDelete={() => setDeleting(m)}
+                      onHistory={() => setHistoryFor(m)}
+                      onToggleArchive={() => toggleArchive(m)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
 
 
@@ -175,10 +229,10 @@ function MedicationsPage() {
       <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("meds.deleteConfirm")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("meds.deleteBody", { name: deleting?.name })}
-            </AlertDialogDescription>
+            <AlertDialogTitle>
+              {t("meds.deleteConfirm")} {deleting?.name && <>— <span className="font-normal">{deleting.name}</span></>}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{t("meds.deleteBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
@@ -259,6 +313,7 @@ function MedicationCard({
   onEdit,
   onDelete,
   onHistory,
+  onToggleArchive,
 }: {
   med: Medication;
   tz: string;
@@ -266,6 +321,7 @@ function MedicationCard({
   onEdit: () => void;
   onDelete: () => void;
   onHistory: () => void;
+  onToggleArchive: () => void;
 }) {
   const { t, i18n } = useTranslation();
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
@@ -307,11 +363,39 @@ function MedicationCard({
               </Button>
               {canEdit && (
                 <>
-                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={onEdit}
+                    aria-label={t("meds.edit")}
+                    title={t("meds.edit")}
+                  >
                     <Pencil className="size-4" />
                   </Button>
-                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
-                    <Trash2 className="size-4 text-destructive" />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={onToggleArchive}
+                    aria-label={t(med.active ? "meds.archive" : "meds.unarchive")}
+                    title={t(med.active ? "meds.archive" : "meds.unarchive")}
+                  >
+                    {med.active ? (
+                      <Archive className="size-4" />
+                    ) : (
+                      <ArchiveRestore className="size-4 text-primary" />
+                    )}
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full opacity-60 hover:opacity-100"
+                    onClick={onDelete}
+                    aria-label={t("meds.delete")}
+                    title={t("meds.delete")}
+                  >
+                    <Trash2 className="size-4 text-muted-foreground" />
                   </Button>
                 </>
               )}
