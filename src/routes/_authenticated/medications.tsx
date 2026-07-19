@@ -140,6 +140,7 @@ function MedicationsPage() {
               canEdit={isOwner}
               onEdit={() => setEditing(m)}
               onDelete={() => setDeleting(m)}
+              onHistory={() => setHistoryFor(m)}
             />
           ))}
         </div>
