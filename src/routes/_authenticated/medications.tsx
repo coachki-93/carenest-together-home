@@ -57,7 +57,7 @@ import {
   type MedRoute,
 } from "@/lib/data/medications";
 import { ByProfile } from "@/components/carenest/ByProfile";
-import { useMyProfile } from "@/lib/auth/use-profile";
+import { useSession } from "@/lib/auth/use-profile";
 
 export const Route = createFileRoute("/_authenticated/medications")({
   head: () => ({ meta: [{ title: "Medications — CareNest" }] }),
