@@ -292,6 +292,12 @@ export const sv = {
     courseStartsOn: "Startar {{date}}",
     courseDoseOf: "Dos {{n}} av {{total}}",
     courseFinished: "Kur avslutad {{date}}",
+    history: "Visa historik",
+    historyTitle: "Doshistorik",
+    historyEmpty: "Inga doser loggade än",
+    historyShowMore: "Visa fler",
+    historyPostponedTo: "Framflyttad till {{time}}",
+    historyReason: "Orsak: {{reason}}",
   },
   schedule: {
     title: "Schema",
