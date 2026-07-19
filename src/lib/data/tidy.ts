@@ -86,6 +86,7 @@ export function useUpsertTidyItem() {
 export function useDeleteTidyItem() {
   const qc = useQueryClient();
   return useMutation({
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("tidy_checklist_items")
         .delete()

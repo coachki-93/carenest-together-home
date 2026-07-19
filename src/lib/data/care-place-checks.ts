@@ -339,6 +339,7 @@ export function useUpsertCarePlaceItem() {
 export function useDeleteCarePlaceItem() {
   const qc = useQueryClient();
   return useMutation({
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("care_place_checklist_items")
         .delete()
