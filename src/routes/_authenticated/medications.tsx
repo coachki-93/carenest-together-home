@@ -81,7 +81,27 @@ function MedicationsPage() {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<Medication | null>(null);
   const [historyFor, setHistoryFor] = useState<Medication | null>(null);
+  const [showPrevious, setShowPrevious] = useState(false);
   const deleteMed = useDeleteMedication();
+  const saveMed = useSaveMedication();
+
+  const activeMeds = (meds ?? []).filter((m) => m.active);
+  const archivedMeds = (meds ?? []).filter((m) => !m.active);
+
+  const toggleArchive = async (m: Medication) => {
+    try {
+      await saveMed.mutateAsync({
+        id: m.id,
+        family_id: m.family_id,
+        child_id: m.child_id,
+        name: m.name,
+        active: !m.active,
+      } as never);
+      toast.success(t(m.active ? "meds.archived" : "meds.unarchived"));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   if (!child && membership) {
     return (
