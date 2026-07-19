@@ -63,7 +63,7 @@ function CaregiverOnboarding() {
       navigate({ to: "/dashboard", search: { tour: 1 } as never });
     },
     onError: (e: Error) => toast.error(e.message),
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
   });
 
   return (

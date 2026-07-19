@@ -50,7 +50,7 @@ function invalidate(qc: ReturnType<typeof useQueryClient>) {
 export function useStartTank() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: {
       family_id: string;
       tank_type: TankType;
@@ -89,7 +89,7 @@ export function useStartTank() {
 export function useReplaceTank() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: { current: OxygenTank; flow_lpm: number; notes?: string | null; created_by?: string | null }) => {
       const now = new Date().toISOString();
       const { error: closeErr } = await supabase
@@ -124,7 +124,7 @@ export function useReplaceTank() {
 export function useChangeFlow() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: { current: OxygenTank; new_flow_lpm: number; created_by?: string | null }) => {
       const now = new Date();
       const remaining = computeRemaining(input.current as OxygenTankRow, now);
@@ -165,7 +165,7 @@ export function useChangeFlow() {
 export function useDeleteOxygenTank() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("oxygen_tanks").delete().eq("id", id);
       if (error) throw error;

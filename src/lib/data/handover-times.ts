@@ -47,7 +47,7 @@ export function useUpsertHandoverTime() {
 export function useDeleteHandoverTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
       const { error } = await supabase
         .from("handover_times")
         .delete()

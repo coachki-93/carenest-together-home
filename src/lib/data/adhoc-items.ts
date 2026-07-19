@@ -63,7 +63,7 @@ export interface AddAdhocInput {
 export function useAddAdhocItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: AddAdhocInput) => {
       const { error } = await supabase.from("care_place_adhoc_items").insert({
         family_id: input.familyId,
@@ -83,7 +83,7 @@ export function useAddAdhocItem() {
 export function useResolveAdhocItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: { id: string; checkId: string | null }) => {
       const { error } = await supabase
         .from("care_place_adhoc_items")
@@ -102,7 +102,7 @@ export function useResolveAdhocItem() {
 export function useDeleteAdhocItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("care_place_adhoc_items")

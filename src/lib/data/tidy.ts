@@ -33,7 +33,7 @@ export function useTidySettings(familyId: string | undefined | null) {
 export function useUpsertTidySettings() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: { family_id: string; enabled: boolean }) => {
       const { error } = await supabase
         .from("tidy_settings")
@@ -163,7 +163,7 @@ export interface SubmitTidyInput {
 export function useSubmitTidy() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: SubmitTidyInput) => {
       const { data: sub, error } = await supabase
         .from("tidy_submissions")

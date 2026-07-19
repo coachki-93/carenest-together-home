@@ -164,7 +164,7 @@ export function useSubmitCarePlaceCheck() {
   const qc = useQueryClient();
   const notifyCritical = useServerFn(notifyCriticalNo);
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: SubmitCheckInput) => {
       const { data: check, error } = await supabase
         .from("care_place_checks")

@@ -78,7 +78,7 @@ function SettingsPage() {
       qc.invalidateQueries({ queryKey: ["my-membership"] });
     },
     onError: (e: Error) => toast.error(e.message),
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
   });
 
   const [newPassword, setNewPassword] = useState("");
@@ -97,7 +97,7 @@ function SettingsPage() {
       setConfirmPassword("");
     },
     onError: (e: Error) => toast.error(e.message),
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
   });
 
   function pickLang(code: Lang) {
