@@ -33,6 +33,7 @@ export function useTidySettings(familyId: string | undefined | null) {
 export function useUpsertTidySettings() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: { family_id: string; enabled: boolean }) => {
       const { error } = await supabase
         .from("tidy_settings")
@@ -63,6 +64,7 @@ export function useTidyItems(familyId: string | undefined | null) {
 export function useUpsertTidyItem() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: TidyItemInsert & { id?: string }) => {
       if (input.id) {
         const { id, ...rest } = input;
@@ -85,6 +87,7 @@ export function useUpsertTidyItem() {
 export function useDeleteTidyItem() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("tidy_checklist_items")
@@ -117,6 +120,7 @@ export function useTidyTimes(familyId: string | undefined | null) {
 export function useUpsertTidyTime() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: TidyTimeInsert & { id?: string }) => {
       if (input.id) {
         const { id, ...rest } = input;
@@ -137,6 +141,7 @@ export function useUpsertTidyTime() {
 export function useDeleteTidyTime() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("tidy_times").delete().eq("id", id);
       if (error) throw error;
@@ -165,6 +170,7 @@ export interface SubmitTidyInput {
 export function useSubmitTidy() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: SubmitTidyInput) => {
       const { data: sub, error } = await supabase
         .from("tidy_submissions")

@@ -37,6 +37,7 @@ export function useAppointmentCompletions(
 export function useLogAppointmentCompletion() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: {
       family_id: string;
       appointment_id: string;
@@ -72,6 +73,7 @@ export function useLogAppointmentCompletion() {
 export function useDeleteAppointmentCompletion() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("appointment_completions")

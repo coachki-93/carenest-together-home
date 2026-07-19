@@ -36,6 +36,7 @@ export function useMyCaregiverProfiles(
 export function useSaveCaregiverProfile() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: CaregiverProfileInsert & { id?: string }) => {
       if (input.id) {
         const { id, ...rest } = input;
@@ -63,6 +64,7 @@ export function useSaveCaregiverProfile() {
 export function useDeleteCaregiverProfile() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("caregiver_profiles").delete().eq("id", id);
       if (error) throw error;

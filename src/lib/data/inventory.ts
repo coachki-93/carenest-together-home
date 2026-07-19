@@ -57,6 +57,7 @@ export function useInventoryItem(itemId: string | undefined | null) {
 export function useUpsertInventoryItem() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (
       input: (InventoryItemInsert & { id?: string }) | (InventoryItemUpdate & { id: string }),
     ) => {
@@ -84,6 +85,7 @@ export function useUpsertInventoryItem() {
 export function useDeleteInventoryItem() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("inventory_items").delete().eq("id", id);
       if (error) throw error;
@@ -147,6 +149,7 @@ export async function adjustInventory(input: AdjustInventoryInput): Promise<void
 export function useAdjustInventory() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: adjustInventory,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["inventory-items"] });
@@ -255,6 +258,7 @@ export interface MarkOrderedInput {
 export function useMarkOrdered() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: MarkOrderedInput) => {
       const { error } = await supabase
         .from("inventory_items")
@@ -273,6 +277,7 @@ export function useMarkOrdered() {
 export function useClearOrder() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (itemId: string) => {
       const { error } = await supabase
         .from("inventory_items")
@@ -295,6 +300,7 @@ export interface ReceiveStockInput {
 export function useReceiveStock() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: ReceiveStockInput) => {
       if (input.quantity <= 0) throw new Error("Quantity must be greater than 0");
       await adjustInventory({

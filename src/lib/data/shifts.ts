@@ -37,6 +37,7 @@ export function useShifts(familyId: string | undefined | null) {
 export function useCreateShift() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (input: ShiftInsert) => {
       const { data, error } = await supabase
         .from("caregiver_shifts")
@@ -53,6 +54,7 @@ export function useCreateShift() {
 export function useUpdateShift() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async ({ id, patch }: { id: string; patch: ShiftUpdate }) => {
       const { data, error } = await supabase
         .from("caregiver_shifts")
@@ -70,6 +72,7 @@ export function useUpdateShift() {
 export function useDeleteShift() {
   const qc = useQueryClient();
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("caregiver_shifts").delete().eq("id", id);
       if (error) throw error;
