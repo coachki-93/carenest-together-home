@@ -163,6 +163,15 @@ function MedicationsPage() {
         />
       )}
 
+      {historyFor && familyId && (
+        <MedicationHistoryDialog
+          familyId={familyId}
+          medication={historyFor}
+          tz={tz}
+          onOpenChange={(o) => !o && setHistoryFor(null)}
+        />
+      )}
+
       <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
