@@ -26,7 +26,6 @@ export function useHandoverTimes(familyId: string | undefined | null) {
 export function useUpsertHandoverTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (input: HandoverTimeInsert & { id?: string }) => {
       if (input.id) {
         const { id, ...rest } = input;
@@ -49,7 +48,6 @@ export function useDeleteHandoverTime() {
   const qc = useQueryClient();
   return useMutation({
     meta: { suppressGlobalError: true },
-    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("handover_times")
         .delete()

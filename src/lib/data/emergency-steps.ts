@@ -56,7 +56,6 @@ export function useSaveEmergencyStep() {
 export function useDeleteEmergencyStep(familyId: string | null | undefined) {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await table().delete().eq("id", id);
       if (error) throw error;

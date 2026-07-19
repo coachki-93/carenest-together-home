@@ -158,7 +158,6 @@ export function useRemoveMember() {
 export function useSetMaterialResponsible() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async ({ id, value }: { id: string; value: boolean }) => {
       const { error } = await supabase
         .from("family_members")
