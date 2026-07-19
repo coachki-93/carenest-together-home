@@ -119,6 +119,7 @@ export function useUpsertTidyTime() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: TidyTimeInsert & { id?: string }) => {
+      if (input.id) {
         const { id, ...rest } = input;
         const { error } = await supabase
           .from("tidy_times")
@@ -139,6 +140,7 @@ export function useDeleteTidyTime() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("tidy_times").delete().eq("id", id);
+      if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tidy-times"] }),
   });

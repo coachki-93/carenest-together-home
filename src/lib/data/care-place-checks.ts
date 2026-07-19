@@ -355,6 +355,7 @@ export function useUpsertCarePlaceTime() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: CarePlaceTimeInsert & { id?: string }) => {
+      if (input.id) {
         const { id, ...rest } = input;
         const { error } = await supabase
           .from("care_place_check_times")
@@ -378,6 +379,7 @@ export function useDeleteCarePlaceTime() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
+        .from("care_place_check_times")
         .delete()
         .eq("id", id);
       if (error) throw error;
