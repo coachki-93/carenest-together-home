@@ -43,15 +43,21 @@ import {
   courseLastDoseAt,
   courseProgressAt,
   nextUpcomingDoseAt,
+  wallClockIn,
+  formatTimeIn,
 } from "@/lib/time/family-tz";
 import {
   useFamilyChild,
   useMedications,
   useSaveMedication,
   useDeleteMedication,
+  useMedLogsFor,
   type Medication,
+  type MedLog,
   type MedRoute,
 } from "@/lib/data/medications";
+import { ByProfile } from "@/components/carenest/ByProfile";
+import { useMyProfile } from "@/lib/auth/use-profile";
 
 export const Route = createFileRoute("/_authenticated/medications")({
   head: () => ({ meta: [{ title: "Medications — CareNest" }] }),
