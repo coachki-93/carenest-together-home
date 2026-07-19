@@ -94,7 +94,7 @@ export function useLatestVitals(familyId: string | undefined | null) {
 export function useLogVital() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: VitalInsert) => {
       const { data, error } = await supabase
         .from("vitals")
@@ -126,7 +126,7 @@ export function useLogVital() {
 export function useDeleteVital() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("vitals").delete().eq("id", id);
       if (error) throw error;

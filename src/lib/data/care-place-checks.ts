@@ -164,7 +164,7 @@ export function useSubmitCarePlaceCheck() {
   const qc = useQueryClient();
   const notifyCritical = useServerFn(notifyCriticalNo);
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: SubmitCheckInput) => {
       const { data: check, error } = await supabase
         .from("care_place_checks")
@@ -316,7 +316,6 @@ export function useSubmitCarePlaceCheck() {
 export function useUpsertCarePlaceItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (input: CarePlaceItemInsert & { id?: string }) => {
       if (input.id) {
         const { id, ...rest } = input;
@@ -340,8 +339,6 @@ export function useUpsertCarePlaceItem() {
 export function useDeleteCarePlaceItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
-    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("care_place_checklist_items")
         .delete()
@@ -356,9 +353,7 @@ export function useDeleteCarePlaceItem() {
 export function useUpsertCarePlaceTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (input: CarePlaceTimeInsert & { id?: string }) => {
-      if (input.id) {
         const { id, ...rest } = input;
         const { error } = await supabase
           .from("care_place_check_times")
@@ -380,10 +375,8 @@ export function useUpsertCarePlaceTime() {
 export function useDeleteCarePlaceTime() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from("care_place_check_times")
         .delete()
         .eq("id", id);
       if (error) throw error;

@@ -192,7 +192,7 @@ export function useMachines(familyId: string | undefined | null) {
 export function useUpsertMachine() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (
       input:
         | (MachineInsert & { id?: string })
@@ -221,7 +221,7 @@ export function useUpsertMachine() {
 export function useDeleteMachine() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("machines").delete().eq("id", id);
       if (error) throw error;
@@ -258,7 +258,7 @@ export function useMaintenanceItems(familyId: string | undefined | null) {
 export function useUpsertMaintenanceItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (
       input:
         | (MaintenanceItemInsert & { id?: string })
@@ -288,7 +288,7 @@ export function useUpsertMaintenanceItem() {
 export function useDeleteMaintenanceItem() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("maintenance_items")
@@ -310,7 +310,7 @@ export function useDeleteMaintenanceItem() {
 export function useMarkMaintenanceDone() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: {
       itemId: string;
       note?: string | null;

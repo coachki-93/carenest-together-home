@@ -46,7 +46,7 @@ export function useLatestHandover(familyId: string | undefined | null) {
 export function useCreateHandover() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: HandoverInsert) => {
       const { data, error } = await supabase
         .from("handovers")
@@ -66,7 +66,7 @@ export function useCreateHandover() {
 export function useDeleteHandover() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("handovers").delete().eq("id", id);
       if (error) throw error;

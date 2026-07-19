@@ -20,7 +20,7 @@ export interface MemberWithProfile extends FamilyMember {
 export function useUpdateChild() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async ({ id, patch }: { id: string; patch: ChildUpdate }) => {
       const { data, error } = await supabase
         .from("children")
@@ -95,7 +95,7 @@ function generateCode() {
 export function useCreateInvite() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async ({
       familyId,
       createdBy,
@@ -131,7 +131,7 @@ export function useCreateInvite() {
 export function useRevokeInvite() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("invites")
@@ -146,7 +146,7 @@ export function useRevokeInvite() {
 export function useRemoveMember() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("family_members").delete().eq("id", id);
       if (error) throw error;
@@ -158,7 +158,6 @@ export function useRemoveMember() {
 export function useSetMaterialResponsible() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
     mutationFn: async ({ id, value }: { id: string; value: boolean }) => {
       const { error } = await supabase
         .from("family_members")
@@ -194,7 +193,7 @@ export function useFamily(familyId: string | undefined | null) {
 export function useUpdateHandoverReminderMinutes() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async ({
       familyId,
       leadMinutes,
@@ -222,7 +221,7 @@ export function useUpdateHandoverReminderMinutes() {
 export function useUpdateFamilyLocale() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async ({
       familyId,
       timezone,
@@ -251,7 +250,7 @@ export function useUpdateFamilyLocale() {
 export function useSetHospitalMode() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async ({ familyId, on }: { familyId: string; on: boolean }) => {
       const { data, error } = await supabase.rpc("set_family_hospital_mode", {
         _family_id: familyId,

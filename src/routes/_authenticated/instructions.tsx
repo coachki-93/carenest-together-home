@@ -93,7 +93,7 @@ function InstructionsPage() {
       setEditing(null);
     },
     onError: (e: Error) => toast.error(e.message),
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
   });
 
   const remove = useMutation({
@@ -107,7 +107,7 @@ function InstructionsPage() {
       setDeleting(null);
     },
     onError: (e: Error) => toast.error(e.message),
-    meta: { suppressGlobalError: true },
+    meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
   });
 
   return (
