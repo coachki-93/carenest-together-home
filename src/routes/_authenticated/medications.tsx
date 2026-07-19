@@ -313,6 +313,7 @@ function MedicationCard({
   onEdit,
   onDelete,
   onHistory,
+  onToggleArchive,
 }: {
   med: Medication;
   tz: string;
@@ -320,6 +321,7 @@ function MedicationCard({
   onEdit: () => void;
   onDelete: () => void;
   onHistory: () => void;
+  onToggleArchive: () => void;
 }) {
   const { t, i18n } = useTranslation();
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
@@ -361,11 +363,39 @@ function MedicationCard({
               </Button>
               {canEdit && (
                 <>
-                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={onEdit}
+                    aria-label={t("meds.edit")}
+                    title={t("meds.edit")}
+                  >
                     <Pencil className="size-4" />
                   </Button>
-                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
-                    <Trash2 className="size-4 text-destructive" />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={onToggleArchive}
+                    aria-label={t(med.active ? "meds.archive" : "meds.unarchive")}
+                    title={t(med.active ? "meds.archive" : "meds.unarchive")}
+                  >
+                    {med.active ? (
+                      <Archive className="size-4" />
+                    ) : (
+                      <ArchiveRestore className="size-4 text-primary" />
+                    )}
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full opacity-60 hover:opacity-100"
+                    onClick={onDelete}
+                    aria-label={t("meds.delete")}
+                    title={t("meds.delete")}
+                  >
+                    <Trash2 className="size-4 text-muted-foreground" />
                   </Button>
                 </>
               )}
