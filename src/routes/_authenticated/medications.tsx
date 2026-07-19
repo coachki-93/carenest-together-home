@@ -249,12 +249,14 @@ function MedicationCard({
   canEdit,
   onEdit,
   onDelete,
+  onHistory,
 }: {
   med: Medication;
   tz: string;
   canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onHistory: () => void;
 }) {
   const { t, i18n } = useTranslation();
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
@@ -283,16 +285,28 @@ function MedicationCard({
                 {dose || "—"} · {t(`meds.route${routeKey(med.route)}`)}
               </p>
             </div>
-            {canEdit && (
-              <div className="flex gap-1">
-                <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
-                  <Pencil className="size-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
-                  <Trash2 className="size-4 text-destructive" />
-                </Button>
-              </div>
-            )}
+            <div className="flex gap-1">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full"
+                onClick={onHistory}
+                aria-label={t("meds.history")}
+                title={t("meds.history")}
+              >
+                <History className="size-4" />
+              </Button>
+              {canEdit && (
+                <>
+                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onEdit}>
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="rounded-full" onClick={onDelete}>
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
           {med.instructions && (
             <p className="text-sm text-muted-foreground mt-2">{med.instructions}</p>
