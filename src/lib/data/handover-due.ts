@@ -10,25 +10,55 @@ export interface HandoverDueItem {
   label: string | null;
   /** Stable id for dismissal persistence. */
   dismissId: string;
+  /**
+   * True when a handover exists whose shift_start (or created_at as fallback)
+   * lies inside the covering window `[at - COVER_LOOKBACK_MIN, until)`.
+   * Callers render the "soft final-notes" prompt in this state instead of
+   * the write-reminder banner.
+   */
+  covered: boolean;
+  /** The covering handover id, when `covered` is true. */
+  coveredHandoverId: string | null;
 }
+
+/**
+ * How far *before* the reminder's `at` a handover can have started while
+ * still counting as coverage for this window. Kept modest so an early
+ * hand-off during the previous shift's grace doesn't silence the next.
+ */
+const COVER_LOOKBACK_MIN = 60;
 
 /**
  * Returns at most ONE handover-due reminder within [rangeStart, rangeEnd),
  * based on the family's configured handover clock times. Mirrors the tidy
  * time model: each entry has a specific time-of-day and a grace duration
  * (how long the banner stays visible).
+ *
+ * Pass `latestHandover` so the banner can switch to a soft final-notes
+ * prompt once someone has written a handover that covers the current
+ * window. When omitted, `covered` is always false.
  */
 export function useHandoverDueItem(
   times: HandoverTime[],
   dismissed: Set<string>,
   rangeStart: Date,
   rangeEnd: Date,
+  latestHandover?: {
+    id: string;
+    created_at: string;
+    shift_start: string | null;
+  } | null,
 ): HandoverDueItem | null {
   return useMemo(() => {
     if (!times.length) return null;
     const now = new Date();
 
-    // Iterate every day in the range and expand each active time.
+    const coverAnchor = latestHandover
+      ? new Date(
+          latestHandover.shift_start ?? latestHandover.created_at,
+        ).getTime()
+      : null;
+
     const candidates: HandoverDueItem[] = [];
     const dayCursor = new Date(rangeStart);
     dayCursor.setHours(0, 0, 0, 0);
@@ -49,11 +79,22 @@ export function useHandoverDueItem(
         const grace = Math.max(1, tm.grace_minutes ?? 30);
         const until = new Date(at.getTime() + grace * 60 * 1000);
         if (until <= rangeStart || at >= rangeEnd) continue;
-        // Only visible between `at` and `until` (grace window).
         if (now < at || now >= until) continue;
         const dismissId = `${tm.id}:${dateIso}`;
         if (dismissed.has(dismissId)) continue;
-        candidates.push({ at, until, label: tm.label, dismissId });
+        const coverStart = at.getTime() - COVER_LOOKBACK_MIN * 60 * 1000;
+        const covered =
+          coverAnchor !== null &&
+          coverAnchor >= coverStart &&
+          coverAnchor < until.getTime();
+        candidates.push({
+          at,
+          until,
+          label: tm.label,
+          dismissId,
+          covered,
+          coveredHandoverId: covered ? latestHandover!.id : null,
+        });
       }
 
       dayCursor.setDate(dayCursor.getDate() + 1);
@@ -62,8 +103,9 @@ export function useHandoverDueItem(
     if (candidates.length === 0) return null;
     candidates.sort((a, b) => a.at.getTime() - b.at.getTime());
     return candidates[0];
-  }, [times, dismissed, rangeStart, rangeEnd]);
+  }, [times, dismissed, rangeStart, rangeEnd, latestHandover]);
 }
+
 
 /**
  * Persist per-caregiver handover-reminder dismissals.
