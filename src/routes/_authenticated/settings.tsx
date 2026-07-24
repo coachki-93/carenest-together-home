@@ -301,6 +301,12 @@ function SettingsPage() {
           isOwner={membership.data?.role === "owner"}
         />
 
+        {/* Owner notification level */}
+        <OwnerNotifyLevelSettings
+          familyId={membership.data?.family_id}
+          isOwner={membership.data?.role === "owner"}
+        />
+
 
 
 
