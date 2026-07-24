@@ -518,24 +518,27 @@ function HandoverPage() {
         open={open}
         onOpenChange={(o) => {
           if (o) {
-            openDialog();
+            if (!editingId) openDialog();
           } else {
-            setOpen(false);
-            setManualWindow(null);
-            resetForm();
-            if (shiftStartIso || shiftEndIso || compose) {
-              navigate({ search: {}, replace: true });
-            }
+            closeDialog();
           }
         }}
       >
         <DialogContent className="rounded-2xl max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t("handoverPage.newTitle")}</DialogTitle>
-            <DialogDescription>{t("handoverPage.newBody")}</DialogDescription>
+            <DialogTitle>
+              {editingId ? t("handoverPage.editTitle") : t("handoverPage.newTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {editingId
+                ? t("handoverPage.editBody", {
+                    minutes: HANDOVER_EDIT_WINDOW_MINUTES,
+                  })
+                : t("handoverPage.newBody")}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            {effectiveWindow && (
+            {!editingId && effectiveWindow && (
               <div className="rounded-xl bg-primary-soft/60 text-sm px-4 py-3 flex items-start gap-2">
                 <Sparkles className="size-4 mt-0.5 text-primary shrink-0" />
                 <div>
