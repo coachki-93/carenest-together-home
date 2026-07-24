@@ -135,19 +135,14 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         const infoFor = (familyId: string) =>
           famInfo.get(familyId) ?? { tz: "Europe/Stockholm", lang: "sv" as Lang };
 
-        const getSubs = async (familyId: string): Promise<Sub[]> => {
-          const { data } = await supabaseAdmin
-            .from("push_subscriptions")
-            .select("endpoint, p256dh, auth")
-            .eq("family_id", familyId);
-          return (data ?? []) as Sub[];
-        };
+        const recipients = createRecipientResolver(supabaseAdmin);
 
         const fanout = async (
           familyId: string,
+          category: NotifyCategory,
           payload: { title: string; body: string; tag: string; url: string },
         ) => {
-          const subs = await getSubs(familyId);
+          const subs = await recipients.getRecipients(familyId, category);
           if (subs.length === 0) return;
           const json = JSON.stringify(payload);
           await Promise.allSettled(
