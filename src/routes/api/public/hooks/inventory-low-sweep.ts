@@ -13,7 +13,7 @@ import { createRecipientResolver } from "@/lib/push/recipients";
  * Recipients (via shared resolver, category = "stock"): owners + any member
  * with `material_responsible = true`, regardless of `owner_notify_level`.
  *
- * Triggered hourly by pg_cron with the project's `apikey` header.
+ * Triggered hourly by pg_cron with the shared `x-cron-secret` header.
  */
 export const Route = createFileRoute("/api/public/hooks/inventory-low-sweep")({
   server: {
