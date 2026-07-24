@@ -306,29 +306,52 @@ function HandoverPage() {
     });
   }
 
+  function closeDialog() {
+    setOpen(false);
+    setEditingId(null);
+    setManualWindow(null);
+    resetForm();
+    if (shiftStartIso || shiftEndIso || compose || editId) {
+      navigate({ search: {}, replace: true });
+    }
+  }
+
   async function handleSubmit() {
     if (!membership?.family_id || !profile?.id) return;
     try {
-      await createHandover.mutateAsync({
-        family_id: membership.family_id,
-        author_id: profile.id,
-        caregiver_profile_id: activeCaregiverId ?? null,
-        shift: form.shift,
-        summary: form.summary || null,
-        sleep: form.sleep || null,
-        mood: form.mood || null,
-        seizures: form.seizures || null,
-        fluids: form.fluids || null,
-        meds: form.meds || null,
-        notes: form.notes || null,
-      });
-      toast.success(t("handoverPage.saved"));
-      setOpen(false);
-      setManualWindow(null);
-      resetForm();
-      if (shiftStartIso || shiftEndIso || compose) {
-        navigate({ search: {}, replace: true });
+      if (editingId) {
+        const target = handovers?.find((h) => h.id === editingId);
+        await editHandover.mutateAsync({
+          id: editingId,
+          shift: form.shift,
+          shift_start: target?.shift_start ?? null,
+          shift_end: target?.shift_end ?? null,
+          summary: form.summary || null,
+          sleep: form.sleep || null,
+          mood: form.mood || null,
+          seizures: form.seizures || null,
+          fluids: form.fluids || null,
+          meds: form.meds || null,
+          notes: form.notes || null,
+        });
+        toast.success(t("handoverPage.savedEdit"));
+      } else {
+        await createHandover.mutateAsync({
+          family_id: membership.family_id,
+          author_id: profile.id,
+          caregiver_profile_id: activeCaregiverId ?? null,
+          shift: form.shift,
+          summary: form.summary || null,
+          sleep: form.sleep || null,
+          mood: form.mood || null,
+          seizures: form.seizures || null,
+          fluids: form.fluids || null,
+          meds: form.meds || null,
+          notes: form.notes || null,
+        });
+        toast.success(t("handoverPage.saved"));
       }
+      closeDialog();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("handoverPage.saveError"));
     }
