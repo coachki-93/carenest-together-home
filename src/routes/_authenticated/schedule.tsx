@@ -210,11 +210,13 @@ function SchedulePage() {
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
     useDismissedHandovers(user?.id, familyId, actor.activeProfileId);
   const { data: handoverTimes = [] } = useHandoverTimes(familyId);
+  const { data: latestHandover } = useLatestHandover(familyId);
   const handoverDue = useHandoverDueItem(
     handoverTimes,
     dismissedHandovers,
     day,
     dayEnd,
+    latestHandover,
   );
   const handoverItems = useMemo<TimelineItem[]>(() => {
     if (!handoverDue) return [];
@@ -226,6 +228,8 @@ function SchedulePage() {
         until: handoverDue.until,
         label: handoverDue.label,
         dismissId: handoverDue.dismissId,
+        covered: handoverDue.covered,
+        coveredHandoverId: handoverDue.coveredHandoverId,
       },
     ];
   }, [handoverDue]);
