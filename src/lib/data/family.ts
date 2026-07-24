@@ -266,3 +266,26 @@ export function useSetHospitalMode() {
     },
   });
 }
+
+export function useUpdateOwnerNotifyLevel() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true }, // safe: caller (OwnerNotifyLevelSettings) wraps mutateAsync in try/catch
+    mutationFn: async ({
+      familyId,
+      level,
+    }: {
+      familyId: string;
+      level: "exceptions" | "all";
+    }) => {
+      const { error } = await supabase
+        .from("families")
+        .update({ owner_notify_level: level })
+        .eq("id", familyId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+    },
+  });
+}
