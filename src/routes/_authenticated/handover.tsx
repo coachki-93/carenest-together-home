@@ -41,7 +41,10 @@ import {
   SHIFT_LABELS,
   useCreateHandover,
   useDeleteHandover,
+  useEditHandover,
   useHandovers,
+  canEditHandover,
+  HANDOVER_EDIT_WINDOW_MINUTES,
   type Handover,
   type ShiftLabel,
 } from "@/lib/data/handovers";
@@ -62,6 +65,7 @@ const handoverSearchSchema = z.object({
   shiftStart: z.string().optional(),
   shiftEnd: z.string().optional(),
   compose: z.union([z.literal("1"), z.literal(1), z.boolean()]).optional(),
+  edit: z.string().uuid().optional(),
 });
 
 function inferredShiftStart(now: Date): Date {
