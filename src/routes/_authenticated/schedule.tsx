@@ -172,6 +172,8 @@ type TimelineItem =
       until: Date;
       label: string | null;
       dismissId: string;
+      covered: boolean;
+      coveredHandoverId: string | null;
     };
 
 function SchedulePage() {
