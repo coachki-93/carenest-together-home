@@ -1026,6 +1026,8 @@ function DashboardPage() {
               at={handoverDue.at}
               until={handoverDue.until}
               label={handoverDue.label}
+              covered={handoverDue.covered}
+              coveredHandoverId={handoverDue.coveredHandoverId}
               onDismiss={() => dismissHandover(handoverDue.dismissId)}
             />
           )}
