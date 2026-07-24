@@ -2390,6 +2390,19 @@ export const sv = {
       close: "Stäng",
     },
   },
+  notifyLevel: {
+    title: "Aviseringar för dig",
+    subtitle: "Välj vilka pushnotiser du får på detta konto. Vårdgivare får alltid alla aviseringar.",
+    saved: "Aviseringsinställning sparad.",
+    exceptions: {
+      label: "Bara när jag behövs",
+      description: "Missade och sena kontroller, kritiska svar i vårdplatsen, syrgasvarningar och lågt förråd. Inget annat.",
+    },
+    all: {
+      label: "Allt",
+      description: "Alla aviseringar en vårdgivare får, inklusive startpåminnelser och pingar för pågående uppgifter.",
+    },
+  },
 };
 
 
