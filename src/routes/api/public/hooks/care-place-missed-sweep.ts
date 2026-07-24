@@ -141,11 +141,8 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
 
           if (!vapidPrivate) continue;
 
-          const { data: subs } = await supabaseAdmin
-            .from("push_subscriptions")
-            .select("endpoint, p256dh, auth")
-            .eq("family_id", tm.family_id);
-          if (!subs?.length) continue;
+          const subs = await recipients.getRecipients(tm.family_id, "missed");
+          if (!subs.length) continue;
 
           const msg = MESSAGES[lang];
           const payload = JSON.stringify({
