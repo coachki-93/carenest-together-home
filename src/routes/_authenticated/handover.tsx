@@ -629,19 +629,20 @@ function HandoverPage() {
             <Button
               variant="ghost"
               className="rounded-full"
-              onClick={() => {
-                setOpen(false);
-                resetForm();
-              }}
+              onClick={closeDialog}
             >
               {t("common.cancel")}
             </Button>
             <Button
               className="rounded-full font-bold"
               onClick={handleSubmit}
-              disabled={createHandover.isPending}
+              disabled={createHandover.isPending || editHandover.isPending}
             >
-              {createHandover.isPending ? t("common.saving") : t("handoverPage.save")}
+              {(editingId ? editHandover.isPending : createHandover.isPending)
+                ? t("common.saving")
+                : editingId
+                  ? t("handoverPage.saveEdit")
+                  : t("handoverPage.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
