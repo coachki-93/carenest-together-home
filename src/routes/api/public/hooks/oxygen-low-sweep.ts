@@ -81,6 +81,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
         let pushes = 0;
         const stale: string[] = [];
         const nowIso = new Date().toISOString();
+        const recipients = createRecipientResolver(supabaseAdmin);
 
         for (const tank of tanks ?? []) {
           if (tank.paused_at) continue;
