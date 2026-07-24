@@ -83,37 +83,44 @@ export const Route = createFileRoute("/api/public/hooks/inventory-low-sweep")({
           const lang = langOf.get(it.family_id) ?? "sv";
           const copy = COPY[lang];
 
-          if (vapidPrivate) {
-            const subs = await recipients.getRecipients(it.family_id, "stock");
-            if (subs.length) {
-              const payload = JSON.stringify({
-                title: copy.title,
-                body: copy.body(it.name, it.quantity, thr),
-                tag: `stock-low-${it.id}`,
-                url: "/inventory",
-              });
-              await Promise.allSettled(
-                subs.map(async (s) => {
-                  try {
-                    await webpush.sendNotification(
-                      { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-                      payload,
-                      { TTL: 6 * 60 * 60 },
-                    );
-                    pushes++;
-                  } catch (e: unknown) {
-                    const status = (e as { statusCode?: number })?.statusCode;
-                    if (status === 404 || status === 410) stale.push(s.endpoint);
-                  }
-                }),
-              );
-            }
-          }
+          // Don't stamp when we can't actually send — otherwise the item goes
+          // silent-forever until it recovers above threshold. Leaving the stamp
+          // NULL means the next hourly run retries.
+          if (!vapidPrivate) continue;
 
-          await supabaseAdmin
-            .from("inventory_items")
-            .update({ low_stock_alert_sent_at: nowIso })
-            .eq("id", it.id);
+          const subs = await recipients.getRecipients(it.family_id, "stock");
+          if (!subs.length) continue;
+
+          const payload = JSON.stringify({
+            title: copy.title,
+            body: copy.body(it.name, it.quantity, thr),
+            tag: `stock-low-${it.id}`,
+            url: "/inventory",
+          });
+          let attempted = 0;
+          await Promise.allSettled(
+            subs.map(async (s) => {
+              attempted++;
+              try {
+                await webpush.sendNotification(
+                  { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+                  payload,
+                  { TTL: 6 * 60 * 60 },
+                );
+                pushes++;
+              } catch (e: unknown) {
+                const status = (e as { statusCode?: number })?.statusCode;
+                if (status === 404 || status === 410) stale.push(s.endpoint);
+              }
+            }),
+          );
+
+          if (attempted > 0) {
+            await supabaseAdmin
+              .from("inventory_items")
+              .update({ low_stock_alert_sent_at: nowIso })
+              .eq("id", it.id);
+          }
         }
 
         if (stale.length) {
