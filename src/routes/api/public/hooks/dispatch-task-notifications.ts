@@ -32,8 +32,6 @@ import { createRecipientResolver, type NotifyCategory } from "@/lib/push/recipie
 const START_GRACE_MINUTES = 15;
 
 
-type Sub = { endpoint: string; p256dh: string; auth: string };
-
 type WebPushModule = {
   setVapidDetails: (subject: string, pub: string, priv: string) => void;
   sendNotification: (
