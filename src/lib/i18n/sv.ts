@@ -353,6 +353,10 @@ export const sv = {
       body: "Skriv en snabb överlämning till nästa vårdgivare. Visas till {{until}}.",
       start: "Starta överlämning",
       skip: "Hoppa över",
+      softBadge: "Skriven",
+      softTitle: "Något mer att lägga till?",
+      softBody: "Överlämningen för det här passet är skriven. Vill du lägga till några sista anteckningar till nästa pass?",
+      softAction: "Lägg till anteckningar",
     },
   },
   taskAction: {
