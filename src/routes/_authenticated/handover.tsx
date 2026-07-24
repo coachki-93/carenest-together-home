@@ -104,6 +104,7 @@ function HandoverPage() {
   const { data: handovers, isLoading } = useHandovers(membership?.family_id);
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
+  const editHandover = useEditHandover();
   const markRead = useMarkHandoverRead();
   const handoverIds = useMemo(
     () => (handovers ?? []).map((h) => h.id),
@@ -113,7 +114,7 @@ function HandoverPage() {
   const { data: caregiverProfiles } = useCaregiverProfiles(membership?.family_id);
   const { data: familyMembers } = useFamilyMembers(membership?.family_id);
   const navigate = Route.useNavigate();
-  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso, compose } = Route.useSearch();
+  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso, compose, edit: editId } = Route.useSearch();
 
   const shiftWindow = useMemo(() => {
     if (shiftStartIso && shiftEndIso) {
