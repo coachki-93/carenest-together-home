@@ -426,6 +426,7 @@ function DashboardPage() {
     dismissedHandovers,
     todayStart,
     todayEnd,
+    latestHandover,
   );
   const search = Route.useSearch();
   const [pendingAction, setPendingAction] = useState<{
