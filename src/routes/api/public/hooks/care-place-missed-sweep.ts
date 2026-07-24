@@ -108,6 +108,7 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         let recorded = 0;
         let pushes = 0;
         const stale: string[] = [];
+        const recipients = createRecipientResolver(supabaseAdmin);
 
         for (const tm of times) {
           const info = famInfo.get(tm.family_id);
