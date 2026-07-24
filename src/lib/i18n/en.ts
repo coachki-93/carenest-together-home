@@ -2391,6 +2391,19 @@ export const en = {
       close: "Close",
     },
   },
+  notifyLevel: {
+    title: "Notifications for you",
+    subtitle: "Choose which push notifications you receive on this account. Caregivers always receive everything.",
+    saved: "Notification preference saved.",
+    exceptions: {
+      label: "Only when I'm needed",
+      description: "Missed and late checks, critical care-place answers, oxygen warnings, and low inventory. Nothing else.",
+    },
+    all: {
+      label: "Everything",
+      description: "Every notification a caregiver would receive, including start reminders and ongoing task pings.",
+    },
+  },
 };
 
 

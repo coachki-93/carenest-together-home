@@ -180,7 +180,7 @@ export function useFamily(familyId: string | undefined | null) {
       const { data, error } = await supabase
         .from("families")
         .select(
-          "id, name, owner_id, at_hospital_since, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language",
+          "id, name, owner_id, at_hospital_since, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language, owner_notify_level",
         )
         .eq("id", familyId!)
         .single();
@@ -263,6 +263,29 @@ export function useSetHospitalMode() {
       qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
       qc.invalidateQueries({ queryKey: ["oxygen-active"] });
       qc.invalidateQueries({ queryKey: ["oxygen-history"] });
+    },
+  });
+}
+
+export function useUpdateOwnerNotifyLevel() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true }, // safe: caller (OwnerNotifyLevelSettings) wraps mutateAsync in try/catch
+    mutationFn: async ({
+      familyId,
+      level,
+    }: {
+      familyId: string;
+      level: "exceptions" | "all";
+    }) => {
+      const { error } = await supabase
+        .from("families")
+        .update({ owner_notify_level: level })
+        .eq("id", familyId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
     },
   });
 }

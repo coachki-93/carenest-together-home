@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { wallClockIn, yesterdayStrIn } from "@/lib/time/family-tz";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
+import { createRecipientResolver } from "@/lib/push/recipients";
 
 /**
  * Sweeps for Care Place Control slots whose grace window has expired today
@@ -107,6 +108,7 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         let recorded = 0;
         let pushes = 0;
         const stale: string[] = [];
+        const recipients = createRecipientResolver(supabaseAdmin);
 
         for (const tm of times) {
           const info = famInfo.get(tm.family_id);
@@ -140,11 +142,8 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
 
           if (!vapidPrivate) continue;
 
-          const { data: subs } = await supabaseAdmin
-            .from("push_subscriptions")
-            .select("endpoint, p256dh, auth")
-            .eq("family_id", tm.family_id);
-          if (!subs?.length) continue;
+          const subs = await recipients.getRecipients(tm.family_id, "missed");
+          if (!subs.length) continue;
 
           const msg = MESSAGES[lang];
           const payload = JSON.stringify({

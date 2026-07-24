@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { computeRemaining, type OxygenTankRow } from "@/lib/oxygen/tanks";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
+import { createRecipientResolver } from "@/lib/push/recipients";
 
 /**
  * Scans every active oxygen tank and pushes one notification when remaining
@@ -80,6 +81,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
         let pushes = 0;
         const stale: string[] = [];
         const nowIso = new Date().toISOString();
+        const recipients = createRecipientResolver(supabaseAdmin);
 
         for (const tank of tanks ?? []) {
           if (tank.paused_at) continue;
@@ -99,12 +101,12 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
           if (!kind) continue;
 
           if (vapidPrivate) {
-            const { data: subs } = await supabaseAdmin
-              .from("push_subscriptions")
-              .select("endpoint, p256dh, auth")
-              .eq("family_id", tank.family_id);
+            const subs = await recipients.getRecipients(
+              tank.family_id,
+              kind === "critical" ? "critical" : "oxygen",
+            );
 
-            if (subs?.length) {
+            if (subs.length) {
               const mins = Math.round(remaining);
               const copy = OX_COPY[lang];
               const payload = JSON.stringify({

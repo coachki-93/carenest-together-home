@@ -45,12 +45,12 @@ export const notifyOngoing = createServerFn({ method: "POST" })
     if (!vapidPrivate) return { ok: false, sent: 0, error: "Missing VAPID_PRIVATE_KEY" };
     webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
 
-    // Everyone in the family EXCEPT the actor.
-    const { data: subs } = await supabaseAdmin
-      .from("push_subscriptions")
-      .select("endpoint, p256dh, auth")
-      .eq("family_id", data.family_id)
-      .neq("user_id", context.userId);
+    // Everyone in the family EXCEPT the actor, respecting owner_notify_level.
+    const { createRecipientResolver } = await import("@/lib/push/recipients");
+    const recipients = createRecipientResolver(supabaseAdmin);
+    const subs = await recipients.getRecipients(data.family_id, "ongoing", {
+      excludeUserId: context.userId,
+    });
 
     if (!subs || subs.length === 0) return { ok: true, sent: 0 };
 

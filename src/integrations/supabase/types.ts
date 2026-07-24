@@ -827,6 +827,7 @@ export type Database = {
           name: string
           notification_language: string
           owner_id: string
+          owner_notify_level: string
           oxygen_critical_minutes: number
           oxygen_warn_minutes: number
           timezone: string
@@ -841,6 +842,7 @@ export type Database = {
           name?: string
           notification_language?: string
           owner_id: string
+          owner_notify_level?: string
           oxygen_critical_minutes?: number
           oxygen_warn_minutes?: number
           timezone?: string
@@ -855,6 +857,7 @@ export type Database = {
           name?: string
           notification_language?: string
           owner_id?: string
+          owner_notify_level?: string
           oxygen_critical_minutes?: number
           oxygen_warn_minutes?: number
           timezone?: string
@@ -1138,6 +1141,7 @@ export type Database = {
           family_id: string
           id: string
           location: string | null
+          low_stock_alert_sent_at: string | null
           low_stock_threshold: number | null
           name: string
           notes: string | null
@@ -1160,6 +1164,7 @@ export type Database = {
           family_id: string
           id?: string
           location?: string | null
+          low_stock_alert_sent_at?: string | null
           low_stock_threshold?: number | null
           name: string
           notes?: string | null
@@ -1182,6 +1187,7 @@ export type Database = {
           family_id?: string
           id?: string
           location?: string | null
+          low_stock_alert_sent_at?: string | null
           low_stock_threshold?: number | null
           name?: string
           notes?: string | null

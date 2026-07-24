@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { formatTimeIn, wallClockIn } from "@/lib/time/family-tz";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
+import { createRecipientResolver, type NotifyCategory } from "@/lib/push/recipients";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
 // anon `apikey` header. Runs four passes per call, all deduped per-occurrence
@@ -30,8 +31,6 @@ import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
  */
 const START_GRACE_MINUTES = 15;
 
-
-type Sub = { endpoint: string; p256dh: string; auth: string };
 
 type WebPushModule = {
   setVapidDetails: (subject: string, pub: string, priv: string) => void;
@@ -136,19 +135,14 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         const infoFor = (familyId: string) =>
           famInfo.get(familyId) ?? { tz: "Europe/Stockholm", lang: "sv" as Lang };
 
-        const getSubs = async (familyId: string): Promise<Sub[]> => {
-          const { data } = await supabaseAdmin
-            .from("push_subscriptions")
-            .select("endpoint, p256dh, auth")
-            .eq("family_id", familyId);
-          return (data ?? []) as Sub[];
-        };
+        const recipients = createRecipientResolver(supabaseAdmin);
 
         const fanout = async (
           familyId: string,
+          category: NotifyCategory,
           payload: { title: string; body: string; tag: string; url: string },
         ) => {
-          const subs = await getSubs(familyId);
+          const subs = await recipients.getRecipients(familyId, category);
           if (subs.length === 0) return;
           const json = JSON.stringify(payload);
           await Promise.allSettled(
@@ -334,7 +328,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           if (!(await tryClaim(c.master_id, c.occurrence_at, "start"))) continue;
 
           const { tz, lang } = infoFor(c.family_id);
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "start", {
             title: c.title || "CareNest",
             body: `${humanKind(c.kind, lang)} • ${formatTimeIn(c.occurrence_at, tz)}`,
             tag: `appt-${c.master_id}-start-${c.occurrence_at}`,
@@ -352,7 +346,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
           const { tz, lang } = infoFor(c.family_id);
           const title = c.title || "CareNest";
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "late", {
             title: COPY[lang].lateTitle(title),
             body: COPY[lang].lateBody(formatTimeIn(c.occurrence_at, tz)),
             tag: `appt-${c.master_id}-late-${c.occurrence_at}`,
@@ -370,7 +364,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
           const { tz, lang } = infoFor(c.family_id);
           const title = c.title || "CareNest";
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "missed", {
             title: COPY[lang].missedTitle(title),
             body: COPY[lang].missedBody(formatTimeIn(c.occurrence_at, tz)),
             tag: `appt-${c.master_id}-missed-${c.occurrence_at}`,
@@ -524,7 +518,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             lang === "sv"
               ? `Påminnelse: ${title} · ${when} ${time}`
               : `Reminder: ${title} · ${when} ${time}`;
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "reminder", {
             title,
             body,
             tag: `appt-${c.master_id}-reminder-${c.occurrence_at}`,
