@@ -449,6 +449,8 @@ function SchedulePage() {
                 at={item.at}
                 until={item.until}
                 label={item.label}
+                covered={item.covered}
+                coveredHandoverId={item.coveredHandoverId}
                 onDismiss={() => dismissHandover(item.dismissId)}
               />
             );
