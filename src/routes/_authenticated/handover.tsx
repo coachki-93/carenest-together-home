@@ -429,15 +429,31 @@ function HandoverPage() {
                   )}
                 </div>
                 {h.author_id === profile?.id && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full text-muted-foreground hover:text-destructive"
-                    onClick={() => setConfirmDelete(h)}
-                    aria-label={t("common.cancel")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    {canEditHandover(h, user?.id, now) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full text-muted-foreground hover:text-primary"
+                        onClick={() => openEdit(h)}
+                        aria-label={t("handoverPage.editAction")}
+                        title={t("handoverPage.editWindowHint", {
+                          minutes: HANDOVER_EDIT_WINDOW_MINUTES,
+                        })}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full text-muted-foreground hover:text-destructive"
+                      onClick={() => setConfirmDelete(h)}
+                      aria-label={t("common.cancel")}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 )}
               </div>
 
