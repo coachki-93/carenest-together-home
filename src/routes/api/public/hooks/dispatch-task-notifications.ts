@@ -328,7 +328,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           if (!(await tryClaim(c.master_id, c.occurrence_at, "start"))) continue;
 
           const { tz, lang } = infoFor(c.family_id);
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "start", {
             title: c.title || "CareNest",
             body: `${humanKind(c.kind, lang)} • ${formatTimeIn(c.occurrence_at, tz)}`,
             tag: `appt-${c.master_id}-start-${c.occurrence_at}`,
@@ -346,7 +346,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
           const { tz, lang } = infoFor(c.family_id);
           const title = c.title || "CareNest";
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "late", {
             title: COPY[lang].lateTitle(title),
             body: COPY[lang].lateBody(formatTimeIn(c.occurrence_at, tz)),
             tag: `appt-${c.master_id}-late-${c.occurrence_at}`,
@@ -364,7 +364,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
           const { tz, lang } = infoFor(c.family_id);
           const title = c.title || "CareNest";
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "missed", {
             title: COPY[lang].missedTitle(title),
             body: COPY[lang].missedBody(formatTimeIn(c.occurrence_at, tz)),
             tag: `appt-${c.master_id}-missed-${c.occurrence_at}`,
@@ -518,7 +518,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             lang === "sv"
               ? `Påminnelse: ${title} · ${when} ${time}`
               : `Reminder: ${title} · ${when} ${time}`;
-          await fanout(c.family_id, {
+          await fanout(c.family_id, "reminder", {
             title,
             body,
             tag: `appt-${c.master_id}-reminder-${c.occurrence_at}`,
