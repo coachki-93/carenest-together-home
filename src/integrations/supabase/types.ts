@@ -2106,6 +2106,47 @@ export type Database = {
         Args: { _family_id: string; _profile_id: string }
         Returns: boolean
       }
+      edit_handover: {
+        Args: {
+          _fluids: string
+          _id: string
+          _meds: string
+          _mood: string
+          _notes: string
+          _seizures: string
+          _shift: Database["public"]["Enums"]["shift_label"]
+          _shift_end: string
+          _shift_start: string
+          _sleep: string
+          _summary: string
+        }
+        Returns: {
+          author_id: string
+          caregiver_profile_id: string | null
+          child_id: string | null
+          created_at: string
+          edited_at: string | null
+          family_id: string
+          fluids: string | null
+          id: string
+          meds: string | null
+          mood: string | null
+          notes: string | null
+          seizures: string | null
+          shift: Database["public"]["Enums"]["shift_label"]
+          shift_end: string | null
+          shift_start: string | null
+          sleep: string | null
+          summary: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "handovers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_app_secret: { Args: { _key: string }; Returns: string }
       is_family_member: {
         Args: { _family_id: string; _user_id: string }
