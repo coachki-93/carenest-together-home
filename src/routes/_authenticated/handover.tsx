@@ -189,6 +189,7 @@ function HandoverPage() {
   }
 
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Handover | null>(null);
   const [form, setForm] = useState({
     shift: defaultShift() as ShiftLabel,
@@ -201,30 +202,73 @@ function HandoverPage() {
     notes: "",
   });
 
+  // Tick every 30s so the Edit button hides as soon as the window closes.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowTick(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const now = useMemo(() => new Date(nowTick), [nowTick]);
+
   // Auto-open when arriving with shift query params or compose flag.
   useEffect(() => {
     if (!shiftWindow) return;
     setOpen(true);
   }, [shiftWindow]);
 
-  // Seed the form from prefill once the window + data are ready. The
-  // "prev || prefill" merge protects anything the user has typed. Runs for
-  // all three entry points: URL params, compose flag, and plain button.
+  // Auto-open in EDIT mode when ?edit=<id> is present and the target
+  // handover exists and is still author-editable.
   useEffect(() => {
-    if (!open || !effectiveWindow || !prefill) return;
+    if (!editId || !handovers || !user?.id) return;
+    const target = handovers.find((h) => h.id === editId);
+    if (!target) return;
+    if (!canEditHandover(target, user.id, new Date())) return;
+    setEditingId(target.id);
+    setForm({
+      shift: target.shift,
+      summary: target.summary ?? "",
+      sleep: target.sleep ?? "",
+      mood: target.mood ?? "",
+      seizures: target.seizures ?? "",
+      fluids: target.fluids ?? "",
+      meds: target.meds ?? "",
+      notes: target.notes ?? "",
+    });
+    setOpen(true);
+  }, [editId, handovers, user?.id]);
+
+  // Seed the form from prefill once the window + data are ready. Skip in
+  // edit mode — the existing handover's fields are the source of truth.
+  useEffect(() => {
+    if (!open || editingId || !effectiveWindow || !prefill) return;
     setForm((prev) => ({
       ...prev,
       shift: shiftLabelFromDate(effectiveWindow.start),
       meds: prev.meds || prefill.meds,
       notes: prev.notes || prefill.notes,
     }));
-  }, [open, effectiveWindow, prefill]);
+  }, [open, editingId, effectiveWindow, prefill]);
 
   function openDialog() {
     if (!shiftWindow) {
       const end = new Date();
       setManualWindow({ start: inferredShiftStart(end), end });
     }
+    setOpen(true);
+  }
+
+  function openEdit(h: Handover) {
+    setEditingId(h.id);
+    setForm({
+      shift: h.shift,
+      summary: h.summary ?? "",
+      sleep: h.sleep ?? "",
+      mood: h.mood ?? "",
+      seizures: h.seizures ?? "",
+      fluids: h.fluids ?? "",
+      meds: h.meds ?? "",
+      notes: h.notes ?? "",
+    });
     setOpen(true);
   }
 
