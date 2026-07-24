@@ -213,8 +213,7 @@ export function buildTodaysDoses(
   day: Date = new Date(),
 ): ScheduledDose[] {
   const out: ScheduledDose[] = [];
-  const dayStart = new Date(day);
-  dayStart.setHours(0, 0, 0, 0);
+  const { todayStr } = wallClockIn(day, familyTimezone);
   const logByKey = new Map<string, MedLog>();
   for (const l of logs) {
     logByKey.set(`${l.medication_id}|${new Date(l.scheduled_for).toISOString()}`, l);
@@ -232,10 +231,11 @@ export function buildTodaysDoses(
       lastMs = courseLastDoseAt(first, total, m.times ?? [], familyTimezone).getTime();
     }
     for (const t of m.times ?? []) {
-      const [hh, mm] = t.split(":").map((n) => parseInt(n, 10));
-      if (Number.isNaN(hh) || Number.isNaN(mm)) continue;
-      const scheduled = new Date(dayStart);
-      scheduled.setHours(hh, mm, 0, 0);
+      if (!/^\d{2}:\d{2}$/.test(t)) continue;
+      // Build the candidate instant in the family timezone so the comparison
+      // against the (family-tz-correct) course boundary is apples-to-apples,
+      // regardless of the device/server timezone.
+      const scheduled = zonedWallClockToDate(todayStr, t, familyTimezone);
       if (firstMs !== null && lastMs !== null) {
         const ts = scheduled.getTime();
         if (ts < firstMs || ts > lastMs) continue;
