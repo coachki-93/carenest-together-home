@@ -10,6 +10,7 @@ import { EnableNotificationsCard } from "@/components/carenest/EnableNotificatio
 import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSettings";
 import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
+import { OwnerNotifyLevelSettings } from "@/components/carenest/OwnerNotifyLevelSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
 
