@@ -100,12 +100,12 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
           if (!kind) continue;
 
           if (vapidPrivate) {
-            const { data: subs } = await supabaseAdmin
-              .from("push_subscriptions")
-              .select("endpoint, p256dh, auth")
-              .eq("family_id", tank.family_id);
+            const subs = await recipients.getRecipients(
+              tank.family_id,
+              kind === "critical" ? "critical" : "oxygen",
+            );
 
-            if (subs?.length) {
+            if (subs.length) {
               const mins = Math.round(remaining);
               const copy = OX_COPY[lang];
               const payload = JSON.stringify({
