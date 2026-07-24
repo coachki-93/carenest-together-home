@@ -41,7 +41,10 @@ import {
   SHIFT_LABELS,
   useCreateHandover,
   useDeleteHandover,
+  useEditHandover,
   useHandovers,
+  canEditHandover,
+  HANDOVER_EDIT_WINDOW_MINUTES,
   type Handover,
   type ShiftLabel,
 } from "@/lib/data/handovers";
@@ -62,6 +65,7 @@ const handoverSearchSchema = z.object({
   shiftStart: z.string().optional(),
   shiftEnd: z.string().optional(),
   compose: z.union([z.literal("1"), z.literal(1), z.boolean()]).optional(),
+  edit: z.string().uuid().optional(),
 });
 
 function inferredShiftStart(now: Date): Date {
@@ -100,6 +104,7 @@ function HandoverPage() {
   const { data: handovers, isLoading } = useHandovers(membership?.family_id);
   const createHandover = useCreateHandover();
   const deleteHandover = useDeleteHandover();
+  const editHandover = useEditHandover();
   const markRead = useMarkHandoverRead();
   const handoverIds = useMemo(
     () => (handovers ?? []).map((h) => h.id),
@@ -109,7 +114,7 @@ function HandoverPage() {
   const { data: caregiverProfiles } = useCaregiverProfiles(membership?.family_id);
   const { data: familyMembers } = useFamilyMembers(membership?.family_id);
   const navigate = Route.useNavigate();
-  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso, compose } = Route.useSearch();
+  const { shiftStart: shiftStartIso, shiftEnd: shiftEndIso, compose, edit: editId } = Route.useSearch();
 
   const shiftWindow = useMemo(() => {
     if (shiftStartIso && shiftEndIso) {
@@ -184,6 +189,7 @@ function HandoverPage() {
   }
 
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Handover | null>(null);
   const [form, setForm] = useState({
     shift: defaultShift() as ShiftLabel,
@@ -196,30 +202,73 @@ function HandoverPage() {
     notes: "",
   });
 
+  // Tick every 30s so the Edit button hides as soon as the window closes.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowTick(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const now = useMemo(() => new Date(nowTick), [nowTick]);
+
   // Auto-open when arriving with shift query params or compose flag.
   useEffect(() => {
     if (!shiftWindow) return;
     setOpen(true);
   }, [shiftWindow]);
 
-  // Seed the form from prefill once the window + data are ready. The
-  // "prev || prefill" merge protects anything the user has typed. Runs for
-  // all three entry points: URL params, compose flag, and plain button.
+  // Auto-open in EDIT mode when ?edit=<id> is present and the target
+  // handover exists and is still author-editable.
   useEffect(() => {
-    if (!open || !effectiveWindow || !prefill) return;
+    if (!editId || !handovers || !user?.id) return;
+    const target = handovers.find((h) => h.id === editId);
+    if (!target) return;
+    if (!canEditHandover(target, user.id, new Date())) return;
+    setEditingId(target.id);
+    setForm({
+      shift: target.shift,
+      summary: target.summary ?? "",
+      sleep: target.sleep ?? "",
+      mood: target.mood ?? "",
+      seizures: target.seizures ?? "",
+      fluids: target.fluids ?? "",
+      meds: target.meds ?? "",
+      notes: target.notes ?? "",
+    });
+    setOpen(true);
+  }, [editId, handovers, user?.id]);
+
+  // Seed the form from prefill once the window + data are ready. Skip in
+  // edit mode — the existing handover's fields are the source of truth.
+  useEffect(() => {
+    if (!open || editingId || !effectiveWindow || !prefill) return;
     setForm((prev) => ({
       ...prev,
       shift: shiftLabelFromDate(effectiveWindow.start),
       meds: prev.meds || prefill.meds,
       notes: prev.notes || prefill.notes,
     }));
-  }, [open, effectiveWindow, prefill]);
+  }, [open, editingId, effectiveWindow, prefill]);
 
   function openDialog() {
     if (!shiftWindow) {
       const end = new Date();
       setManualWindow({ start: inferredShiftStart(end), end });
     }
+    setOpen(true);
+  }
+
+  function openEdit(h: Handover) {
+    setEditingId(h.id);
+    setForm({
+      shift: h.shift,
+      summary: h.summary ?? "",
+      sleep: h.sleep ?? "",
+      mood: h.mood ?? "",
+      seizures: h.seizures ?? "",
+      fluids: h.fluids ?? "",
+      meds: h.meds ?? "",
+      notes: h.notes ?? "",
+    });
     setOpen(true);
   }
 
@@ -257,29 +306,52 @@ function HandoverPage() {
     });
   }
 
+  function closeDialog() {
+    setOpen(false);
+    setEditingId(null);
+    setManualWindow(null);
+    resetForm();
+    if (shiftStartIso || shiftEndIso || compose || editId) {
+      navigate({ search: {}, replace: true });
+    }
+  }
+
   async function handleSubmit() {
     if (!membership?.family_id || !profile?.id) return;
     try {
-      await createHandover.mutateAsync({
-        family_id: membership.family_id,
-        author_id: profile.id,
-        caregiver_profile_id: activeCaregiverId ?? null,
-        shift: form.shift,
-        summary: form.summary || null,
-        sleep: form.sleep || null,
-        mood: form.mood || null,
-        seizures: form.seizures || null,
-        fluids: form.fluids || null,
-        meds: form.meds || null,
-        notes: form.notes || null,
-      });
-      toast.success(t("handoverPage.saved"));
-      setOpen(false);
-      setManualWindow(null);
-      resetForm();
-      if (shiftStartIso || shiftEndIso || compose) {
-        navigate({ search: {}, replace: true });
+      if (editingId) {
+        const target = handovers?.find((h) => h.id === editingId);
+        await editHandover.mutateAsync({
+          id: editingId,
+          shift: form.shift,
+          shift_start: target?.shift_start ?? null,
+          shift_end: target?.shift_end ?? null,
+          summary: form.summary || null,
+          sleep: form.sleep || null,
+          mood: form.mood || null,
+          seizures: form.seizures || null,
+          fluids: form.fluids || null,
+          meds: form.meds || null,
+          notes: form.notes || null,
+        });
+        toast.success(t("handoverPage.savedEdit"));
+      } else {
+        await createHandover.mutateAsync({
+          family_id: membership.family_id,
+          author_id: profile.id,
+          caregiver_profile_id: activeCaregiverId ?? null,
+          shift: form.shift,
+          summary: form.summary || null,
+          sleep: form.sleep || null,
+          mood: form.mood || null,
+          seizures: form.seizures || null,
+          fluids: form.fluids || null,
+          meds: form.meds || null,
+          notes: form.notes || null,
+        });
+        toast.success(t("handoverPage.saved"));
       }
+      closeDialog();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("handoverPage.saveError"));
     }
@@ -357,15 +429,31 @@ function HandoverPage() {
                   )}
                 </div>
                 {h.author_id === profile?.id && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full text-muted-foreground hover:text-destructive"
-                    onClick={() => setConfirmDelete(h)}
-                    aria-label={t("common.cancel")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    {canEditHandover(h, user?.id, now) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full text-muted-foreground hover:text-primary"
+                        onClick={() => openEdit(h)}
+                        aria-label={t("handoverPage.editAction")}
+                        title={t("handoverPage.editWindowHint", {
+                          minutes: HANDOVER_EDIT_WINDOW_MINUTES,
+                        })}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full text-muted-foreground hover:text-destructive"
+                      onClick={() => setConfirmDelete(h)}
+                      aria-label={t("common.cancel")}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 )}
               </div>
 
@@ -430,24 +518,27 @@ function HandoverPage() {
         open={open}
         onOpenChange={(o) => {
           if (o) {
-            openDialog();
+            if (!editingId) openDialog();
           } else {
-            setOpen(false);
-            setManualWindow(null);
-            resetForm();
-            if (shiftStartIso || shiftEndIso || compose) {
-              navigate({ search: {}, replace: true });
-            }
+            closeDialog();
           }
         }}
       >
         <DialogContent className="rounded-2xl max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t("handoverPage.newTitle")}</DialogTitle>
-            <DialogDescription>{t("handoverPage.newBody")}</DialogDescription>
+            <DialogTitle>
+              {editingId ? t("handoverPage.editTitle") : t("handoverPage.newTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {editingId
+                ? t("handoverPage.editBody", {
+                    minutes: HANDOVER_EDIT_WINDOW_MINUTES,
+                  })
+                : t("handoverPage.newBody")}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            {effectiveWindow && (
+            {!editingId && effectiveWindow && (
               <div className="rounded-xl bg-primary-soft/60 text-sm px-4 py-3 flex items-start gap-2">
                 <Sparkles className="size-4 mt-0.5 text-primary shrink-0" />
                 <div>
@@ -538,19 +629,20 @@ function HandoverPage() {
             <Button
               variant="ghost"
               className="rounded-full"
-              onClick={() => {
-                setOpen(false);
-                resetForm();
-              }}
+              onClick={closeDialog}
             >
               {t("common.cancel")}
             </Button>
             <Button
               className="rounded-full font-bold"
               onClick={handleSubmit}
-              disabled={createHandover.isPending}
+              disabled={createHandover.isPending || editHandover.isPending}
             >
-              {createHandover.isPending ? t("common.saving") : t("handoverPage.save")}
+              {(editingId ? editHandover.isPending : createHandover.isPending)
+                ? t("common.saving")
+                : editingId
+                  ? t("handoverPage.saveEdit")
+                  : t("handoverPage.save")}
             </Button>
           </DialogFooter>
         </DialogContent>

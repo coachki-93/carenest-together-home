@@ -107,6 +107,7 @@ import {
   useDismissedHandovers,
 } from "@/lib/data/handover-due";
 import { useHandoverTimes } from "@/lib/data/handover-times";
+import { useLatestHandover } from "@/lib/data/handovers";
 import { ClipboardCheck } from "lucide-react";
 
 type RepeatMode = "none" | RecurrenceFreq | "specific_times";
@@ -171,6 +172,8 @@ type TimelineItem =
       until: Date;
       label: string | null;
       dismissId: string;
+      covered: boolean;
+      coveredHandoverId: string | null;
     };
 
 function SchedulePage() {
@@ -209,11 +212,13 @@ function SchedulePage() {
   const { dismissed: dismissedHandovers, dismiss: dismissHandover } =
     useDismissedHandovers(user?.id, familyId, actor.activeProfileId);
   const { data: handoverTimes = [] } = useHandoverTimes(familyId);
+  const { data: latestHandover } = useLatestHandover(familyId);
   const handoverDue = useHandoverDueItem(
     handoverTimes,
     dismissedHandovers,
     day,
     dayEnd,
+    latestHandover,
   );
   const handoverItems = useMemo<TimelineItem[]>(() => {
     if (!handoverDue) return [];
@@ -225,6 +230,8 @@ function SchedulePage() {
         until: handoverDue.until,
         label: handoverDue.label,
         dismissId: handoverDue.dismissId,
+        covered: handoverDue.covered,
+        coveredHandoverId: handoverDue.coveredHandoverId,
       },
     ];
   }, [handoverDue]);
@@ -442,6 +449,8 @@ function SchedulePage() {
                 at={item.at}
                 until={item.until}
                 label={item.label}
+                covered={item.covered}
+                coveredHandoverId={item.coveredHandoverId}
                 onDismiss={() => dismissHandover(item.dismissId)}
               />
             );
@@ -1650,11 +1659,15 @@ function HandoverDueRow({
   at,
   until,
   label,
+  covered,
+  coveredHandoverId,
   onDismiss,
 }: {
   at: Date;
   until: Date;
   label: string | null;
+  covered: boolean;
+  coveredHandoverId: string | null;
   onDismiss: () => void;
 }) {
   const { t, i18n } = useTranslation();
@@ -1662,25 +1675,40 @@ function HandoverDueRow({
     i18n.language === "sv" ? "sv-SE" : "en-US",
     { hour: "2-digit", minute: "2-digit" },
   );
+  const tone = covered
+    ? "border-primary/40 bg-primary/5"
+    : "border-warning/60 bg-warning/5";
+  const iconTone = covered
+    ? "bg-primary/20 text-primary"
+    : "bg-warning/30 text-warning-foreground";
+  const badgeTone = covered
+    ? "text-primary/80"
+    : "text-warning-foreground/80";
   return (
-    <li className="card-soft p-4 flex items-center gap-4 border-2 border-warning/60 bg-warning/5">
+    <li className={`card-soft p-4 flex items-center gap-4 border-2 ${tone}`}>
       <div className="text-center shrink-0 w-16">
         <div className="text-xl font-extrabold tabular-nums">
           {timeFmt.format(at)}
         </div>
-        <div className="text-[10px] font-bold uppercase text-warning-foreground/80 mt-0.5">
-          {t("schedule.handoverDue.badge")}
+        <div className={`text-[10px] font-bold uppercase mt-0.5 ${badgeTone}`}>
+          {covered
+            ? t("schedule.handoverDue.softBadge")
+            : t("schedule.handoverDue.badge")}
         </div>
       </div>
-      <div className="size-12 rounded-2xl flex items-center justify-center shrink-0 bg-warning/30 text-warning-foreground">
+      <div className={`size-12 rounded-2xl flex items-center justify-center shrink-0 ${iconTone}`}>
         <ClipboardCheck className="size-6" />
       </div>
       <div className="min-w-0 flex-1">
         <h3 className="font-extrabold truncate">
-          {label || t("schedule.handoverDue.title")}
+          {covered
+            ? t("schedule.handoverDue.softTitle")
+            : label || t("schedule.handoverDue.title")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {t("schedule.handoverDue.body", { until: timeFmt.format(until) })}
+          {covered
+            ? t("schedule.handoverDue.softBody")
+            : t("schedule.handoverDue.body", { until: timeFmt.format(until) })}
         </p>
       </div>
       <div className="flex gap-2 shrink-0">
@@ -1693,11 +1721,18 @@ function HandoverDueRow({
           {t("schedule.handoverDue.skip")}
         </Button>
         <Button asChild size="sm" className="rounded-full font-semibold">
-          <Link to="/handover" search={{ compose: "1" }}>
-            {t("schedule.handoverDue.start")}
-          </Link>
+          {covered && coveredHandoverId ? (
+            <Link to="/handover" search={{ edit: coveredHandoverId }}>
+              {t("schedule.handoverDue.softAction")}
+            </Link>
+          ) : (
+            <Link to="/handover" search={{ compose: "1" }}>
+              {t("schedule.handoverDue.start")}
+            </Link>
+          )}
         </Button>
       </div>
     </li>
   );
 }
+
