@@ -107,6 +107,7 @@ import {
   useDismissedHandovers,
 } from "@/lib/data/handover-due";
 import { useHandoverTimes } from "@/lib/data/handover-times";
+import { useLatestHandover } from "@/lib/data/handovers";
 import { ClipboardCheck } from "lucide-react";
 
 type RepeatMode = "none" | RecurrenceFreq | "specific_times";
