@@ -42,6 +42,7 @@ import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authent
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
 import { Route as ApiPublicHooksOxygenLowSweepRouteImport } from './routes/api/public/hooks/oxygen-low-sweep'
+import { Route as ApiPublicHooksInventoryLowSweepRouteImport } from './routes/api/public/hooks/inventory-low-sweep'
 import { Route as ApiPublicHooksDispatchTaskNotificationsRouteImport } from './routes/api/public/hooks/dispatch-task-notifications'
 import { Route as ApiPublicHooksCarePlaceMissedSweepRouteImport } from './routes/api/public/hooks/care-place-missed-sweep'
 
@@ -216,6 +217,12 @@ const ApiPublicHooksOxygenLowSweepRoute =
     path: '/api/public/hooks/oxygen-low-sweep',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksInventoryLowSweepRoute =
+  ApiPublicHooksInventoryLowSweepRouteImport.update({
+    id: '/api/public/hooks/inventory-low-sweep',
+    path: '/api/public/hooks/inventory-low-sweep',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDispatchTaskNotificationsRoute =
   ApiPublicHooksDispatchTaskNotificationsRouteImport.update({
     id: '/api/public/hooks/dispatch-task-notifications',
@@ -263,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
+  '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
 }
 export interface FileRoutesByTo {
@@ -299,6 +307,7 @@ export interface FileRoutesByTo {
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
+  '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
 }
 export interface FileRoutesById {
@@ -337,6 +346,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding/child': typeof AuthenticatedOnboardingChildRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
+  '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
 }
 export interface FileRouteTypes {
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
     | '/onboarding/child'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
+    | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -411,6 +422,7 @@ export interface FileRouteTypes {
     | '/onboarding/child'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
+    | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
   id:
     | '__root__'
@@ -448,6 +460,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding/child'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
+    | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
   fileRoutesById: FileRoutesById
 }
@@ -463,6 +476,7 @@ export interface RootRouteChildren {
   InviteIndexRoute: typeof InviteIndexRoute
   ApiPublicHooksCarePlaceMissedSweepRoute: typeof ApiPublicHooksCarePlaceMissedSweepRoute
   ApiPublicHooksDispatchTaskNotificationsRoute: typeof ApiPublicHooksDispatchTaskNotificationsRoute
+  ApiPublicHooksInventoryLowSweepRoute: typeof ApiPublicHooksInventoryLowSweepRoute
   ApiPublicHooksOxygenLowSweepRoute: typeof ApiPublicHooksOxygenLowSweepRoute
 }
 
@@ -699,6 +713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksOxygenLowSweepRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/inventory-low-sweep': {
+      id: '/api/public/hooks/inventory-low-sweep'
+      path: '/api/public/hooks/inventory-low-sweep'
+      fullPath: '/api/public/hooks/inventory-low-sweep'
+      preLoaderRoute: typeof ApiPublicHooksInventoryLowSweepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/dispatch-task-notifications': {
       id: '/api/public/hooks/dispatch-task-notifications'
       path: '/api/public/hooks/dispatch-task-notifications'
@@ -793,6 +814,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksCarePlaceMissedSweepRoute,
   ApiPublicHooksDispatchTaskNotificationsRoute:
     ApiPublicHooksDispatchTaskNotificationsRoute,
+  ApiPublicHooksInventoryLowSweepRoute: ApiPublicHooksInventoryLowSweepRoute,
   ApiPublicHooksOxygenLowSweepRoute: ApiPublicHooksOxygenLowSweepRoute,
 }
 export const routeTree = rootRouteImport
