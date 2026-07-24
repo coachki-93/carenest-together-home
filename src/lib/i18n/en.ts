@@ -353,6 +353,10 @@ export const en = {
       body: "Write a quick handover for the next caregiver. Visible until {{until}}.",
       start: "Start handover",
       skip: "Skip",
+      softBadge: "Written",
+      softTitle: "Anything else to add?",
+      softBody: "The handover for this window is written. Add any final notes for the next shift?",
+      softAction: "Add notes",
     },
   },
   taskAction: {
