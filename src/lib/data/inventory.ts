@@ -13,8 +13,19 @@ export type InventoryAdjustment =
 export type InventoryAdjustmentInsert =
   Database["public"]["Tables"]["inventory_adjustments"]["Insert"];
 export type UnitKind = Database["public"]["Enums"]["unit_kind"];
+export type InventoryCategory =
+  Database["public"]["Enums"]["inventory_category"];
 export type AdjustmentReason =
   Database["public"]["Enums"]["inventory_adjustment_reason"];
+
+export const INVENTORY_CATEGORIES: InventoryCategory[] = [
+  "nutrition",
+  "hygiene",
+  "medicine",
+  "medical_supplies",
+  "equipment",
+  "other",
+];
 
 export const UNIT_GROUPS: { group: "count" | "volume" | "weight"; units: UnitKind[] }[] = [
   { group: "count", units: ["pcs", "box", "pack"] },
