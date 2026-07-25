@@ -592,6 +592,14 @@ function MedicationDialog({
       courseFirstIso = first.toISOString();
       courseTotal = n;
     }
+    if (!canSaveLink) {
+      // The button is already disabled in this state; belt-and-braces.
+      return;
+    }
+    const savedPerDose =
+      inventoryItemId && perDoseResult?.kind === "ok"
+        ? perDoseResult.perDose
+        : null;
     try {
       await saveMed.mutateAsync({
         id: medication?.id,
