@@ -251,10 +251,20 @@ export function useSetHospitalMode() {
   const qc = useQueryClient();
   return useMutation({
     meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
-    mutationFn: async ({ familyId, on }: { familyId: string; on: boolean }) => {
+    mutationFn: async ({
+      familyId,
+      on,
+      paused,
+    }: {
+      familyId: string;
+      on: boolean;
+      /** Only sent when turning ON. Persisted verbatim as families.hospital_paused. */
+      paused?: Record<string, boolean> | null;
+    }) => {
       const { data, error } = await supabase.rpc("set_family_hospital_mode", {
         _family_id: familyId,
         _on: on,
+        _paused: paused ?? null,
       });
       if (error) throw error;
       return data as string | null;
