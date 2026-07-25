@@ -167,6 +167,7 @@ export const sv = {
   },
   nav: {
     care: "Omsorg",
+    caregiversGroup: "Vårdgivare",
     family: "Familj",
     dashboard: "Idag",
     schedule: "Schema",
@@ -1008,6 +1009,12 @@ export const sv = {
     helpSub: "Spela upp guiden igen eller starta om välkomstguiden.",
     replayTour: "Spela upp guiden igen",
     restartWizard: "Starta om välkomstguiden",
+    accountBlockTitle: "Ditt konto",
+    accountBlockSub: "Personliga inställningar för dig på den här enheten.",
+    familyBlockTitle: "Familjeinställningar",
+    familyBlockSub: "Delade inställningar för hela vårdteamet. Endast ägare.",
+    activeProfileTitle: "Aktiv vårdgivarprofil",
+    activeProfileSub: "Välj vilken av dina profiler du agerar som just nu.",
   },
   wizard: {
     welcome: "Välkommen till CareNest",
