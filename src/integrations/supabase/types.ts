@@ -1135,6 +1135,7 @@ export type Database = {
       inventory_items: {
         Row: {
           active: boolean
+          category: Database["public"]["Enums"]["inventory_category"]
           created_at: string
           created_by: string
           days_left_estimate: number | null
@@ -1158,6 +1159,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          category?: Database["public"]["Enums"]["inventory_category"]
           created_at?: string
           created_by: string
           days_left_estimate?: number | null
@@ -1181,6 +1183,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          category?: Database["public"]["Enums"]["inventory_category"]
           created_at?: string
           created_by?: string
           days_left_estimate?: number | null
@@ -2238,6 +2241,13 @@ export type Database = {
         | "expiry_writeoff"
         | "received"
         | "days_left_update"
+      inventory_category:
+        | "nutrition"
+        | "hygiene"
+        | "medicine"
+        | "medical_supplies"
+        | "equipment"
+        | "other"
       invite_status: "pending" | "accepted" | "revoked"
       maintenance_scope: "machine" | "part"
       med_log_status: "given" | "skipped" | "missed" | "postponed" | "ongoing"
@@ -2431,6 +2441,14 @@ export const Constants = {
         "expiry_writeoff",
         "received",
         "days_left_update",
+      ],
+      inventory_category: [
+        "nutrition",
+        "hygiene",
+        "medicine",
+        "medical_supplies",
+        "equipment",
+        "other",
       ],
       invite_status: ["pending", "accepted", "revoked"],
       maintenance_scope: ["machine", "part"],
