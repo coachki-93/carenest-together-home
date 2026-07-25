@@ -55,7 +55,9 @@ import {
   expiryStatus,
   summarizeStock,
   UNIT_GROUPS,
+  INVENTORY_CATEGORIES,
   type InventoryItem,
+  type InventoryCategory,
   type UnitKind,
 } from "@/lib/data/inventory";
 import { useFamilyMembers } from "@/lib/data/family";
@@ -76,6 +78,7 @@ export const Route = createFileRoute("/_authenticated/inventory")({
 });
 
 type FilterMode = "all" | "low" | "expiring";
+type CategoryFilter = "all" | InventoryCategory;
 
 function InventoryPage() {
   const { t } = useTranslation();
@@ -104,6 +107,7 @@ function InventoryPage() {
   }, [openAdhocs, nextSlot]);
 
   const [filter, setFilter] = useState<FilterMode>("all");
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [editing, setEditing] = useState<InventoryItem | null>(null);
   const [creating, setCreating] = useState(false);
   const [historyFor, setHistoryFor] = useState<InventoryItem | null>(null);
@@ -113,6 +117,7 @@ function InventoryPage() {
   const filtered = useMemo(() => {
     return items.filter((it) => {
       if (!it.active) return false;
+      if (categoryFilter !== "all" && it.category !== categoryFilter) return false;
       if (filter === "low") return isLowStock(it);
       if (filter === "expiring") {
         const e = expiryStatus(it);
@@ -120,7 +125,7 @@ function InventoryPage() {
       }
       return true;
     });
-  }, [items, filter]);
+  }, [items, filter, categoryFilter]);
 
   return (
     <DashboardLayout
@@ -176,8 +181,8 @@ function InventoryPage() {
           </div>
         )}
 
-        {/* Filters */}
-        <div className="flex gap-2">
+        {/* Filters — status row */}
+        <div className="flex gap-2 flex-wrap">
           {(["all", "low", "expiring"] as FilterMode[]).map((m) => (
             <button
               key={m}
@@ -194,6 +199,38 @@ function InventoryPage() {
             </button>
           ))}
         </div>
+
+        {/* Filters — category row */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mt-2 pb-1">
+          <button
+            type="button"
+            onClick={() => setCategoryFilter("all")}
+            className={cn(
+              "shrink-0 px-3 py-1.5 rounded-full text-sm font-semibold border",
+              categoryFilter === "all"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background hover:bg-muted",
+            )}
+          >
+            {t("inventory.category.all")}
+          </button>
+          {INVENTORY_CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategoryFilter(c)}
+              className={cn(
+                "shrink-0 px-3 py-1.5 rounded-full text-sm font-semibold border",
+                categoryFilter === c
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background hover:bg-muted",
+              )}
+            >
+              {t(`inventory.category.${c}`)}
+            </button>
+          ))}
+        </div>
+
 
         {/* Items */}
         {isLoading ? (
@@ -811,6 +848,7 @@ function InventoryDialog({
   const adjust = useAdjustInventory();
 
   const [name, setName] = useState(item?.name ?? "");
+  const [category, setCategory] = useState<InventoryCategory>(item?.category ?? "other");
   const [unit, setUnit] = useState<UnitKind>(item?.unit ?? "pcs");
   const [quantity, setQuantity] = useState(
     item ? String(item.quantity) : "0",
@@ -850,6 +888,7 @@ function InventoryDialog({
           family_id: item.family_id,
           created_by: item.created_by,
           name: name.trim(),
+          category,
           unit,
           low_stock_threshold: thr,
           expiry_date: expiry || null,
@@ -879,6 +918,7 @@ function InventoryDialog({
                 family_id: familyId,
                 created_by: userId,
                 name: name.trim(),
+                category,
                 unit,
                 quantity: 0,
                 low_stock_threshold: thr,
@@ -926,6 +966,23 @@ function InventoryDialog({
             <Label>{t("inventory.name")}</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
+
+          <div className="space-y-1.5">
+            <Label>{t("inventory.category.label")}</Label>
+            <Select value={category} onValueChange={(v) => setCategory(v as InventoryCategory)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {INVENTORY_CATEGORIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {t(`inventory.category.${c}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
