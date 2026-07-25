@@ -823,6 +823,7 @@ export type Database = {
           created_at: string
           handover_reminder_duration_minutes: number
           handover_reminder_minutes: number
+          hospital_paused: Json | null
           id: string
           name: string
           notification_language: string
@@ -838,6 +839,7 @@ export type Database = {
           created_at?: string
           handover_reminder_duration_minutes?: number
           handover_reminder_minutes?: number
+          hospital_paused?: Json | null
           id?: string
           name?: string
           notification_language?: string
@@ -853,6 +855,7 @@ export type Database = {
           created_at?: string
           handover_reminder_duration_minutes?: number
           handover_reminder_minutes?: number
+          hospital_paused?: Json | null
           id?: string
           name?: string
           notification_language?: string
@@ -2178,10 +2181,12 @@ export type Database = {
         }
         Returns: string
       }
-      set_family_hospital_mode: {
-        Args: { _family_id: string; _on: boolean }
-        Returns: string
-      }
+      set_family_hospital_mode:
+        | { Args: { _family_id: string; _on: boolean }; Returns: string }
+        | {
+            Args: { _family_id: string; _on: boolean; _paused?: Json }
+            Returns: string
+          }
       shares_family_with: {
         Args: { _me: string; _other_user: string }
         Returns: boolean
