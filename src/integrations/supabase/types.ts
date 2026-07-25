@@ -2241,6 +2241,7 @@ export type Database = {
         | "expiry_writeoff"
         | "received"
         | "days_left_update"
+        | "med_dose"
       inventory_category:
         | "nutrition"
         | "hygiene"
@@ -2441,6 +2442,7 @@ export const Constants = {
         "expiry_writeoff",
         "received",
         "days_left_update",
+        "med_dose",
       ],
       inventory_category: [
         "nutrition",
