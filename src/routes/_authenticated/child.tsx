@@ -14,6 +14,8 @@ import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 import { useFamilyChild } from "@/lib/data/medications";
 import { useUpdateChild } from "@/lib/data/family";
 import { EmergencyStepsSettings } from "@/components/carenest/EmergencyStepsSettings";
+import { CareNeedsPicker } from "@/components/carenest/CareNeedsPicker";
+import { parseCareNeeds, type CareNeeds } from "@/lib/care-needs/parse";
 import {
   ageMonthsFromDob,
   getVitalRanges,
@@ -21,6 +23,7 @@ import {
   type VitalRangeOverrides,
   type VitalType,
 } from "@/lib/data/vitals";
+
 
 
 export const Route = createFileRoute("/_authenticated/child")({
@@ -59,6 +62,8 @@ function ChildProfilePage() {
   const [contacts, setContacts] = useState<Contact[]>([{ name: "", phone: "", relationship: "" }]);
   const [doctors, setDoctors] = useState<Doctor[]>([{ name: "", specialty: "", phone: "" }]);
   const [customRanges, setCustomRanges] = useState<VitalRangeOverrides>({});
+  const [careNeeds, setCareNeeds] = useState<CareNeeds>({ capabilities: [] });
+
 
   useEffect(() => {
     if (!child) return;
@@ -71,6 +76,8 @@ function ChildProfilePage() {
     setContacts(asContacts(child.emergency_contacts));
     setDoctors(asDoctors(child.doctors));
     setCustomRanges(parseRangeOverrides(child.custom_vital_ranges));
+    setCareNeeds(parseCareNeeds((child as unknown as { care_needs?: unknown }).care_needs));
+
   }, [child]);
 
   const ageMonths = ageMonthsFromDob(dob);
@@ -101,6 +108,11 @@ function ChildProfilePage() {
           emergency_contacts: contacts.filter((c) => c.name.trim()) as unknown as never,
           doctors: doctors.filter((d) => d.name.trim()) as unknown as never,
           custom_vital_ranges: customRanges as unknown as never,
+          care_needs: {
+            ...(((child as unknown as { care_needs?: Record<string, unknown> }).care_needs) ?? {}),
+            ...careNeeds,
+          } as unknown as never,
+
         },
 
       });
@@ -228,6 +240,10 @@ function ChildProfilePage() {
         />
 
         <EmergencyStepsSettings familyId={membership?.family_id} canEdit={canEdit} />
+
+        <CareNeedsPicker value={careNeeds} onChange={setCareNeeds} canEdit={canEdit} />
+
+
 
 
         <section className="space-y-3">
