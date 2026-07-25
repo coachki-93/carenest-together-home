@@ -42,6 +42,10 @@ function SettingsPage() {
   const { user } = useSession();
   const profile = useProfile();
   const membership = useMyMembership();
+  const isOwner = membership.data?.role === "owner";
+  const familyId = membership.data?.family_id;
+  const actor = useCurrentActor(familyId);
+  const showActiveProfile = actor.profiles.length > 1 && !!user?.id && !!familyId;
 
   const [name, setName] = useState("");
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
