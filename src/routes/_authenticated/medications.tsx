@@ -1009,7 +1009,7 @@ function MedicationDialog({
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" disabled={saveMed.isPending} className="rounded-full">
+            <Button type="submit" disabled={saveMed.isPending || !canSaveLink} className="rounded-full">
               {saveMed.isPending ? t("meds.saving") : t("meds.saveMed")}
             </Button>
           </DialogFooter>
