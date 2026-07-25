@@ -180,7 +180,7 @@ export function useFamily(familyId: string | undefined | null) {
       const { data, error } = await supabase
         .from("families")
         .select(
-          "id, name, owner_id, at_hospital_since, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language, owner_notify_level",
+          "id, name, owner_id, at_hospital_since, hospital_paused, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language, owner_notify_level",
         )
         .eq("id", familyId!)
         .single();
