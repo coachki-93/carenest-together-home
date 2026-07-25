@@ -326,6 +326,10 @@ function MedicationCard({
   onToggleArchive: () => void;
 }) {
   const { t, i18n } = useTranslation();
+  const { data: invItems } = useInventoryItems(med.family_id);
+  const linkedInv = med.inventory_item_id
+    ? (invItems ?? []).find((i) => i.id === med.inventory_item_id) ?? null
+    : null;
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
   const now = new Date();
   const status = courseStatus(med as MedWithCourse, tz, now);
