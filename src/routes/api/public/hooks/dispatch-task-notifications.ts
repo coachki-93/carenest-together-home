@@ -3,6 +3,7 @@ import { formatTimeIn, wallClockIn } from "@/lib/time/family-tz";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver, type NotifyCategory } from "@/lib/push/recipients";
+import { isPaused } from "@/lib/hospital/paused";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
 // anon `apikey` header. Runs four passes per call, all deduped per-occurrence
