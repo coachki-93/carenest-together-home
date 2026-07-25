@@ -15,6 +15,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "@/lib/notify";
+import { isPaused } from "@/lib/hospital/paused";
 import {
   useCarePlaceItems,
   useCarePlaceTimes,
@@ -101,7 +102,7 @@ export function CarePlaceCheckBanner({ familyId, userId }: Props) {
   const [notes, setNotes] = useState("");
 
   if (!familyId || !userId || !currentSlot) return null;
-  if (family?.at_hospital_since) return null;
+  if (isPaused(family ?? null, "care_place")) return null;
 
   const activeItems = items.filter((i) => i.active);
 

@@ -109,6 +109,7 @@ import {
 import { useHandoverTimes } from "@/lib/data/handover-times";
 import { useLatestHandover } from "@/lib/data/handovers";
 import { ClipboardCheck } from "lucide-react";
+import { isPaused } from "@/lib/hospital/paused";
 
 type RepeatMode = "none" | RecurrenceFreq | "specific_times";
 
@@ -222,6 +223,7 @@ function SchedulePage() {
   );
   const handoverItems = useMemo<TimelineItem[]>(() => {
     if (!handoverDue) return [];
+    if (isPaused(family ?? null, "handover")) return [];
     return [
       {
         kind: "handover",
@@ -234,7 +236,7 @@ function SchedulePage() {
         coveredHandoverId: handoverDue.coveredHandoverId,
       },
     ];
-  }, [handoverDue]);
+  }, [handoverDue, family]);
 
   const timeline = useMemo<TimelineItem[]>(() => {
     const items: TimelineItem[] = [];

@@ -3,6 +3,7 @@ import { wallClockIn, yesterdayStrIn } from "@/lib/time/family-tz";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver } from "@/lib/push/recipients";
+import { isPaused } from "@/lib/hospital/paused";
 
 /**
  * Sweeps for Care Place Control slots whose grace window has expired today
@@ -59,22 +60,25 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
         if (tErr) return Response.json({ ok: false, error: tErr.message }, { status: 500 });
         if (!times?.length) return Response.json({ ok: true, missed: 0 });
 
-        // Load per-family settings once: hospital mode, timezone, language.
+        // Load per-family settings once: hospital-pause selection, tz, lang.
         const familyIds = Array.from(new Set(times.map((t) => t.family_id)));
         const { data: fams } = await supabaseAdmin
           .from("families")
-          .select("id, at_hospital_since, timezone, notification_language")
+          .select("id, at_hospital_since, hospital_paused, timezone, notification_language")
           .in("id", familyIds);
         const famInfo = new Map<
           string,
-          { tz: string; lang: Lang; hospital: boolean }
+          { tz: string; lang: Lang; paused: boolean }
         >(
           (fams ?? []).map((f) => [
             f.id,
             {
               tz: f.timezone ?? "Europe/Stockholm",
               lang: (f.notification_language === "en" ? "en" : "sv") as Lang,
-              hospital: !!f.at_hospital_since,
+              paused: isPaused(
+                { at_hospital_since: f.at_hospital_since, hospital_paused: f.hospital_paused },
+                "care_place",
+              ),
             },
           ]),
         );
@@ -112,7 +116,7 @@ export const Route = createFileRoute("/api/public/hooks/care-place-missed-sweep"
 
         for (const tm of times) {
           const info = famInfo.get(tm.family_id);
-          if (info?.hospital) continue;
+          if (info?.paused) continue;
           const tz = info?.tz ?? "Europe/Stockholm";
           const lang: Lang = info?.lang ?? "sv";
 

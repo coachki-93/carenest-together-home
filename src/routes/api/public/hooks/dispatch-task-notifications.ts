@@ -3,6 +3,7 @@ import { formatTimeIn, wallClockIn } from "@/lib/time/family-tz";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver, type NotifyCategory } from "@/lib/push/recipients";
+import { isPaused } from "@/lib/hospital/paused";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
 // anon `apikey` header. Runs four passes per call, all deduped per-occurrence
@@ -119,21 +120,32 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         const staleEndpoints: string[] = [];
         let dispatched = 0;
 
-        // Preload per-family timezone + language once.
+        // Preload per-family timezone + language + hospital-pause once.
         const { data: allFams } = await supabaseAdmin
           .from("families")
-          .select("id, timezone, notification_language");
-        const famInfo = new Map<string, { tz: string; lang: Lang }>(
+          .select("id, timezone, notification_language, at_hospital_since, hospital_paused");
+        const famInfo = new Map<
+          string,
+          { tz: string; lang: Lang; tasksPaused: boolean }
+        >(
           (allFams ?? []).map((f) => [
             f.id,
             {
               tz: f.timezone ?? "Europe/Stockholm",
               lang: (f.notification_language === "en" ? "en" : "sv") as Lang,
+              tasksPaused: isPaused(
+                { at_hospital_since: f.at_hospital_since, hospital_paused: f.hospital_paused },
+                "tasks",
+              ),
             },
           ]),
         );
         const infoFor = (familyId: string) =>
-          famInfo.get(familyId) ?? { tz: "Europe/Stockholm", lang: "sv" as Lang };
+          famInfo.get(familyId) ?? {
+            tz: "Europe/Stockholm",
+            lang: "sv" as Lang,
+            tasksPaused: false,
+          };
 
         const recipients = createRecipientResolver(supabaseAdmin);
 
@@ -323,6 +335,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 1: start (within START_GRACE_MINUTES) --------
         for (const c of slmCandidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const diffMin = (now.getTime() - c.occurrence_ms) / 60_000;
           if (diffMin < 0 || diffMin > START_GRACE_MINUTES) continue;
           if (!(await tryClaim(c.master_id, c.occurrence_at, "start"))) continue;
@@ -338,6 +351,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 2: late --------
         for (const c of slmCandidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const dueMs = c.occurrence_ms + c.late_after_minutes * 60_000;
           if (now.getTime() < dueMs) continue;
           if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
@@ -356,6 +370,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 3: missed --------
         for (const c of slmCandidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const dueMs = c.occurrence_ms + c.missed_after_minutes * 60_000;
           if (now.getTime() < dueMs) continue;
           if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
@@ -489,6 +504,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         }
 
         for (const c of candidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const remindAtMs = c.starts_at_ms - c.reminder_minutes * 60_000;
           if (now.getTime() < remindAtMs) continue;
           if (now.getTime() >= c.starts_at_ms) continue;

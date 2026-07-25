@@ -106,6 +106,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Play } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
+import { isPaused } from "@/lib/hospital/paused";
 
 const dashboardSearch = z.object({
   tour: z.coerce.number().int().optional(),
@@ -373,6 +374,8 @@ function DashboardPage() {
   const { data: invites = [] } = useInvites(familyId);
   const { data: family } = useFamily(familyId);
   const hospitalOn = !!family?.at_hospital_since;
+  const carePlacePaused = isPaused(family ?? null, "care_place");
+  const handoverPausedByHospital = isPaused(family ?? null, "handover");
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
 
@@ -967,7 +970,7 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
-          {!hospitalOn && missedChecks.length > 0 && (
+          {!carePlacePaused && missedChecks.length > 0 && (
             <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4 flex items-start gap-3">
               <div className="size-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center flex-none">
                 <ClipboardCheck className="size-5" />
@@ -1021,7 +1024,7 @@ function DashboardPage() {
             viewerUserId={user?.id}
             viewerProfileId={activeCaregiverId}
           />
-          {handoverDue && (
+          {handoverDue && !handoverPausedByHospital && (
             <HandoverDueBanner
               at={handoverDue.at}
               until={handoverDue.until}

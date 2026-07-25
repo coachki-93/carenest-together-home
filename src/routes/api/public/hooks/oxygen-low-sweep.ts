@@ -3,6 +3,7 @@ import { computeRemaining, type OxygenTankRow } from "@/lib/oxygen/tanks";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver } from "@/lib/push/recipients";
+import { isPaused } from "@/lib/hospital/paused";
 
 /**
  * Scans every active oxygen tank and pushes one notification when remaining
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
         const { data: families } = await supabaseAdmin
           .from("families")
           .select(
-            "id, oxygen_warn_minutes, oxygen_critical_minutes, at_hospital_since, notification_language",
+            "id, oxygen_warn_minutes, oxygen_critical_minutes, at_hospital_since, hospital_paused, notification_language",
           );
         const famSettings = new Map<
           string,
@@ -54,10 +55,17 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
             },
           ]),
         );
-        // Families currently at hospital have hospital-supplied oxygen, so we
-        // skip low-tank pushes for them entirely.
-        const hospitalFamilyIds = new Set<string>(
-          (families ?? []).filter((f) => f.at_hospital_since).map((f) => f.id),
+        // Families that paused the "oxygen" category (default: on while at
+        // hospital) skip low-tank pushes — the hospital supplies oxygen.
+        const oxygenPausedFamilyIds = new Set<string>(
+          (families ?? [])
+            .filter((f) =>
+              isPaused(
+                { at_hospital_since: f.at_hospital_since, hospital_paused: f.hospital_paused },
+                "oxygen",
+              ),
+            )
+            .map((f) => f.id),
         );
 
         const OX_COPY = {
@@ -85,7 +93,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
 
         for (const tank of tanks ?? []) {
           if (tank.paused_at) continue;
-          if (hospitalFamilyIds.has(tank.family_id)) continue;
+          if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
           const info = computeRemaining(tank as unknown as OxygenTankRow);
           if (!info) continue;
           const { warn, crit, lang } = famSettings.get(tank.family_id) ?? {
