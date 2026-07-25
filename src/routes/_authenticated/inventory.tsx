@@ -55,7 +55,9 @@ import {
   expiryStatus,
   summarizeStock,
   UNIT_GROUPS,
+  INVENTORY_CATEGORIES,
   type InventoryItem,
+  type InventoryCategory,
   type UnitKind,
 } from "@/lib/data/inventory";
 import { useFamilyMembers } from "@/lib/data/family";
