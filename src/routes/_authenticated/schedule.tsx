@@ -236,7 +236,7 @@ function SchedulePage() {
         coveredHandoverId: handoverDue.coveredHandoverId,
       },
     ];
-  }, [handoverDue]);
+  }, [handoverDue, family]);
 
   const timeline = useMemo<TimelineItem[]>(() => {
     const items: TimelineItem[] = [];
