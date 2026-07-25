@@ -723,6 +723,7 @@ export type Database = {
       children: {
         Row: {
           allergies: string | null
+          care_needs: Json
           condition_details: string | null
           created_at: string
           custom_vital_ranges: Json
@@ -738,6 +739,7 @@ export type Database = {
         }
         Insert: {
           allergies?: string | null
+          care_needs?: Json
           condition_details?: string | null
           created_at?: string
           custom_vital_ranges?: Json
@@ -753,6 +755,7 @@ export type Database = {
         }
         Update: {
           allergies?: string | null
+          care_needs?: Json
           condition_details?: string | null
           created_at?: string
           custom_vital_ranges?: Json
