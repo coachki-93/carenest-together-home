@@ -109,6 +109,7 @@ import {
 import { useHandoverTimes } from "@/lib/data/handover-times";
 import { useLatestHandover } from "@/lib/data/handovers";
 import { ClipboardCheck } from "lucide-react";
+import { isPaused } from "@/lib/hospital/paused";
 
 type RepeatMode = "none" | RecurrenceFreq | "specific_times";
 
