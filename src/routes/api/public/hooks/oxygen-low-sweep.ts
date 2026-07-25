@@ -86,7 +86,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
 
         for (const tank of tanks ?? []) {
           if (tank.paused_at) continue;
-          if (hospitalFamilyIds.has(tank.family_id)) continue;
+          if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
           const info = computeRemaining(tank as unknown as OxygenTankRow);
           if (!info) continue;
           const { warn, crit, lang } = famSettings.get(tank.family_id) ?? {
