@@ -56,6 +56,8 @@ import {
   type MedLog,
   type MedRoute,
 } from "@/lib/data/medications";
+import { useInventoryItems } from "@/lib/data/inventory";
+import { computePerDose } from "@/lib/data/medication-inventory";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { useSession } from "@/lib/auth/use-profile";
 
