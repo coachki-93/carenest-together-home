@@ -672,6 +672,72 @@ function MedicationDialog({
             </div>
           </div>
 
+          <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+            <Label className="font-semibold">{t("meds.inventory.section")}</Label>
+            <Select
+              value={inventoryItemId ?? "__none__"}
+              onValueChange={(v) => setInventoryItemId(v === "__none__" ? null : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("meds.inventory.pick")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">{t("meds.inventory.none")}</SelectItem>
+                {medicineItems.length === 0 && (
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                    {t("meds.inventory.noMedicineItems")}
+                  </div>
+                )}
+                {medicineItems.map((i) => (
+                  <SelectItem key={i.id} value={i.id}>
+                    {i.name} ({i.quantity} {i.unit})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {linkedItem && perDoseResult?.kind === "ok" && (
+              <p className="text-xs text-muted-foreground">
+                {t("meds.inventory.perDoseHint", {
+                  amount: perDoseResult.perDose,
+                  unit: perDoseResult.itemUnit,
+                  item: linkedItem.name,
+                })}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "crossFamily" && (
+              <p className="text-xs text-destructive">
+                {t("meds.inventory.crossFamilyBlock", {
+                  from: perDoseResult.normalizedDoseUnit,
+                  to: perDoseResult.itemUnit,
+                })}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "packaging" && (
+              <p className="text-xs text-destructive">
+                {t("meds.inventory.packagingBlock")}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "unrecognized" && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t("meds.inventory.unrecognizedUnitWarn", {
+                  unit: perDoseResult.rawDoseUnit ?? "",
+                })}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "invalidAmount" && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t("meds.inventory.invalidAmountWarn")}
+              </p>
+            )}
+            {linkedItem && (
+              <p className="text-xs text-muted-foreground">
+                {t("meds.inventory.retroNote")}
+              </p>
+            )}
+          </div>
+
+
+
           <div className="space-y-1.5">
             <Label>{t("meds.route")}</Label>
             <Select value={route} onValueChange={(v) => setRoute(v as MedRoute)}>
