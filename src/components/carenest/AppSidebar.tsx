@@ -60,20 +60,41 @@ export function AppSidebar() {
     { title: t("nav.maintenance"), url: "/maintenance", icon: Wrench },
     { title: t("nav.shopping"), url: "/shopping", icon: ShoppingCart },
     { title: t("nav.emergency"), url: "/emergency", icon: AlertTriangle },
-
-    
   ];
 
+  const caregiversGroup = [
+    { title: t("nav.caregivers"), url: "/caregivers", icon: Users },
+    { title: t("nav.shifts"), url: "/shifts", icon: CalendarDays },
+  ];
 
   const family = [
     { title: t("nav.child"), url: "/child", icon: Baby },
-    { title: t("nav.caregivers"), url: "/caregivers", icon: Users },
-    { title: t("nav.shifts"), url: "/shifts", icon: CalendarDays },
-    { title: t("nav.settings"), url: "/settings", icon: Settings },
   ];
+
+  const settingsItem = { title: t("nav.settings"), url: "/settings", icon: Settings };
 
   const isActive = (url: string) =>
     pathname === url || pathname.startsWith(url + "/");
+
+  const renderMenu = (list: { title: string; url: string; icon: typeof Baby }[]) => (
+    <SidebarMenu>
+      {list.map((item) => (
+        <SidebarMenuItem key={item.url}>
+          <SidebarMenuButton
+            asChild
+            isActive={isActive(item.url)}
+            className="rounded-xl h-11"
+            tooltip={item.title}
+          >
+            <Link to={item.url} className="flex items-center gap-3">
+              <item.icon className="size-5" />
+              {!collapsed && <span className="font-semibold">{item.title}</span>}
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
 
   return (
     <Sidebar collapsible="icon" className="border-r">
@@ -85,57 +106,42 @@ export function AppSidebar() {
       <SidebarContent data-tour="sidebar">
         <SidebarGroup>
           {!collapsed && <SidebarGroupLabel>{t("nav.care")}</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    className="rounded-xl h-11"
-                    tooltip={item.title}
-                  >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="size-5" />
-                      {!collapsed && <span className="font-semibold">{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
+          <SidebarGroupContent>{renderMenu(items)}</SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel>{t("nav.caregiversGroup")}</SidebarGroupLabel>}
+          <SidebarGroupContent>{renderMenu(caregiversGroup)}</SidebarGroupContent>
         </SidebarGroup>
 
         <SidebarGroup>
           {!collapsed && <SidebarGroupLabel>{t("nav.family")}</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {family.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    className="rounded-xl h-11"
-                    tooltip={item.title}
-                  >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="size-5" />
-                      {!collapsed && <span className="font-semibold">{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
+          <SidebarGroupContent>{renderMenu(family)}</SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {!collapsed && (
-        <SidebarFooter className="px-3 py-3 safe-pb space-y-2">
-          <HospitalToggle />
-          <LanguageToggle />
-        </SidebarFooter>
-      )}
-
+      <SidebarFooter className="px-3 py-3 safe-pb space-y-2 border-t">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive(settingsItem.url)}
+              className="rounded-xl h-11"
+              tooltip={settingsItem.title}
+            >
+              <Link to={settingsItem.url} className="flex items-center gap-3">
+                <settingsItem.icon className="size-5" />
+                {!collapsed && <span className="font-semibold">{settingsItem.title}</span>}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        {!collapsed && (
+          <>
+            <HospitalToggle />
+            <LanguageToggle />
+          </>
+        )}
+      </SidebarFooter>
     </Sidebar>
   );
 }
