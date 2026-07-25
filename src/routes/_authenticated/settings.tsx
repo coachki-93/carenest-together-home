@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles, Hospital } from "lucide-react";
+import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles, Hospital, UserCircle2, Users2 } from "lucide-react";
 import { resetTour } from "@/lib/onboarding/tour-state";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
@@ -13,6 +13,8 @@ import { HandoverReminderSettings } from "@/components/carenest/HandoverReminder
 import { OwnerNotifyLevelSettings } from "@/components/carenest/OwnerNotifyLevelSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
+import { ActiveProfileSwitcher } from "@/components/carenest/ActiveProfileSwitcher";
+import { useCurrentActor } from "@/lib/data/current-actor";
 
 import {
   AvatarColorPicker,
