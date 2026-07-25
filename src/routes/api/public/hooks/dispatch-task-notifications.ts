@@ -335,6 +335,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 1: start (within START_GRACE_MINUTES) --------
         for (const c of slmCandidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const diffMin = (now.getTime() - c.occurrence_ms) / 60_000;
           if (diffMin < 0 || diffMin > START_GRACE_MINUTES) continue;
           if (!(await tryClaim(c.master_id, c.occurrence_at, "start"))) continue;
@@ -350,6 +351,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 2: late --------
         for (const c of slmCandidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const dueMs = c.occurrence_ms + c.late_after_minutes * 60_000;
           if (now.getTime() < dueMs) continue;
           if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
@@ -368,6 +370,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // -------- PASS 3: missed --------
         for (const c of slmCandidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const dueMs = c.occurrence_ms + c.missed_after_minutes * 60_000;
           if (now.getTime() < dueMs) continue;
           if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
