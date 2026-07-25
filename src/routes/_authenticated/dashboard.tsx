@@ -970,7 +970,7 @@ function DashboardPage() {
           </section>
 
           {/* Today's schedule */}
-          {!hospitalOn && missedChecks.length > 0 && (
+          {!carePlacePaused && missedChecks.length > 0 && (
             <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4 flex items-start gap-3">
               <div className="size-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center flex-none">
                 <ClipboardCheck className="size-5" />
@@ -1024,7 +1024,7 @@ function DashboardPage() {
             viewerUserId={user?.id}
             viewerProfileId={activeCaregiverId}
           />
-          {handoverDue && (
+          {handoverDue && !handoverPausedByHospital && (
             <HandoverDueBanner
               at={handoverDue.at}
               until={handoverDue.until}
