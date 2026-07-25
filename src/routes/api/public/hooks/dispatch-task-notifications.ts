@@ -119,21 +119,32 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         const staleEndpoints: string[] = [];
         let dispatched = 0;
 
-        // Preload per-family timezone + language once.
+        // Preload per-family timezone + language + hospital-pause once.
         const { data: allFams } = await supabaseAdmin
           .from("families")
-          .select("id, timezone, notification_language");
-        const famInfo = new Map<string, { tz: string; lang: Lang }>(
+          .select("id, timezone, notification_language, at_hospital_since, hospital_paused");
+        const famInfo = new Map<
+          string,
+          { tz: string; lang: Lang; tasksPaused: boolean }
+        >(
           (allFams ?? []).map((f) => [
             f.id,
             {
               tz: f.timezone ?? "Europe/Stockholm",
               lang: (f.notification_language === "en" ? "en" : "sv") as Lang,
+              tasksPaused: isPaused(
+                { at_hospital_since: f.at_hospital_since, hospital_paused: f.hospital_paused },
+                "tasks",
+              ),
             },
           ]),
         );
         const infoFor = (familyId: string) =>
-          famInfo.get(familyId) ?? { tz: "Europe/Stockholm", lang: "sv" as Lang };
+          famInfo.get(familyId) ?? {
+            tz: "Europe/Stockholm",
+            lang: "sv" as Lang,
+            tasksPaused: false,
+          };
 
         const recipients = createRecipientResolver(supabaseAdmin);
 
