@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles, Hospital } from "lucide-react";
+import { Loader2, LogOut, User, Lock, Globe, Palette, HelpCircle, Sparkles, Hospital, UserCircle2, Users2 } from "lucide-react";
 import { resetTour } from "@/lib/onboarding/tour-state";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { ImageUpload } from "@/components/carenest/ImageUpload";
@@ -13,6 +13,8 @@ import { HandoverReminderSettings } from "@/components/carenest/HandoverReminder
 import { OwnerNotifyLevelSettings } from "@/components/carenest/OwnerNotifyLevelSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
+import { ActiveProfileSwitcher } from "@/components/carenest/ActiveProfileSwitcher";
+import { useCurrentActor } from "@/lib/data/current-actor";
 
 import {
   AvatarColorPicker,
@@ -40,6 +42,10 @@ function SettingsPage() {
   const { user } = useSession();
   const profile = useProfile();
   const membership = useMyMembership();
+  const isOwner = membership.data?.role === "owner";
+  const familyId = membership.data?.family_id;
+  const actor = useCurrentActor(familyId);
+  const showActiveProfile = actor.profiles.length > 1 && !!user?.id && !!familyId;
 
   const [name, setName] = useState("");
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
@@ -126,308 +132,324 @@ function SettingsPage() {
       title={t("nav.settings")}
       subtitle={t("settingsPage.subtitle")}
     >
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Profile */}
-        <section className="card-soft p-6 md:p-8 space-y-6">
-          <header className="flex items-center gap-3">
+      <div className="max-w-2xl mx-auto space-y-8">
+        {/* ============ YOUR ACCOUNT ============ */}
+        <div className="space-y-3">
+          <header className="flex items-center gap-3 px-1">
             <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
-              <User className="size-5" />
+              <UserCircle2 className="size-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">{t("settingsPage.profileTitle")}</h2>
-              <p className="text-sm text-muted-foreground">
-                {t("settingsPage.profileSub")}
-              </p>
+              <h2 className="text-xl font-bold">{t("settingsPage.accountBlockTitle")}</h2>
+              <p className="text-sm text-muted-foreground">{t("settingsPage.accountBlockSub")}</p>
             </div>
           </header>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              saveProfile.mutate();
-            }}
-            className="space-y-6"
-          >
-            <div className="flex flex-col items-center gap-4">
-              {user && (
-                <ImageUpload
-                  userId={user.id}
-                  folder="profiles"
-                  value={avatarPath}
-                  onChange={setAvatarPath}
-                  size={96}
-                />
-              )}
-              {!avatarPath && (
-                <div className="flex flex-col items-center gap-3">
-                  <div
-                    className="size-20 rounded-full flex items-center justify-center text-white text-2xl font-bold"
-                    style={{ backgroundColor: color }}
-                  >
-                    {initials(name || "?")}
-                  </div>
+          <div className="space-y-6">
+            {/* Profile */}
+            <section className="card-soft p-6 md:p-8 space-y-6">
+              <header className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                  <User className="size-5" />
                 </div>
-              )}
-            </div>
+                <div>
+                  <h2 className="text-lg font-bold">{t("settingsPage.profileTitle")}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {t("settingsPage.profileSub")}
+                  </p>
+                </div>
+              </header>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-sm font-semibold">
-                {t("common.fullName")}
-              </Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="h-11 rounded-xl"
-                required
-              />
-            </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  saveProfile.mutate();
+                }}
+                className="space-y-6"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  {user && (
+                    <ImageUpload
+                      userId={user.id}
+                      folder="profiles"
+                      value={avatarPath}
+                      onChange={setAvatarPath}
+                      size={96}
+                    />
+                  )}
+                  {!avatarPath && (
+                    <div className="flex flex-col items-center gap-3">
+                      <div
+                        className="size-20 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                        style={{ backgroundColor: color }}
+                      >
+                        {initials(name || "?")}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold flex items-center gap-2">
-                <Palette className="size-4" /> {t("settingsPage.color")}
-              </Label>
-              <AvatarColorPicker value={color} onChange={setColor} />
-            </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-sm font-semibold">
+                    {t("common.fullName")}
+                  </Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="h-11 rounded-xl"
+                    required
+                  />
+                </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">{t("common.email")}</Label>
-              <Input
-                value={user?.email ?? ""}
-                disabled
-                className="h-11 rounded-xl bg-muted"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold flex items-center gap-2">
+                    <Palette className="size-4" /> {t("settingsPage.color")}
+                  </Label>
+                  <AvatarColorPicker value={color} onChange={setColor} />
+                </div>
 
-            <Button
-              type="submit"
-              disabled={saveProfile.isPending}
-              className="rounded-full"
-            >
-              {saveProfile.isPending && (
-                <Loader2 className="size-4 animate-spin" />
-              )}
-              {saveProfile.isPending
-                ? t("common.saving")
-                : t("settingsPage.saveProfile")}
-            </Button>
-          </form>
-        </section>
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-semibold">{t("common.email")}</Label>
+                  <Input
+                    value={user?.email ?? ""}
+                    disabled
+                    className="h-11 rounded-xl bg-muted"
+                  />
+                </div>
 
-        {/* Language */}
-        <section className="card-soft p-6 md:p-8 space-y-4">
-          <header className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
-              <Globe className="size-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold">{t("common.language")}</h2>
-              <p className="text-sm text-muted-foreground">
-                {t("settingsPage.languageSub")}
-              </p>
-            </div>
-          </header>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => pickLang("en")}
-              className={`rounded-xl border-2 p-4 text-left transition-colors ${
-                currentLang === "en"
-                  ? "border-primary bg-primary-soft"
-                  : "border-border hover:border-primary/40"
-              }`}
-            >
-              <div className="text-2xl">🇬🇧</div>
-              <div className="font-semibold mt-1">English</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => pickLang("sv")}
-              className={`rounded-xl border-2 p-4 text-left transition-colors ${
-                currentLang === "sv"
-                  ? "border-primary bg-primary-soft"
-                  : "border-border hover:border-primary/40"
-              }`}
-            >
-              <div className="text-2xl">🇸🇪</div>
-              <div className="font-semibold mt-1">Svenska</div>
-            </button>
+                <Button
+                  type="submit"
+                  disabled={saveProfile.isPending}
+                  className="rounded-full"
+                >
+                  {saveProfile.isPending && (
+                    <Loader2 className="size-4 animate-spin" />
+                  )}
+                  {saveProfile.isPending
+                    ? t("common.saving")
+                    : t("settingsPage.saveProfile")}
+                </Button>
+              </form>
+            </section>
+
+            {/* Active caregiver profile (only shown when the account has 2+ profiles) */}
+            {showActiveProfile && (
+              <section className="card-soft p-6 md:p-8 space-y-4">
+                <header className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                    <Users2 className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold">{t("settingsPage.activeProfileTitle")}</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {t("settingsPage.activeProfileSub")}
+                    </p>
+                  </div>
+                </header>
+                <ActiveProfileSwitcher familyId={familyId!} userId={user!.id} />
+              </section>
+            )}
+
+            {/* Language */}
+            <section className="card-soft p-6 md:p-8 space-y-4">
+              <header className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                  <Globe className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">{t("common.language")}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {t("settingsPage.languageSub")}
+                  </p>
+                </div>
+              </header>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => pickLang("en")}
+                  className={`rounded-xl border-2 p-4 text-left transition-colors ${
+                    currentLang === "en"
+                      ? "border-primary bg-primary-soft"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <div className="text-2xl">🇬🇧</div>
+                  <div className="font-semibold mt-1">English</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => pickLang("sv")}
+                  className={`rounded-xl border-2 p-4 text-left transition-colors ${
+                    currentLang === "sv"
+                      ? "border-primary bg-primary-soft"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <div className="text-2xl">🇸🇪</div>
+                  <div className="font-semibold mt-1">Svenska</div>
+                </button>
+              </div>
+            </section>
+
+            {/* Notifications */}
+            <EnableNotificationsCard />
+
+            {/* Password */}
+            <section className="card-soft p-6 md:p-8 space-y-6">
+              <header className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                  <Lock className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">{t("settingsPage.passwordTitle")}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {t("settingsPage.passwordSub")}
+                  </p>
+                </div>
+              </header>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  changePassword.mutate();
+                }}
+                className="space-y-4"
+              >
+                <div className="space-y-1.5">
+                  <Label htmlFor="new-pw" className="text-sm font-semibold">
+                    {t("auth.newPassword")}
+                  </Label>
+                  <Input
+                    id="new-pw"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="h-11 rounded-xl"
+                    placeholder={t("auth.atLeast8")}
+                    autoComplete="new-password"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirm-pw" className="text-sm font-semibold">
+                    {t("auth.confirmPassword")}
+                  </Label>
+                  <Input
+                    id="confirm-pw"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="h-11 rounded-xl"
+                    autoComplete="new-password"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  disabled={changePassword.isPending || !newPassword}
+                  className="rounded-full"
+                >
+                  {changePassword.isPending && (
+                    <Loader2 className="size-4 animate-spin" />
+                  )}
+                  {t("auth.updatePassword")}
+                </Button>
+              </form>
+            </section>
+
+            {/* Help & onboarding */}
+            <section className="card-soft p-6 md:p-8 space-y-4">
+              <header className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                  <HelpCircle className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">{t("settingsPage.helpTitle")}</h2>
+                  <p className="text-sm text-muted-foreground">{t("settingsPage.helpSub")}</p>
+                </div>
+              </header>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  className="rounded-xl h-auto py-3 justify-start"
+                  onClick={() => {
+                    resetTour(user?.id);
+                    navigate({ to: "/dashboard", search: { tour: 1 } as never });
+                  }}
+                >
+                  <Sparkles className="size-4" />
+                  <span className="text-left">{t("settingsPage.replayTour")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-xl h-auto py-3 justify-start"
+                  onClick={() =>
+                    navigate({ to: "/onboarding/child", search: { step: 1 } })
+                  }
+                >
+                  <HelpCircle className="size-4" />
+                  <span className="text-left">{t("settingsPage.restartWizard")}</span>
+                </Button>
+              </div>
+            </section>
+
+            {/* Sign out */}
+            <section className="card-soft p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold">{t("settingsPage.signOutTitle")}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {t("settingsPage.signOutSub")}
+                </p>
+              </div>
+              <Button
+                variant="destructive"
+                onClick={signOut}
+                className="rounded-full"
+              >
+                <LogOut className="size-4" />
+                {t("common.signOut")}
+              </Button>
+            </section>
           </div>
-        </section>
+        </div>
 
-        {/* Notifications */}
-        <EnableNotificationsCard />
+        {/* ============ FAMILY SETTINGS (owner only) ============ */}
+        {isOwner && (
+          <div className="space-y-3">
+            <header className="flex items-center gap-3 px-1">
+              <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                <Hospital className="size-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">{t("settingsPage.familyBlockTitle")}</h2>
+                <p className="text-sm text-muted-foreground">{t("settingsPage.familyBlockSub")}</p>
+              </div>
+            </header>
 
-        {/* Hospital mode */}
-        <section className="card-soft p-6 md:p-8 space-y-4">
-          <header className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
-              <Hospital className="size-5" />
+            <div className="space-y-6">
+              <section className="card-soft p-6 md:p-8 space-y-4">
+                <header className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                    <Hospital className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold">{t("dashboard.atHospital")}</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {t("dashboard.atHospitalDesc", { defaultValue: "Pause oxygen and mark the family as at hospital." })}
+                    </p>
+                  </div>
+                </header>
+                <HospitalToggle />
+              </section>
+
+              <FamilyLocaleSettings familyId={familyId} isOwner={isOwner} />
+              <CarePlaceCheckSettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
+              <TidySettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
+              <HandoverReminderSettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
+              <OwnerNotifyLevelSettings familyId={familyId} isOwner={isOwner} />
             </div>
-            <div>
-              <h2 className="text-lg font-bold">{t("dashboard.atHospital")}</h2>
-              <p className="text-sm text-muted-foreground">
-                {t("dashboard.atHospitalDesc", { defaultValue: "Pause oxygen and mark the family as at hospital." })}
-              </p>
-            </div>
-          </header>
-          <HospitalToggle />
-        </section>
-
-
-        {/* Family timezone & notification language */}
-        <FamilyLocaleSettings
-          familyId={membership.data?.family_id}
-          isOwner={membership.data?.role === "owner"}
-        />
-
-        {/* Care place control */}
-        <CarePlaceCheckSettings
-          familyId={membership.data?.family_id}
-          userId={user?.id}
-          isOwner={membership.data?.role === "owner"}
-        />
-
-        {/* End-of-Shift Tidy */}
-        <TidySettings
-          familyId={membership.data?.family_id}
-          userId={user?.id}
-          isOwner={membership.data?.role === "owner"}
-        />
-
-        {/* Handover reminder timing */}
-        <HandoverReminderSettings
-          familyId={membership.data?.family_id}
-          userId={user?.id}
-          isOwner={membership.data?.role === "owner"}
-        />
-
-        {/* Owner notification level */}
-        <OwnerNotifyLevelSettings
-          familyId={membership.data?.family_id}
-          isOwner={membership.data?.role === "owner"}
-        />
-
-
-
-
-
-        {/* Password */}
-        <section className="card-soft p-6 md:p-8 space-y-6">
-          <header className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
-              <Lock className="size-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold">{t("settingsPage.passwordTitle")}</h2>
-              <p className="text-sm text-muted-foreground">
-                {t("settingsPage.passwordSub")}
-              </p>
-            </div>
-          </header>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              changePassword.mutate();
-            }}
-            className="space-y-4"
-          >
-            <div className="space-y-1.5">
-              <Label htmlFor="new-pw" className="text-sm font-semibold">
-                {t("auth.newPassword")}
-              </Label>
-              <Input
-                id="new-pw"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="h-11 rounded-xl"
-                placeholder={t("auth.atLeast8")}
-                autoComplete="new-password"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="confirm-pw" className="text-sm font-semibold">
-                {t("auth.confirmPassword")}
-              </Label>
-              <Input
-                id="confirm-pw"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="h-11 rounded-xl"
-                autoComplete="new-password"
-              />
-            </div>
-            <Button
-              type="submit"
-              variant="outline"
-              disabled={changePassword.isPending || !newPassword}
-              className="rounded-full"
-            >
-              {changePassword.isPending && (
-                <Loader2 className="size-4 animate-spin" />
-              )}
-              {t("auth.updatePassword")}
-            </Button>
-          </form>
-        </section>
-
-        {/* Help & onboarding */}
-        <section className="card-soft p-6 md:p-8 space-y-4">
-          <header className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
-              <HelpCircle className="size-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold">{t("settingsPage.helpTitle")}</h2>
-              <p className="text-sm text-muted-foreground">{t("settingsPage.helpSub")}</p>
-            </div>
-          </header>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              className="rounded-xl h-auto py-3 justify-start"
-              onClick={() => {
-                resetTour(user?.id);
-                navigate({ to: "/dashboard", search: { tour: 1 } as never });
-              }}
-            >
-              <Sparkles className="size-4" />
-              <span className="text-left">{t("settingsPage.replayTour")}</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="rounded-xl h-auto py-3 justify-start"
-              onClick={() =>
-                navigate({ to: "/onboarding/child", search: { step: 1 } })
-              }
-            >
-              <HelpCircle className="size-4" />
-              <span className="text-left">{t("settingsPage.restartWizard")}</span>
-            </Button>
           </div>
-        </section>
-
-        {/* Sign out */}
-        <section className="card-soft p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-          <div>
-            <h2 className="text-lg font-bold">{t("settingsPage.signOutTitle")}</h2>
-            <p className="text-sm text-muted-foreground">
-              {t("settingsPage.signOutSub")}
-            </p>
-          </div>
-          <Button
-            variant="destructive"
-            onClick={signOut}
-            className="rounded-full"
-          >
-            <LogOut className="size-4" />
-            {t("common.signOut")}
-          </Button>
-        </section>
+        )}
       </div>
     </DashboardLayout>
   );

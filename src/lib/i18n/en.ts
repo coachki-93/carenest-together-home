@@ -167,6 +167,7 @@ export const en = {
   },
   nav: {
     care: "Care",
+    caregiversGroup: "Caregivers",
     family: "Family",
     dashboard: "Today",
     schedule: "Schedule",
@@ -1008,6 +1009,12 @@ export const en = {
     helpSub: "Replay the dashboard tour or restart the welcome wizard.",
     replayTour: "Replay dashboard tour",
     restartWizard: "Restart setup wizard",
+    accountBlockTitle: "Your account",
+    accountBlockSub: "Personal settings for you on this device.",
+    familyBlockTitle: "Family settings",
+    familyBlockSub: "Shared settings for the whole care team. Owner only.",
+    activeProfileTitle: "Active caregiver profile",
+    activeProfileSub: "Choose which of your profiles you're acting as right now.",
   },
   wizard: {
     welcome: "Welcome to CareNest",
