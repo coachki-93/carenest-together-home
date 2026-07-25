@@ -504,6 +504,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         }
 
         for (const c of candidates) {
+          if (infoFor(c.family_id).tasksPaused) continue;
           const remindAtMs = c.starts_at_ms - c.reminder_minutes * 60_000;
           if (now.getTime() < remindAtMs) continue;
           if (now.getTime() >= c.starts_at_ms) continue;
