@@ -355,6 +355,11 @@ function MedicationCard({
               <p className="text-sm text-muted-foreground">
                 {dose || "—"} · {t(`meds.route${routeKey(med.route)}`)}
               </p>
+              {linkedInv && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("meds.inventory.linkedChip", { item: linkedInv.name })}
+                </p>
+              )}
             </div>
             <div className="flex gap-1">
               <Button
