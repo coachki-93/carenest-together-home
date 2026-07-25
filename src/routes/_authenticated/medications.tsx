@@ -525,6 +525,23 @@ function MedicationDialog({
       : defaultAnchorIso(),
   );
 
+  // Inventory link (medicine-category items only; box/pack refused by helper).
+  const { data: inventoryItems } = useInventoryItems(familyId);
+  const medicineItems = (inventoryItems ?? []).filter((i) => i.category === "medicine");
+  const [inventoryItemId, setInventoryItemId] = useState<string | null>(
+    medication?.inventory_item_id ?? null,
+  );
+  const linkedItem = medicineItems.find((i) => i.id === inventoryItemId) ?? null;
+  const perDoseAmount = doseAmount ? Number(doseAmount.replace(",", ".")) : null;
+  const perDoseResult = linkedItem
+    ? computePerDose(perDoseAmount, doseUnit, linkedItem.unit)
+    : null;
+  const canSaveLink =
+    !linkedItem ||
+    (perDoseResult?.kind !== "crossFamily" && perDoseResult?.kind !== "packaging");
+
+
+
 
 
   // Derived preview for the dialog.
