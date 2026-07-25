@@ -1,0 +1,1 @@
+ALTER TYPE public.inventory_adjustment_reason ADD VALUE IF NOT EXISTS 'med_dose';
