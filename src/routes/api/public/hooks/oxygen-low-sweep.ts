@@ -3,6 +3,7 @@ import { computeRemaining, type OxygenTankRow } from "@/lib/oxygen/tanks";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver } from "@/lib/push/recipients";
+import { isPaused } from "@/lib/hospital/paused";
 
 /**
  * Scans every active oxygen tank and pushes one notification when remaining
