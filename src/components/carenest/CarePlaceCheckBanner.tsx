@@ -15,6 +15,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "@/lib/notify";
+import { isPaused } from "@/lib/hospital/paused";
 import {
   useCarePlaceItems,
   useCarePlaceTimes,
