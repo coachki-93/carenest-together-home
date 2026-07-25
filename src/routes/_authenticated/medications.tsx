@@ -56,6 +56,8 @@ import {
   type MedLog,
   type MedRoute,
 } from "@/lib/data/medications";
+import { useInventoryItems } from "@/lib/data/inventory";
+import { computePerDose } from "@/lib/data/medication-inventory";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { useSession } from "@/lib/auth/use-profile";
 
@@ -324,6 +326,10 @@ function MedicationCard({
   onToggleArchive: () => void;
 }) {
   const { t, i18n } = useTranslation();
+  const { data: invItems } = useInventoryItems(med.family_id);
+  const linkedInv = med.inventory_item_id
+    ? (invItems ?? []).find((i) => i.id === med.inventory_item_id) ?? null
+    : null;
   const dose = [med.dose_amount, med.dose_unit].filter(Boolean).join(" ");
   const now = new Date();
   const status = courseStatus(med as MedWithCourse, tz, now);
@@ -349,6 +355,11 @@ function MedicationCard({
               <p className="text-sm text-muted-foreground">
                 {dose || "—"} · {t(`meds.route${routeKey(med.route)}`)}
               </p>
+              {linkedInv && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("meds.inventory.linkedChip", { item: linkedInv.name })}
+                </p>
+              )}
             </div>
             <div className="flex gap-1">
               <Button
@@ -523,6 +534,23 @@ function MedicationDialog({
       : defaultAnchorIso(),
   );
 
+  // Inventory link (medicine-category items only; box/pack refused by helper).
+  const { data: inventoryItems } = useInventoryItems(familyId);
+  const medicineItems = (inventoryItems ?? []).filter((i) => i.category === "medicine");
+  const [inventoryItemId, setInventoryItemId] = useState<string | null>(
+    medication?.inventory_item_id ?? null,
+  );
+  const linkedItem = medicineItems.find((i) => i.id === inventoryItemId) ?? null;
+  const perDoseAmount = doseAmount ? Number(doseAmount.replace(",", ".")) : null;
+  const perDoseResult = linkedItem
+    ? computePerDose(perDoseAmount, doseUnit, linkedItem.unit)
+    : null;
+  const canSaveLink =
+    !linkedItem ||
+    (perDoseResult?.kind !== "crossFamily" && perDoseResult?.kind !== "packaging");
+
+
+
 
 
   // Derived preview for the dialog.
@@ -573,6 +601,14 @@ function MedicationDialog({
       courseFirstIso = first.toISOString();
       courseTotal = n;
     }
+    if (!canSaveLink) {
+      // The button is already disabled in this state; belt-and-braces.
+      return;
+    }
+    const savedPerDose =
+      inventoryItemId && perDoseResult?.kind === "ok"
+        ? perDoseResult.perDose
+        : null;
     try {
       await saveMed.mutateAsync({
         id: medication?.id,
@@ -592,6 +628,8 @@ function MedicationDialog({
         timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
         course_first_dose_at: courseFirstIso,
         course_total_doses: courseTotal,
+        inventory_item_id: inventoryItemId,
+        inventory_per_dose: savedPerDose,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
@@ -642,6 +680,72 @@ function MedicationDialog({
               />
             </div>
           </div>
+
+          <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+            <Label className="font-semibold">{t("meds.inventory.section")}</Label>
+            <Select
+              value={inventoryItemId ?? "__none__"}
+              onValueChange={(v) => setInventoryItemId(v === "__none__" ? null : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("meds.inventory.pick")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">{t("meds.inventory.none")}</SelectItem>
+                {medicineItems.length === 0 && (
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                    {t("meds.inventory.noMedicineItems")}
+                  </div>
+                )}
+                {medicineItems.map((i) => (
+                  <SelectItem key={i.id} value={i.id}>
+                    {i.name} ({i.quantity} {i.unit})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {linkedItem && perDoseResult?.kind === "ok" && (
+              <p className="text-xs text-muted-foreground">
+                {t("meds.inventory.perDoseHint", {
+                  amount: perDoseResult.perDose,
+                  unit: perDoseResult.itemUnit,
+                  item: linkedItem.name,
+                })}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "crossFamily" && (
+              <p className="text-xs text-destructive">
+                {t("meds.inventory.crossFamilyBlock", {
+                  from: perDoseResult.normalizedDoseUnit,
+                  to: perDoseResult.itemUnit,
+                })}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "packaging" && (
+              <p className="text-xs text-destructive">
+                {t("meds.inventory.packagingBlock")}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "unrecognized" && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t("meds.inventory.unrecognizedUnitWarn", {
+                  unit: perDoseResult.rawDoseUnit ?? "",
+                })}
+              </p>
+            )}
+            {linkedItem && perDoseResult?.kind === "invalidAmount" && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t("meds.inventory.invalidAmountWarn")}
+              </p>
+            )}
+            {linkedItem && (
+              <p className="text-xs text-muted-foreground">
+                {t("meds.inventory.retroNote")}
+              </p>
+            )}
+          </div>
+
+
 
           <div className="space-y-1.5">
             <Label>{t("meds.route")}</Label>
@@ -914,7 +1018,7 @@ function MedicationDialog({
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" disabled={saveMed.isPending} className="rounded-full">
+            <Button type="submit" disabled={saveMed.isPending || !canSaveLink} className="rounded-full">
               {saveMed.isPending ? t("meds.saving") : t("meds.saveMed")}
             </Button>
           </DialogFooter>

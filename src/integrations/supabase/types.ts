@@ -1076,6 +1076,7 @@ export type Database = {
       }
       inventory_adjustments: {
         Row: {
+          caregiver_profile_id: string | null
           created_at: string
           delta: number
           family_id: string
@@ -1085,8 +1086,10 @@ export type Database = {
           performed_by: string
           reason: Database["public"]["Enums"]["inventory_adjustment_reason"]
           source_check_id: string | null
+          source_med_log_id: string | null
         }
         Insert: {
+          caregiver_profile_id?: string | null
           created_at?: string
           delta: number
           family_id: string
@@ -1096,8 +1099,10 @@ export type Database = {
           performed_by: string
           reason: Database["public"]["Enums"]["inventory_adjustment_reason"]
           source_check_id?: string | null
+          source_med_log_id?: string | null
         }
         Update: {
+          caregiver_profile_id?: string | null
           created_at?: string
           delta?: number
           family_id?: string
@@ -1107,8 +1112,16 @@ export type Database = {
           performed_by?: string
           reason?: Database["public"]["Enums"]["inventory_adjustment_reason"]
           source_check_id?: string | null
+          source_med_log_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "inventory_adjustments_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "inventory_adjustments_family_id_fkey"
             columns: ["family_id"]
@@ -1128,6 +1141,13 @@ export type Database = {
             columns: ["source_check_id"]
             isOneToOne: false
             referencedRelation: "care_place_checks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_adjustments_source_med_log_id_fkey"
+            columns: ["source_med_log_id"]
+            isOneToOne: false
+            referencedRelation: "med_logs"
             referencedColumns: ["id"]
           },
         ]
@@ -1604,6 +1624,8 @@ export type Database = {
           family_id: string
           id: string
           instructions: string | null
+          inventory_item_id: string | null
+          inventory_per_dose: number | null
           late_after_minutes: number
           missed_after_minutes: number
           name: string
@@ -1626,6 +1648,8 @@ export type Database = {
           family_id: string
           id?: string
           instructions?: string | null
+          inventory_item_id?: string | null
+          inventory_per_dose?: number | null
           late_after_minutes?: number
           missed_after_minutes?: number
           name: string
@@ -1648,6 +1672,8 @@ export type Database = {
           family_id?: string
           id?: string
           instructions?: string | null
+          inventory_item_id?: string | null
+          inventory_per_dose?: number | null
           late_after_minutes?: number
           missed_after_minutes?: number
           name?: string
@@ -1669,6 +1695,13 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medications_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
             referencedColumns: ["id"]
           },
         ]
