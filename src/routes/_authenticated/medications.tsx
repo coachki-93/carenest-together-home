@@ -619,6 +619,8 @@ function MedicationDialog({
         timer_minutes: enableTimer ? Math.max(1, Math.min(120, parseInt(timerMinutes, 10) || 1)) : null,
         course_first_dose_at: courseFirstIso,
         course_total_doses: courseTotal,
+        inventory_item_id: inventoryItemId,
+        inventory_per_dose: savedPerDose,
       } as never);
       toast.success(t("meds.saved"));
       onOpenChange(false);
