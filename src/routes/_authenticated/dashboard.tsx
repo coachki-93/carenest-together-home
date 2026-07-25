@@ -373,6 +373,8 @@ function DashboardPage() {
   const { data: invites = [] } = useInvites(familyId);
   const { data: family } = useFamily(familyId);
   const hospitalOn = !!family?.at_hospital_since;
+  const carePlacePaused = isPaused(family ?? null, "care_place");
+  const handoverPausedByHospital = isPaused(family ?? null, "handover");
   const { data: shifts = [], isLoading: shiftsLoading } = useShifts(familyId);
   const { data: caregiverProfiles = [] } = useCaregiverProfiles(familyId);
 
