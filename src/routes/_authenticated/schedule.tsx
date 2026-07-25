@@ -222,6 +222,7 @@ function SchedulePage() {
   );
   const handoverItems = useMemo<TimelineItem[]>(() => {
     if (!handoverDue) return [];
+    if (isPaused(family ?? null, "handover")) return [];
     return [
       {
         kind: "handover",
