@@ -1178,7 +1178,7 @@ function LogReadingDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                {VITAL_TYPES.map((vt) => (
+                {visibleVitals.map((vt) => (
                   <SelectItem key={vt} value={vt}>
                     {t(`vitals.${vitalI18nKey(vt)}` as const)}
                   </SelectItem>
