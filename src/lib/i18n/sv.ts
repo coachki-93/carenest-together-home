@@ -829,6 +829,10 @@ export const sv = {
     subtitle: "Välj allt som stämmer. CareNest använder valen för att anpassa appen efter barnet.",
     countBadge: "{{selected}} / {{total}}",
     otherPlaceholder: "Beskriv annat behov med några ord.",
+    vitalsTitle: "Vitalparametrar för det här barnet",
+    vitalsSubtitle: "Föreslås utifrån vårdbehoven ovan. Slå på extra som ni följer, eller dölj sådana ni inte behöver.",
+    vitalsRetentionHint: "Att stänga av en vitalparameter döljer den bara. Historik raderas aldrig och kommer tillbaka när ni slår på den igen.",
+
     categories: {
       airways: "Luftvägar & andning",
       feeding: "Mat & nutrition",
