@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { toast } from "sonner";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { ByProfile } from "@/components/carenest/ByProfile";
@@ -139,31 +140,28 @@ function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card/60 backdrop-blur sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-black">{t("careEvents.pageTitle")}</h1>
-            <p className="text-sm text-muted-foreground">{t("careEvents.pageSubtitle")}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <LanguageToggle />
-            <Button
-              size="sm"
-              onClick={() => {
-                setEditing(null);
-                setDialogOpen(true);
-              }}
-              className="rounded-full font-semibold"
-            >
-              <Plus className="size-4 mr-1" />
-              {t("careEvents.logEvent")}
-            </Button>
-          </div>
-        </div>
-      </header>
+    <DashboardLayout
+      title={t("careEvents.pageTitle")}
+      subtitle={t("careEvents.pageSubtitle")}
+      actions={
+        <>
+          <LanguageToggle />
+          <Button
+            size="sm"
+            onClick={() => {
+              setEditing(null);
+              setDialogOpen(true);
+            }}
+            className="rounded-full font-semibold"
+          >
+            <Plus className="size-4 mr-1" />
+            {t("careEvents.logEvent")}
+          </Button>
+        </>
+      }
+    >
+      <div className="max-w-4xl mx-auto">
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex flex-wrap gap-2 mb-4">
           <button
             onClick={() => setFilter("all")}
@@ -342,7 +340,7 @@ function EventsPage() {
             ))}
           </div>
         )}
-      </main>
+      </div>
 
       {familyId && (
         <CareEventDialog
@@ -357,6 +355,7 @@ function EventsPage() {
           event={editing}
         />
       )}
-    </div>
+    </DashboardLayout>
+
   );
 }

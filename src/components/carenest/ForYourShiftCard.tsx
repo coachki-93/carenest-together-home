@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, Pill, Plus } from "lucide-react";
+import { AlertCircle, Pill } from "lucide-react";
 import {
   buildTodaysDoses,
   useMedications,
@@ -8,15 +8,10 @@ import {
 } from "@/lib/data/medications";
 import { useFamily } from "@/lib/data/family";
 import { getForwardShiftWindow } from "@/lib/data/handover-shift";
-import { Button } from "@/components/ui/button";
-import { CareEventDialog } from "@/components/carenest/CareEventDialog";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   familyId: string | undefined | null;
 }
-
 
 /**
  * "Critical upcoming" card.
@@ -29,6 +24,9 @@ interface Props {
  * Future extension: appointments and maintenance items marked with an
  * `is_critical` (or similar) flag by the user will also render here.
  * Non-critical schedule items live on their own pages by design.
+ *
+ * Note: Event logging is centralised in QuickLogDialog (dashboard) and the
+ * /events page. Do not add a duplicate "Log event" entry point here.
  */
 export function ForYourShiftCard({ familyId }: Props) {
   const { t, i18n } = useTranslation();
@@ -67,99 +65,53 @@ export function ForYourShiftCard({ familyId }: Props) {
       .filter((d) => {
         if (d.scheduled_for < window.start) return false;
         if (d.scheduled_for >= window.end) return false;
-        // Skip already-documented outcomes; only show doses with no log yet.
         if (d.log) return false;
         return true;
       })
       .slice(0, 8);
   }, [meds, medLogs, tz, now, window.start, window.end]);
 
-  // TODO: when appointments / maintenance gain an `is_critical` flag,
-  // fetch and merge them here alongside meds.
-
-  const [eventOpen, setEventOpen] = useState(false);
-  const { data: child } = useQuery({
-    queryKey: ["fys-child", familyId],
-    enabled: !!familyId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("children")
-        .select("id, care_needs")
-        .eq("family_id", familyId!)
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  if (dueMeds.length === 0 && !familyId) return null;
+  if (dueMeds.length === 0) return null;
 
   return (
-    <>
-      <div className="card-soft p-5 mb-6 max-w-3xl mx-auto border border-amber-200 bg-amber-50/40">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="size-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-            <AlertCircle className="size-4" />
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-extrabold">
-              {t("handoverPage.forYourShift.title")}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {t("handoverPage.forYourShift.window", {
-                end: timeFmt.format(window.end),
-              })}
-            </div>
-          </div>
-          {familyId && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setEventOpen(true)}
-              className="rounded-full font-semibold gap-1"
-            >
-              <Plus className="size-3.5" />
-              {t("careEvents.logEvent")}
-            </Button>
-          )}
+    <div className="card-soft p-5 mb-6 max-w-3xl mx-auto border border-amber-200 bg-amber-50/40">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="size-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+          <AlertCircle className="size-4" />
         </div>
-
-        {dueMeds.length > 0 && (
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1.5">
-              <Pill className="size-3.5" />
-              {t("handoverPage.forYourShift.meds")}
-            </div>
-            <ul className="space-y-1">
-              {dueMeds.map((d) => (
-                <li key={d.key} className="flex items-baseline gap-2">
-                  <span className="font-mono text-xs text-muted-foreground w-12">
-                    {timeFmt.format(d.scheduled_for)}
-                  </span>
-                  <span className="text-sm">
-                    {d.medication.name}
-                    {d.medication.dose_amount != null
-                      ? ` — ${d.medication.dose_amount}${d.medication.dose_unit ? ` ${d.medication.dose_unit}` : ""}`
-                      : ""}
-                  </span>
-                </li>
-              ))}
-            </ul>
+        <div className="flex-1">
+          <div className="text-sm font-extrabold">
+            {t("handoverPage.forYourShift.title")}
           </div>
-        )}
+          <div className="text-xs text-muted-foreground">
+            {t("handoverPage.forYourShift.window", {
+              end: timeFmt.format(window.end),
+            })}
+          </div>
+        </div>
       </div>
-      {familyId && (
-        <CareEventDialog
-          open={eventOpen}
-          onOpenChange={setEventOpen}
-          familyId={familyId}
-          childId={child?.id ?? null}
-          careNeeds={child?.care_needs}
-        />
-      )}
-    </>
+
+      <div>
+        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1.5">
+          <Pill className="size-3.5" />
+          {t("handoverPage.forYourShift.meds")}
+        </div>
+        <ul className="space-y-1">
+          {dueMeds.map((d) => (
+            <li key={d.key} className="flex items-baseline gap-2">
+              <span className="font-mono text-xs text-muted-foreground w-12">
+                {timeFmt.format(d.scheduled_for)}
+              </span>
+              <span className="text-sm">
+                {d.medication.name}
+                {d.medication.dose_amount != null
+                  ? ` — ${d.medication.dose_amount}${d.medication.dose_unit ? ` ${d.medication.dose_unit}` : ""}`
+                  : ""}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
-

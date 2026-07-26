@@ -187,7 +187,7 @@ export function CareEventDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>
             {event ? t("careEvents.dialog.editTitle") : t("careEvents.dialog.newTitle")}
@@ -195,12 +195,12 @@ export function CareEventDialog({
           <DialogDescription>{t("careEvents.dialog.desc")}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
             <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               {t("careEvents.dialog.type")}
             </Label>
-            <div className="grid grid-cols-2 gap-2 mt-2 sm:grid-cols-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
               {orderedTypes.map((k) => {
                 const Icon = KIND_ICONS[k];
                 const selected = type === k;
@@ -209,14 +209,14 @@ export function CareEventDialog({
                     key={k}
                     type="button"
                     onClick={() => setType(k)}
-                    className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-xs font-semibold transition ${
+                    className={`flex flex-col items-center justify-center gap-1 rounded-xl border p-2 min-h-[60px] text-[11px] font-semibold transition ${
                       selected
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border hover:bg-muted"
                     }`}
                   >
-                    <Icon className="size-4" />
-                    <span className="text-center leading-tight">
+                    <Icon className="size-4 shrink-0" />
+                    <span className="text-center leading-tight break-words w-full">
                       {t(`careEvents.types.${k}`)}
                     </span>
                   </button>
@@ -226,22 +226,28 @@ export function CareEventDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor="ev-date">{t("careEvents.dialog.date")}</Label>
+            <div className="space-y-1.5 min-w-0">
+              <Label htmlFor="ev-date" className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                {t("careEvents.dialog.date")}
+              </Label>
               <Input
                 id="ev-date"
                 type="date"
                 value={dateStr}
                 onChange={(e) => setDateStr(e.target.value)}
+                className="rounded-xl w-full"
               />
             </div>
-            <div>
-              <Label htmlFor="ev-time">{t("careEvents.dialog.time")}</Label>
+            <div className="space-y-1.5 min-w-0">
+              <Label htmlFor="ev-time" className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                {t("careEvents.dialog.time")}
+              </Label>
               <Input
                 id="ev-time"
                 type="time"
                 value={timeStr}
                 onChange={(e) => setTimeStr(e.target.value)}
+                className="rounded-xl w-full"
               />
             </div>
           </div>
@@ -250,7 +256,7 @@ export function CareEventDialog({
             <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               {t("careEvents.dialog.severity")}
             </Label>
-            <div className="flex gap-2 mt-2">
+            <div className="grid grid-cols-4 gap-2 mt-2">
               {[
                 { n: null, key: "none" },
                 { n: 1, key: "mild" },
@@ -263,7 +269,7 @@ export function CareEventDialog({
                     key={s.key}
                     type="button"
                     onClick={() => setSeverity(s.n)}
-                    className={`flex-1 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
+                    className={`rounded-xl border px-2 py-2 text-xs font-semibold transition ${
                       selected
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border hover:bg-muted"
@@ -280,61 +286,73 @@ export function CareEventDialog({
             <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               {t("careEvents.dialog.duration")}
             </Label>
-            <div className="flex items-center gap-2 mt-2">
-              <Input
-                type="number"
-                min={0}
-                placeholder="0"
-                value={durationMin}
-                onChange={(e) => setDurationMin(e.target.value)}
-                className="w-20"
-              />
-              <span className="text-sm text-muted-foreground">
-                {t("careEvents.dialog.min")}
-              </span>
-              <Input
-                type="number"
-                min={0}
-                max={59}
-                placeholder="0"
-                value={durationSec}
-                onChange={(e) => setDurationSec(e.target.value)}
-                className="w-20"
-              />
-              <span className="text-sm text-muted-foreground">
-                {t("careEvents.dialog.sec")}
-              </span>
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Input
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={durationMin}
+                  onChange={(e) => setDurationMin(e.target.value)}
+                  className="rounded-xl min-w-0 flex-1"
+                />
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {t("careEvents.dialog.min")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 min-w-0">
+                <Input
+                  type="number"
+                  min={0}
+                  max={59}
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={durationSec}
+                  onChange={(e) => setDurationSec(e.target.value)}
+                  className="rounded-xl min-w-0 flex-1"
+                />
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {t("careEvents.dialog.sec")}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="ev-desc">{t("careEvents.dialog.description")}</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="ev-desc" className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              {t("careEvents.dialog.description")}
+            </Label>
             <Textarea
               id="ev-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t("careEvents.dialog.descriptionPh")}
               rows={3}
+              className="rounded-xl resize-none"
             />
           </div>
 
-          <div>
-            <Label htmlFor="ev-action">{t("careEvents.dialog.action")}</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="ev-action" className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              {t("careEvents.dialog.action")}
+            </Label>
             <Textarea
               id="ev-action"
               value={action}
               onChange={(e) => setAction(e.target.value)}
               placeholder={t("careEvents.dialog.actionPh")}
               rows={2}
+              className="rounded-xl resize-none"
             />
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full">
             {t("common.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={submitting}>
+          <Button onClick={handleSubmit} disabled={submitting} className="rounded-full font-semibold">
             {submitting ? t("common.saving") : t("common.save")}
           </Button>
         </DialogFooter>
@@ -342,3 +360,4 @@ export function CareEventDialog({
     </Dialog>
   );
 }
+

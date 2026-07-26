@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+
 import {
   Thermometer,
   Heart,
@@ -27,6 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/notify";
 import { useLogVital, DEFAULT_UNIT, VITAL_CONTEXTS, type VitalType, type VitalContext } from "@/lib/data/vitals";
+import { useCreateCareEvent, type CareEventType } from "@/lib/data/care-events";
+import { useCurrentActor, guardActingProfile } from "@/lib/data/current-actor";
 
 type PresetKey =
   | "temperature"
@@ -39,26 +42,36 @@ type PresetKey =
   | "vomit"
   | "note";
 
-type Preset = {
-  key: PresetKey;
-  icon: LucideIcon;
-  tone: string;
-  vitalType: VitalType;
-  needsValue: boolean;
-  defaultNote?: string;
-};
+type Preset =
+  | {
+      kind: "vital";
+      key: PresetKey;
+      icon: LucideIcon;
+      tone: string;
+      vitalType: VitalType;
+      needsValue: boolean;
+    }
+  | {
+      kind: "event";
+      key: PresetKey;
+      icon: LucideIcon;
+      tone: string;
+      eventType: CareEventType;
+      needsValue: false;
+    };
 
 const PRESETS: Preset[] = [
-  { key: "temperature", icon: Thermometer, tone: "bg-rose-50 text-rose-600", vitalType: "temperature", needsValue: true },
-  { key: "heart_rate", icon: Heart, tone: "bg-pink-50 text-pink-600", vitalType: "heart_rate", needsValue: true },
-  { key: "spo2", icon: Wind, tone: "bg-sky-50 text-sky-600", vitalType: "spo2", needsValue: true },
-  { key: "breathing", icon: Activity, tone: "bg-cyan-50 text-cyan-600", vitalType: "breathing", needsValue: true },
-  { key: "fluids", icon: Droplet, tone: "bg-blue-50 text-blue-600", vitalType: "fluids", needsValue: true },
-  { key: "diaper", icon: Baby, tone: "bg-amber-50 text-amber-700", vitalType: "other", needsValue: false },
-  { key: "seizure", icon: Zap, tone: "bg-violet-50 text-violet-600", vitalType: "seizure", needsValue: true },
-  { key: "vomit", icon: Frown, tone: "bg-emerald-50 text-emerald-600", vitalType: "other", needsValue: false },
-  { key: "note", icon: StickyNote, tone: "bg-slate-100 text-slate-700", vitalType: "other", needsValue: false },
+  { kind: "vital", key: "temperature", icon: Thermometer, tone: "bg-rose-50 text-rose-600", vitalType: "temperature", needsValue: true },
+  { kind: "vital", key: "heart_rate", icon: Heart, tone: "bg-pink-50 text-pink-600", vitalType: "heart_rate", needsValue: true },
+  { kind: "vital", key: "spo2", icon: Wind, tone: "bg-sky-50 text-sky-600", vitalType: "spo2", needsValue: true },
+  { kind: "vital", key: "breathing", icon: Activity, tone: "bg-cyan-50 text-cyan-600", vitalType: "breathing", needsValue: true },
+  { kind: "vital", key: "fluids", icon: Droplet, tone: "bg-blue-50 text-blue-600", vitalType: "fluids", needsValue: true },
+  { kind: "vital", key: "diaper", icon: Baby, tone: "bg-amber-50 text-amber-700", vitalType: "other", needsValue: false },
+  { kind: "event", key: "seizure", icon: Zap, tone: "bg-violet-50 text-violet-600", eventType: "seizure", needsValue: false },
+  { kind: "event", key: "vomit", icon: Frown, tone: "bg-emerald-50 text-emerald-600", eventType: "vomiting", needsValue: false },
+  { kind: "event", key: "note", icon: StickyNote, tone: "bg-slate-100 text-slate-700", eventType: "other", needsValue: false },
 ];
+
 
 function toLocalInput(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -80,6 +93,8 @@ export function QuickLogDialog({
 }) {
   const { t } = useTranslation();
   const logVital = useLogVital();
+  const createCareEvent = useCreateCareEvent();
+  const actor = useCurrentActor(familyId);
   const [preset, setPreset] = useState<Preset | null>(null);
   const [value, setValue] = useState("");
   const [notes, setNotes] = useState("");
@@ -96,10 +111,60 @@ export function QuickLogDialog({
     }
   }, [open]);
 
-  const unit = useMemo(() => (preset ? DEFAULT_UNIT[preset.vitalType] : ""), [preset]);
+  const unit = useMemo(
+    () => (preset && preset.kind === "vital" ? DEFAULT_UNIT[preset.vitalType] : ""),
+    [preset],
+  );
 
   async function submit() {
-    if (!preset || !familyId || !childId || !loggedBy) return;
+    if (!preset || !familyId || !loggedBy) return;
+    const when = loggedAt ? new Date(loggedAt) : new Date();
+    if (Number.isNaN(when.getTime())) {
+      toast.error(t("quickLog.invalidTime"));
+      return;
+    }
+    const label = t(`quickLog.presets.${preset.key}`);
+
+    if (preset.kind === "event") {
+      const guard = guardActingProfile(actor);
+      if (guard.blocked) {
+        toast.error(t("careEvents.errors.pickProfile"));
+        return;
+      }
+      const description = notes.trim() || label;
+      try {
+        await createCareEvent.mutateAsync({
+          family_id: familyId,
+          child_id: childId ?? null,
+          caregiver_profile_id: guard.caregiverProfileId,
+          created_by: loggedBy,
+          occurred_at: when.toISOString(),
+          type: preset.eventType,
+          description,
+          action_taken: null,
+          severity: null,
+          duration_seconds: null,
+        });
+        toast.success(t("quickLog.saved", { label }), {
+          action: {
+            label: t("quickLog.addDetail"),
+            onClick: () => {
+              onOpenChange(false);
+              // Route the user to the events page to add detail.
+              window.location.assign("/events");
+            },
+          },
+        });
+        onOpenChange(false);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        toast.error(msg || t("common.saveFailed"));
+      }
+      return;
+    }
+
+    // vital branch
+    if (!childId) return;
     let num = 0;
     if (preset.needsValue) {
       const n = Number(value);
@@ -109,12 +174,6 @@ export function QuickLogDialog({
       }
       num = n;
     }
-    const when = loggedAt ? new Date(loggedAt) : new Date();
-    if (Number.isNaN(when.getTime())) {
-      toast.error(t("quickLog.invalidTime"));
-      return;
-    }
-    const label = t(`quickLog.presets.${preset.key}`);
     const finalNotes = preset.needsValue
       ? notes.trim() || null
       : `${label}${notes.trim() ? ` — ${notes.trim()}` : ""}`;
@@ -132,6 +191,7 @@ export function QuickLogDialog({
     toast.success(t("quickLog.saved", { label }));
     onOpenChange(false);
   }
+
 
 
   return (
@@ -282,9 +342,9 @@ export function QuickLogDialog({
           <Button
             className="rounded-full font-bold"
             onClick={submit}
-            disabled={!preset || logVital.isPending}
+            disabled={!preset || logVital.isPending || createCareEvent.isPending}
           >
-            {logVital.isPending ? t("vitals.saving") : t("quickLog.save")}
+            {logVital.isPending || createCareEvent.isPending ? t("vitals.saving") : t("quickLog.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
