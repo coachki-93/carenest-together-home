@@ -605,6 +605,8 @@ function MaintenancePage() {
         viewerUserId={user?.id ?? null}
         fmtDateTime={fmtDateTime}
       />
+      </>
+      )}
     </DashboardLayout>
   );
 }
