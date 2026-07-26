@@ -69,9 +69,7 @@ for name in "${FORBIDDEN[@]}"; do
   fi
 done
 
-# Additional structural checks — strip comment lines first so the contract
-# text in the module's own docstring isn't flagged.
-CODE_ONLY="$(grep -Ev '^\s*(\*|//)' "$FILE")"
+# Additional structural checks (reuse CODE_ONLY defined above).
 
 if echo "$CODE_ONLY" | grep -Eq "\.select\(\s*['\"]\*['\"]"; then
   echo "FORBIDDEN: $FILE uses select('*') — every column must be explicit" >&2
