@@ -56,10 +56,14 @@ FORBIDDEN=(
   scaffolds
 )
 
+# Strip comment lines so the module's own contract text (which enumerates
+# the forbidden tables in its docstring) isn't flagged.
+CODE_ONLY="$(grep -Ev '^\s*(\*|//)' "$FILE")"
+
 fail=0
 for name in "${FORBIDDEN[@]}"; do
   # Match .from("name"), .from('name'), or bare "name" / 'name' string.
-  if grep -Eq "\.from\(\s*['\"]${name}['\"]|['\"]${name}['\"]" "$FILE"; then
+  if echo "$CODE_ONLY" | grep -Eq "\.from\(\s*['\"]${name}['\"]|['\"]${name}['\"]"; then
     echo "FORBIDDEN: $FILE references health/operational table '${name}'" >&2
     fail=1
   fi
