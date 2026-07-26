@@ -327,7 +327,12 @@ export function useHandoverPrefill(
         }
       }
 
-      // Oxygen tank events during the shift
+      // Oxygen tank events during the shift.
+      // Care-needs gate: only emit if the child has the oxygen module.
+      // Safety override: if a real event exists in the window we always
+      // emit it, because it actually happened (data mismatch, existing
+      // family, etc. must not silently swallow live oxygen activity).
+      if (oxygenAllowed || oxyTanks.length > 0)
       for (const tank of oxyTanks) {
         const tankLabel =
           TANKS[tank.tank_type as TankType]?.label ?? tank.tank_type;
