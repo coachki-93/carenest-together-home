@@ -1094,6 +1094,7 @@ function LogReadingDialog({
   childId,
   loggedBy,
   presetType,
+  visibleVitals,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -1101,26 +1102,37 @@ function LogReadingDialog({
   childId: string;
   loggedBy: string;
   presetType: VitalType | null;
+  visibleVitals: VitalType[];
 }) {
   const { t } = useTranslation();
   const logVital = useLogVital();
-  const [type, setType] = useState<VitalType>(presetType ?? "heart_rate");
+  // Default to preset if visible, else the first visible type — defensive against
+  // a preset that got hidden between renders.
+  const fallbackType: VitalType =
+    presetType && visibleVitals.includes(presetType)
+      ? presetType
+      : visibleVitals[0] ?? "heart_rate";
+  const [type, setType] = useState<VitalType>(fallbackType);
   const [value, setValue] = useState("");
-  const [unit, setUnit] = useState(DEFAULT_UNIT[presetType ?? "heart_rate"]);
+  const [unit, setUnit] = useState(DEFAULT_UNIT[fallbackType]);
   const [notes, setNotes] = useState("");
   const [context, setContext] = useState<VitalContext | null>(null);
 
   // Reset when opening
   useMemo(() => {
     if (open) {
-      const t0 = presetType ?? "heart_rate";
+      const t0: VitalType =
+        presetType && visibleVitals.includes(presetType)
+          ? presetType
+          : visibleVitals[0] ?? "heart_rate";
       setType(t0);
       setUnit(DEFAULT_UNIT[t0]);
       setValue("");
       setNotes("");
       setContext(null);
     }
-  }, [open, presetType]);
+  }, [open, presetType, visibleVitals]);
+
 
   async function submit() {
     const num = Number(value);
