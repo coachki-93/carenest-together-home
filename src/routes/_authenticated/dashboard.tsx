@@ -107,6 +107,7 @@ import { Play } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { isPaused } from "@/lib/hospital/paused";
+import { hasModule } from "@/lib/care-needs/modules";
 
 const dashboardSearch = z.object({
   tour: z.coerce.number().int().optional(),
