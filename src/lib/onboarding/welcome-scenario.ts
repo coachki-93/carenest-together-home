@@ -5,7 +5,8 @@ import {
   Wind,
   CupSoda,
   Zap,
-  Users,
+  Bell,
+  KeyRound,
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
@@ -21,12 +22,22 @@ export type WelcomeTone =
   | "violet"
   | "rose";
 
+/**
+ * Optional slot identifier for pages that render an embedded interactive
+ * component below the body copy (e.g. the notifications enable card).
+ */
+export type WelcomeSlot = "notifications";
+
 export interface WelcomePage {
   key: string;
   icon: LucideIcon;
   tone: WelcomeTone;
   titleKey: string;
   bodyKey: string;
+  /** Optional secondary line rendered under body (e.g. install hint). */
+  hintKey?: string;
+  /** Optional embedded interactive slot rendered inside the page. */
+  slot?: WelcomeSlot;
 }
 
 const INTRO: WelcomePage = {
@@ -71,12 +82,21 @@ const VITALS: WelcomePage = {
   titleKey: "welcome.pages.vitals.title",
   bodyKey: "welcome.pages.vitals.body",
 };
-const TEAM: WelcomePage = {
-  key: "team",
-  icon: Users,
+const NOTIFICATIONS: WelcomePage = {
+  key: "notifications",
+  icon: Bell,
+  tone: "amber",
+  titleKey: "welcome.pages.notifications.title",
+  bodyKey: "welcome.pages.notifications.body",
+  hintKey: "welcome.pages.notifications.installHint",
+  slot: "notifications",
+};
+const TEAM_LOGIN: WelcomePage = {
+  key: "teamLogin",
+  icon: KeyRound,
   tone: "primary",
-  titleKey: "welcome.pages.team.title",
-  bodyKey: "welcome.pages.team.body",
+  titleKey: "welcome.pages.teamLogin.title",
+  bodyKey: "welcome.pages.teamLogin.body",
 };
 const CLOSE: WelcomePage = {
   key: "close",
@@ -87,18 +107,28 @@ const CLOSE: WelcomePage = {
 };
 
 const FEEDING_CAPS = new Set(["g_tube", "nj_tube", "tpn", "fluid_tracking"]);
+const CARE_SPECIFIC_CAP = 2;
+
+export interface BuildWelcomeOptions {
+  hasTeamAccount?: boolean;
+}
 
 /**
- * Build the ordered scenario pages for the welcome tour based on the
- * child's care_needs. Rules:
- *   - INTRO + HANDOVER always lead.
- *   - Care-specific pages appended in a fixed order (oxygen, feeding, events/vitals).
- *   - TEAM always follows the care-specific block.
- *   - CLOSE is ALWAYS the final page (carries the "Take me to the dashboard" CTA).
- *   - Cap total at 5: cap is applied to the [INTRO, HANDOVER, ...care, TEAM]
- *     head — CLOSE is appended after the cap and is never dropped.
+ * Build the ordered scenario pages for the welcome tour.
+ *
+ * Order: [INTRO, HANDOVER, ...care-specific (capped), NOTIFICATIONS,
+ *         (TEAM_LOGIN if hasTeamAccount), CLOSE].
+ *
+ * The cap applies ONLY to the care-specific middle. The trailing group
+ * (NOTIFICATIONS + optional TEAM_LOGIN + CLOSE) is always appended and
+ * never sliced off — NOTIFICATIONS and CLOSE are guaranteed to render.
+ * Max length: 2 + CARE_SPECIFIC_CAP + 3 = 7 (heavy staff family), or 6
+ * without staff.
  */
-export function buildWelcomePages(rawCareNeeds: unknown): WelcomePage[] {
+export function buildWelcomePages(
+  rawCareNeeds: unknown,
+  opts: BuildWelcomeOptions = {},
+): WelcomePage[] {
   const cn = parseCareNeeds(rawCareNeeds);
   const caps = new Set(cn.capabilities);
 
@@ -107,14 +137,12 @@ export function buildWelcomePages(rawCareNeeds: unknown): WelcomePage[] {
   if ([...FEEDING_CAPS].some((k) => caps.has(k))) careSpecific.push(FEEDING);
   if (caps.has("seizures")) careSpecific.push(EVENTS);
   else if (visibleVitalsFor(cn).length > 0 && caps.size > 0) {
-    // Only show the vitals page for children who explicitly selected some
-    // care needs — the generic fallback (no caps) shouldn't get it.
     careSpecific.push(VITALS);
   }
+  const cappedCare = careSpecific.slice(0, CARE_SPECIFIC_CAP);
 
-  const head: WelcomePage[] = [INTRO, HANDOVER, ...careSpecific, TEAM];
-  // Cap the head at 4 so INTRO + HANDOVER + up to 1 care-specific + TEAM fit,
-  // then CLOSE is always appended — max 5 pages total, CLOSE guaranteed last.
-  const capped = head.slice(0, 4);
-  return [...capped, CLOSE];
+  const pages: WelcomePage[] = [INTRO, HANDOVER, ...cappedCare, NOTIFICATIONS];
+  if (opts.hasTeamAccount) pages.push(TEAM_LOGIN);
+  pages.push(CLOSE);
+  return pages;
 }
