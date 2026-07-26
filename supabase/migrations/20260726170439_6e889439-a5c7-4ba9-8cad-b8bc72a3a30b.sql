@@ -1,0 +1,1 @@
+ALTER TABLE public.families ADD COLUMN uses_equipment boolean NOT NULL DEFAULT true;

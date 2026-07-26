@@ -912,6 +912,7 @@ export type Database = {
           oxygen_warn_minutes: number
           timezone: string
           updated_at: string
+          uses_equipment: boolean
         }
         Insert: {
           at_hospital_since?: string | null
@@ -928,6 +929,7 @@ export type Database = {
           oxygen_warn_minutes?: number
           timezone?: string
           updated_at?: string
+          uses_equipment?: boolean
         }
         Update: {
           at_hospital_since?: string | null
@@ -944,6 +946,7 @@ export type Database = {
           oxygen_warn_minutes?: number
           timezone?: string
           updated_at?: string
+          uses_equipment?: boolean
         }
         Relationships: []
       }
