@@ -468,7 +468,7 @@ export const en = {
     handover: "Handover preview",
     oxygenTitle: "Oxygen",
     oxygenRemaining: "remaining",
-    oxygenEmpty: "No tank tracked",
+    oxygenEmpty: "No active oxygen tank — start one?",
     handoverCountdown: "{{minutes}} min report",
     shiftEndsIn: "Shift ends in {{time}}",
     handoverIntro: "A quick summary of the day so the next caregiver is up to speed.",
