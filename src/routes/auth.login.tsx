@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Loader2, Mail, Lock, Eye, EyeOff, Users2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/auth/login")({
   head: () => ({ meta: [{ title: "Log in — CareNest" }] }),
   component: LoginPage,
 });
+
 
 /** Map a Supabase auth error to an i18n key. Invalid-credential errors are the
  * only ones that should read as "wrong email or password"; anything else
@@ -36,7 +37,9 @@ function mapAuthError(t: (k: string) => string, message: string | undefined): st
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<"email" | "team">("email");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -46,17 +49,57 @@ function LoginPage() {
     email: z.string().trim().email(t("auth.invalidEmail")),
     password: z.string().min(1, t("auth.passwordRequired")),
   });
+  const teamSchema = z.object({
+    username: z.string().trim().min(1, t("auth.usernameRequired")),
+    password: z.string().min(1, t("auth.passwordRequired")),
+  });
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
-    const parsed = schema.safeParse({ email, password });
+    if (mode === "email") {
+      const parsed = schema.safeParse({ email, password });
+      if (!parsed.success) {
+        setFormError(parsed.error.errors[0]?.message ?? "");
+        return;
+      }
+      setSubmitting(true);
+      const { error } = await supabase.auth.signInWithPassword(parsed.data);
+      setSubmitting(false);
+      if (error) {
+        setFormError(mapAuthError(t, error.message));
+        return;
+      }
+      navigate({ to: "/home" });
+      return;
+    }
+
+    // Team username → lookup_team_email → signInWithPassword
+    const parsed = teamSchema.safeParse({ username: username.trim().toLowerCase(), password });
     if (!parsed.success) {
       setFormError(parsed.error.errors[0]?.message ?? "");
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    const { data: resolvedEmail, error: lookupErr } = await supabase.rpc(
+      "lookup_team_email",
+      { _username: parsed.data.username },
+    );
+    if (lookupErr) {
+      setSubmitting(false);
+      setFormError(t("auth.genericError"));
+      return;
+    }
+    if (!resolvedEmail) {
+      setSubmitting(false);
+      // Treat "username not found" as bad-creds to avoid enumeration.
+      setFormError(t("auth.badCreds"));
+      return;
+    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email: resolvedEmail as string,
+      password: parsed.data.password,
+    });
     setSubmitting(false);
     if (error) {
       setFormError(mapAuthError(t, error.message));
@@ -64,6 +107,7 @@ function LoginPage() {
     }
     navigate({ to: "/home" });
   }
+
 
   async function oauth(provider: "google" | "apple") {
     setFormError(null);
@@ -89,26 +133,67 @@ function LoginPage() {
         <p className="text-sm text-muted-foreground">{t("auth.loginSubtitle")}</p>
       </div>
 
+      <div className="grid grid-cols-2 rounded-full border border-border p-1 bg-muted/40 text-sm font-semibold">
+        <button
+          type="button"
+          onClick={() => { setMode("email"); setFormError(null); }}
+          className={`rounded-full h-9 transition ${mode === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+        >
+          {t("auth.tabEmail")}
+        </button>
+        <button
+          type="button"
+          onClick={() => { setMode("team"); setFormError(null); }}
+          className={`rounded-full h-9 transition ${mode === "team" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+        >
+          {t("auth.tabTeam")}
+        </button>
+      </div>
+
       <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="email">{t("common.email")}</Label>
-          <div className="relative">
-            <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="email" type="email" autoComplete="email" required autoFocus
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); if (formError) setFormError(null); }}
-              placeholder="you@example.com" className="h-12 rounded-xl pl-10"
-            />
+        {mode === "email" ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="email">{t("common.email")}</Label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="email" type="email" autoComplete="email" required autoFocus
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); if (formError) setFormError(null); }}
+                placeholder="you@example.com" className="h-12 rounded-xl pl-10"
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-1.5">
+            <Label htmlFor="username">{t("auth.teamUsername")}</Label>
+            <div className="relative">
+              <Users2 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="username" type="text" autoComplete="username" required autoFocus
+                value={username}
+                onChange={(e) => { setUsername(e.target.value); if (formError) setFormError(null); }}
+                placeholder={t("auth.teamUsernamePlaceholder")}
+                className="h-12 rounded-xl pl-10"
+                autoCapitalize="none" spellCheck={false}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">{t("auth.teamHint")}</p>
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <div className="flex items-baseline justify-between">
             <Label htmlFor="password">{t("common.password")}</Label>
-            <Link to="/auth/forgot-password" className="text-xs text-primary font-semibold hover:underline">
-              {t("auth.forgot")}
-            </Link>
+            {mode === "email" ? (
+              <Link to="/auth/forgot-password" className="text-xs text-primary font-semibold hover:underline">
+                {t("auth.forgot")}
+              </Link>
+            ) : (
+              <span className="text-xs text-muted-foreground">{t("auth.teamPwFromOwner")}</span>
+            )}
           </div>
+
           <div className="relative">
             <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -138,12 +223,16 @@ function LoginPage() {
         </Button>
       </form>
 
+      {mode === "email" && (
       <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
         <span className="flex-1 border-t border-black/10" />
         <span>{t("auth.orSignInWith")}</span>
         <span className="flex-1 border-t border-black/10" />
       </div>
+      )}
 
+
+      {mode === "email" && (
       <div className="grid grid-cols-2 gap-3">
         <Button type="button" variant="outline" className="rounded-xl h-11" onClick={() => oauth("google")}>
           <GoogleIcon /> {t("common.google")}
@@ -152,6 +241,8 @@ function LoginPage() {
           <AppleIcon /> {t("common.apple")}
         </Button>
       </div>
+      )}
+
 
       <div className="text-center space-y-1.5">
         <p className="text-sm text-muted-foreground">

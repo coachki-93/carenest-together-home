@@ -12,6 +12,8 @@ import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
 import { OwnerNotifyLevelSettings } from "@/components/carenest/OwnerNotifyLevelSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
+import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
+
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
 import { ActiveProfileSwitcher } from "@/components/carenest/ActiveProfileSwitcher";
 import { useCurrentActor } from "@/lib/data/current-actor";
@@ -447,6 +449,8 @@ function SettingsPage() {
               <TidySettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
               <HandoverReminderSettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
               <OwnerNotifyLevelSettings familyId={familyId} isOwner={isOwner} />
+              {familyId && <TeamAccountCard familyId={familyId} isOwner={isOwner} />}
+
             </div>
           </div>
         )}
