@@ -332,8 +332,8 @@ export function useHandoverPrefill(
       // Safety override: if a real event exists in the window we always
       // emit it, because it actually happened (data mismatch, existing
       // family, etc. must not silently swallow live oxygen activity).
-      if (oxygenAllowed || oxyTanks.length > 0)
-      for (const tank of oxyTanks) {
+      if (oxygenAllowed || oxyTanks.length > 0) {
+        for (const tank of oxyTanks) {
         const tankLabel =
           TANKS[tank.tank_type as TankType]?.label ?? tank.tank_type;
         const flowStr = formatFlow(Number(tank.flow_lpm));
