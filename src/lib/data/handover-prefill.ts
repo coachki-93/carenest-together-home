@@ -89,11 +89,14 @@ export function useHandoverPrefill(
       input?.familyId,
       input?.shiftStart.toISOString(),
       input?.shiftEnd.toISOString(),
+      // Include care_needs in the key so toggling capabilities invalidates.
+      hasModule(input?.careNeeds, "oxygen"),
     ],
     enabled,
     queryFn: async (): Promise<HandoverPrefill> => {
       if (!input) return { meds: "", notes: "", hasContent: false };
       const { familyId, shiftStart, shiftEnd } = input;
+      const oxygenAllowed = hasModule(input.careNeeds, "oxygen");
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
