@@ -1231,9 +1231,18 @@ export const en = {
         title: "Everyone on the same page",
         body: "The whole care team sees the same picture — no phone calls between shifts, no lost sticky notes.",
       },
+      notifications: {
+        title: "Stay alerted",
+        body: "Turn on notifications so late meds, low oxygen, and missed checks reach you in time.",
+        installHint: "For reliable alerts, add CareNest to your home screen — on iPhone, use Share → Add to Home Screen.",
+      },
+      teamLogin: {
+        title: "How your team signs in",
+        body: "Give your team the username and password from Settings. They log in and pick their name each shift.",
+      },
       close: {
         title: "You're set",
-        body: "Open the dashboard when you're ready — you can replay this any time from Settings.",
+        body: "Open the dashboard when you're ready. Care needs, reminders, and settings can all be changed anytime from Settings — and you can replay this tour from there too.",
       },
     },
   },

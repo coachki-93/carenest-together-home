@@ -1231,9 +1231,18 @@ export const sv = {
         title: "Alla ser samma bild",
         body: "Hela vårdteamet har samma överblick — inga samtal mellan skiften, inga bortglömda lappar.",
       },
+      notifications: {
+        title: "Missa inget viktigt",
+        body: "Slå på notiser så att sena mediciner, lågt syre och missade kontroller når dig i tid.",
+        installHint: "För pålitliga notiser, lägg till CareNest på hemskärmen — på iPhone: Dela → Lägg till på hemskärmen.",
+      },
+      teamLogin: {
+        title: "Så loggar teamet in",
+        body: "Ge teamet användarnamnet och lösenordet från Inställningar. De loggar in och väljer sitt namn vid varje skift.",
+      },
       close: {
         title: "Då är du igång",
-        body: "Öppna översikten när du är redo — du kan spela upp det här igen från Inställningar.",
+        body: "Öppna översikten när du är redo. Vårdbehov, påminnelser och inställningar kan ändras när som helst från Inställningar — och du kan spela upp den här rundturen därifrån också.",
       },
     },
   },
