@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   AlertTriangle,
   Wrench,
+  ShieldAlert,
 } from "lucide-react";
 
 
