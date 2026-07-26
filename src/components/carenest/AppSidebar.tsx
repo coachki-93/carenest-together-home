@@ -146,6 +146,23 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {isAdmin.data === true && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive("/admin")}
+                className="rounded-xl h-11"
+                tooltip={t("admin.navLabel")}
+              >
+                <Link to="/admin" className="flex items-center gap-3">
+                  <ShieldAlert className="size-5 text-amber-600" />
+                  {!collapsed && (
+                    <span className="font-semibold">{t("admin.navLabel")}</span>
+                  )}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
         {!collapsed && (
           <>
