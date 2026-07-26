@@ -25,6 +25,8 @@ export const sv = {
     saveFailed: "Något gick fel — ändringen sparades inte. Försök igen.",
     loadFailed: "Kunde inte hämta data — kontrollera anslutningen.",
     close: "Stäng",
+    yes: "Ja",
+    no: "Nej",
     language: "Språk",
     english: "English",
     swedish: "Svenska",
