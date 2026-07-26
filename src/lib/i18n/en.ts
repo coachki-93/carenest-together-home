@@ -147,6 +147,11 @@ export const en = {
     conditionDetails: "Condition & devices",
     conditionDetailsHelp: "A longer description shown on the Emergency screen — devices (tracheostomy, PEG…), important background. Use blank lines for paragraphs and start a line with \"-\" for a bullet.",
     conditionDetailsPh: "e.g.\nApert syndrome — affects skull and limb development.\n\n- Tracheostomy for breathing support\n- PEG tube for feeding",
+    careNeedsStep: {
+      title: "Tell us about {{name}}'s care",
+      titleFallback: "Tell us about your child's care",
+      subtitle: "Pick what applies so CareNest fits your child from day one — vitals, modules and reminders will follow. You can change any of this later on the child profile.",
+    },
   },
   onboardingCaregiver: {
     title: "Welcome, caregiver",
