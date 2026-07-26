@@ -348,7 +348,9 @@ function VitalsPage() {
         childId={child.id}
         loggedBy={membership!.user_id}
         presetType={presetType}
+        visibleVitals={visibleVitals}
       />
+
 
       <AlertDialog open={!!confirmDel} onOpenChange={(o) => !o && setConfirmDel(null)}>
         <AlertDialogContent className="rounded-2xl">
