@@ -78,13 +78,11 @@ import {
   type Vital,
   type VitalType,
   type VitalContext,
+  type VitalRangeOverrides,
 } from "@/lib/data/vitals";
 import { parseCareNeeds } from "@/lib/care-needs/parse";
 import { visibleVitalsFor } from "@/lib/care-needs/vitals";
-type _unused = 0;
 
-  type VitalRangeOverrides,
-} from "@/lib/data/vitals";
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
