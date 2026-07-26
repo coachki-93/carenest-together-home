@@ -1370,6 +1370,7 @@ export const sv = {
             instructionTitle: "Specialkost",
             instructionBody: "<p><strong>Typ av kost</strong></p><p>Beskriv kosten (t.ex. ketogen, lågprotein, allergisäker) och vem som ordinerat.</p><p><strong>Livsmedel att inkludera</strong></p><ul><li>Lista basvaror, portioner och eventuella uppmätta komponenter.</li></ul><p><strong>Livsmedel att undvika</strong></p><ul><li>Lista undvik-livsmedel och dolda källor.</li></ul><p><strong>Särskild tillagning</strong></p><ul><li>Vägning, tillagningsmetod, tidpunkt i förhållande till läkemedel.</li></ul>",
           },
+        },
       },
       tracheostomy: {
         cardTitle: "Sätt upp trachvård för {{name}}?",
