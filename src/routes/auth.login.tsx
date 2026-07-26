@@ -185,10 +185,15 @@ function LoginPage() {
         <div className="space-y-1.5">
           <div className="flex items-baseline justify-between">
             <Label htmlFor="password">{t("common.password")}</Label>
-            <Link to="/auth/forgot-password" className="text-xs text-primary font-semibold hover:underline">
-              {t("auth.forgot")}
-            </Link>
+            {mode === "email" ? (
+              <Link to="/auth/forgot-password" className="text-xs text-primary font-semibold hover:underline">
+                {t("auth.forgot")}
+              </Link>
+            ) : (
+              <span className="text-xs text-muted-foreground">{t("auth.teamPwFromOwner")}</span>
+            )}
           </div>
+
           <div className="relative">
             <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -218,11 +223,14 @@ function LoginPage() {
         </Button>
       </form>
 
+      {mode === "email" && (
       <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
         <span className="flex-1 border-t border-black/10" />
         <span>{t("auth.orSignInWith")}</span>
         <span className="flex-1 border-t border-black/10" />
       </div>
+      )}
+
 
       <div className="grid grid-cols-2 gap-3">
         <Button type="button" variant="outline" className="rounded-xl h-11" onClick={() => oauth("google")}>
