@@ -2213,6 +2213,8 @@ export const sv = {
     subtitle: "Maskiner och deras planerade underhåll.",
     readOnly: "Endast familjens ägare eller en materialansvarig vårdgivare kan lägga till eller redigera maskiner.",
     empty: "Inga maskiner än. Lägg till den första för att börja spåra underhåll.",
+    disabledBody: "Underhållsspårning är avstängd. Om ni har utrustning som behöver skötsel, aktivera det i Inställningar.",
+    disabledCta: "Öppna Inställningar",
     emptyCta: "Lägg till maskin",
     addMachine: "Lägg till maskin",
     editMachine: "Redigera maskin",
