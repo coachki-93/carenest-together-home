@@ -1370,8 +1370,87 @@ export const sv = {
             instructionTitle: "Specialkost",
             instructionBody: "<p><strong>Typ av kost</strong></p><p>Beskriv kosten (t.ex. ketogen, lågprotein, allergisäker) och vem som ordinerat.</p><p><strong>Livsmedel att inkludera</strong></p><ul><li>Lista basvaror, portioner och eventuella uppmätta komponenter.</li></ul><p><strong>Livsmedel att undvika</strong></p><ul><li>Lista undvik-livsmedel och dolda källor.</li></ul><p><strong>Särskild tillagning</strong></p><ul><li>Vägning, tillagningsmetod, tidpunkt i förhållande till läkemedel.</li></ul>",
           },
+      },
+      tracheostomy: {
+        cardTitle: "Sätt upp trachvård för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för trakeostomivård och dagliga kontroller. Redigera efter er vårdplan.",
+        offers: {
+          trach_instruction: {
+            label: "Anteckning för trachvård med dagliga kontroller",
+            title: "Trakeostomivård",
+            desc: "En startanteckning för daglig trachvård. Redigera efter er vårdplan.",
+            instructionTitle: "Trakeostomi — daglig vård",
+            instructionBody: "<p><strong>Daglig vård</strong></p><ul><li>Stomarengöring enligt teamets rutin.</li><li>Kontrollera band eller hållare — sitter åt men med utrymme för ett finger.</li><li>Innerkanyl — vård och rengöringsschema.</li><li>Fuktning på plats enligt ordination.</li></ul><p><strong>Akututrustning inom räckhåll</strong></p><ul><li>Reservkanyl (samma storlek) och en storlek mindre.</li><li>Sugutrustning laddad, sugkatetrar redo.</li><li>Andningsmask (bag-valve) i rätt storlek för barnet.</li><li>Sax, vattenbaserat glidmedel, koksalt.</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Blockerad, urdragen eller blödande kanyl vid stomat.</li><li>Ny färgförändring, ökat andningsarbete eller sjunkande SpO₂.</li><li>Feber med förändring i sekret.</li></ul>",
+          },
         },
       },
+      ventilator: {
+        cardTitle: "Sätt upp respiratorvård för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för respiratorkontroller och larmhantering. Redigera efter er utrustning och vårdplan.",
+        offers: {
+          vent_instruction: {
+            label: "Anteckning för respiratorvård med krets- och larmkontroller",
+            title: "Respiratorvård",
+            desc: "En startanteckning för hemrespirator. Redigera efter er utrustning och vårdplan.",
+            instructionTitle: "Respirator — daglig vård",
+            instructionBody: "<p><strong>Ordinerade inställningar</strong></p><p>Notera inställningarna från teamet (läge, frekvens, tryck, FiO₂). Ändra inte utan deras anvisning.</p><p><strong>Före varje användning</strong></p><ul><li>Krets ansluten, inga läckor, filter inom datum.</li><li>Vattennivå och temperatur i fuktaren.</li><li>Batteri laddat, reservbatteri redo.</li><li>Larm hörbara och inställda enligt ordination.</li></ul><p><strong>Larmhantering</strong></p><ul><li>Lågt tryck eller frånkoppling — kontrollera krets och kopplingar.</li><li>Högt tryck — leta efter veck, sekret eller att barnet biter i tuben.</li><li>Låg SpO₂ — bedöm barnet först, sedan utrustningen.</li><li>Vid tveksamhet — koppla loss och andas med handventilator.</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Larm som inte försvinner efter standardkontroller.</li><li>Utrustningsfel, batterifel eller trasig krets utan reserv.</li><li>Förändring i barnets färg, andning eller vakenhet.</li></ul>",
+          },
+        },
+      },
+      cpap_bipap: {
+        cardTitle: "Sätt upp CPAP/BiPAP-vård för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för mask, gränssnitt och daglig användning. Redigera efter er utrustning och vårdplan.",
+        offers: {
+          mask_instruction: {
+            label: "Anteckning för mask- och gränssnittsvård",
+            title: "CPAP/BiPAP-vård",
+            desc: "En startanteckning för CPAP/BiPAP i hemmet. Redigera efter er utrustning och vårdplan.",
+            instructionTitle: "CPAP/BiPAP — daglig vård",
+            instructionBody: "<p><strong>Ordinerade inställningar</strong></p><p>Notera inställningarna från teamet (läge, tryck, ramp). Ändra inte utan deras anvisning.</p><p><strong>Före användning</strong></p><ul><li>Mask och huvudband rena och torra, remmar inte för hårt spända.</li><li>Hudkontroll under masken — ingen rodnad eller tryckmärken.</li><li>Vattennivå i fuktaren.</li><li>Filter rent och inom datum.</li></ul><p><strong>Under användning</strong></p><ul><li>God tätning, minimal läcka.</li><li>Barnet bekvämt, ingen uppspänd mage.</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Hudskada från masken.</li><li>Ihållande läcka som inte går att lösa.</li><li>Ny dagtrötthet, morgonhuvudvärk eller försämrad andning.</li></ul>",
+          },
+        },
+      },
+      suctioning: {
+        cardTitle: "Sätt upp sugningsanteckning för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för sugteknik och utrustningskontroller. Redigera efter teamets anvisningar.",
+        offers: {
+          suction_instruction: {
+            label: "Anteckning för sugteknik och utrustning",
+            title: "Sugning",
+            desc: "En startanteckning för luftvägssugning i hemmet. Redigera efter er vårdplan.",
+            instructionTitle: "Sugning — teknik och kontroller",
+            instructionBody: "<p><strong>Ordinerad teknik</strong></p><ul><li>Väg: oralt, nasalt eller via trach — enligt teamets instruktion.</li><li>Kateterstorlek och sugtryck enligt vårdplanen.</li><li>Varaktighet: håll varje passage kort (vanligen ≤10 sekunder).</li></ul><p><strong>Före varje sugning</strong></p><ul><li>Sugutrustning laddad och fungerande, mätare visar rätt tryck.</li><li>Rätt kateterstorlek, handskar och koksalt redo.</li><li>Överväg preoxygenering om det är ordinerat.</li></ul><p><strong>Var uppmärksam på</strong></p><ul><li>Sjunkande SpO₂ eller färgförändring under sugning — pausa och låt barnet återhämta sig.</li><li>Blödning, ny smärta eller förändring i sekretets färg eller mängd.</li></ul><p><strong>Utrustning</strong></p><ul><li>Reservmanuell sug tillgänglig.</li><li>Reservkatetrar och slang i väskan när ni lämnar hemmet.</li></ul>",
+          },
+        },
+      },
+      inhalations: {
+        cardTitle: "Sätt upp nebulisering för {{name}}?",
+        cardBody: "Vi lägger till en återkommande uppgift för nebuliseringar. Ange tider och läkemedel från er vårdplan.",
+        offers: {
+          neb_task: {
+            label: "Återkommande nebulisering med tider",
+            title: "Nebulisering för {{name}}",
+            desc: "En återkommande påminnelse för nebuliserad medicin. Ange tider och läkemedel enligt ordination.",
+            taskTitle: "Nebulisering",
+            taskNotes: "Från vårdplanen: läkemedel, dos och spädning. Rengör nebuliseringskopp och slang enligt tillverkarens schema.",
+          },
+        },
+      },
+      cough_assist: {
+        cardTitle: "Sätt upp hostmaskinsrutin för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för hostmaskinssessioner och utrustningskontroller. Redigera efter er utrustning och vårdplan.",
+        offers: {
+          cough_instruction: {
+            label: "Anteckning för hostmaskinssession",
+            title: "Hostmaskin",
+            desc: "En startanteckning för hostmaskin i hemmet. Redigera efter er utrustning och vårdplan.",
+            instructionTitle: "Hostmaskin — sessionsrutin",
+            instructionBody: "<p><strong>Ordinerade inställningar</strong></p><p>Notera inställningarna från teamet (insufflations- och exsufflationstryck, tider, cykler). Ändra inte utan deras anvisning.</p><p><strong>Före sessionen</strong></p><ul><li>Mask eller gränssnitt rent och i rätt storlek.</li><li>Utrustningen testad; batteri laddat.</li><li>Sugutrustning redo om sekret behöver rensas.</li></ul><p><strong>Under sessionen</strong></p><ul><li>Samordna cyklerna med barnet.</li><li>Håll koll på tolerans — färg, komfort, ansträngning.</li><li>Pausa mellan omgångar enligt ordination.</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Dålig tolerans, ny smärta eller ihållande SpO₂-fall.</li><li>Utrustningsfel eller skada.</li><li>Ökade sekret med feber eller andningsförändringar.</li></ul>",
+          },
+        },
+      },
+    },
+  },
     },
   },
   notFound: {
