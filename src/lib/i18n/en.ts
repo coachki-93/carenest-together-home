@@ -1370,6 +1370,7 @@ export const en = {
             instructionTitle: "Special diet",
             instructionBody: "<p><strong>Diet type</strong></p><p>Describe the diet (e.g. ketogenic, low-protein, allergy-safe) and who prescribed it.</p><p><strong>Foods to include</strong></p><ul><li>List staples, portions, and any measured components.</li></ul><p><strong>Foods to avoid</strong></p><ul><li>List avoid-list and hidden sources.</li></ul><p><strong>Special preparation</strong></p><ul><li>Weighing, cooking method, timing with medications.</li></ul>",
           },
+        },
       },
       tracheostomy: {
         cardTitle: "Set up trach care for {{name}}?",
