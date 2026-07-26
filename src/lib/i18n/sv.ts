@@ -1124,7 +1124,19 @@ export const sv = {
     activeProfileTitle: "Aktiv vårdgivarprofil",
     activeProfileSub: "Välj vilken av dina profiler du agerar som just nu.",
   },
+  usesEquipment: {
+    title: "Spåra utrustningsunderhåll",
+    subtitle: "Visa underhållssektionen för maskiner som behöver skötsel.",
+    toggle: "Spåra utrustningsunderhåll",
+    saved: "Sparat",
+  },
   wizard: {
+    equipment: {
+      title: "Använder ni utrustning som behöver skötsel?",
+      subtitle: "Ventilator, syrgaskoncentrator, matningspump, sug — allt med filter, batterier eller service.",
+      yes: "Ja",
+      no: "Nej",
+    },
     welcome: "Välkommen till CareNest",
     welcomeHi: "Välkommen, {{name}}",
     welcomeSub: "Vi sätter upp ditt vårdrum på ca 2 minuter.",
@@ -2201,6 +2213,8 @@ export const sv = {
     subtitle: "Maskiner och deras planerade underhåll.",
     readOnly: "Endast familjens ägare eller en materialansvarig vårdgivare kan lägga till eller redigera maskiner.",
     empty: "Inga maskiner än. Lägg till den första för att börja spåra underhåll.",
+    disabledBody: "Underhållsspårning är avstängd. Om ni har utrustning som behöver skötsel, aktivera det i Inställningar.",
+    disabledCta: "Öppna Inställningar",
     emptyCta: "Lägg till maskin",
     addMachine: "Lägg till maskin",
     editMachine: "Redigera maskin",

@@ -37,6 +37,8 @@ import {
 import { Logo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
 import { HospitalToggle } from "./HospitalToggle";
+import { useMyMembership } from "@/lib/auth/use-profile";
+import { useFamily } from "@/lib/data/family";
 
 
 export function AppSidebar() {
@@ -44,6 +46,10 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const membership = useMyMembership();
+  const { data: familyRow } = useFamily(membership.data?.family_id);
+  // Undefined (loading) → treat as visible to avoid a flash-out.
+  const showMaintenance = familyRow?.uses_equipment !== false;
 
   const items = [
     { title: t("nav.dashboard"), url: "/dashboard", icon: LayoutDashboard },
@@ -56,7 +62,9 @@ export function AppSidebar() {
     { title: t("nav.handover"), url: "/handover", icon: ClipboardList },
     { title: t("nav.instructions"), url: "/instructions", icon: BookOpen },
     { title: t("nav.inventory"), url: "/inventory", icon: Boxes },
-    { title: t("nav.maintenance"), url: "/maintenance", icon: Wrench },
+    ...(showMaintenance
+      ? [{ title: t("nav.maintenance"), url: "/maintenance", icon: Wrench }]
+      : []),
     { title: t("nav.shopping"), url: "/shopping", icon: ShoppingCart },
     { title: t("nav.emergency"), url: "/emergency", icon: AlertTriangle },
   ];

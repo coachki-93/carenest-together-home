@@ -1124,7 +1124,19 @@ export const en = {
     activeProfileTitle: "Active caregiver profile",
     activeProfileSub: "Choose which of your profiles you're acting as right now.",
   },
+  usesEquipment: {
+    title: "Track equipment maintenance",
+    subtitle: "Show the Maintenance section for machines that need upkeep.",
+    toggle: "Track equipment maintenance",
+    saved: "Saved",
+  },
   wizard: {
+    equipment: {
+      title: "Do you use equipment that needs upkeep?",
+      subtitle: "Ventilator, oxygen concentrator, feeding pump, suction — anything with filters, batteries, or servicing.",
+      yes: "Yes",
+      no: "No",
+    },
     welcome: "Welcome to CareNest",
     welcomeHi: "Welcome, {{name}}",
     welcomeSub: "Let's set up your care space in about 2 minutes.",
@@ -2202,6 +2214,8 @@ export const en = {
     subtitle: "Machines and their scheduled maintenance.",
     readOnly: "Only the family owner or a material-responsible caregiver can add or edit machines.",
     empty: "No machines yet. Add the first one to start tracking maintenance.",
+    disabledBody: "Maintenance tracking is off. If you use equipment that needs upkeep, turn it on in Settings.",
+    disabledCta: "Open Settings",
     emptyCta: "Add machine",
     addMachine: "Add machine",
     editMachine: "Edit machine",

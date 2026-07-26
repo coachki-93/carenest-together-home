@@ -36,6 +36,7 @@ import {
 import { toast } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
+import { useFamily } from "@/lib/data/family";
 
 import {
   useMachines,
@@ -79,6 +80,7 @@ function MaintenancePage() {
   const canManage =
     membership?.role === "owner" || membership?.material_responsible === true;
 
+  const { data: family } = useFamily(familyId);
   const { data: machines = [] } = useMachines(familyId);
   const { data: items = [] } = useMaintenanceItems(familyId);
   
@@ -168,6 +170,18 @@ function MaintenancePage() {
         ) : null
       }
     >
+      {family?.uses_equipment === false ? (
+        <div className="card-soft p-8 text-center space-y-3">
+          <Wrench className="size-8 mx-auto text-muted-foreground" />
+          <p className="text-muted-foreground">
+            {t("maintenance.disabledBody")}
+          </p>
+          <Button asChild variant="outline" className="rounded-full">
+            <a href="/settings">{t("maintenance.disabledCta")}</a>
+          </Button>
+        </div>
+      ) : (
+      <>
       {!canManage && (
         <div className="card-soft mb-4 p-3 text-sm text-muted-foreground border border-border/60">
           {t("maintenance.readOnly")}
@@ -591,6 +605,8 @@ function MaintenancePage() {
         viewerUserId={user?.id ?? null}
         fmtDateTime={fmtDateTime}
       />
+      </>
+      )}
     </DashboardLayout>
   );
 }

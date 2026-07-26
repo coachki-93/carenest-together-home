@@ -180,7 +180,7 @@ export function useFamily(familyId: string | undefined | null) {
       const { data, error } = await supabase
         .from("families")
         .select(
-          "id, name, owner_id, at_hospital_since, hospital_paused, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language, owner_notify_level",
+          "id, name, owner_id, at_hospital_since, hospital_paused, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language, owner_notify_level, uses_equipment",
         )
         .eq("id", familyId!)
         .single();
@@ -291,6 +291,29 @@ export function useUpdateOwnerNotifyLevel() {
       const { error } = await supabase
         .from("families")
         .update({ owner_notify_level: level })
+        .eq("id", familyId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+    },
+  });
+}
+
+export function useUpdateUsesEquipment() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true },
+    mutationFn: async ({
+      familyId,
+      value,
+    }: {
+      familyId: string;
+      value: boolean;
+    }) => {
+      const { error } = await supabase
+        .from("families")
+        .update({ uses_equipment: value })
         .eq("id", familyId);
       if (error) throw error;
     },

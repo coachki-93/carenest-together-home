@@ -1028,7 +1028,7 @@ function DashboardPage() {
             />
           )}
 
-          <MaintenanceDueCard familyId={familyId} />
+          {family?.uses_equipment !== false && <MaintenanceDueCard familyId={familyId} />}
 
           <section className="card-soft p-6" data-tour="today-schedule">
 
