@@ -92,7 +92,8 @@ import {
 } from "@/components/carenest/TaskActionDialog";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
-import { GuidedTour, type TourStep } from "@/components/carenest/GuidedTour";
+import { WelcomeTour } from "@/components/carenest/WelcomeTour";
+import { buildWelcomePages } from "@/lib/onboarding/welcome-scenario";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
 import { EndOfShiftTidyBanner } from "@/components/carenest/EndOfShiftTidyBanner";
 import { MaintenanceDueCard } from "@/components/carenest/MaintenanceDueCard";
@@ -486,35 +487,9 @@ function DashboardPage() {
     }
   }, [user?.id, search.tour, navigate]);
 
-  const tourSteps: TourStep[] = useMemo(
-    () => [
-      {
-        target: '[data-tour="today-schedule"]',
-        titleKey: "tour.scheduleTitle",
-        bodyKey: "tour.scheduleBody",
-      },
-      {
-        target: '[data-tour="vitals"]',
-        titleKey: "tour.vitalsTitle",
-        bodyKey: "tour.vitalsBody",
-      },
-      {
-        target: '[data-tour="handover"]',
-        titleKey: "tour.handoverTitle",
-        bodyKey: "tour.handoverBody",
-      },
-      {
-        target: '[data-tour="care-team"]',
-        titleKey: "tour.teamTitle",
-        bodyKey: "tour.teamBody",
-      },
-      {
-        target: '[data-tour="sidebar"]',
-        titleKey: "tour.navTitle",
-        bodyKey: "tour.navBody",
-      },
-    ],
-    [],
+  const welcomePages = useMemo(
+    () => buildWelcomePages(child?.care_needs),
+    [child?.care_needs],
   );
 
   function closeTour() {
