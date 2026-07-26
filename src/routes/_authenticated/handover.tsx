@@ -168,6 +168,29 @@ function HandoverPage() {
         breathing: t("vitals.breathing"),
         other: t("vitals.other"),
       },
+      careEventTypeLabels: {
+        seizure: t("careEvents.types.seizure"),
+        desaturation: t("careEvents.types.desaturation"),
+        vomiting: t("careEvents.types.vomiting"),
+        feed_issue: t("careEvents.types.feed_issue"),
+        breathing_difficulty: t("careEvents.types.breathing_difficulty"),
+        behavioural: t("careEvents.types.behavioural"),
+        injury: t("careEvents.types.injury"),
+        other: t("careEvents.types.other"),
+      },
+      careEventSeverityLabels: {
+        1: t("careEvents.severity.mild"),
+        2: t("careEvents.severity.moderate"),
+        3: t("careEvents.severity.severe"),
+      },
+      careEventActionPrefix: t("careEvents.actionLabel"),
+      careEventDuration: (s: number) => {
+        if (s < 60) return t("careEvents.duration.seconds", { s });
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        if (sec === 0) return t("careEvents.duration.minutes", { m });
+        return t("careEvents.duration.mixed", { m, s: sec });
+      },
     }),
     [t],
   );

@@ -5,6 +5,8 @@ import { VITAL_RANGES, type VitalType } from "@/lib/data/vitals";
 import { buildTodaysDoses, type Medication } from "@/lib/data/medications";
 import { TANKS, formatFlow, type TankType } from "@/lib/oxygen/tanks";
 import { hasModule } from "@/lib/care-needs/modules";
+import { _formatCareEventLine, type CareEvent, type CareEventType } from "@/lib/data/care-events";
+import { formatTimeIn } from "@/lib/time/family-tz";
 
 type MedLog = Database["public"]["Tables"]["med_logs"]["Row"];
 type Vital = Database["public"]["Tables"]["vitals"]["Row"];
@@ -45,6 +47,11 @@ interface Labels {
   maintenanceDone: string;
   maintenanceOverdue: string;
   vitalTypeLabels?: Partial<Record<string, string>>;
+  /** Care-event formatting labels. */
+  careEventTypeLabels?: Partial<Record<CareEventType, string>>;
+  careEventSeverityLabels?: Partial<Record<number, string>>;
+  careEventActionPrefix?: string;
+  careEventDuration?: (seconds: number) => string;
 }
 
 
@@ -100,7 +107,7 @@ export function useHandoverPrefill(
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
-      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes, maintLogsRes, maintItemsRes] =
+      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes, maintLogsRes, maintItemsRes, careEventsRes] =
         await Promise.all([
           supabase
             .from("medications")
@@ -173,6 +180,14 @@ export function useHandoverPrefill(
             .select("id, name, action_type, interval_days, last_done_at, active, machine:machines(name)")
             .eq("family_id", familyId)
             .eq("active", true),
+          supabase
+            .from("care_events")
+            .select("*")
+            .eq("family_id", familyId)
+            .eq("active", true)
+            .gte("occurred_at", startIso)
+            .lt("occurred_at", endIso)
+            .order("occurred_at", { ascending: true }),
         ]);
 
       const meds = (medsRes.data ?? []) as Medication[];
@@ -435,6 +450,24 @@ export function useHandoverPrefill(
         );
       }
 
+      // Care events during the shift — surfaced unconditionally when they occur.
+      const careEvents = (careEventsRes.data ?? []) as CareEvent[];
+      for (const ev of careEvents) {
+        const time = formatTimeIn(ev.occurred_at, tz);
+        const line = _formatCareEventLine(
+          ev,
+          {
+            typeLabel: (t) =>
+              labels.careEventTypeLabels?.[t] ?? t,
+            severityLabel: (n) =>
+              labels.careEventSeverityLabels?.[n] ?? String(n),
+            actionPrefix: labels.careEventActionPrefix ?? "Action",
+            duration: labels.careEventDuration ?? ((s) => `${s}s`),
+          },
+          time,
+        );
+        noteLines.push(line);
+      }
 
       const medsStr = medLines.length ? medLines.join("\n") : "";
       const notesStr = noteLines.length ? noteLines.join("\n") : "";

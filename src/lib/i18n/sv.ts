@@ -181,6 +181,8 @@ export const sv = {
     maintenance: "Underhåll",
     shopping: "Inköpslista",
     emergency: "Nödinformation",
+    events: "Händelser",
+
 
 
 
@@ -2523,7 +2525,56 @@ export const sv = {
       description: "Alla aviseringar en vårdgivare får, inklusive startpåminnelser och pingar för pågående uppgifter.",
     },
   },
+  careEvents: {
+    title: "Händelser",
+    subtitle: "Logga händelser och viktiga observationer.",
+    logEvent: "Logga händelse",
+    newEvent: "Ny händelse",
+    editEvent: "Redigera händelse",
+    empty: "Inga händelser ännu.",
+    filters: {
+      all: "Alla typer",
+      active: "Aktiva",
+      archived: "Arkiverade",
+    },
+    fields: {
+      type: "Typ",
+      occurredAt: "När",
+      severity: "Allvarlighetsgrad",
+      duration: "Varaktighet (sekunder)",
+      description: "Vad hände",
+      actionTaken: "Åtgärd (valfritt)",
+    },
+    types: {
+      seizure: "Anfall",
+      desaturation: "Syrgasfall",
+      vomiting: "Kräkning",
+      feed_issue: "Matningsproblem",
+      breathing_difficulty: "Andningssvårighet",
+      behavioural: "Beteende",
+      injury: "Skada",
+      other: "Övrigt",
+    },
+    severity: {
+      none: "—",
+      mild: "Lindrig",
+      moderate: "Måttlig",
+      severe: "Allvarlig",
+    },
+    actionLabel: "Åtgärd",
+    duration: {
+      seconds: "{{s}} s",
+      minutes: "{{m}} min",
+      mixed: "{{m}} min {{s}} s",
+    },
+    editWindowClosed: "Redigeringsfönstret (2 h) har stängts.",
+    archive: "Arkivera",
+    unarchive: "Återställ",
+    delete: "Ta bort",
+    confirmDelete: "Ta bort denna händelse permanent?",
+  },
 };
+
 
 
 

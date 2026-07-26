@@ -181,6 +181,8 @@ export const en = {
     maintenance: "Maintenance",
     shopping: "Shopping list",
     emergency: "Emergency info",
+    events: "Events",
+
 
 
 
@@ -2524,7 +2526,56 @@ export const en = {
       description: "Every notification a caregiver would receive, including start reminders and ongoing task pings.",
     },
   },
+  careEvents: {
+    title: "Events",
+    subtitle: "Log incidents and notable moments.",
+    logEvent: "Log event",
+    newEvent: "New event",
+    editEvent: "Edit event",
+    empty: "No events yet.",
+    filters: {
+      all: "All types",
+      active: "Active",
+      archived: "Archived",
+    },
+    fields: {
+      type: "Type",
+      occurredAt: "When",
+      severity: "Severity",
+      duration: "Duration (seconds)",
+      description: "What happened",
+      actionTaken: "Action taken (optional)",
+    },
+    types: {
+      seizure: "Seizure",
+      desaturation: "Desaturation",
+      vomiting: "Vomiting",
+      feed_issue: "Feed issue",
+      breathing_difficulty: "Breathing difficulty",
+      behavioural: "Behavioural",
+      injury: "Injury",
+      other: "Other",
+    },
+    severity: {
+      none: "—",
+      mild: "Mild",
+      moderate: "Moderate",
+      severe: "Severe",
+    },
+    actionLabel: "Action",
+    duration: {
+      seconds: "{{s}} s",
+      minutes: "{{m}} min",
+      mixed: "{{m}} min {{s}} s",
+    },
+    editWindowClosed: "Editing window (2h) has closed.",
+    archive: "Archive",
+    unarchive: "Restore",
+    delete: "Delete",
+    confirmDelete: "Delete this event permanently?",
+  },
 };
+
 
 
 
