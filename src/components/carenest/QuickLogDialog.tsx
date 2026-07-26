@@ -342,9 +342,9 @@ export function QuickLogDialog({
           <Button
             className="rounded-full font-bold"
             onClick={submit}
-            disabled={!preset || logVital.isPending}
+            disabled={!preset || logVital.isPending || createCareEvent.isPending}
           >
-            {logVital.isPending ? t("vitals.saving") : t("quickLog.save")}
+            {logVital.isPending || createCareEvent.isPending ? t("vitals.saving") : t("quickLog.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
