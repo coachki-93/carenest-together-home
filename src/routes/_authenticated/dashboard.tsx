@@ -487,9 +487,24 @@ function DashboardPage() {
     }
   }, [user?.id, search.tour, navigate]);
 
+  const { data: teamAccountRow } = useQuery({
+    queryKey: ["team_accounts", "exists", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_accounts")
+        .select("family_id")
+        .eq("family_id", familyId!)
+        .maybeSingle();
+      if (error) return null;
+      return data;
+    },
+  });
+  const hasTeamAccount = !!teamAccountRow;
+
   const welcomePages = useMemo(
-    () => buildWelcomePages(child?.care_needs),
-    [child?.care_needs],
+    () => buildWelcomePages(child?.care_needs, { hasTeamAccount }),
+    [child?.care_needs, hasTeamAccount],
   );
 
   function closeTour() {
