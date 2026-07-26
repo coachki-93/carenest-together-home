@@ -237,9 +237,7 @@ function VitalsPage() {
 
         {/* Overview tiles */}
         <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-          {(
-            ["heart_rate", "spo2", "temperature", "breathing", "weight", "fluids"] as VitalType[]
-          ).map((type) => {
+          {visibleVitals.map((type) => {
             const latest = latestMap?.get(type);
             return (
               <VitalOverviewTile
