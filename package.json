@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check:admin": "bash scripts/check-admin-minimization.sh"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",

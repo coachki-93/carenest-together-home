@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   AlertTriangle,
   Wrench,
+  ShieldAlert,
 } from "lucide-react";
 
 
@@ -38,7 +39,9 @@ import { Logo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
 import { HospitalToggle } from "./HospitalToggle";
 import { useMyMembership } from "@/lib/auth/use-profile";
+import { useIsAdmin } from "@/lib/auth/use-is-admin";
 import { useFamily } from "@/lib/data/family";
+
 
 
 export function AppSidebar() {
@@ -48,8 +51,10 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const membership = useMyMembership();
   const { data: familyRow } = useFamily(membership.data?.family_id);
+  const isAdmin = useIsAdmin();
   // Undefined (loading) → treat as visible to avoid a flash-out.
   const showMaintenance = familyRow?.uses_equipment !== false;
+
 
   const items = [
     { title: t("nav.dashboard"), url: "/dashboard", icon: LayoutDashboard },
@@ -141,6 +146,23 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {isAdmin.data === true && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive("/admin")}
+                className="rounded-xl h-11"
+                tooltip={t("admin.navLabel")}
+              >
+                <Link to="/admin" className="flex items-center gap-3">
+                  <ShieldAlert className="size-5 text-amber-600" />
+                  {!collapsed && (
+                    <span className="font-semibold">{t("admin.navLabel")}</span>
+                  )}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
         {!collapsed && (
           <>

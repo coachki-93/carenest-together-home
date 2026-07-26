@@ -40,6 +40,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedChildRouteImport } from './routes/_authenticated/child'
 import { Route as AuthenticatedCaregiversRouteImport } from './routes/_authenticated/caregivers'
 import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authenticated/appointments'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
 import { Route as ApiPublicHooksOxygenLowSweepRouteImport } from './routes/api/public/hooks/oxygen-low-sweep'
@@ -205,6 +206,11 @@ const AuthenticatedAppointmentsRoute =
     path: '/appointments',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOnboardingChildRoute =
   AuthenticatedOnboardingChildRouteImport.update({
     id: '/onboarding/child',
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
@@ -327,6 +335,7 @@ export interface FileRoutesById {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/appointments': typeof AuthenticatedAppointmentsRoute
   '/_authenticated/caregivers': typeof AuthenticatedCaregiversRoute
   '/_authenticated/child': typeof AuthenticatedChildRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/admin'
     | '/appointments'
     | '/caregivers'
     | '/child'
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/admin'
     | '/appointments'
     | '/caregivers'
     | '/child'
@@ -444,6 +455,7 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/_authenticated/admin'
     | '/_authenticated/appointments'
     | '/_authenticated/caregivers'
     | '/_authenticated/child'
@@ -711,6 +723,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppointmentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding/child': {
       id: '/_authenticated/onboarding/child'
       path: '/onboarding/child'
@@ -757,6 +776,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAppointmentsRoute: typeof AuthenticatedAppointmentsRoute
   AuthenticatedCaregiversRoute: typeof AuthenticatedCaregiversRoute
   AuthenticatedChildRoute: typeof AuthenticatedChildRoute
@@ -780,6 +800,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAppointmentsRoute: AuthenticatedAppointmentsRoute,
   AuthenticatedCaregiversRoute: AuthenticatedCaregiversRoute,
   AuthenticatedChildRoute: AuthenticatedChildRoute,
