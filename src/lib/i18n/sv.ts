@@ -1124,7 +1124,19 @@ export const sv = {
     activeProfileTitle: "Aktiv vårdgivarprofil",
     activeProfileSub: "Välj vilken av dina profiler du agerar som just nu.",
   },
+  usesEquipment: {
+    title: "Spåra utrustningsunderhåll",
+    subtitle: "Visa underhållssektionen för maskiner som behöver skötsel.",
+    toggle: "Spåra utrustningsunderhåll",
+    saved: "Sparat",
+  },
   wizard: {
+    equipment: {
+      title: "Använder ni utrustning som behöver skötsel?",
+      subtitle: "Ventilator, syrgaskoncentrator, matningspump, sug — allt med filter, batterier eller service.",
+      yes: "Ja",
+      no: "Nej",
+    },
     welcome: "Välkommen till CareNest",
     welcomeHi: "Välkommen, {{name}}",
     welcomeSub: "Vi sätter upp ditt vårdrum på ca 2 minuter.",
