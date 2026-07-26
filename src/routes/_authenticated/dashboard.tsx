@@ -97,6 +97,7 @@ import { buildWelcomePages } from "@/lib/onboarding/welcome-scenario";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
 import { EndOfShiftTidyBanner } from "@/components/carenest/EndOfShiftTidyBanner";
 import { MaintenanceDueCard } from "@/components/carenest/MaintenanceDueCard";
+import { ScaffoldSuggestionCard } from "@/components/carenest/ScaffoldSuggestionCard";
 import { useTodayMissedChecks } from "@/lib/data/missed-checks";
 import { useLowStockSummary } from "@/lib/data/inventory";
 import { Boxes } from "lucide-react";
