@@ -1451,8 +1451,6 @@ export const sv = {
       },
     },
   },
-    },
-  },
   notFound: {
     kicker: "Sidan hittades inte",
     title: "Vi kunde inte hitta sidan",
