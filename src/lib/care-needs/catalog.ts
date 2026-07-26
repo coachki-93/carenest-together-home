@@ -73,11 +73,11 @@ export const CARE_NEED_CATEGORIES: CareNeedCategory[] = [
 
 export const CARE_CAPABILITIES: CareCapability[] = [
   // Airways
-  { key: "oxygen", category: "airways", icon: Wind, impliedVitals: ["spo2"] },
-  { key: "tracheostomy", category: "airways", icon: AirVent, impliedVitals: ["spo2", "breathing"] },
+  { key: "oxygen", category: "airways", icon: Wind, impliedVitals: ["spo2"], impliedModules: ["oxygen"] },
+  { key: "tracheostomy", category: "airways", icon: AirVent, impliedVitals: ["spo2", "breathing"], impliedModules: ["oxygen"] },
   { key: "suctioning", category: "airways", icon: Droplets, impliedVitals: ["spo2"] },
-  { key: "ventilator", category: "airways", icon: Activity, impliedVitals: ["spo2", "breathing"] },
-  { key: "cpap_bipap", category: "airways", icon: Gauge, impliedVitals: ["spo2", "breathing"] },
+  { key: "ventilator", category: "airways", icon: Activity, impliedVitals: ["spo2", "breathing"], impliedModules: ["oxygen"] },
+  { key: "cpap_bipap", category: "airways", icon: Gauge, impliedVitals: ["spo2", "breathing"], impliedModules: ["oxygen"] },
   { key: "inhalations", category: "airways", icon: Cloud, impliedVitals: ["spo2"] },
   { key: "cough_assist", category: "airways", icon: WavesIcon, impliedVitals: ["spo2"] },
 
