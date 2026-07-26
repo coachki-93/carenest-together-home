@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { VITAL_RANGES, type VitalType } from "@/lib/data/vitals";
 import { buildTodaysDoses, type Medication } from "@/lib/data/medications";
 import { TANKS, formatFlow, type TankType } from "@/lib/oxygen/tanks";
+import { hasModule } from "@/lib/care-needs/modules";
 
 type MedLog = Database["public"]["Tables"]["med_logs"]["Row"];
 type Vital = Database["public"]["Tables"]["vitals"]["Row"];
@@ -15,6 +16,8 @@ export interface HandoverPrefillInput {
   familyId: string;
   shiftStart: Date;
   shiftEnd: Date;
+  /** Raw `children.care_needs` for the active child. Parsed internally. */
+  careNeeds?: unknown;
 }
 
 export interface HandoverPrefill {
