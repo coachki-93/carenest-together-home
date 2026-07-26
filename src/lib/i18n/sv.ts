@@ -1258,6 +1258,122 @@ export const sv = {
       },
     },
   },
+  scaffolds: {
+    stepOf: "Steg {{current}} av {{total}}",
+    skipStep: "Hoppa över",
+    starterNote: "Startinnehåll — anpassa efter er vårdplan.",
+    resetTitle: "Visa förslag igen",
+    resetBody: "Ta tillbaka förslagen på översikten för att sätta upp rutiner för barnets vårdbehov.",
+    resetBtn: "Återställ förslag",
+    resetDone: "Förslagen visas på översikten igen.",
+    card: {
+      setUp: "Sätt upp",
+      notNow: "Inte nu",
+      dismiss: "Avfärda",
+      overflow: "+{{count}} förslag till tillgängligt",
+      overflow_other: "+{{count}} förslag till tillgängliga",
+    },
+    task: {
+      titleLabel: "Titel",
+      titleRequired: "Ange en titel.",
+      timesLabel: "Tider på dygnet",
+      timesPlaceholder: "t.ex. 07:00, 12:00, 17:00, 21:00",
+      timesHint: "Komma-separerade. Du kan justera dem senare i Schemat.",
+      amountLabel: "Volym per matning (ml)",
+      amountPlaceholder: "t.ex. 200",
+      notesLabel: "Anteckningar",
+      saved: "Sondmatning skapad.",
+      saveError: "Kunde inte skapa uppgiften.",
+    },
+    instruction: {
+      titleLabel: "Titel",
+      titleRequired: "Ange en titel.",
+      bodyLabel: "Innehåll",
+      saved: "Vårdinstruktion sparad.",
+      saveError: "Kunde inte spara instruktionen.",
+    },
+    capabilities: {
+      g_tube: {
+        cardTitle: "Sätt upp sondmatning för {{name}}?",
+        cardBody: "Vi hjälper er att lägga in en daglig sondmatningsuppgift och en anteckning för stomivård. Ni fyller i tider, volym och detaljer från er vårdplan.",
+        offers: {
+          feed_task: {
+            label: "Daglig sondmatning med tider och volym",
+            title: "Sondmatning för {{name}}",
+            desc: "En daglig påminnelse för sondmatning. Ange tider och volym enligt vårdgivarens ordination.",
+            taskTitle: "Sondmatning",
+            taskNotes: "Från vårdgivarens ordination: sondmat, hastighet, volym per matning.",
+          },
+          site_instruction: {
+            label: "Anteckning för stomivård med daglig checklista",
+            title: "Stomivård",
+            desc: "En startanteckning med dagliga kontroller. Redigera efter er vårdplan.",
+            instructionTitle: "Stomiställe — daglig vård",
+            instructionBody: "<p><strong>Daglig vård av stomat</strong></p><ul><li>Rengör runt stomat enligt teamets rutin.</li><li>Kontrollera huden avseende rodnad, läckage eller granulationsvävnad.</li><li>Byt förband enligt vårdplan.</li><li>Kontrollera yttre sondlängd före varje matning.</li><li>Kontrollera ballongvolym vid behov.</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Ihållande läckage eller blödning runt stomat.</li><li>Ny rodnad, värme eller flytning som kan tyda på infektion.</li><li>Sonden åker ut eller flyttar sig.</li></ul>",
+          },
+        },
+      },
+      nj_tube: {
+        cardTitle: "Sätt upp sondmatning för {{name}}?",
+        cardBody: "Vi hjälper er att lägga in en daglig sondmatningsuppgift och en anteckning anpassad för NJ-sond. Ni fyller i detaljerna.",
+        offers: {
+          feed_task: {
+            label: "Daglig sondmatning med tider och volym",
+            title: "Sondmatning för {{name}}",
+            desc: "En daglig påminnelse för NJ-sondmatning. Ange tider och volym enligt vårdgivarens ordination.",
+            taskTitle: "Sondmatning",
+            taskNotes: "Från vårdgivarens ordination: sondmat, hastighet, volym per matning. NJ-matning är oftast kontinuerlig eller långsam bolus.",
+          },
+          site_instruction: {
+            label: "Anteckning för NJ-sondvård med kontroller",
+            title: "NJ-sondvård",
+            desc: "En startanteckning för NJ-vård. Redigera efter er vårdplan.",
+            instructionTitle: "NJ-sond — daglig vård",
+            instructionBody: "<p><strong>Daglig vård</strong></p><ul><li>Kontrollera näsan och tejpstället för tryckmärken och hudskador.</li><li>Kontrollera att den yttre längden inte har ändrats sedan inläggning.</li><li>Spola enligt vårdplan (före, mellan och efter matning/läkemedel).</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Ny hosta, färgförändring eller andningsförändring under matning.</li><li>Sonden flyttar sig, åker ut eller går inte att spola.</li><li>Hudskada vid tejpstället.</li></ul>",
+          },
+        },
+      },
+      tpn: {
+        cardTitle: "Sätt upp CVK-vård för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för central venkateter och TPN. Ni redigerar efter er vårdplan.",
+        offers: {
+          line_instruction: {
+            label: "Anteckning för CVK-vård med dagliga kontroller",
+            title: "CVK-vård",
+            desc: "En startanteckning för linjevård. Redigera efter er vårdplan.",
+            instructionTitle: "Central venkateter och TPN — daglig vård",
+            instructionBody: "<p><strong>Aseptisk teknik</strong></p><ul><li>Tvätta händerna och använd den aseptiska rutin ert team lärt er innan ni rör linjen.</li><li>Håll klämmor i det läge som anges i vårdplanen.</li></ul><p><strong>Dagliga kontroller</strong></p><ul><li>Förband intakt, ingen lossning eller nedsmutsning.</li><li>Ingen rodnad, värme eller svullnad runt insticksstället.</li><li>Ingen läckage från linjen eller kopplingar.</li><li>Linjen säkrad — inget drag.</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Feber eller frossa under eller efter infusion.</li><li>Rodnad, flytning eller smärta vid insticksstället.</li><li>Linjen går sönder, kopplas isär eller går inte att spola.</li></ul>",
+          },
+        },
+      },
+      oral_feeding_support: {
+        cardTitle: "Sätt upp måltidsanteckning för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för måltider så varje vårdgivare följer samma rutin.",
+        offers: {
+          mealtime_instruction: {
+            label: "Måltidsanteckning med positionering och signaler",
+            title: "Måltidsrutin",
+            desc: "En startanteckning för måltider. Redigera efter er vårdplan.",
+            instructionTitle: "Måltider — rutin",
+            instructionBody: "<p><strong>Innan måltiden</strong></p><ul><li>Positionering: enligt logoped/arbetsterapeut.</li><li>Bestick och kopptyp: enligt vårdplan.</li><li>Konsistens och förtjockning vid behov.</li></ul><p><strong>Under måltiden</strong></p><ul><li>Tempo, signaler och pauser.</li><li>Tecken på att pausa eller avbryta (hosta, färgförändring, trötthet).</li></ul><p><strong>Var uppmärksam på</strong></p><ul><li>Ihållande hosta eller kvävningskänsla.</li><li>Viktnedgång eller vägran att äta under flera måltider — notera i journalen.</li></ul>",
+          },
+        },
+      },
+      special_diet: {
+        cardTitle: "Sätt upp kostanteckning för {{name}}?",
+        cardBody: "Vi lägger till en startanteckning för kosten — tillåtna livsmedel, vad som ska undvikas och särskild tillagning.",
+        offers: {
+          diet_instruction: {
+            label: "Kostanteckning med tillåten / undvik-lista",
+            title: "Specialkost",
+            desc: "En startanteckning för kosten. Redigera efter er vårdplan.",
+            instructionTitle: "Specialkost",
+            instructionBody: "<p><strong>Typ av kost</strong></p><p>Beskriv kosten (t.ex. ketogen, lågprotein, allergisäker) och vem som ordinerat.</p><p><strong>Livsmedel att inkludera</strong></p><ul><li>Lista basvaror, portioner och eventuella uppmätta komponenter.</li></ul><p><strong>Livsmedel att undvika</strong></p><ul><li>Lista undvik-livsmedel och dolda källor.</li></ul><p><strong>Särskild tillagning</strong></p><ul><li>Vägning, tillagningsmetod, tidpunkt i förhållande till läkemedel.</li></ul>",
+          },
+        },
+      },
+    },
+  },
   notFound: {
     kicker: "Sidan hittades inte",
     title: "Vi kunde inte hitta sidan",
