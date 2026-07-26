@@ -1457,8 +1457,11 @@ function DashboardPage() {
             })()}
           </section>
 
-          {/* Oxygen bar */}
-          <OxygenBar familyId={familyId} activeOxygen={activeOxygen} isLoading={oxygenLoading} now={now} />
+          {/* Oxygen bar — gated on the "oxygen" care module, with an
+              active-tank safety override so a live countdown always shows. */}
+          {(hasModule(child?.care_needs, "oxygen") || !!activeOxygen) && (
+            <OxygenBar familyId={familyId} activeOxygen={activeOxygen} isLoading={oxygenLoading} now={now} />
+          )}
 
           {/* Handover preview */}
           <section
