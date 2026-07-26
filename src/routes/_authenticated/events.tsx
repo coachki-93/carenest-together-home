@@ -339,7 +339,7 @@ function EventsPage() {
             ))}
           </div>
         )}
-      </main>
+      </div>
 
       {familyId && (
         <CareEventDialog
@@ -354,6 +354,7 @@ function EventsPage() {
           event={editing}
         />
       )}
-    </div>
+    </DashboardLayout>
+
   );
 }
