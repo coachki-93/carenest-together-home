@@ -604,6 +604,33 @@ function StepCareNeeds({
 
       <CareNeedsPicker value={careNeeds} onChange={setCareNeeds} canEdit />
 
+      <div className="rounded-2xl border p-4 space-y-3">
+        <div>
+          <div className="font-semibold">{t("wizard.equipment.title")}</div>
+          <p className="text-sm text-muted-foreground">
+            {t("wizard.equipment.subtitle")}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant={usesEquipment ? "default" : "outline"}
+            className="rounded-full"
+            onClick={() => setUsesEquipment(true)}
+          >
+            {t("wizard.equipment.yes")}
+          </Button>
+          <Button
+            type="button"
+            variant={!usesEquipment ? "default" : "outline"}
+            className="rounded-full"
+            onClick={() => setUsesEquipment(false)}
+          >
+            {t("wizard.equipment.no")}
+          </Button>
+        </div>
+      </div>
+
       <StepFooter
         onBack={onBack}
         onSkip={onSkip}
