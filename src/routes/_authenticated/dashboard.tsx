@@ -1030,6 +1030,16 @@ function DashboardPage() {
 
           {family?.uses_equipment !== false && <MaintenanceDueCard familyId={familyId} />}
 
+          {familyId && child?.id && user?.id && (
+            <ScaffoldSuggestionCard
+              familyId={familyId}
+              childId={child.id}
+              userId={user.id}
+              childName={child.name ?? ""}
+              careNeedsRaw={(child as { care_needs?: unknown }).care_needs}
+            />
+          )}
+
           <section className="card-soft p-6" data-tour="today-schedule">
 
 
