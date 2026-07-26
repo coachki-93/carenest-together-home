@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string | null
+          created_at: string
+          detail: Json
+          id: string
+          target_family_id: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          target_family_id?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          target_family_id?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       appointment_completions: {
         Row: {
           appointment_id: string
@@ -1847,6 +1877,24 @@ export type Database = {
           },
         ]
       }
+      platform_admins: {
+        Row: {
+          created_at: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
@@ -2351,6 +2399,7 @@ export type Database = {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
+      is_platform_admin: { Args: { _uid: string }; Returns: boolean }
       is_team_account: { Args: { _user_id: string }; Returns: boolean }
       lookup_invite: {
         Args: { _code: string }
