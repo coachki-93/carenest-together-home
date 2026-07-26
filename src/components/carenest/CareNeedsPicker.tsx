@@ -10,6 +10,7 @@ import {
   CircleDot,
   Wind,
   Activity,
+  Candy,
   type LucideIcon,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +38,7 @@ const VITAL_ICONS: Record<VitalType, LucideIcon> = {
   seizure: Zap,
   fluids: CircleDot,
   breathing: Wind,
+  glucose: Candy,
   other: Activity,
 };
 

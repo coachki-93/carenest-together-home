@@ -10,6 +10,7 @@ import {
   Zap,
   CircleDot,
   Wind,
+  Candy,
   Plus,
   Trash2,
   TrendingDown,
@@ -101,6 +102,7 @@ const TYPE_ICONS: Record<VitalType, typeof Heart> = {
   seizure: Zap,
   fluids: Droplet,
   breathing: Wind,
+  glucose: Candy,
   other: CircleDot,
 };
 
@@ -112,6 +114,7 @@ const TYPE_TONES: Record<VitalType, { bg: string; fg: string; stroke: string }> 
   seizure: { bg: "bg-destructive/15", fg: "text-destructive", stroke: "var(--destructive)" },
   fluids: { bg: "bg-primary-soft", fg: "text-primary", stroke: "var(--primary)" },
   breathing: { bg: "bg-success/20", fg: "text-success-foreground", stroke: "var(--success)" },
+  glucose: { bg: "bg-warning/20", fg: "text-warning-foreground", stroke: "var(--warning)" },
   other: { bg: "bg-muted", fg: "text-muted-foreground", stroke: "var(--muted-foreground)" },
 };
 

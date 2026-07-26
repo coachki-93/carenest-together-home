@@ -15,6 +15,7 @@ export const VITAL_TYPES: VitalType[] = [
   "seizure",
   "fluids",
   "breathing",
+  "glucose",
   "other",
 ];
 
@@ -26,6 +27,7 @@ export const DEFAULT_UNIT: Record<VitalType, string> = {
   seizure: "min",
   fluids: "ml",
   breathing: "br/min",
+  glucose: "mmol/L",
   other: "",
 };
 
@@ -160,6 +162,10 @@ export const VITAL_RANGES: Partial<Record<VitalType, Range>> = {
   spo2: { low: 95, high: 100 },
   temperature: { low: 36.0, high: 37.9 },
   breathing: { low: 12, high: 18 },
+  // Screening reference only — real per-child targets belong in
+  // children.custom_vital_ranges. Glucose varies hugely by fasting/post-meal
+  // context; this window is deliberately wide and informational.
+  glucose: { low: 4.0, high: 10.0 },
 };
 
 /**
@@ -173,6 +179,7 @@ export function getVitalRanges(
 ): Partial<Record<VitalType, Range>> {
   const spo2: Range = { low: 95, high: 100 };
   const temperature: Range = { low: 36.0, high: 37.9 };
+  const glucose: Range = { low: 4.0, high: 10.0 };
   let base: Partial<Record<VitalType, Range>>;
   if (ageMonths == null || Number.isNaN(ageMonths)) {
     base = { ...VITAL_RANGES };
@@ -201,7 +208,9 @@ export function getVitalRanges(
       heart_rate = { low: 60, high: 100 };
       breathing = { low: 12, high: 18 };
     }
-    base = { heart_rate, spo2, temperature, breathing };
+    // Glucose default doesn't shift by age — real targets are child-specific
+    // and belong in the per-child custom range override.
+    base = { heart_rate, spo2, temperature, breathing, glucose };
   }
   if (!overrides) return base;
   const merged: Partial<Record<VitalType, Range>> = { ...base };
