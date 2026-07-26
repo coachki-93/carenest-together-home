@@ -148,6 +148,17 @@ function VitalsPage() {
     () => parseRangeOverrides(child?.custom_vital_ranges),
     [child?.custom_vital_ranges],
   );
+  // Per-child vital presence (Phase 1b). Presentation filter only —
+  // `useLatestVitals` above still fetches every type so hidden vitals' history
+  // is preserved and re-appears the moment they're toggled back on.
+  const visibleVitals = useMemo(
+    () =>
+      visibleVitalsFor(
+        parseCareNeeds((child as unknown as { care_needs?: unknown })?.care_needs),
+      ),
+    [child],
+  );
+
 
 
   // Vitals trimmed to the current range, used by trend charts + history.
