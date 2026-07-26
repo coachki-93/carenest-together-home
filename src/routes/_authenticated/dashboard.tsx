@@ -97,6 +97,7 @@ import { buildWelcomePages } from "@/lib/onboarding/welcome-scenario";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
 import { EndOfShiftTidyBanner } from "@/components/carenest/EndOfShiftTidyBanner";
 import { MaintenanceDueCard } from "@/components/carenest/MaintenanceDueCard";
+import { ScaffoldSuggestionCard } from "@/components/carenest/ScaffoldSuggestionCard";
 import { useTodayMissedChecks } from "@/lib/data/missed-checks";
 import { useLowStockSummary } from "@/lib/data/inventory";
 import { Boxes } from "lucide-react";
@@ -1029,6 +1030,16 @@ function DashboardPage() {
           )}
 
           {family?.uses_equipment !== false && <MaintenanceDueCard familyId={familyId} />}
+
+          {familyId && child?.id && user?.id && (
+            <ScaffoldSuggestionCard
+              familyId={familyId}
+              childId={child.id}
+              userId={user.id}
+              childName={child.name ?? ""}
+              careNeedsRaw={(child as { care_needs?: unknown }).care_needs}
+            />
+          )}
 
           <section className="card-soft p-6" data-tour="today-schedule">
 

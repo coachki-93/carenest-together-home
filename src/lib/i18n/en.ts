@@ -1258,6 +1258,122 @@ export const en = {
       },
     },
   },
+  scaffolds: {
+    stepOf: "Step {{current}} of {{total}}",
+    skipStep: "Skip this",
+    starterNote: "Starter content — please adapt to your care plan.",
+    resetTitle: "Show setup suggestions again",
+    resetBody: "Bring back the dashboard suggestions to set up routines for your child's care needs.",
+    resetBtn: "Reset suggestions",
+    resetDone: "Suggestions will reappear on the dashboard.",
+    card: {
+      setUp: "Set up",
+      notNow: "Not now",
+      dismiss: "Dismiss",
+      overflow: "+{{count}} more suggestion available",
+      overflow_other: "+{{count}} more suggestions available",
+    },
+    task: {
+      titleLabel: "Title",
+      titleRequired: "Please add a title.",
+      timesLabel: "Times of day",
+      timesPlaceholder: "e.g. 07:00, 12:00, 17:00, 21:00",
+      timesHint: "Comma-separated. You can adjust these later on the Schedule.",
+      amountLabel: "Volume per feed (ml)",
+      amountPlaceholder: "e.g. 200",
+      notesLabel: "Notes",
+      saved: "Feed task created.",
+      saveError: "Couldn't create the task.",
+    },
+    instruction: {
+      titleLabel: "Title",
+      titleRequired: "Please add a title.",
+      bodyLabel: "Content",
+      saved: "Care instruction saved.",
+      saveError: "Couldn't save the instruction.",
+    },
+    capabilities: {
+      g_tube: {
+        cardTitle: "Set up feeding for {{name}}?",
+        cardBody: "We'll help you add a daily feed task and a tube-site care note. You add the times, volume, and details from your care plan.",
+        offers: {
+          feed_task: {
+            label: "Daily feed task with times and volume",
+            title: "Feed task for {{name}}",
+            desc: "A daily reminder for tube feeds. Enter the times and volume your clinician prescribed.",
+            taskTitle: "Tube feed",
+            taskNotes: "From clinician's plan: formula, rate, volume per feed.",
+          },
+          site_instruction: {
+            label: "Tube-site care note with a daily check list",
+            title: "Tube-site care",
+            desc: "A starter note with daily site checks. Edit to match your care plan.",
+            instructionTitle: "G-tube site — daily care",
+            instructionBody: "<p><strong>Daily site care</strong></p><ul><li>Clean around the stoma with the routine recommended by your team.</li><li>Check the skin for redness, leakage, or granulation tissue.</li><li>Change dressings per the care plan.</li><li>Confirm the external tube length matches your record before each feed.</li><li>Check balloon volume if applicable.</li></ul><p><strong>When to call the care team</strong></p><ul><li>Persistent leakage or bleeding around the site.</li><li>New redness, warmth, or discharge suggesting infection.</li><li>The tube comes out or moves.</li></ul>",
+          },
+        },
+      },
+      nj_tube: {
+        cardTitle: "Set up feeding for {{name}}?",
+        cardBody: "We'll help you add a daily feed task and a tube-site care note tailored for NJ tubes. You add the specifics.",
+        offers: {
+          feed_task: {
+            label: "Daily feed task with times and volume",
+            title: "Feed task for {{name}}",
+            desc: "A daily reminder for NJ tube feeds. Enter the times and volume your clinician prescribed.",
+            taskTitle: "Tube feed",
+            taskNotes: "From clinician's plan: formula, rate, volume per feed. NJ feeds are usually continuous or slow bolus.",
+          },
+          site_instruction: {
+            label: "NJ-tube site care note with checks",
+            title: "NJ-tube site care",
+            desc: "A starter note for NJ care. Edit to match your care plan.",
+            instructionTitle: "NJ-tube — daily care",
+            instructionBody: "<p><strong>Daily care</strong></p><ul><li>Check the nose and tape site for pressure marks and skin breakdown.</li><li>Confirm the external length hasn't changed since placement.</li><li>Flush per the care plan (before, between, and after feeds/medications).</li></ul><p><strong>When to call the care team</strong></p><ul><li>New coughing, colour change, or breathing changes during feeds.</li><li>The tube moves, comes out, or won't flush.</li><li>Skin breakdown at the tape site.</li></ul>",
+          },
+        },
+      },
+      tpn: {
+        cardTitle: "Set up TPN line care for {{name}}?",
+        cardBody: "We'll add a starter note for central line and TPN care. You edit to match your care plan.",
+        offers: {
+          line_instruction: {
+            label: "Central line care note with daily checks",
+            title: "Central line care",
+            desc: "A starter note for line care. Edit to match your care plan.",
+            instructionTitle: "Central line and TPN — daily care",
+            instructionBody: "<p><strong>Aseptic technique</strong></p><ul><li>Wash hands and use the aseptic routine your team taught you before touching the line.</li><li>Keep clamps in the position on your care plan.</li></ul><p><strong>Daily checks</strong></p><ul><li>Dressing intact, no lifting or soiling.</li><li>No redness, warmth, or swelling around the exit site.</li><li>No leakage from the line or connections.</li><li>Line secured — no tugging.</li></ul><p><strong>When to call the care team</strong></p><ul><li>Fever or shivering during or after an infusion.</li><li>Redness, discharge, or pain at the exit site.</li><li>The line breaks, disconnects, or won't flush.</li></ul>",
+          },
+        },
+      },
+      oral_feeding_support: {
+        cardTitle: "Set up mealtime notes for {{name}}?",
+        cardBody: "We'll add a starter note for mealtimes so every caregiver follows the same routine.",
+        offers: {
+          mealtime_instruction: {
+            label: "Mealtime note with positioning and cues",
+            title: "Mealtime routine",
+            desc: "A starter note for mealtimes. Edit to match your care plan.",
+            instructionTitle: "Mealtimes — routine",
+            instructionBody: "<p><strong>Setting up</strong></p><ul><li>Positioning: as recommended by therapy.</li><li>Utensils and cup type: per the plan.</li><li>Food consistency and thickening if used.</li></ul><p><strong>During the meal</strong></p><ul><li>Pace, cues, and rest breaks.</li><li>Signs to pause or stop (coughing, colour change, fatigue).</li></ul><p><strong>Watch for</strong></p><ul><li>Persistent coughing or choking.</li><li>Weight loss or refusing to eat over several meals — note in the journal.</li></ul>",
+          },
+        },
+      },
+      special_diet: {
+        cardTitle: "Set up diet notes for {{name}}?",
+        cardBody: "We'll add a starter note for the diet — allowed foods, foods to avoid, and any special preparation.",
+        offers: {
+          diet_instruction: {
+            label: "Diet note with allowed / avoid list",
+            title: "Special diet",
+            desc: "A starter note for the diet. Edit to match your care plan.",
+            instructionTitle: "Special diet",
+            instructionBody: "<p><strong>Diet type</strong></p><p>Describe the diet (e.g. ketogenic, low-protein, allergy-safe) and who prescribed it.</p><p><strong>Foods to include</strong></p><ul><li>List staples, portions, and any measured components.</li></ul><p><strong>Foods to avoid</strong></p><ul><li>List avoid-list and hidden sources.</li></ul><p><strong>Special preparation</strong></p><ul><li>Weighing, cooking method, timing with medications.</li></ul>",
+          },
+        },
+      },
+    },
+  },
   notFound: {
     kicker: "Page not found",
     title: "We couldn't find that page",
