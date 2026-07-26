@@ -200,7 +200,8 @@ export function CareEventDialog({
                     <div
                       className={cn(
                         "size-10 rounded-xl flex items-center justify-center shrink-0",
-                        tone,
+                        bg,
+                        text,
                       )}
                     >
                       <Icon className="size-5" />
