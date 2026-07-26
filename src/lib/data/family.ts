@@ -299,3 +299,26 @@ export function useUpdateOwnerNotifyLevel() {
     },
   });
 }
+
+export function useUpdateUsesEquipment() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true },
+    mutationFn: async ({
+      familyId,
+      value,
+    }: {
+      familyId: string;
+      value: boolean;
+    }) => {
+      const { error } = await supabase
+        .from("families")
+        .update({ uses_equipment: value })
+        .eq("id", familyId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+    },
+  });
+}
