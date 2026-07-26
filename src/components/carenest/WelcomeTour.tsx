@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
@@ -24,9 +24,10 @@ const TONE_TILE: Record<WelcomeTone, string> = {
 
 export function WelcomeTour({ open, pages, onClose, onFinish }: Props) {
   const { t } = useTranslation();
-  // Local step index — reset every time the tour reopens.
-  // (No external state store; the tour is one-shot per session.)
-  const [index, setIndex] = useStepIndex(open);
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (open) setIndex(0);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -136,13 +137,3 @@ export function WelcomeTour({ open, pages, onClose, onFinish }: Props) {
   return createPortal(overlay, document.body);
 }
 
-/** Reset step to 0 on every reopen. */
-function useStepIndex(open: boolean): [number, (n: number) => void] {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react") as typeof import("react");
-  const [index, setIndex] = React.useState(0);
-  React.useEffect(() => {
-    if (open) setIndex(0);
-  }, [open]);
-  return [index, setIndex];
-}
