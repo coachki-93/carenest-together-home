@@ -170,6 +170,18 @@ function MaintenancePage() {
         ) : null
       }
     >
+      {family?.uses_equipment === false ? (
+        <div className="card-soft p-8 text-center space-y-3">
+          <Wrench className="size-8 mx-auto text-muted-foreground" />
+          <p className="text-muted-foreground">
+            {t("maintenance.disabledBody")}
+          </p>
+          <Button asChild variant="outline" className="rounded-full">
+            <a href="/settings">{t("maintenance.disabledCta")}</a>
+          </Button>
+        </div>
+      ) : (
+      <>
       {!canManage && (
         <div className="card-soft mb-4 p-3 text-sm text-muted-foreground border border-border/60">
           {t("maintenance.readOnly")}
