@@ -1643,9 +1643,9 @@ function DashboardPage() {
       />
 
 
-      <GuidedTour
+      <WelcomeTour
         open={tourOpen}
-        steps={tourSteps}
+        pages={welcomePages}
         onClose={closeTour}
         onFinish={closeTour}
       />
