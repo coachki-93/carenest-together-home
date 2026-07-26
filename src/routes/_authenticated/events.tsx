@@ -53,16 +53,8 @@ export const Route = createFileRoute("/_authenticated/events")({
   component: EventsPage,
 });
 
-const KIND_ICONS: Record<CareEventType, React.ComponentType<{ className?: string }>> = {
-  seizure: Zap,
-  desaturation: Wind,
-  vomiting: Utensils,
-  feed_issue: CircleDot,
-  breathing_difficulty: Activity,
-  behavioural: Brain,
-  injury: AlertTriangle,
-  other: MoreHorizontal,
-};
+import { CARE_EVENT_META } from "@/lib/carenest/care-event-meta";
+
 
 function useChild(familyId: string | undefined | null) {
   return useQuery({
