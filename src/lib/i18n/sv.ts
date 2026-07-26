@@ -181,6 +181,8 @@ export const sv = {
     maintenance: "Underhåll",
     shopping: "Inköpslista",
     emergency: "Nödinformation",
+    events: "Händelser",
+
 
 
 
