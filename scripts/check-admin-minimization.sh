@@ -65,13 +65,16 @@ for name in "${FORBIDDEN[@]}"; do
   fi
 done
 
-# Additional structural checks.
-if grep -Eq "select\(\s*['\"]\*['\"]" "$FILE"; then
+# Additional structural checks — strip comment lines first so the contract
+# text in the module's own docstring isn't flagged.
+CODE_ONLY="$(grep -Ev '^\s*(\*|//)' "$FILE")"
+
+if echo "$CODE_ONLY" | grep -Eq "\.select\(\s*['\"]\*['\"]"; then
   echo "FORBIDDEN: $FILE uses select('*') — every column must be explicit" >&2
   fail=1
 fi
 
-if grep -Eq "\.rpc\(" "$FILE"; then
+if echo "$CODE_ONLY" | grep -Eq "\.rpc\("; then
   # is_platform_admin is called through supabase.rpc from the caller's
   # RLS-scoped client. That's the only allowed rpc call. Verify.
   if ! grep -q 'rpc("is_platform_admin"' "$FILE"; then
