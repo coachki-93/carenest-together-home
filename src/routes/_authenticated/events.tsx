@@ -163,7 +163,7 @@ function EventsPage() {
             {t("careEvents.filter.all")}
           </button>
           {CARE_EVENT_TYPES.map((k) => {
-            const Icon = KIND_ICONS[k];
+            const { icon: Icon, text } = CARE_EVENT_META[k];
             const selected = filter === k;
             return (
               <button
@@ -175,11 +175,12 @@ function EventsPage() {
                     : "border-border hover:bg-muted"
                 }`}
               >
-                <Icon className="size-3.5" />
+                <Icon className={cn("size-3.5", !selected && text)} />
                 {t(`careEvents.types.${k}`)}
               </button>
             );
           })}
+
         </div>
 
         <div className="flex items-center justify-end mb-4">
