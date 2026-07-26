@@ -484,7 +484,110 @@ function StepChild({
   );
 }
 
-/* --------------------- Step 3: First medication (optional) ----------------- */
+/* --------------------- Step 3: Care needs (optional) ---------------------- */
+function StepCareNeeds({
+  onBack,
+  onContinue,
+  onSkip,
+}: {
+  onBack: () => void;
+  onContinue: () => void;
+  onSkip: () => void;
+}) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const membership = useMyMembership();
+  const familyId = membership.data?.family_id;
+
+  const child = useQuery({
+    queryKey: ["wizard-child-care-needs", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("children")
+        .select("id, name, care_needs")
+        .eq("family_id", familyId!)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const [careNeeds, setCareNeeds] = useState<CareNeeds>({ capabilities: [] });
+  const [seeded, setSeeded] = useState(false);
+
+  // No-child bounce-back: if the user reached step 3 via ?step=3 without
+  // completing step 2, there's nothing to attach care_needs to — skip once
+  // the query settles. Mirrors the pattern in StepFirstMedication.
+  useEffect(() => {
+    if (!child.isFetched) return;
+    if (!child.data) {
+      onSkip();
+      return;
+    }
+    if (!seeded) {
+      setCareNeeds(parseCareNeeds(child.data.care_needs));
+      setSeeded(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [child.isFetched, child.data?.id]);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!child.data) throw new Error("Setup incomplete");
+      // Merge-on-save: preserve any forward-compat fields on care_needs that
+      // the picker doesn't yet know about (e.g. future settings blobs).
+      const existing = parseCareNeeds(child.data.care_needs);
+      const merged: CareNeeds = { ...existing, ...careNeeds };
+      const { error } = await supabase
+        .from("children")
+        .update({ care_needs: merged as unknown as never })
+        .eq("id", child.data.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries();
+      onContinue();
+    },
+    onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
+  });
+
+  const name = child.data?.name ?? "";
+
+  return (
+    <div className="card-soft p-6 md:p-8 space-y-6">
+      <div className="space-y-2 text-center">
+        <div className="size-14 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto">
+          <HeartPulse className="size-7" />
+        </div>
+        <h2 className="text-2xl md:text-3xl font-extrabold">
+          {name
+            ? t("onboardingChild.careNeedsStep.title", { name })
+            : t("onboardingChild.careNeedsStep.titleFallback")}
+        </h2>
+        <p className="text-muted-foreground">
+          {t("onboardingChild.careNeedsStep.subtitle")}
+        </p>
+      </div>
+
+      <CareNeedsPicker value={careNeeds} onChange={setCareNeeds} canEdit />
+
+      <StepFooter
+        onBack={onBack}
+        onSkip={onSkip}
+        primaryLabel={save.isPending ? t("common.saving") : t("wizard.saveContinue")}
+        primaryDisabled={save.isPending || !child.data}
+        primaryLoading={save.isPending}
+        onPrimary={() => save.mutate()}
+      />
+    </div>
+  );
+}
+
+/* --------------------- Step 4: First medication (optional) ----------------- */
 function StepFirstMedication({
   onBack,
   onContinue,
