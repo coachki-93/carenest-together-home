@@ -1,6 +1,17 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown } from "lucide-react";
+import {
+  ChevronDown,
+  Heart,
+  Droplet,
+  Thermometer,
+  Scale,
+  Zap,
+  CircleDot,
+  Wind,
+  Activity,
+  type LucideIcon,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { CareNeeds } from "@/lib/care-needs/parse";
@@ -9,12 +20,37 @@ import {
   capabilitiesByCategory,
   type CareNeedCategory,
 } from "@/lib/care-needs/catalog";
+import { visibleVitalsFor } from "@/lib/care-needs/vitals";
+import { VITAL_TYPES, type VitalType } from "@/lib/data/vitals";
 
 interface Props {
   value: CareNeeds;
   onChange: (next: CareNeeds) => void;
   canEdit: boolean;
 }
+
+const VITAL_ICONS: Record<VitalType, LucideIcon> = {
+  heart_rate: Heart,
+  spo2: Droplet,
+  temperature: Thermometer,
+  weight: Scale,
+  seizure: Zap,
+  fluids: CircleDot,
+  breathing: Wind,
+  other: Activity,
+};
+
+function vitalI18nKey(t: VitalType): string {
+  switch (t) {
+    case "heart_rate":
+      return "heartRate";
+    case "temperature":
+      return "temp";
+    default:
+      return t;
+  }
+}
+
 
 export function CareNeedsPicker({ value, onChange, canEdit }: Props) {
   const { t } = useTranslation();
