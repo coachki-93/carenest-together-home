@@ -1372,6 +1372,84 @@ export const en = {
           },
         },
       },
+      tracheostomy: {
+        cardTitle: "Set up trach care for {{name}}?",
+        cardBody: "We'll add a starter note for tracheostomy care and daily checks. Edit to match your care plan.",
+        offers: {
+          trach_instruction: {
+            label: "Trach care note with daily checks",
+            title: "Tracheostomy care",
+            desc: "A starter note for daily trach care. Edit to match your care plan.",
+            instructionTitle: "Tracheostomy — daily care",
+            instructionBody: "<p><strong>Daily care</strong></p><ul><li>Stoma cleaning per your team's routine.</li><li>Tie or holder check — snug but one-finger space.</li><li>Inner cannula care and cleaning schedule.</li><li>Humidification in place as prescribed.</li></ul><p><strong>Emergency supplies at hand</strong></p><ul><li>Spare tube (same size) and one size smaller.</li><li>Suction unit charged, catheters ready.</li><li>Bag-valve mask sized for the child.</li><li>Scissors, water-based lubricant, saline.</li></ul><p><strong>When to call for help</strong></p><ul><li>Tube blocked, dislodged, or bleeding at the stoma.</li><li>New colour change, increased work of breathing, or falling SpO₂.</li><li>Fever with change in secretions.</li></ul>",
+          },
+        },
+      },
+      ventilator: {
+        cardTitle: "Set up ventilator care for {{name}}?",
+        cardBody: "We'll add a starter note for ventilator checks and alarm response. Edit to match your device and care plan.",
+        offers: {
+          vent_instruction: {
+            label: "Ventilator care note with circuit and alarm checks",
+            title: "Ventilator care",
+            desc: "A starter note for ventilator use at home. Edit to match your device and care plan.",
+            instructionTitle: "Ventilator — daily care",
+            instructionBody: "<p><strong>Prescribed settings</strong></p><p>Record the settings from your team (mode, rate, pressures, FiO₂). Do not change without their instruction.</p><p><strong>Before each use</strong></p><ul><li>Circuit connected, no leaks, filters in date.</li><li>Humidifier water level and temperature.</li><li>Battery charged, backup battery ready.</li><li>Alarms audible and set to prescribed limits.</li></ul><p><strong>Alarm response</strong></p><ul><li>Low pressure or disconnect — check circuit and connections.</li><li>High pressure — check for kinks, secretions, or the child biting the tube.</li><li>Low SpO₂ — assess the child first, then the device.</li><li>If in doubt, disconnect and bag with the resuscitation bag.</li></ul><p><strong>When to call for help</strong></p><ul><li>Alarms that don't resolve after standard checks.</li><li>Device fault, battery failure, or damaged circuit with no spare.</li><li>Change in the child's colour, breathing, or level of alertness.</li></ul>",
+          },
+        },
+      },
+      cpap_bipap: {
+        cardTitle: "Set up CPAP/BiPAP care for {{name}}?",
+        cardBody: "We'll add a starter note for the mask, interface, and daily use. Edit to match your device and care plan.",
+        offers: {
+          mask_instruction: {
+            label: "Mask and interface care note",
+            title: "CPAP/BiPAP care",
+            desc: "A starter note for CPAP/BiPAP use at home. Edit to match your device and care plan.",
+            instructionTitle: "CPAP/BiPAP — daily care",
+            instructionBody: "<p><strong>Prescribed settings</strong></p><p>Record the settings from your team (mode, pressures, ramp). Do not change without their instruction.</p><p><strong>Before use</strong></p><ul><li>Mask and headgear clean and dry, straps not overtightened.</li><li>Skin check under the mask — no redness or pressure marks.</li><li>Humidifier water level.</li><li>Filter clean and in date.</li></ul><p><strong>During use</strong></p><ul><li>Good seal, minimal leak.</li><li>Child comfortable, no gastric distension.</li></ul><p><strong>When to call for help</strong></p><ul><li>Skin breakdown from the mask.</li><li>Persistent leak that can't be resolved.</li><li>New daytime sleepiness, morning headaches, or worse breathing.</li></ul>",
+          },
+        },
+      },
+      suctioning: {
+        cardTitle: "Set up suctioning note for {{name}}?",
+        cardBody: "We'll add a starter note for suctioning technique and equipment checks. Edit to match your team's guidance.",
+        offers: {
+          suction_instruction: {
+            label: "Suctioning technique and equipment note",
+            title: "Suctioning",
+            desc: "A starter note for airway suctioning at home. Edit to match your care plan.",
+            instructionTitle: "Suctioning — technique and checks",
+            instructionBody: "<p><strong>Prescribed technique</strong></p><ul><li>Route: oral, nasal, or via trach — as taught by your team.</li><li>Catheter size and suction pressure per the care plan.</li><li>Duration: keep passes short (typically ≤10 seconds).</li></ul><p><strong>Before each suction</strong></p><ul><li>Suction unit charged and working, gauge reads correct pressure.</li><li>Correct-size catheter, gloves, and saline ready.</li><li>Consider pre-oxygenation if prescribed.</li></ul><p><strong>Watch for</strong></p><ul><li>Falling SpO₂ or colour change during suctioning — stop and let the child recover.</li><li>Bleeding, new pain, or change in secretion colour or amount.</li></ul><p><strong>Equipment</strong></p><ul><li>Backup manual suction available.</li><li>Spare catheters and tubing in the bag when leaving home.</li></ul>",
+          },
+        },
+      },
+      inhalations: {
+        cardTitle: "Set up nebulizer routine for {{name}}?",
+        cardBody: "We'll add a recurring task for nebulizer treatments. Enter times and medication from your care plan.",
+        offers: {
+          neb_task: {
+            label: "Recurring nebulizer treatment with times",
+            title: "Nebulizer treatment for {{name}}",
+            desc: "A recurring reminder for nebulized medication. Enter times and medication as prescribed.",
+            taskTitle: "Nebulizer treatment",
+            taskNotes: "From the care plan: medication, dose, and diluent. Clean the nebulizer cup and tubing per the manufacturer's schedule.",
+          },
+        },
+      },
+      cough_assist: {
+        cardTitle: "Set up cough assist routine for {{name}}?",
+        cardBody: "We'll add a starter note for cough assist sessions and equipment checks. Edit to match your device and care plan.",
+        offers: {
+          cough_instruction: {
+            label: "Cough assist session note",
+            title: "Cough assist",
+            desc: "A starter note for cough assist use at home. Edit to match your device and care plan.",
+            instructionTitle: "Cough assist — session routine",
+            instructionBody: "<p><strong>Prescribed settings</strong></p><p>Record the settings from your team (insufflation and exsufflation pressures, times, cycles). Do not change without their instruction.</p><p><strong>Before the session</strong></p><ul><li>Mask or interface clean and correct size.</li><li>Device tested; battery charged.</li><li>Suction unit ready in case secretions need clearing.</li></ul><p><strong>During the session</strong></p><ul><li>Coordinate cycles with the child.</li><li>Watch for tolerance — colour, comfort, effort.</li><li>Pause between sets as prescribed.</li></ul><p><strong>When to call for help</strong></p><ul><li>Poor tolerance, new pain, or persistent SpO₂ drops.</li><li>Device fault or damage.</li><li>Increased secretions with fever or breathing changes.</li></ul>",
+          },
+        },
+      },
     },
   },
   notFound: {
