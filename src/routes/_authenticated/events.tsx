@@ -3,18 +3,13 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Activity,
-  AlertTriangle,
   Archive,
   ArchiveRestore,
-  Brain,
-  CircleDot,
-  MoreHorizontal,
   Pencil,
   Plus,
-  Utensils,
-  Wind,
-  Zap,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { toast } from "sonner";
@@ -35,6 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth/use-profile";
 import { formatTimeIn, wallClockIn } from "@/lib/time/family-tz";
+import { CARE_EVENT_META } from "@/lib/carenest/care-event-meta";
 
 export const Route = createFileRoute("/_authenticated/events")({
   head: () => ({
@@ -58,16 +54,9 @@ export const Route = createFileRoute("/_authenticated/events")({
   component: EventsPage,
 });
 
-const KIND_ICONS: Record<CareEventType, React.ComponentType<{ className?: string }>> = {
-  seizure: Zap,
-  desaturation: Wind,
-  vomiting: Utensils,
-  feed_issue: CircleDot,
-  breathing_difficulty: Activity,
-  behavioural: Brain,
-  injury: AlertTriangle,
-  other: MoreHorizontal,
-};
+
+
+
 
 function useChild(familyId: string | undefined | null) {
   return useQuery({
@@ -174,7 +163,7 @@ function EventsPage() {
             {t("careEvents.filter.all")}
           </button>
           {CARE_EVENT_TYPES.map((k) => {
-            const Icon = KIND_ICONS[k];
+            const { icon: Icon, text } = CARE_EVENT_META[k];
             const selected = filter === k;
             return (
               <button
@@ -186,11 +175,12 @@ function EventsPage() {
                     : "border-border hover:bg-muted"
                 }`}
               >
-                <Icon className="size-3.5" />
+                <Icon className={cn("size-3.5", !selected && text)} />
                 {t(`careEvents.types.${k}`)}
               </button>
             );
           })}
+
         </div>
 
         <div className="flex items-center justify-end mb-4">
@@ -233,7 +223,7 @@ function EventsPage() {
                 </h2>
                 <ul className="space-y-2">
                   {rows.map((ev) => {
-                    const Icon = KIND_ICONS[ev.type];
+                    const { icon: Icon, bg, text } = CARE_EVENT_META[ev.type];
                     const canEdit = canEditCareEvent(ev, user?.id);
                     const isAuthor = user?.id === ev.created_by;
                     return (
@@ -242,9 +232,10 @@ function EventsPage() {
                         className={`card-soft p-4 ${!ev.active ? "opacity-60" : ""}`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="size-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                          <div className={cn("size-10 rounded-xl flex items-center justify-center shrink-0", bg, text)}>
                             <Icon className="size-5" />
                           </div>
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-mono text-xs text-muted-foreground">
