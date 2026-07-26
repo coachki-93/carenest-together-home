@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/onboarding/child")({
   component: ChildOnboarding,
 });
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 
 interface Contact {
