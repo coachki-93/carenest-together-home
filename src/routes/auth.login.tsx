@@ -133,19 +133,55 @@ function LoginPage() {
         <p className="text-sm text-muted-foreground">{t("auth.loginSubtitle")}</p>
       </div>
 
+      <div className="grid grid-cols-2 rounded-full border border-border p-1 bg-muted/40 text-sm font-semibold">
+        <button
+          type="button"
+          onClick={() => { setMode("email"); setFormError(null); }}
+          className={`rounded-full h-9 transition ${mode === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+        >
+          {t("auth.tabEmail")}
+        </button>
+        <button
+          type="button"
+          onClick={() => { setMode("team"); setFormError(null); }}
+          className={`rounded-full h-9 transition ${mode === "team" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+        >
+          {t("auth.tabTeam")}
+        </button>
+      </div>
+
       <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="email">{t("common.email")}</Label>
-          <div className="relative">
-            <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="email" type="email" autoComplete="email" required autoFocus
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); if (formError) setFormError(null); }}
-              placeholder="you@example.com" className="h-12 rounded-xl pl-10"
-            />
+        {mode === "email" ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="email">{t("common.email")}</Label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="email" type="email" autoComplete="email" required autoFocus
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); if (formError) setFormError(null); }}
+                placeholder="you@example.com" className="h-12 rounded-xl pl-10"
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-1.5">
+            <Label htmlFor="username">{t("auth.teamUsername")}</Label>
+            <div className="relative">
+              <Users2 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="username" type="text" autoComplete="username" required autoFocus
+                value={username}
+                onChange={(e) => { setUsername(e.target.value); if (formError) setFormError(null); }}
+                placeholder={t("auth.teamUsernamePlaceholder")}
+                className="h-12 rounded-xl pl-10"
+                autoCapitalize="none" spellCheck={false}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">{t("auth.teamHint")}</p>
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <div className="flex items-baseline justify-between">
             <Label htmlFor="password">{t("common.password")}</Label>
