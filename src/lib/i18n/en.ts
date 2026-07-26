@@ -102,6 +102,13 @@ export const en = {
     showcaseFeat2Body: "Plan who's working which days, visible to every caregiver.",
     showcaseFeat3Title: "Private by default",
     showcaseFeat3Body: "Only the people you invite see your child's information.",
+    tabEmail: "Email",
+    tabTeam: "Team username",
+    teamUsername: "Team username",
+    teamUsernamePlaceholder: "e.g. andersson-team",
+    teamHint: "Use this if the family owner shared a team username and password with you.",
+    teamPwFromOwner: "Ask the family owner",
+    usernameRequired: "Enter the team username",
   },
   invite: {
     haveInvite: "Have an invite?",
