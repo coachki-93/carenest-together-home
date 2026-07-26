@@ -3,18 +3,13 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Activity,
-  AlertTriangle,
   Archive,
   ArchiveRestore,
-  Brain,
-  CircleDot,
-  MoreHorizontal,
   Pencil,
   Plus,
-  Utensils,
-  Wind,
-  Zap,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { toast } from "sonner";
