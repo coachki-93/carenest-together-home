@@ -185,12 +185,14 @@ export const createTeamAccount = createServerFn({ method: "POST" })
       // primary error but leak nothing to the caller — the team_accounts
       // row is gone (or absent) so no future function-call path returns
       // success with the family_members row missing.
-      await supabaseAdmin
-        .from("team_accounts")
-        .delete()
-        .eq("family_id", data.familyId)
-        .catch(() => {});
+      try {
+        await supabaseAdmin
+          .from("team_accounts")
+          .delete()
+          .eq("family_id", data.familyId);
+      } catch { /* best-effort rollback */ }
       await supabaseAdmin.auth.admin.deleteUser(newUserId).catch(() => {});
+
       throw new Error(`Failed to bind membership: ${fmErr.message}`);
     }
 
