@@ -102,6 +102,36 @@ export const SCAFFOLD_DEFINITIONS: ScaffoldDefinition[] = [
       { key: "cough_instruction", engine: "instruction", templateKey: "cough_assist_care" },
     ],
   },
+  // ----- Metabolic (Phase 4, Slice 1) -----
+  {
+    capability: "diabetes",
+    i18nKey: "diabetes",
+    offers: [
+      { key: "glucose_task", engine: "task", templateKey: "glucose_task" },
+      { key: "diabetes_instruction", engine: "instruction", templateKey: "diabetes_mgmt" },
+    ],
+  },
+  {
+    capability: "adrenal_insufficiency",
+    i18nKey: "adrenal_insufficiency",
+    offers: [
+      { key: "adrenal_instruction", engine: "instruction", templateKey: "adrenal_sickday" },
+    ],
+  },
+  {
+    capability: "thyroid",
+    i18nKey: "thyroid",
+    offers: [
+      { key: "thyroid_instruction", engine: "instruction", templateKey: "thyroid_meds" },
+    ],
+  },
+  {
+    capability: "metabolic_disorder",
+    i18nKey: "metabolic_disorder",
+    offers: [
+      { key: "metabolic_instruction", engine: "instruction", templateKey: "metabolic_mgmt" },
+    ],
+  },
 ];
 
 export function scaffoldFor(capability: string): ScaffoldDefinition | undefined {
@@ -126,6 +156,8 @@ export function taskTemplateFor(templateKey: string): TaskTemplate {
       return { kind: "meal", titleFallback: "", hasAmountMl: true };
     case "neb_task":
       return { kind: "medication", titleFallback: "", hasAmountMl: false };
+    case "glucose_task":
+      return { kind: "task", titleFallback: "", hasAmountMl: false };
     default:
       return { kind: "task", titleFallback: "", hasAmountMl: false };
   }
