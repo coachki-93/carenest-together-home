@@ -20,8 +20,9 @@ import { parseCareNeeds, type CareNeeds } from "@/lib/care-needs/parse";
 
 
 const stepSchema = z.object({
-  step: z.coerce.number().int().min(1).max(5).optional().default(1),
+  step: z.coerce.number().int().min(1).max(6).optional().default(1),
 });
+
 
 export const Route = createFileRoute("/_authenticated/onboarding/child")({
   head: () => ({ meta: [{ title: "Welcome to CareNest" }] }),
