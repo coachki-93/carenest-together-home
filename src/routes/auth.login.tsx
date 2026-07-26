@@ -232,6 +232,7 @@ function LoginPage() {
       )}
 
 
+      {mode === "email" && (
       <div className="grid grid-cols-2 gap-3">
         <Button type="button" variant="outline" className="rounded-xl h-11" onClick={() => oauth("google")}>
           <GoogleIcon /> {t("common.google")}
@@ -240,6 +241,8 @@ function LoginPage() {
           <AppleIcon /> {t("common.apple")}
         </Button>
       </div>
+      )}
+
 
       <div className="text-center space-y-1.5">
         <p className="text-sm text-muted-foreground">
