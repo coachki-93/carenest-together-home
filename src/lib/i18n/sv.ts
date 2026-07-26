@@ -2613,6 +2613,22 @@ export const sv = {
     delete: "Ta bort",
     confirmDelete: "Ta bort denna händelse permanent?",
   },
+  teamAccount: {
+    title: "Delat team-konto",
+    subtitle: "En inloggning som dina barnvakter, nattsköterskor eller hjälpare kan dela. Du styr det.",
+    emptyBody: "Inget delat konto än. Skapa ett och dela användarnamnet och lösenordet med ditt team.",
+    generate: "Skapa team-konto",
+    usernameLabel: "Team-användarnamn",
+    passwordLabel: "Lösenord",
+    passwordHidden: "Dolt — syns bara direkt efter att du skapat eller återställt det.",
+    shownOnce: "Kopiera lösenordet nu — av säkerhetsskäl visar vi det inte igen. Du kan alltid återställa det.",
+    created: "Skapat",
+    reset: "Återställ lösenord",
+    resetBtn: "Återställ lösenord",
+    resetConfirmTitle: "Återställ team-lösenordet?",
+    resetConfirmBody: "Alla som använder det delade kontot loggas ut inom en timme och behöver det nya lösenordet för att logga in igen.",
+    resetConfirmCta: "Återställ lösenord",
+  },
 };
 
 

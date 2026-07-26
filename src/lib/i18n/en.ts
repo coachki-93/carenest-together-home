@@ -2614,6 +2614,22 @@ export const en = {
     delete: "Delete",
     confirmDelete: "Delete this event permanently?",
   },
+  teamAccount: {
+    title: "Shared team account",
+    subtitle: "One login your nannies, night nurses, or helpers can share. You control it.",
+    emptyBody: "No shared account yet. Generate one and share the username and password with your team.",
+    generate: "Generate team account",
+    usernameLabel: "Team username",
+    passwordLabel: "Password",
+    passwordHidden: "Hidden — visible only right after you generate or reset it.",
+    shownOnce: "Copy the password now — for security, we won't show it again. You can always reset it.",
+    created: "Created",
+    reset: "Reset password",
+    resetBtn: "Reset password",
+    resetConfirmTitle: "Reset the team password?",
+    resetConfirmBody: "Everyone using the shared account will be logged out within the hour and will need the new password to sign back in.",
+    resetConfirmCta: "Reset password",
+  },
 };
 
 
