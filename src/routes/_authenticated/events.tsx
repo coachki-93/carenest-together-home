@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { toast } from "sonner";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { ByProfile } from "@/components/carenest/ByProfile";
