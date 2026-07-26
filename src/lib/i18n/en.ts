@@ -829,6 +829,10 @@ export const en = {
     subtitle: "Pick everything that applies. CareNest will use these choices to tailor the app to your child.",
     countBadge: "{{selected}} / {{total}}",
     otherPlaceholder: "Describe any other need in a few words.",
+    vitalsTitle: "Vitals shown for this child",
+    vitalsSubtitle: "Suggested based on care needs above. Turn on any extras you track, or hide ones you don't.",
+    vitalsRetentionHint: "Turning a vital off only hides it. Historical readings are never deleted and re-appear when you turn it back on.",
+
     categories: {
       airways: "Airways & breathing",
       feeding: "Feeding & nutrition",

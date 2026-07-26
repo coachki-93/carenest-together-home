@@ -69,7 +69,7 @@ import {
   useLogVital,
   useDeleteVital,
   DEFAULT_UNIT,
-  VITAL_TYPES,
+  
   VITAL_CONTEXTS,
   getVitalRanges,
   parseRangeOverrides,
@@ -80,6 +80,9 @@ import {
   type VitalContext,
   type VitalRangeOverrides,
 } from "@/lib/data/vitals";
+import { parseCareNeeds } from "@/lib/care-needs/parse";
+import { visibleVitalsFor } from "@/lib/care-needs/vitals";
+
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -145,6 +148,17 @@ function VitalsPage() {
     () => parseRangeOverrides(child?.custom_vital_ranges),
     [child?.custom_vital_ranges],
   );
+  // Per-child vital presence (Phase 1b). Presentation filter only —
+  // `useLatestVitals` above still fetches every type so hidden vitals' history
+  // is preserved and re-appears the moment they're toggled back on.
+  const visibleVitals = useMemo(
+    () =>
+      visibleVitalsFor(
+        parseCareNeeds((child as unknown as { care_needs?: unknown })?.care_needs),
+      ),
+    [child],
+  );
+
 
 
   // Vitals trimmed to the current range, used by trend charts + history.
@@ -223,9 +237,7 @@ function VitalsPage() {
 
         {/* Overview tiles */}
         <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-          {(
-            ["heart_rate", "spo2", "temperature", "breathing", "weight", "fluids"] as VitalType[]
-          ).map((type) => {
+          {visibleVitals.map((type) => {
             const latest = latestMap?.get(type);
             return (
               <VitalOverviewTile
@@ -336,7 +348,9 @@ function VitalsPage() {
         childId={child.id}
         loggedBy={membership!.user_id}
         presetType={presetType}
+        visibleVitals={visibleVitals}
       />
+
 
       <AlertDialog open={!!confirmDel} onOpenChange={(o) => !o && setConfirmDel(null)}>
         <AlertDialogContent className="rounded-2xl">
@@ -1080,6 +1094,7 @@ function LogReadingDialog({
   childId,
   loggedBy,
   presetType,
+  visibleVitals,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -1087,26 +1102,37 @@ function LogReadingDialog({
   childId: string;
   loggedBy: string;
   presetType: VitalType | null;
+  visibleVitals: VitalType[];
 }) {
   const { t } = useTranslation();
   const logVital = useLogVital();
-  const [type, setType] = useState<VitalType>(presetType ?? "heart_rate");
+  // Default to preset if visible, else the first visible type — defensive against
+  // a preset that got hidden between renders.
+  const fallbackType: VitalType =
+    presetType && visibleVitals.includes(presetType)
+      ? presetType
+      : visibleVitals[0] ?? "heart_rate";
+  const [type, setType] = useState<VitalType>(fallbackType);
   const [value, setValue] = useState("");
-  const [unit, setUnit] = useState(DEFAULT_UNIT[presetType ?? "heart_rate"]);
+  const [unit, setUnit] = useState(DEFAULT_UNIT[fallbackType]);
   const [notes, setNotes] = useState("");
   const [context, setContext] = useState<VitalContext | null>(null);
 
   // Reset when opening
   useMemo(() => {
     if (open) {
-      const t0 = presetType ?? "heart_rate";
+      const t0: VitalType =
+        presetType && visibleVitals.includes(presetType)
+          ? presetType
+          : visibleVitals[0] ?? "heart_rate";
       setType(t0);
       setUnit(DEFAULT_UNIT[t0]);
       setValue("");
       setNotes("");
       setContext(null);
     }
-  }, [open, presetType]);
+  }, [open, presetType, visibleVitals]);
+
 
   async function submit() {
     const num = Number(value);
@@ -1152,7 +1178,7 @@ function LogReadingDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                {VITAL_TYPES.map((vt) => (
+                {visibleVitals.map((vt) => (
                   <SelectItem key={vt} value={vt}>
                     {t(`vitals.${vitalI18nKey(vt)}` as const)}
                   </SelectItem>
