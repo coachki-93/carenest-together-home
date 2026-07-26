@@ -206,26 +206,34 @@ export function CareEventDialog({
             </Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
               {orderedTypes.map((k) => {
-                const Icon = KIND_ICONS[k];
+                const { icon: Icon, tone } = KIND_META[k];
                 const selected = type === k;
                 return (
                   <button
                     key={k}
                     type="button"
                     onClick={() => setType(k)}
-                    className={`flex flex-col items-center justify-center gap-1 rounded-xl border p-2 min-h-[60px] text-[11px] font-semibold transition ${
+                    className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border p-2 min-h-[84px] text-[11px] font-semibold transition ${
                       selected
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border hover:bg-muted"
                     }`}
                   >
-                    <Icon className="size-4 shrink-0" />
+                    <div
+                      className={cn(
+                        "size-10 rounded-xl flex items-center justify-center shrink-0",
+                        tone,
+                      )}
+                    >
+                      <Icon className="size-5" />
+                    </div>
                     <span className="text-center leading-tight break-words w-full">
                       {t(`careEvents.types.${k}`)}
                     </span>
                   </button>
                 );
               })}
+
             </div>
           </div>
 
