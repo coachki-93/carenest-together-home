@@ -13,17 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import {
-  Activity,
-  AlertTriangle,
-  Brain,
-  Frown,
-  MoreHorizontal,
-  Utensils,
-  Wind,
-  Zap,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CARE_EVENT_META } from "@/lib/carenest/care-event-meta";
 import {
   useCreateCareEvent,
   useEditCareEvent,
@@ -47,19 +38,6 @@ interface Props {
   event?: CareEvent | null;
 }
 
-const KIND_META: Record<
-  CareEventType,
-  { icon: React.ComponentType<{ className?: string }>; tone: string }
-> = {
-  seizure: { icon: Zap, tone: "bg-violet-50 text-violet-600" },
-  desaturation: { icon: Wind, tone: "bg-sky-50 text-sky-600" },
-  vomiting: { icon: Frown, tone: "bg-emerald-50 text-emerald-600" },
-  feed_issue: { icon: Utensils, tone: "bg-amber-50 text-amber-700" },
-  breathing_difficulty: { icon: Activity, tone: "bg-cyan-50 text-cyan-600" },
-  behavioural: { icon: Brain, tone: "bg-pink-50 text-pink-600" },
-  injury: { icon: AlertTriangle, tone: "bg-rose-50 text-rose-600" },
-  other: { icon: MoreHorizontal, tone: "bg-slate-100 text-slate-700" },
-};
 
 
 function timeInputIn(date: Date, tz: string): string {
