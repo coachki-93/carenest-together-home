@@ -124,6 +124,8 @@ export function taskTemplateFor(templateKey: string): TaskTemplate {
   switch (templateKey) {
     case "feed_task":
       return { kind: "meal", titleFallback: "", hasAmountMl: true };
+    case "neb_task":
+      return { kind: "medication", titleFallback: "", hasAmountMl: false };
     default:
       return { kind: "task", titleFallback: "", hasAmountMl: false };
   }
