@@ -51,8 +51,10 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const membership = useMyMembership();
   const { data: familyRow } = useFamily(membership.data?.family_id);
+  const isAdmin = useIsAdmin();
   // Undefined (loading) → treat as visible to avoid a flash-out.
   const showMaintenance = familyRow?.uses_equipment !== false;
+
 
   const items = [
     { title: t("nav.dashboard"), url: "/dashboard", icon: LayoutDashboard },
