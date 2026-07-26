@@ -2214,6 +2214,8 @@ export const en = {
     subtitle: "Machines and their scheduled maintenance.",
     readOnly: "Only the family owner or a material-responsible caregiver can add or edit machines.",
     empty: "No machines yet. Add the first one to start tracking maintenance.",
+    disabledBody: "Maintenance tracking is off. If you use equipment that needs upkeep, turn it on in Settings.",
+    disabledCta: "Open Settings",
     emptyCta: "Add machine",
     addMachine: "Add machine",
     editMachine: "Edit machine",
