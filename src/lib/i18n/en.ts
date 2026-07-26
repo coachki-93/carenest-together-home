@@ -25,6 +25,8 @@ export const en = {
     saveFailed: "Something went wrong — the change wasn't saved. Please try again.",
     loadFailed: "Couldn't load data — check your connection.",
     close: "Close",
+    yes: "Yes",
+    no: "No",
     language: "Language",
     english: "English",
     swedish: "Svenska",
