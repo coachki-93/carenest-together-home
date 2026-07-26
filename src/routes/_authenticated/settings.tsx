@@ -449,6 +449,8 @@ function SettingsPage() {
               <TidySettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
               <HandoverReminderSettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
               <OwnerNotifyLevelSettings familyId={familyId} isOwner={isOwner} />
+              {familyId && <TeamAccountCard familyId={familyId} isOwner={isOwner} />}
+
             </div>
           </div>
         )}

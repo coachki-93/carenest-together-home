@@ -94,18 +94,14 @@ function ChildOnboarding() {
             onSkip={() => goTo(5)}
           />
         )}
-        {/*
-          NOTE: This invite-code step is slated for replacement in Phase 5.4
-          (auto-generated team account via synthetic email + admin server fn).
-          Do not evolve the invite UX here — the whole step will be swapped.
-        */}
         {step === 5 && (
-          <StepInvite
+          <StepTeam
             onBack={() => goTo(4)}
             onContinue={() => goTo(6)}
             onSkip={() => goTo(6)}
           />
         )}
+
         {step === 6 && (
           <StepDone
             onBack={() => goTo(5)}
