@@ -223,7 +223,7 @@ function EventsPage() {
                 </h2>
                 <ul className="space-y-2">
                   {rows.map((ev) => {
-                    const Icon = KIND_ICONS[ev.type];
+                    const { icon: Icon, bg, text } = CARE_EVENT_META[ev.type];
                     const canEdit = canEditCareEvent(ev, user?.id);
                     const isAuthor = user?.id === ev.created_by;
                     return (
@@ -232,9 +232,10 @@ function EventsPage() {
                         className={`card-soft p-4 ${!ev.active ? "opacity-60" : ""}`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="size-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                          <div className={cn("size-10 rounded-xl flex items-center justify-center shrink-0", bg, text)}>
                             <Icon className="size-5" />
                           </div>
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-mono text-xs text-muted-foreground">
