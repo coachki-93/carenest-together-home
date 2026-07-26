@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate, useSearch, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users, Activity, Wind, CalendarCheck, Siren, ArrowRight } from "lucide-react";
+import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users, Activity, Wind, CalendarCheck, Siren, ArrowRight, HeartPulse } from "lucide-react";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/lib/notify";
 import { useCreateInvite, useInvites } from "@/lib/data/family";
+import { CareNeedsPicker } from "@/components/carenest/CareNeedsPicker";
+import { parseCareNeeds, type CareNeeds } from "@/lib/care-needs/parse";
+
 
 const stepSchema = z.object({
   step: z.coerce.number().int().min(1).max(5).optional().default(1),
