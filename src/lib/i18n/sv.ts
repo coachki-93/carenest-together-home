@@ -527,6 +527,7 @@ export const sv = {
     invalidTime: "Välj en giltig tid.",
     loggedSection: "Loggade händelser",
     removeLogged: "Ta bort",
+    addDetail: "Lägg till detaljer",
     presets: {
       temperature: "Temperatur",
       heart_rate: "Puls",
