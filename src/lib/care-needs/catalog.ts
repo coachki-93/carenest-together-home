@@ -97,7 +97,7 @@ export const CARE_CAPABILITIES: CareCapability[] = [
   { key: "sensory_needs", category: "neurological", icon: Sparkles },
 
   // Metabolic
-  { key: "diabetes", category: "metabolic", icon: Candy },
+  { key: "diabetes", category: "metabolic", icon: Candy, impliedVitals: ["glucose"] },
   { key: "adrenal_insufficiency", category: "metabolic", icon: ShieldAlert, impliedVitals: ["temperature"] },
   { key: "thyroid", category: "metabolic", icon: Hexagon, impliedVitals: ["weight"] },
   { key: "metabolic_disorder", category: "metabolic", icon: Atom, impliedVitals: ["weight"] },

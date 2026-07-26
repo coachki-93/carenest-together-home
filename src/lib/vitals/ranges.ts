@@ -16,6 +16,7 @@ const VITAL_TYPE_VALUES: VitalType[] = [
   "seizure",
   "fluids",
   "breathing",
+  "glucose",
   "other",
 ];
 
@@ -24,6 +25,8 @@ export const VITAL_RANGES: Partial<Record<VitalType, Range>> = {
   spo2: { low: 95, high: 100 },
   temperature: { low: 36.0, high: 37.9 },
   breathing: { low: 12, high: 18 },
+  // Screening reference — glucose targets are child-specific (custom range override).
+  glucose: { low: 4.0, high: 10.0 },
 };
 
 export function getVitalRanges(
@@ -32,6 +35,7 @@ export function getVitalRanges(
 ): Partial<Record<VitalType, Range>> {
   const spo2: Range = { low: 95, high: 100 };
   const temperature: Range = { low: 36.0, high: 37.9 };
+  const glucose: Range = { low: 4.0, high: 10.0 };
   let base: Partial<Record<VitalType, Range>>;
   if (ageMonths == null || Number.isNaN(ageMonths)) {
     base = { ...VITAL_RANGES };
@@ -45,7 +49,7 @@ export function getVitalRanges(
     else if (ageMonths < 72) { heart_rate = { low: 70, high: 115 }; breathing = { low: 20, high: 25 }; }
     else if (ageMonths < 144) { heart_rate = { low: 60, high: 100 }; breathing = { low: 14, high: 22 }; }
     else { heart_rate = { low: 60, high: 100 }; breathing = { low: 12, high: 18 }; }
-    base = { heart_rate, spo2, temperature, breathing };
+    base = { heart_rate, spo2, temperature, breathing, glucose };
   }
   if (!overrides) return base;
   const merged: Partial<Record<VitalType, Range>> = { ...base };

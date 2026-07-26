@@ -70,7 +70,12 @@ describe("visibleVitalsFor", () => {
     expect(VITAL_TYPES).toContain("seizure");
     expect(VITAL_TYPES).toContain("fluids");
     expect(VITAL_TYPES).toContain("breathing");
+    expect(VITAL_TYPES).toContain("glucose");
     expect(VITAL_TYPES).toContain("other");
-    expect(VITAL_TYPES.length).toBe(8);
+    expect(VITAL_TYPES.length).toBe(9);
+  });
+
+  it("diabetes capability derives glucose", () => {
+    expect(visibleVitalsFor({ capabilities: ["diabetes"] })).toEqual(["glucose"]);
   });
 });
