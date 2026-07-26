@@ -73,34 +73,34 @@ export const CARE_NEED_CATEGORIES: CareNeedCategory[] = [
 
 export const CARE_CAPABILITIES: CareCapability[] = [
   // Airways
-  { key: "oxygen", category: "airways", icon: Wind },
-  { key: "tracheostomy", category: "airways", icon: AirVent },
-  { key: "suctioning", category: "airways", icon: Droplets },
-  { key: "ventilator", category: "airways", icon: Activity },
-  { key: "cpap_bipap", category: "airways", icon: Gauge },
-  { key: "inhalations", category: "airways", icon: Cloud },
-  { key: "cough_assist", category: "airways", icon: WavesIcon },
+  { key: "oxygen", category: "airways", icon: Wind, impliedVitals: ["spo2"] },
+  { key: "tracheostomy", category: "airways", icon: AirVent, impliedVitals: ["spo2", "breathing"] },
+  { key: "suctioning", category: "airways", icon: Droplets, impliedVitals: ["spo2"] },
+  { key: "ventilator", category: "airways", icon: Activity, impliedVitals: ["spo2", "breathing"] },
+  { key: "cpap_bipap", category: "airways", icon: Gauge, impliedVitals: ["spo2", "breathing"] },
+  { key: "inhalations", category: "airways", icon: Cloud, impliedVitals: ["spo2"] },
+  { key: "cough_assist", category: "airways", icon: WavesIcon, impliedVitals: ["spo2"] },
 
   // Feeding
-  { key: "g_tube", category: "feeding", icon: CircleDot },
-  { key: "nj_tube", category: "feeding", icon: Syringe },
-  { key: "tpn", category: "feeding", icon: FlaskConical },
-  { key: "oral_feeding_support", category: "feeding", icon: Utensils },
-  { key: "special_diet", category: "feeding", icon: Salad },
-  { key: "fluid_tracking", category: "feeding", icon: CupSoda },
+  { key: "g_tube", category: "feeding", icon: CircleDot, impliedVitals: ["weight", "fluids"] },
+  { key: "nj_tube", category: "feeding", icon: Syringe, impliedVitals: ["weight", "fluids"] },
+  { key: "tpn", category: "feeding", icon: FlaskConical, impliedVitals: ["weight", "fluids"] },
+  { key: "oral_feeding_support", category: "feeding", icon: Utensils, impliedVitals: ["weight"] },
+  { key: "special_diet", category: "feeding", icon: Salad, impliedVitals: ["weight"] },
+  { key: "fluid_tracking", category: "feeding", icon: CupSoda, impliedVitals: ["fluids"] },
 
   // Neurological
-  { key: "seizures", category: "neurological", icon: Zap },
-  { key: "vns", category: "neurological", icon: Cpu },
+  { key: "seizures", category: "neurological", icon: Zap, impliedVitals: ["seizure"] },
+  { key: "vns", category: "neurological", icon: Cpu, impliedVitals: ["seizure"] },
   { key: "shunt", category: "neurological", icon: GitBranch },
   { key: "pain_management", category: "neurological", icon: HeartPulse },
   { key: "sensory_needs", category: "neurological", icon: Sparkles },
 
   // Metabolic
   { key: "diabetes", category: "metabolic", icon: Candy },
-  { key: "adrenal_insufficiency", category: "metabolic", icon: ShieldAlert },
-  { key: "thyroid", category: "metabolic", icon: Hexagon },
-  { key: "metabolic_disorder", category: "metabolic", icon: Atom },
+  { key: "adrenal_insufficiency", category: "metabolic", icon: ShieldAlert, impliedVitals: ["temperature"] },
+  { key: "thyroid", category: "metabolic", icon: Hexagon, impliedVitals: ["weight"] },
+  { key: "metabolic_disorder", category: "metabolic", icon: Atom, impliedVitals: ["weight"] },
 
   // Mobility
   { key: "wheelchair", category: "mobility", icon: Accessibility },
@@ -126,6 +126,7 @@ export const CARE_CAPABILITIES: CareCapability[] = [
   // Other
   { key: "other", category: "other", icon: MoreHorizontal },
 ];
+
 
 export function capabilitiesByCategory(category: CareNeedCategory): CareCapability[] {
   return CARE_CAPABILITIES.filter((c) => c.category === category);
