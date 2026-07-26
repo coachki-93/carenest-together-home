@@ -513,8 +513,24 @@ function StepCareNeeds({
     },
   });
 
+  const familyRow = useQuery({
+    queryKey: ["wizard-family-uses-equipment", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("families")
+        .select("uses_equipment")
+        .eq("id", familyId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const [careNeeds, setCareNeeds] = useState<CareNeeds>({ capabilities: [] });
+  const [usesEquipment, setUsesEquipment] = useState<boolean>(true);
   const [seeded, setSeeded] = useState(false);
+  const [seededFamily, setSeededFamily] = useState(false);
 
   // No-child bounce-back: if the user reached step 3 via ?step=3 without
   // completing step 2, there's nothing to attach care_needs to — skip once
@@ -532,13 +548,28 @@ function StepCareNeeds({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [child.isFetched, child.data?.id]);
 
+  useEffect(() => {
+    if (familyRow.data && !seededFamily) {
+      setUsesEquipment(familyRow.data.uses_equipment ?? true);
+      setSeededFamily(true);
+    }
+  }, [familyRow.data, seededFamily]);
+
   const save = useMutation({
     mutationFn: async () => {
       if (!child.data) throw new Error("Setup incomplete");
+      if (!familyId) throw new Error("Setup incomplete");
       // Merge-on-save: preserve any forward-compat fields on care_needs that
       // the picker doesn't yet know about (e.g. future settings blobs).
       const existing = parseCareNeeds(child.data.care_needs);
       const merged: CareNeeds = { ...existing, ...careNeeds };
+      // Order: family flag first, then child care_needs. Both errors surface
+      // via throw → onError toast; neither is swallowed silently.
+      const famRes = await supabase
+        .from("families")
+        .update({ uses_equipment: usesEquipment })
+        .eq("id", familyId);
+      if (famRes.error) throw famRes.error;
       const { error } = await supabase
         .from("children")
         .update({ care_needs: merged as unknown as never })
