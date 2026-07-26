@@ -1115,7 +1115,7 @@ export const en = {
     signOutSub: "End your session on this device.",
     helpTitle: "Help & onboarding",
     helpSub: "Replay the dashboard tour or restart the welcome wizard.",
-    replayTour: "Replay dashboard tour",
+    replayTour: "Replay welcome",
     restartWizard: "Restart setup wizard",
     accountBlockTitle: "Your account",
     accountBlockSub: "Personal settings for you on this device.",
@@ -1196,6 +1196,46 @@ export const en = {
     teamBody: "Everyone who can see and log care for this child.",
     navTitle: "Everything else",
     navBody: "Schedule, Meds, Vitals, Handover, Caregivers and Settings live in the sidebar.",
+  },
+  welcome: {
+    stepOf: "Step {{current}} of {{total}}",
+    skip: "Skip",
+    next: "Next",
+    finish: "Take me to the dashboard",
+    pages: {
+      intro: {
+        title: "Welcome to CareNest",
+        body: "One calm place for everyone caring for your child — so nothing falls between shifts.",
+      },
+      handover: {
+        title: "A softer handover",
+        body: "At shift change, the next caregiver opens CareNest and sees exactly how the night went — sleep, mood, meds, and anything to watch.",
+      },
+      oxygen: {
+        title: "Oxygen, at a glance",
+        body: "Log a new tank and CareNest counts down what's left, so no one is surprised at 3am.",
+      },
+      feeding: {
+        title: "Feeds and fluids logged once",
+        body: "Note a feed or a fluid on Today and it flows straight into the next handover — no double bookkeeping.",
+      },
+      events: {
+        title: "Every event, timestamped",
+        body: "Seizures and other events land in the journal with time and notes — ready for the next doctor's visit.",
+      },
+      vitals: {
+        title: "Vitals in context",
+        body: "Readings from the shift show up on Today, coloured by range, so out-of-range values stand out.",
+      },
+      team: {
+        title: "Everyone on the same page",
+        body: "The whole care team sees the same picture — no phone calls between shifts, no lost sticky notes.",
+      },
+      close: {
+        title: "You're set",
+        body: "Open the dashboard when you're ready — you can replay this any time from Settings.",
+      },
+    },
   },
   notFound: {
     kicker: "Page not found",

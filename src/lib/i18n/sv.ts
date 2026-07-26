@@ -1115,7 +1115,7 @@ export const sv = {
     signOutSub: "Avsluta sessionen på den här enheten.",
     helpTitle: "Hjälp & introduktion",
     helpSub: "Spela upp guiden igen eller starta om välkomstguiden.",
-    replayTour: "Spela upp guiden igen",
+    replayTour: "Spela upp introduktionen igen",
     restartWizard: "Starta om välkomstguiden",
     accountBlockTitle: "Ditt konto",
     accountBlockSub: "Personliga inställningar för dig på den här enheten.",
@@ -1196,6 +1196,46 @@ export const sv = {
     teamBody: "Alla som kan se och logga vård för det här barnet.",
     navTitle: "Allt annat",
     navBody: "Schema, mediciner, värden, överlämning, vårdgivare och inställningar finns i sidofältet.",
+  },
+  welcome: {
+    stepOf: "Steg {{current}} av {{total}}",
+    skip: "Hoppa över",
+    next: "Nästa",
+    finish: "Till översikten",
+    pages: {
+      intro: {
+        title: "Välkommen till CareNest",
+        body: "En lugn plats för alla som vårdar ditt barn — så inget faller mellan skiften.",
+      },
+      handover: {
+        title: "En mjukare överlämning",
+        body: "Vid skiftbyte öppnar nästa vårdgivare CareNest och ser precis hur natten gick — sömn, humör, mediciner och sådant att hålla koll på.",
+      },
+      oxygen: {
+        title: "Syret, med en blick",
+        body: "Logga en ny tub så räknar CareNest ner det som är kvar — ingen ska bli överraskad klockan tre på natten.",
+      },
+      feeding: {
+        title: "Mat och vätska loggas en gång",
+        body: "Skriv in en måltid eller vätska på Idag så följer det med till nästa överlämning — ingen dubbel bokföring.",
+      },
+      events: {
+        title: "Varje händelse, med tid",
+        body: "Anfall och andra händelser hamnar i journalen med tid och anteckningar — redo till nästa läkarbesök.",
+      },
+      vitals: {
+        title: "Värden i sitt sammanhang",
+        body: "Mätningar från skiftet visas på Idag, färgade efter intervall, så avvikande värden syns tydligt.",
+      },
+      team: {
+        title: "Alla ser samma bild",
+        body: "Hela vårdteamet har samma överblick — inga samtal mellan skiften, inga bortglömda lappar.",
+      },
+      close: {
+        title: "Då är du igång",
+        body: "Öppna översikten när du är redo — du kan spela upp det här igen från Inställningar.",
+      },
+    },
   },
   notFound: {
     kicker: "Sidan hittades inte",
