@@ -1451,8 +1451,6 @@ export const en = {
       },
     },
   },
-    },
-  },
   notFound: {
     kicker: "Page not found",
     title: "We couldn't find that page",
