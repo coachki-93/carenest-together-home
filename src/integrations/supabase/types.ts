@@ -244,6 +244,82 @@ export type Database = {
           },
         ]
       }
+      care_events: {
+        Row: {
+          action_taken: string | null
+          active: boolean
+          caregiver_profile_id: string | null
+          child_id: string | null
+          created_at: string
+          created_by: string
+          description: string
+          duration_seconds: number | null
+          edited_at: string | null
+          family_id: string
+          id: string
+          occurred_at: string
+          severity: number | null
+          type: Database["public"]["Enums"]["care_event_type"]
+          updated_at: string
+        }
+        Insert: {
+          action_taken?: string | null
+          active?: boolean
+          caregiver_profile_id?: string | null
+          child_id?: string | null
+          created_at?: string
+          created_by: string
+          description: string
+          duration_seconds?: number | null
+          edited_at?: string | null
+          family_id: string
+          id?: string
+          occurred_at: string
+          severity?: number | null
+          type: Database["public"]["Enums"]["care_event_type"]
+          updated_at?: string
+        }
+        Update: {
+          action_taken?: string | null
+          active?: boolean
+          caregiver_profile_id?: string | null
+          child_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          duration_seconds?: number | null
+          edited_at?: string | null
+          family_id?: string
+          id?: string
+          occurred_at?: string
+          severity?: number | null
+          type?: Database["public"]["Enums"]["care_event_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_events_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_events_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_events_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       care_instructions: {
         Row: {
           body: string
@@ -2148,6 +2224,41 @@ export type Database = {
         Args: { _family_id: string; _profile_id: string }
         Returns: boolean
       }
+      edit_care_event: {
+        Args: {
+          _action_taken: string
+          _caregiver_profile_id: string
+          _description: string
+          _duration_seconds: number
+          _id: string
+          _occurred_at: string
+          _severity: number
+          _type: Database["public"]["Enums"]["care_event_type"]
+        }
+        Returns: {
+          action_taken: string | null
+          active: boolean
+          caregiver_profile_id: string | null
+          child_id: string | null
+          created_at: string
+          created_by: string
+          description: string
+          duration_seconds: number | null
+          edited_at: string | null
+          family_id: string
+          id: string
+          occurred_at: string
+          severity: number | null
+          type: Database["public"]["Enums"]["care_event_type"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "care_events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       edit_handover: {
         Args: {
           _fluids: string
@@ -2220,6 +2331,32 @@ export type Database = {
         }
         Returns: string
       }
+      set_care_event_active: {
+        Args: { _active: boolean; _id: string }
+        Returns: {
+          action_taken: string | null
+          active: boolean
+          caregiver_profile_id: string | null
+          child_id: string | null
+          created_at: string
+          created_by: string
+          description: string
+          duration_seconds: number | null
+          edited_at: string | null
+          family_id: string
+          id: string
+          occurred_at: string
+          severity: number | null
+          type: Database["public"]["Enums"]["care_event_type"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "care_events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_family_hospital_mode:
         | { Args: { _family_id: string; _on: boolean }; Returns: string }
         | {
@@ -2262,6 +2399,15 @@ export type Database = {
         | "lab"
         | "dental"
         | "hospital_stay"
+      care_event_type:
+        | "seizure"
+        | "desaturation"
+        | "vomiting"
+        | "feed_issue"
+        | "breathing_difficulty"
+        | "behavioural"
+        | "injury"
+        | "other"
       care_place_item_type:
         | "yesno"
         | "count"
@@ -2461,6 +2607,16 @@ export const Constants = {
         "lab",
         "dental",
         "hospital_stay",
+      ],
+      care_event_type: [
+        "seizure",
+        "desaturation",
+        "vomiting",
+        "feed_issue",
+        "breathing_difficulty",
+        "behavioural",
+        "injury",
+        "other",
       ],
       care_place_item_type: [
         "yesno",

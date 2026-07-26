@@ -34,6 +34,7 @@ import { Route as AuthenticatedInventoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInstructionsRouteImport } from './routes/_authenticated/instructions'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
+import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedEmergencyRouteImport } from './routes/_authenticated/emergency'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedChildRouteImport } from './routes/_authenticated/child'
@@ -173,6 +174,11 @@ const AuthenticatedHandoverRoute = AuthenticatedHandoverRouteImport.update({
   path: '/handover',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEmergencyRoute = AuthenticatedEmergencyRouteImport.update({
   id: '/emergency',
   path: '/emergency',
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/emergency': typeof AuthenticatedEmergencyRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/emergency': typeof AuthenticatedEmergencyRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
@@ -324,6 +332,7 @@ export interface FileRoutesById {
   '/_authenticated/child': typeof AuthenticatedChildRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/emergency': typeof AuthenticatedEmergencyRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/instructions': typeof AuthenticatedInstructionsRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/child'
     | '/dashboard'
     | '/emergency'
+    | '/events'
     | '/handover'
     | '/home'
     | '/instructions'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/child'
     | '/dashboard'
     | '/emergency'
+    | '/events'
     | '/handover'
     | '/home'
     | '/instructions'
@@ -438,6 +449,7 @@ export interface FileRouteTypes {
     | '/_authenticated/child'
     | '/_authenticated/dashboard'
     | '/_authenticated/emergency'
+    | '/_authenticated/events'
     | '/_authenticated/handover'
     | '/_authenticated/home'
     | '/_authenticated/instructions'
@@ -657,6 +669,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHandoverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events': {
+      id: '/_authenticated/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emergency': {
       id: '/_authenticated/emergency'
       path: '/emergency'
@@ -743,6 +762,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChildRoute: typeof AuthenticatedChildRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmergencyRoute: typeof AuthenticatedEmergencyRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInstructionsRoute: typeof AuthenticatedInstructionsRoute
@@ -765,6 +785,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChildRoute: AuthenticatedChildRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmergencyRoute: AuthenticatedEmergencyRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInstructionsRoute: AuthenticatedInstructionsRoute,

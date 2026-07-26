@@ -6,6 +6,7 @@ import {
   CalendarHeart,
   Pill,
   Activity,
+  ActivitySquare,
   ClipboardList,
   Baby,
   Users,
@@ -17,9 +18,6 @@ import {
   ShoppingCart,
   AlertTriangle,
   Wrench,
-
-
-  
 } from "lucide-react";
 
 
@@ -53,6 +51,7 @@ export function AppSidebar() {
     { title: t("nav.appointments"), url: "/appointments", icon: CalendarHeart },
     { title: t("nav.medications"), url: "/medications", icon: Pill },
     { title: t("nav.vitals"), url: "/vitals", icon: Activity },
+    { title: t("nav.events"), url: "/events", icon: ActivitySquare },
     { title: t("nav.oxygen"), url: "/oxygen", icon: Wind },
     { title: t("nav.handover"), url: "/handover", icon: ClipboardList },
     { title: t("nav.instructions"), url: "/instructions", icon: BookOpen },
