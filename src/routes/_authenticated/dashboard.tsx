@@ -1364,101 +1364,130 @@ function DashboardPage() {
 
         {/* RIGHT — sidebar column */}
         <div className="space-y-6">
-          {/* Vitals snapshot */}
-          <section className="card-soft p-6" data-tour="vitals">
+          {/* Vitals snapshot — curated 4-tile summary, per-child gated
+              via visibleVitalsFor. Section hides entirely when none of the
+              snapshot's four vitals apply to this child. */}
+          {(() => {
+            const visibleVitals = new Set(
+              visibleVitalsFor(parseCareNeeds(child?.care_needs)),
+            );
+            const showHr = visibleVitals.has("heart_rate");
+            const showSpo2 = visibleVitals.has("spo2");
+            const showTemp = visibleVitals.has("temperature");
+            const showFluid = visibleVitals.has("fluids");
+            const anySnapshotVisible = showHr || showSpo2 || showTemp || showFluid;
+            if (!anySnapshotVisible) return null;
+            const visibleCount =
+              Number(showHr) + Number(showSpo2) + Number(showTemp) + Number(showFluid);
+            return (
+              <section className="card-soft p-6" data-tour="vitals">
+                {vitalsLoading ? (
+                  <>
+                    <div className="flex items-center justify-between mb-4">
+                      <Skeleton className="h-5 w-32 rounded" />
+                      <Skeleton className="h-4 w-16 rounded" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {Array.from({ length: visibleCount }).map((_, i) => (
+                        <Skeleton key={i} className="h-24 rounded-2xl" />
+                      ))}
+                    </div>
+                    <Skeleton className="w-full h-10 mt-4 rounded-full" />
+                  </>
+                ) : (() => {
+                  const hr = latestVitals?.get("heart_rate");
+                  const spo2 = latestVitals?.get("spo2");
+                  const temp = latestVitals?.get("temperature");
+                  const fluidsTotal = (fluidsToday ?? []).reduce(
+                    (sum, v) => sum + Number(v.value ?? 0),
+                    0,
+                  );
+                  const mostRecent = [
+                    showHr ? hr : null,
+                    showSpo2 ? spo2 : null,
+                    showTemp ? temp : null,
+                  ]
+                    .filter((v): v is NonNullable<typeof v> => !!v)
+                    .sort((a, b) => +new Date(b.logged_at) - +new Date(a.logged_at))[0];
+                  const lastTime = mostRecent
+                    ? new Date(mostRecent.logged_at).toLocaleTimeString(
+                        i18n.language === "sv" ? "sv-SE" : "en-US",
+                        { hour: "2-digit", minute: "2-digit" },
+                      )
+                    : "—";
+                  const fmt = (n: number) =>
+                    Number.isFinite(n) ? (Math.abs(n) >= 10 ? n.toFixed(0) : n.toFixed(1)) : "—";
+                  const toneFor = (
+                    type: "heart_rate" | "spo2" | "temperature",
+                    v: number | undefined,
+                    fallback: "primary" | "success" | "warning" | "lavender",
+                  ): "primary" | "success" | "warning" | "lavender" => {
+                    if (v === undefined) return fallback;
+                    const s = vitalStatus(type, v);
+                    if (s === "ok") return "success";
+                    if (s === "low" || s === "high") return "warning";
+                    return fallback;
+                  };
+                  return (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-extrabold">{t("dashboard.vitalsSnapshot")}</h3>
+                        <span className="text-xs text-muted-foreground">
+                          {t("dashboard.lastLogged", { time: lastTime })}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {showHr && (
+                          <VitalTile
+                            icon={Heart}
+                            label={t("vitals.heartRate")}
+                            value={hr ? fmt(Number(hr.value)) : "—"}
+                            unit={hr?.unit ?? DEFAULT_UNIT.heart_rate}
+                            tone={toneFor("heart_rate", hr ? Number(hr.value) : undefined, "primary")}
+                          />
+                        )}
+                        {showSpo2 && (
+                          <VitalTile
+                            icon={Activity}
+                            label={t("vitals.spo2")}
+                            value={spo2 ? fmt(Number(spo2.value)) : "—"}
+                            unit={spo2?.unit ?? DEFAULT_UNIT.spo2}
+                            tone={toneFor("spo2", spo2 ? Number(spo2.value) : undefined, "success")}
+                          />
+                        )}
+                        {showTemp && (
+                          <VitalTile
+                            icon={Thermometer}
+                            label={t("vitals.temp")}
+                            value={temp ? Number(temp.value).toFixed(1) : "—"}
+                            unit={temp?.unit ?? DEFAULT_UNIT.temperature}
+                            tone={toneFor("temperature", temp ? Number(temp.value) : undefined, "warning")}
+                          />
+                        )}
+                        {showFluid && (
+                          <VitalTile
+                            icon={Droplet}
+                            label={t("vitals.fluids")}
+                            value={fluidsTotal > 0 ? String(Math.round(fluidsTotal)) : "—"}
+                            unit={DEFAULT_UNIT.fluids}
+                            tone="lavender"
+                          />
+                        )}
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="w-full mt-4 rounded-full font-bold"
+                        onClick={() => navigate({ to: "/vitals" })}
+                      >
+                        {t("dashboard.logVitals")}
+                      </Button>
+                    </>
+                  );
+                })()}
+              </section>
+            );
+          })()}
 
-            {vitalsLoading ? (
-              <>
-                <div className="flex items-center justify-between mb-4">
-                  <Skeleton className="h-5 w-32 rounded" />
-                  <Skeleton className="h-4 w-16 rounded" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-24 rounded-2xl" />
-                  ))}
-                </div>
-                <Skeleton className="w-full h-10 mt-4 rounded-full" />
-              </>
-            ) : (() => {
-              const hr = latestVitals?.get("heart_rate");
-              const spo2 = latestVitals?.get("spo2");
-              const temp = latestVitals?.get("temperature");
-              const fluidsTotal = (fluidsToday ?? []).reduce(
-                (sum, v) => sum + Number(v.value ?? 0),
-                0,
-              );
-              const mostRecent = [hr, spo2, temp]
-                .filter((v): v is NonNullable<typeof v> => !!v)
-                .sort((a, b) => +new Date(b.logged_at) - +new Date(a.logged_at))[0];
-              const lastTime = mostRecent
-                ? new Date(mostRecent.logged_at).toLocaleTimeString(
-                    i18n.language === "sv" ? "sv-SE" : "en-US",
-                    { hour: "2-digit", minute: "2-digit" },
-                  )
-                : "—";
-              const fmt = (n: number) =>
-                Number.isFinite(n) ? (Math.abs(n) >= 10 ? n.toFixed(0) : n.toFixed(1)) : "—";
-              const toneFor = (
-                type: "heart_rate" | "spo2" | "temperature",
-                v: number | undefined,
-                fallback: "primary" | "success" | "warning" | "lavender",
-              ): "primary" | "success" | "warning" | "lavender" => {
-                if (v === undefined) return fallback;
-                const s = vitalStatus(type, v);
-                if (s === "ok") return "success";
-                if (s === "low" || s === "high") return "warning";
-                return fallback;
-              };
-              return (
-                <>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-extrabold">{t("dashboard.vitalsSnapshot")}</h3>
-                    <span className="text-xs text-muted-foreground">
-                      {t("dashboard.lastLogged", { time: lastTime })}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <VitalTile
-                      icon={Heart}
-                      label={t("vitals.heartRate")}
-                      value={hr ? fmt(Number(hr.value)) : "—"}
-                      unit={hr?.unit ?? DEFAULT_UNIT.heart_rate}
-                      tone={toneFor("heart_rate", hr ? Number(hr.value) : undefined, "primary")}
-                    />
-                    <VitalTile
-                      icon={Activity}
-                      label={t("vitals.spo2")}
-                      value={spo2 ? fmt(Number(spo2.value)) : "—"}
-                      unit={spo2?.unit ?? DEFAULT_UNIT.spo2}
-                      tone={toneFor("spo2", spo2 ? Number(spo2.value) : undefined, "success")}
-                    />
-                    <VitalTile
-                      icon={Thermometer}
-                      label={t("vitals.temp")}
-                      value={temp ? Number(temp.value).toFixed(1) : "—"}
-                      unit={temp?.unit ?? DEFAULT_UNIT.temperature}
-                      tone={toneFor("temperature", temp ? Number(temp.value) : undefined, "warning")}
-                    />
-                    <VitalTile
-                      icon={Droplet}
-                      label={t("vitals.fluids")}
-                      value={fluidsTotal > 0 ? String(Math.round(fluidsTotal)) : "—"}
-                      unit={DEFAULT_UNIT.fluids}
-                      tone="lavender"
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full mt-4 rounded-full font-bold"
-                    onClick={() => navigate({ to: "/vitals" })}
-                  >
-                    {t("dashboard.logVitals")}
-                  </Button>
-                </>
-              );
-            })()}
-          </section>
 
           {/* Oxygen bar — gated on the "oxygen" care module, with an
               active-tank safety override so a live countdown always shows. */}
