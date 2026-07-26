@@ -68,7 +68,7 @@ async function logAdminAction(
       action,
       target_family_id: fields.target_family_id ?? null,
       target_user_id: fields.target_user_id ?? null,
-      detail: fields.detail ?? {},
+      detail: (fields.detail ?? {}) as never,
     });
   } catch (e) {
     // Never fail an admin action because audit logging failed; surface to
