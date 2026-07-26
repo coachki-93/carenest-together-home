@@ -78,6 +78,11 @@ import {
   type Vital,
   type VitalType,
   type VitalContext,
+} from "@/lib/data/vitals";
+import { parseCareNeeds } from "@/lib/care-needs/parse";
+import { visibleVitalsFor } from "@/lib/care-needs/vitals";
+type _unused = 0;
+
   type VitalRangeOverrides,
 } from "@/lib/data/vitals";
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
