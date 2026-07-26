@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate, useSearch, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users, Activity, Wind, CalendarCheck, Siren, ArrowRight } from "lucide-react";
+import { Loader2, Plus, X, Check, Copy, Sparkles, Baby, Pill, Users, Activity, Wind, CalendarCheck, Siren, ArrowRight, HeartPulse } from "lucide-react";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,10 +15,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/lib/notify";
 import { useCreateInvite, useInvites } from "@/lib/data/family";
+import { CareNeedsPicker } from "@/components/carenest/CareNeedsPicker";
+import { parseCareNeeds, type CareNeeds } from "@/lib/care-needs/parse";
+
 
 const stepSchema = z.object({
-  step: z.coerce.number().int().min(1).max(5).optional().default(1),
+  step: z.coerce.number().int().min(1).max(6).optional().default(1),
 });
+
 
 export const Route = createFileRoute("/_authenticated/onboarding/child")({
   head: () => ({ meta: [{ title: "Welcome to CareNest" }] }),
@@ -36,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/onboarding/child")({
   component: ChildOnboarding,
 });
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 
 interface Contact {
@@ -68,7 +72,7 @@ function ChildOnboarding() {
 
         <ProgressDots current={step} total={TOTAL_STEPS} />
 
-        {step === 1 && <StepWelcome onNext={() => goTo(2)} onSkip={() => goTo(5)} />}
+        {step === 1 && <StepWelcome onNext={() => goTo(2)} onSkip={() => goTo(6)} />}
         {step === 2 && (
           <StepChild
             onBack={() => goTo(1)}
@@ -77,25 +81,38 @@ function ChildOnboarding() {
           />
         )}
         {step === 3 && (
-          <StepFirstMedication
+          <StepCareNeeds
             onBack={() => goTo(2)}
             onContinue={() => goTo(4)}
             onSkip={() => goTo(4)}
           />
         )}
         {step === 4 && (
-          <StepInvite
+          <StepFirstMedication
             onBack={() => goTo(3)}
             onContinue={() => goTo(5)}
             onSkip={() => goTo(5)}
           />
         )}
+        {/*
+          NOTE: This invite-code step is slated for replacement in Phase 5.4
+          (auto-generated team account via synthetic email + admin server fn).
+          Do not evolve the invite UX here — the whole step will be swapped.
+        */}
         {step === 5 && (
-          <StepDone
+          <StepInvite
             onBack={() => goTo(4)}
+            onContinue={() => goTo(6)}
+            onSkip={() => goTo(6)}
+          />
+        )}
+        {step === 6 && (
+          <StepDone
+            onBack={() => goTo(5)}
             onFinish={() => navigate({ to: "/dashboard", search: { tour: 1 } as never })}
           />
         )}
+
 
         <p className="text-center text-xs text-muted-foreground">
           {t("wizard.canResumeLater")}
@@ -467,7 +484,110 @@ function StepChild({
   );
 }
 
-/* --------------------- Step 3: First medication (optional) ----------------- */
+/* --------------------- Step 3: Care needs (optional) ---------------------- */
+function StepCareNeeds({
+  onBack,
+  onContinue,
+  onSkip,
+}: {
+  onBack: () => void;
+  onContinue: () => void;
+  onSkip: () => void;
+}) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const membership = useMyMembership();
+  const familyId = membership.data?.family_id;
+
+  const child = useQuery({
+    queryKey: ["wizard-child-care-needs", familyId],
+    enabled: !!familyId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("children")
+        .select("id, name, care_needs")
+        .eq("family_id", familyId!)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const [careNeeds, setCareNeeds] = useState<CareNeeds>({ capabilities: [] });
+  const [seeded, setSeeded] = useState(false);
+
+  // No-child bounce-back: if the user reached step 3 via ?step=3 without
+  // completing step 2, there's nothing to attach care_needs to — skip once
+  // the query settles. Mirrors the pattern in StepFirstMedication.
+  useEffect(() => {
+    if (!child.isFetched) return;
+    if (!child.data) {
+      onSkip();
+      return;
+    }
+    if (!seeded) {
+      setCareNeeds(parseCareNeeds(child.data.care_needs));
+      setSeeded(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [child.isFetched, child.data?.id]);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!child.data) throw new Error("Setup incomplete");
+      // Merge-on-save: preserve any forward-compat fields on care_needs that
+      // the picker doesn't yet know about (e.g. future settings blobs).
+      const existing = parseCareNeeds(child.data.care_needs);
+      const merged: CareNeeds = { ...existing, ...careNeeds };
+      const { error } = await supabase
+        .from("children")
+        .update({ care_needs: merged as unknown as never })
+        .eq("id", child.data.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries();
+      onContinue();
+    },
+    onError: (e: Error) => toast.error(e.message),
+    meta: { suppressGlobalError: true },
+  });
+
+  const name = child.data?.name ?? "";
+
+  return (
+    <div className="card-soft p-6 md:p-8 space-y-6">
+      <div className="space-y-2 text-center">
+        <div className="size-14 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto">
+          <HeartPulse className="size-7" />
+        </div>
+        <h2 className="text-2xl md:text-3xl font-extrabold">
+          {name
+            ? t("onboardingChild.careNeedsStep.title", { name })
+            : t("onboardingChild.careNeedsStep.titleFallback")}
+        </h2>
+        <p className="text-muted-foreground">
+          {t("onboardingChild.careNeedsStep.subtitle")}
+        </p>
+      </div>
+
+      <CareNeedsPicker value={careNeeds} onChange={setCareNeeds} canEdit />
+
+      <StepFooter
+        onBack={onBack}
+        onSkip={onSkip}
+        primaryLabel={save.isPending ? t("common.saving") : t("wizard.saveContinue")}
+        primaryDisabled={save.isPending || !child.data}
+        primaryLoading={save.isPending}
+        onPrimary={() => save.mutate()}
+      />
+    </div>
+  );
+}
+
+/* --------------------- Step 4: First medication (optional) ----------------- */
 function StepFirstMedication({
   onBack,
   onContinue,
