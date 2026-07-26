@@ -18,6 +18,7 @@ function HomeRouter() {
   const { user } = useSession();
   const profile = useProfile();
   const membership = useMyMembership();
+  const isAdmin = useIsAdmin();
   const [processingInvite, setProcessingInvite] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem("carenest:pending_invite");
