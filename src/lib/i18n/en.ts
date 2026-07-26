@@ -527,6 +527,7 @@ export const en = {
     invalidTime: "Please pick a valid time.",
     loggedSection: "Logged events",
     removeLogged: "Remove",
+    addDetail: "Add detail",
     presets: {
       temperature: "Temperature",
       heart_rate: "Heart rate",
