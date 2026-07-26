@@ -11,6 +11,7 @@ import { CarePlaceCheckSettings } from "@/components/carenest/CarePlaceCheckSett
 import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
 import { OwnerNotifyLevelSettings } from "@/components/carenest/OwnerNotifyLevelSettings";
+import { UsesEquipmentSettings } from "@/components/carenest/UsesEquipmentSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
 
