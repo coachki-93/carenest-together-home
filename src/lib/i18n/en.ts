@@ -1124,7 +1124,19 @@ export const en = {
     activeProfileTitle: "Active caregiver profile",
     activeProfileSub: "Choose which of your profiles you're acting as right now.",
   },
+  usesEquipment: {
+    title: "Track equipment maintenance",
+    subtitle: "Show the Maintenance section for machines that need upkeep.",
+    toggle: "Track equipment maintenance",
+    saved: "Saved",
+  },
   wizard: {
+    equipment: {
+      title: "Do you use equipment that needs upkeep?",
+      subtitle: "Ventilator, oxygen concentrator, feeding pump, suction — anything with filters, batteries, or servicing.",
+      yes: "Yes",
+      no: "No",
+    },
     welcome: "Welcome to CareNest",
     welcomeHi: "Welcome, {{name}}",
     welcomeSub: "Let's set up your care space in about 2 minutes.",
