@@ -26,7 +26,7 @@ export interface ScaffoldDefinition {
   offers: ScaffoldOffer[];
 }
 
-/** Slice 1 — Feeding. Respiratory arrives in Slice 2. */
+/** Slice 1 — Feeding. Slice 2 — Respiratory. */
 export const SCAFFOLD_DEFINITIONS: ScaffoldDefinition[] = [
   {
     capability: "g_tube",
@@ -58,6 +58,49 @@ export const SCAFFOLD_DEFINITIONS: ScaffoldDefinition[] = [
     capability: "special_diet",
     i18nKey: "special_diet",
     offers: [{ key: "diet_instruction", engine: "instruction", templateKey: "special_diet" }],
+  },
+  // ----- Respiratory (Slice 2) -----
+  {
+    capability: "tracheostomy",
+    i18nKey: "tracheostomy",
+    offers: [
+      { key: "trach_instruction", engine: "instruction", templateKey: "trach_care" },
+    ],
+  },
+  {
+    capability: "ventilator",
+    i18nKey: "ventilator",
+    offers: [
+      { key: "vent_instruction", engine: "instruction", templateKey: "vent_care" },
+    ],
+  },
+  {
+    capability: "cpap_bipap",
+    i18nKey: "cpap_bipap",
+    offers: [
+      { key: "mask_instruction", engine: "instruction", templateKey: "mask_care" },
+    ],
+  },
+  {
+    capability: "suctioning",
+    i18nKey: "suctioning",
+    offers: [
+      { key: "suction_instruction", engine: "instruction", templateKey: "suction_care" },
+    ],
+  },
+  {
+    capability: "inhalations",
+    i18nKey: "inhalations",
+    offers: [
+      { key: "neb_task", engine: "task", templateKey: "neb_task" },
+    ],
+  },
+  {
+    capability: "cough_assist",
+    i18nKey: "cough_assist",
+    offers: [
+      { key: "cough_instruction", engine: "instruction", templateKey: "cough_assist_care" },
+    ],
   },
 ];
 
