@@ -15,7 +15,7 @@ export function useIsAdmin() {
     queryKey: ["is-platform-admin", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const r = await probe({ data: {} as never });
+      const r = await probe();
       return r.isAdmin;
     },
     staleTime: 5 * 60_000,
