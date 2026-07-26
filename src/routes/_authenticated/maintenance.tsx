@@ -79,6 +79,7 @@ function MaintenancePage() {
   const canManage =
     membership?.role === "owner" || membership?.material_responsible === true;
 
+  const { data: family } = useFamily(familyId);
   const { data: machines = [] } = useMachines(familyId);
   const { data: items = [] } = useMaintenanceItems(familyId);
   
