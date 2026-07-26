@@ -69,13 +69,12 @@ function usernameToEmail(username: string): string {
  * client. Throws on any failure. Returns the families.name for slugging.
  */
 async function assertCallerIsOwner(
-  supabase: Awaited<ReturnType<typeof import("@/integrations/supabase/auth-middleware").requireSupabaseAuth.server>> extends never
-    ? never
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
   userId: string,
   familyId: string,
 ): Promise<{ name: string }> {
+
   const { data, error } = await supabase
     .from("families")
     .select("id, name, owner_id")
