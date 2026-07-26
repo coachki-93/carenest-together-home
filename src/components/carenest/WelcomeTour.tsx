@@ -99,6 +99,16 @@ export function WelcomeTour({ open, pages, onClose, onFinish }: Props) {
           <p className="text-base text-muted-foreground max-w-md">
             {t(page.bodyKey)}
           </p>
+          {page.slot === "notifications" && (
+            <div className="w-full mt-5 text-left">
+              <EnableNotificationsCard />
+            </div>
+          )}
+          {page.hintKey && (
+            <p className="mt-4 text-sm text-muted-foreground/90 max-w-md">
+              {t(page.hintKey)}
+            </p>
+          )}
         </div>
 
         {/* Progress dots */}
