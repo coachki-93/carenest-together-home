@@ -1,0 +1,1 @@
+ALTER TYPE public.vital_type ADD VALUE IF NOT EXISTS 'glucose';
