@@ -37,6 +37,8 @@ import {
 import { Logo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
 import { HospitalToggle } from "./HospitalToggle";
+import { useMyMembership } from "@/lib/auth/use-profile";
+import { useFamily } from "@/lib/data/family";
 
 
 export function AppSidebar() {
@@ -44,6 +46,10 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const membership = useMyMembership();
+  const { data: family } = useFamily(membership.data?.family_id);
+  // Undefined (loading) → treat as visible to avoid a flash-out.
+  const showMaintenance = family?.uses_equipment !== false;
 
   const items = [
     { title: t("nav.dashboard"), url: "/dashboard", icon: LayoutDashboard },
