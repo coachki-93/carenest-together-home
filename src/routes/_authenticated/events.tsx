@@ -54,7 +54,8 @@ export const Route = createFileRoute("/_authenticated/events")({
   component: EventsPage,
 });
 
-import { CARE_EVENT_META } from "@/lib/carenest/care-event-meta";
+
+
 
 
 function useChild(familyId: string | undefined | null) {
