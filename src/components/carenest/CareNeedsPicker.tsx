@@ -175,6 +175,73 @@ export function CareNeedsPicker({ value, onChange, canEdit }: Props) {
           );
         })}
       </div>
+
+      <VitalPresenceSection value={value} onChange={onChange} canEdit={canEdit} />
     </section>
   );
 }
+
+function VitalPresenceSection({
+  value,
+  onChange,
+  canEdit,
+}: {
+  value: CareNeeds;
+  onChange: (next: CareNeeds) => void;
+  canEdit: boolean;
+}) {
+  const { t } = useTranslation();
+  // "On" set = the currently visible set (derived or explicit or default).
+  // First toggle materializes this into an explicit `care_needs.vitals` array,
+  // locking in the user's choice so future capability changes don't silently
+  // re-add hidden vitals.
+  const visible = useMemo(() => new Set(visibleVitalsFor(value)), [value]);
+
+  function toggle(v: VitalType) {
+    if (!canEdit) return;
+    const next = new Set(visible);
+    if (next.has(v)) next.delete(v);
+    else next.add(v);
+    onChange({ ...value, vitals: Array.from(next) });
+  }
+
+  return (
+    <section className="space-y-3 pt-2">
+      <div>
+        <h3 className="font-semibold">{t("careNeeds.vitalsTitle")}</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {t("careNeeds.vitalsSubtitle")}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {VITAL_TYPES.map((v) => {
+          const Icon = VITAL_ICONS[v];
+          const on = visible.has(v);
+          return (
+            <button
+              key={v}
+              type="button"
+              onClick={() => toggle(v)}
+              disabled={!canEdit}
+              aria-pressed={on}
+              className={cn(
+                "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                on
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background border-border/60 hover:bg-muted",
+                !canEdit && "opacity-70 cursor-not-allowed",
+              )}
+            >
+              <Icon className="size-3.5" />
+              {t(`vitals.${vitalI18nKey(v)}` as const)}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {t("careNeeds.vitalsRetentionHint")}
+      </p>
+    </section>
+  );
+}
+
