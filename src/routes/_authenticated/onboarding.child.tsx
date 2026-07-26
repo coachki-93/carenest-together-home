@@ -72,7 +72,7 @@ function ChildOnboarding() {
 
         <ProgressDots current={step} total={TOTAL_STEPS} />
 
-        {step === 1 && <StepWelcome onNext={() => goTo(2)} onSkip={() => goTo(5)} />}
+        {step === 1 && <StepWelcome onNext={() => goTo(2)} onSkip={() => goTo(6)} />}
         {step === 2 && (
           <StepChild
             onBack={() => goTo(1)}
@@ -81,25 +81,38 @@ function ChildOnboarding() {
           />
         )}
         {step === 3 && (
-          <StepFirstMedication
+          <StepCareNeeds
             onBack={() => goTo(2)}
             onContinue={() => goTo(4)}
             onSkip={() => goTo(4)}
           />
         )}
         {step === 4 && (
-          <StepInvite
+          <StepFirstMedication
             onBack={() => goTo(3)}
             onContinue={() => goTo(5)}
             onSkip={() => goTo(5)}
           />
         )}
+        {/*
+          NOTE: This invite-code step is slated for replacement in Phase 5.4
+          (auto-generated team account via synthetic email + admin server fn).
+          Do not evolve the invite UX here — the whole step will be swapped.
+        */}
         {step === 5 && (
-          <StepDone
+          <StepInvite
             onBack={() => goTo(4)}
+            onContinue={() => goTo(6)}
+            onSkip={() => goTo(6)}
+          />
+        )}
+        {step === 6 && (
+          <StepDone
+            onBack={() => goTo(5)}
             onFinish={() => navigate({ to: "/dashboard", search: { tour: 1 } as never })}
           />
         )}
+
 
         <p className="text-center text-xs text-muted-foreground">
           {t("wizard.canResumeLater")}
