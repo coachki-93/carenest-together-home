@@ -12,6 +12,8 @@ import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
 import { OwnerNotifyLevelSettings } from "@/components/carenest/OwnerNotifyLevelSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
+import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
+
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
 import { ActiveProfileSwitcher } from "@/components/carenest/ActiveProfileSwitcher";
 import { useCurrentActor } from "@/lib/data/current-actor";
