@@ -1453,6 +1453,65 @@ export const sv = {
           },
         },
       },
+      diabetes: {
+        cardTitle: "Sätt upp diabetesrutin för {{name}}?",
+        cardBody: "Vi lägger till en uppgift för blodsockerkontroller och en anteckning för diabetesbehandling. Ni fyller i tider, målintervall och detaljer från er vårdplan.",
+        offers: {
+          glucose_task: {
+            label: "Blodsockerkontroll med tider",
+            title: "Blodsockerkontroller för {{name}}",
+            desc: "En daglig påminnelse att mäta blodsocker. Ange tiderna ert team bad er kontrollera.",
+            taskTitle: "Kontrollera blodsocker",
+            taskNotes: "Från vårdplanen: när du ska mäta, målintervall, vad du gör vid lågt eller högt värde. Logga värdet under Vitalvärden → Blodsocker.",
+          },
+          diabetes_instruction: {
+            label: "Anteckning för diabetesbehandling",
+            title: "Diabetesbehandling",
+            desc: "En startanteckning för insulintider, tecken på hypo/hyper och sjukdagsregler. Fyll i det specifika från ert team.",
+            instructionTitle: "Diabetes — behandlingsplan",
+            instructionBody: "<p><strong>Insulin och läkemedel</strong></p><ul><li>Notera vad barnet tar, när och vem som ordinerat.</li><li>Notera var varje läkemedel förvaras och eventuella förvaringsregler.</li></ul><p><strong>Monitorering</strong></p><ul><li>Notera när blodsocker ska kontrolleras och det målintervall ert team gett er.</li><li>Logga värden under Vitalvärden → Blodsocker.</li></ul><p><strong>Lågt blodsocker (hypo)</strong></p><ul><li>Notera de tecken ert team bad er vara uppmärksam på.</li><li>Notera stegen ert team sagt att ni ska göra, i rätt ordning.</li></ul><p><strong>Högt blodsocker (hyper)</strong></p><ul><li>Notera de tecken ert team bad er vara uppmärksam på.</li><li>Notera vad ert team sagt att ni ska göra.</li></ul><p><strong>Sjukdagsregler</strong></p><ul><li>Notera ert teams sjukdagsplan (kontroller, mat, vätska, läkemedelsjusteringar).</li><li>Notera när ni ska kontakta teamet vid sjukdom.</li></ul><p><strong>När ni ska kontakta vården</strong></p><ul><li>Notera de situationer ert team bad er kontakta om.</li></ul>",
+          },
+        },
+      },
+      adrenal_insufficiency: {
+        cardTitle: "Sätt upp binjuresjukdagsplan för {{name}}?",
+        cardBody: "Vi lägger till en anteckning där ni skriver ner teamets dagliga medicinering, stressdoseringsregler och sjukdagsplan. CareNest anger inga doser — ni skriver ner det er läkare sagt.",
+        offers: {
+          adrenal_instruction: {
+            label: "Anteckning för sjukdags- och stressdosering",
+            title: "Binjurebarkssvikt — plan",
+            desc: "En startanteckning där ni skriver ner er läkares plan. Redigera efter det ert team sagt er.",
+            instructionTitle: "Binjurebarkssvikt — sjukdags- och stressplan",
+            instructionBody: "<p><strong>Daglig medicinering</strong></p><ul><li>Notera vad barnet tar och när, enligt ordination.</li></ul><p><strong>Stressdosering</strong></p><ul><li>Notera er läkares stressdoseringsplan.</li><li>Notera de situationer ert team sagt att ni ska ge den (sjukdom, skada, ingrepp).</li></ul><p><strong>Sjukdagsplan</strong></p><ul><li>Notera er läkares steg-för-steg-anvisningar för sjuka dagar.</li><li>Notera hur ni följer barnet hemma och när planen ändras.</li></ul><p><strong>Akutinjektion</strong></p><ul><li>Notera om barnet har en, var den förvaras och vilka som är utbildade att ge den.</li><li>Notera ert teams anvisning för när den ska användas.</li></ul><p><strong>När ni ska kontakta teamet eller söka akut</strong></p><ul><li>Notera de situationer er läkare flaggat.</li><li>Ha denna anteckning där vårdgivare snabbt hittar den.</li></ul>",
+          },
+        },
+      },
+      thyroid: {
+        cardTitle: "Sätt upp anteckning för sköldkörtelmedicin för {{name}}?",
+        cardBody: "Vi lägger till en anteckning för medicintider och uppföljning. Ni fyller i det ert team ordinerat.",
+        offers: {
+          thyroid_instruction: {
+            label: "Anteckning för sköldkörtelmedicin och uppföljning",
+            title: "Sköldkörtelmedicinering",
+            desc: "En startanteckning för medicintider och blodprovsuppföljning. Redigera efter er vårdplan.",
+            instructionTitle: "Sköldkörtelmedicinering",
+            instructionBody: "<p><strong>Läkemedel</strong></p><ul><li>Notera läkemedlets namn och tid enligt ordination.</li></ul><p><strong>Fastande och interaktionsanteckningar</strong></p><ul><li>Notera de tidsregler ert team gett er (t.ex. avstånd till mat eller andra läkemedel) för detta barn.</li></ul><p><strong>Uppföljning</strong></p><ul><li>Notera schemat för blodprover och var svaren förvaras.</li><li>Notera vem som granskar svaren.</li></ul><p><strong>När ni ska kontakta teamet</strong></p><ul><li>Notera de tecken ert team bad er rapportera.</li></ul>",
+          },
+        },
+      },
+      metabolic_disorder: {
+        cardTitle: "Sätt upp anteckning för metabol behandling för {{name}}?",
+        cardBody: "Vi lägger till en generell anteckning för tillståndet — kost, läkemedel, uppföljning och sjukdagsplan. Ni fyller i det specifika för denna diagnos.",
+        offers: {
+          metabolic_instruction: {
+            label: "Anteckning för metabol behandling",
+            title: "Metabol sjukdom — behandlingsplan",
+            desc: "En startanteckning. Redigera efter detta tillstånd och er vårdplan.",
+            instructionTitle: "Metabol sjukdom — behandlingsplan",
+            instructionBody: "<p><strong>Tillstånd</strong></p><ul><li>Notera den specifika diagnosen och det behandlande teamet.</li></ul><p><strong>Kost och kosttillskott</strong></p><ul><li>Notera kostregler, ämnen som ska begränsas och tillskott enligt ordination.</li></ul><p><strong>Läkemedel</strong></p><ul><li>Notera läkemedel och tider enligt ordination.</li></ul><p><strong>Uppföljning</strong></p><ul><li>Notera vad som följs (blodprover, symtom, tillväxt) och hur ofta.</li></ul><p><strong>Sjukdags- / dekompensationsplan</strong></p><ul><li>Notera ert teams plan för sjukdom och när ni ska söka akut.</li></ul><p><strong>När ni ska kontakta teamet</strong></p><ul><li>Notera de situationer er läkare flaggat.</li></ul>",
+          },
+        },
+      },
     },
   },
   notFound: {

@@ -1453,6 +1453,65 @@ export const en = {
           },
         },
       },
+      diabetes: {
+        cardTitle: "Set up diabetes routine for {{name}}?",
+        cardBody: "We'll add a blood-sugar check task and a diabetes-management note. You add the times, target range, and details from your care plan.",
+        offers: {
+          glucose_task: {
+            label: "Blood-sugar check task with times",
+            title: "Blood-sugar checks for {{name}}",
+            desc: "A daily reminder to check blood sugar. Enter the times your team asked you to check.",
+            taskTitle: "Check blood sugar",
+            taskNotes: "From your care plan: when to check, target range, what to do if low or high. Log the reading under Vitals → Blood sugar.",
+          },
+          diabetes_instruction: {
+            label: "Diabetes management note",
+            title: "Diabetes management",
+            desc: "A starter note for insulin timing, hypo/hyper signs, and sick-day rules. Fill in the specifics from your team.",
+            instructionTitle: "Diabetes — management plan",
+            instructionBody: "<p><strong>Insulin and medications</strong></p><ul><li>Record what the child takes, when, and who prescribed it.</li><li>Note where each medication is kept and any storage rules.</li></ul><p><strong>Monitoring</strong></p><ul><li>Record when to check blood sugar and the target range your team gave you.</li><li>Log readings under Vitals → Blood sugar.</li></ul><p><strong>Low blood sugar (hypo)</strong></p><ul><li>Record the signs your team asked you to watch for.</li><li>Record the steps your team told you to take, in order.</li></ul><p><strong>High blood sugar (hyper)</strong></p><ul><li>Record the signs your team asked you to watch for.</li><li>Record what your team told you to do.</li></ul><p><strong>Sick-day rules</strong></p><ul><li>Record your team's sick-day plan (monitoring, food, fluids, medication changes).</li><li>Record when to contact the team during illness.</li></ul><p><strong>When to call the care team</strong></p><ul><li>Record the situations your team asked to be contacted about.</li></ul>",
+          },
+        },
+      },
+      adrenal_insufficiency: {
+        cardTitle: "Set up adrenal sick-day plan for {{name}}?",
+        cardBody: "We'll add a note where you record your team's daily medication, stress-dosing rules, and sick-day plan. CareNest doesn't set doses — you write down what your clinician has told you.",
+        offers: {
+          adrenal_instruction: {
+            label: "Sick-day and stress-dose note",
+            title: "Adrenal insufficiency — plan",
+            desc: "A starter note where you record your clinician's plan. Edit to match what your team has told you.",
+            instructionTitle: "Adrenal insufficiency — sick-day and stress plan",
+            instructionBody: "<p><strong>Daily medication</strong></p><ul><li>Record what the child takes and when, as prescribed by your team.</li></ul><p><strong>Stress dosing</strong></p><ul><li>Record your clinician's stress-dose plan.</li><li>Record the situations your team said to give it (illness, injury, procedures).</li></ul><p><strong>Sick-day plan</strong></p><ul><li>Record your clinician's step-by-step sick-day instructions.</li><li>Record how to monitor at home and when the plan changes.</li></ul><p><strong>Emergency injection</strong></p><ul><li>Record whether the child has one, where it is kept, and who is trained to give it.</li><li>Record your team's instruction for when to use it.</li></ul><p><strong>When to call the team or seek urgent care</strong></p><ul><li>Record the situations your clinician flagged.</li><li>Keep this note where caregivers can find it quickly.</li></ul>",
+          },
+        },
+      },
+      thyroid: {
+        cardTitle: "Set up thyroid medication note for {{name}}?",
+        cardBody: "We'll add a note for medication timing and monitoring. You fill in what your team has prescribed.",
+        offers: {
+          thyroid_instruction: {
+            label: "Thyroid medication and monitoring note",
+            title: "Thyroid medication routine",
+            desc: "A starter note for medication timing and blood-test monitoring. Edit to match your care plan.",
+            instructionTitle: "Thyroid medication routine",
+            instructionBody: "<p><strong>Medication</strong></p><ul><li>Record the medication name and timing as prescribed.</li></ul><p><strong>Empty-stomach and interaction notes</strong></p><ul><li>Record the timing rules your team gave you (e.g. gap before food or other medications) as they apply to this child.</li></ul><p><strong>Monitoring</strong></p><ul><li>Record the blood-test schedule and where results are kept.</li><li>Note who reviews the results.</li></ul><p><strong>When to contact the team</strong></p><ul><li>Record the signs your team asked to be reported.</li></ul>",
+          },
+        },
+      },
+      metabolic_disorder: {
+        cardTitle: "Set up metabolic management note for {{name}}?",
+        cardBody: "We'll add a general note for the condition — diet, medications, monitoring, and sick-day plan. You fill in the specifics for this diagnosis.",
+        offers: {
+          metabolic_instruction: {
+            label: "Metabolic management note",
+            title: "Metabolic condition — management plan",
+            desc: "A starter note. Edit to match this condition and your care plan.",
+            instructionTitle: "Metabolic condition — management plan",
+            instructionBody: "<p><strong>Condition</strong></p><ul><li>Record the specific diagnosis and the treating team.</li></ul><p><strong>Diet and supplements</strong></p><ul><li>Record dietary rules, restricted substances, and supplements as prescribed.</li></ul><p><strong>Medications</strong></p><ul><li>Record medications and timing as prescribed.</li></ul><p><strong>Monitoring</strong></p><ul><li>Record what is monitored (blood tests, symptoms, growth) and how often.</li></ul><p><strong>Sick-day / decompensation plan</strong></p><ul><li>Record your team's plan for illness and when to seek urgent care.</li></ul><p><strong>When to call the team</strong></p><ul><li>Record the situations your clinician flagged.</li></ul>",
+          },
+        },
+      },
     },
   },
   notFound: {
