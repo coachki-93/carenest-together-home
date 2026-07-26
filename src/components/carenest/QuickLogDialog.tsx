@@ -93,6 +93,8 @@ export function QuickLogDialog({
 }) {
   const { t } = useTranslation();
   const logVital = useLogVital();
+  const createCareEvent = useCreateCareEvent();
+  const actor = useCurrentActor(familyId);
   const [preset, setPreset] = useState<Preset | null>(null);
   const [value, setValue] = useState("");
   const [notes, setNotes] = useState("");
@@ -109,10 +111,60 @@ export function QuickLogDialog({
     }
   }, [open]);
 
-  const unit = useMemo(() => (preset ? DEFAULT_UNIT[preset.vitalType] : ""), [preset]);
+  const unit = useMemo(
+    () => (preset && preset.kind === "vital" ? DEFAULT_UNIT[preset.vitalType] : ""),
+    [preset],
+  );
 
   async function submit() {
-    if (!preset || !familyId || !childId || !loggedBy) return;
+    if (!preset || !familyId || !loggedBy) return;
+    const when = loggedAt ? new Date(loggedAt) : new Date();
+    if (Number.isNaN(when.getTime())) {
+      toast.error(t("quickLog.invalidTime"));
+      return;
+    }
+    const label = t(`quickLog.presets.${preset.key}`);
+
+    if (preset.kind === "event") {
+      const guard = guardActingProfile(actor);
+      if (guard.blocked) {
+        toast.error(t("careEvents.errors.pickProfile"));
+        return;
+      }
+      const description = notes.trim() || label;
+      try {
+        await createCareEvent.mutateAsync({
+          family_id: familyId,
+          child_id: childId ?? null,
+          caregiver_profile_id: guard.caregiverProfileId,
+          created_by: loggedBy,
+          occurred_at: when.toISOString(),
+          type: preset.eventType,
+          description,
+          action_taken: null,
+          severity: null,
+          duration_seconds: null,
+        });
+        toast.success(t("quickLog.saved", { label }), {
+          action: {
+            label: t("quickLog.addDetail"),
+            onClick: () => {
+              onOpenChange(false);
+              // Route the user to the events page to add detail.
+              window.location.assign("/events");
+            },
+          },
+        });
+        onOpenChange(false);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        toast.error(msg || t("common.saveFailed"));
+      }
+      return;
+    }
+
+    // vital branch
+    if (!childId) return;
     let num = 0;
     if (preset.needsValue) {
       const n = Number(value);
@@ -122,12 +174,6 @@ export function QuickLogDialog({
       }
       num = n;
     }
-    const when = loggedAt ? new Date(loggedAt) : new Date();
-    if (Number.isNaN(when.getTime())) {
-      toast.error(t("quickLog.invalidTime"));
-      return;
-    }
-    const label = t(`quickLog.presets.${preset.key}`);
     const finalNotes = preset.needsValue
       ? notes.trim() || null
       : `${label}${notes.trim() ? ` — ${notes.trim()}` : ""}`;
@@ -145,6 +191,7 @@ export function QuickLogDialog({
     toast.success(t("quickLog.saved", { label }));
     onOpenChange(false);
   }
+
 
 
   return (
