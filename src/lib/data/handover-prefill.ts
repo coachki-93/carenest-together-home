@@ -351,6 +351,7 @@ export function useHandoverPrefill(
             );
           }
         }
+        }
       }
 
       // Hospital flag — currently at hospital and that started before shiftEnd
