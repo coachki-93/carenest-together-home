@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { VITAL_RANGES, type VitalType } from "@/lib/data/vitals";
 import { buildTodaysDoses, type Medication } from "@/lib/data/medications";
 import { TANKS, formatFlow, type TankType } from "@/lib/oxygen/tanks";
+import { hasModule } from "@/lib/care-needs/modules";
 
 type MedLog = Database["public"]["Tables"]["med_logs"]["Row"];
 type Vital = Database["public"]["Tables"]["vitals"]["Row"];
@@ -15,6 +16,8 @@ export interface HandoverPrefillInput {
   familyId: string;
   shiftStart: Date;
   shiftEnd: Date;
+  /** Raw `children.care_needs` for the active child. Parsed internally. */
+  careNeeds?: unknown;
 }
 
 export interface HandoverPrefill {
@@ -86,11 +89,14 @@ export function useHandoverPrefill(
       input?.familyId,
       input?.shiftStart.toISOString(),
       input?.shiftEnd.toISOString(),
+      // Include care_needs in the key so toggling capabilities invalidates.
+      hasModule(input?.careNeeds, "oxygen"),
     ],
     enabled,
     queryFn: async (): Promise<HandoverPrefill> => {
       if (!input) return { meds: "", notes: "", hasContent: false };
       const { familyId, shiftStart, shiftEnd } = input;
+      const oxygenAllowed = hasModule(input.careNeeds, "oxygen");
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
@@ -321,8 +327,13 @@ export function useHandoverPrefill(
         }
       }
 
-      // Oxygen tank events during the shift
-      for (const tank of oxyTanks) {
+      // Oxygen tank events during the shift.
+      // Care-needs gate: only emit if the child has the oxygen module.
+      // Safety override: if a real event exists in the window we always
+      // emit it, because it actually happened (data mismatch, existing
+      // family, etc. must not silently swallow live oxygen activity).
+      if (oxygenAllowed || oxyTanks.length > 0) {
+        for (const tank of oxyTanks) {
         const tankLabel =
           TANKS[tank.tank_type as TankType]?.label ?? tank.tank_type;
         const flowStr = formatFlow(Number(tank.flow_lpm));
@@ -339,6 +350,7 @@ export function useHandoverPrefill(
               `• ${fmtTime(replacedAt)} ${labels.oxygenReplaced} — ${tankLabel}`,
             );
           }
+        }
         }
       }
 

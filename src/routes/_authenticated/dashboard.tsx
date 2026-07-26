@@ -107,6 +107,7 @@ import { Play } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { isPaused } from "@/lib/hospital/paused";
+import { hasModule } from "@/lib/care-needs/modules";
 
 const dashboardSearch = z.object({
   tour: z.coerce.number().int().optional(),
@@ -1457,8 +1458,11 @@ function DashboardPage() {
             })()}
           </section>
 
-          {/* Oxygen bar */}
-          <OxygenBar familyId={familyId} activeOxygen={activeOxygen} isLoading={oxygenLoading} now={now} />
+          {/* Oxygen bar — gated on the "oxygen" care module, with an
+              active-tank safety override so a live countdown always shows. */}
+          {(hasModule(child?.care_needs, "oxygen") || !!activeOxygen) && (
+            <OxygenBar familyId={familyId} activeOxygen={activeOxygen} isLoading={oxygenLoading} now={now} />
+          )}
 
           {/* Handover preview */}
           <section

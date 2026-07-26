@@ -49,6 +49,7 @@ import {
   type ShiftLabel,
 } from "@/lib/data/handovers";
 import { useHandoverPrefill } from "@/lib/data/handover-prefill";
+import { useFamilyChild } from "@/lib/data/medications";
 import {
   isUnreadForViewer,
   useHandoverReadsBulk,
@@ -171,12 +172,14 @@ function HandoverPage() {
     [t],
   );
 
+  const { data: child } = useFamilyChild(membership?.family_id);
   const prefillInput =
     membership?.family_id && effectiveWindow
       ? {
           familyId: membership.family_id,
           shiftStart: effectiveWindow.start,
           shiftEnd: effectiveWindow.end,
+          careNeeds: child?.care_needs,
         }
       : null;
   const { data: prefill } = useHandoverPrefill(prefillInput, prefillLabels);

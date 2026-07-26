@@ -468,7 +468,7 @@ export const sv = {
     handover: "Överlämning",
     oxygenTitle: "Syrgas",
     oxygenRemaining: "kvar",
-    oxygenEmpty: "Ingen tub följs",
+    oxygenEmpty: "Ingen aktiv syrgastub — starta en?",
     handoverCountdown: "{{minutes}} min rapport",
     shiftEndsIn: "Passet slutar om {{time}}",
     handoverIntro: "En snabb sammanfattning så nästa vårdgivare är uppdaterad.",
