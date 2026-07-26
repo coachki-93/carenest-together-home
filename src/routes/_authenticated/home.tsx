@@ -57,10 +57,17 @@ function HomeRouter() {
 
   useEffect(() => {
     if (processingInvite) return;
-    if (profile.isLoading || membership.isLoading) return;
+    if (profile.isLoading || membership.isLoading || isAdmin.isLoading) return;
     if (profile.isError || membership.isError) {
       toast.error(t("home.loadFailed"));
       navigate({ to: "/auth/login", replace: true });
+      return;
+    }
+    // Platform admin with no family membership → dedicated /admin surface.
+    // The self-read is scoped by RLS to the caller (is_platform_admin), so
+    // no enumeration of other admins is possible.
+    if (isAdmin.data === true && !membership.data) {
+      navigate({ to: "/admin", replace: true });
       return;
     }
     const p = profile.data;
@@ -89,6 +96,8 @@ function HomeRouter() {
     membership.isLoading,
     profile.isError,
     membership.isError,
+    isAdmin.data,
+    isAdmin.isLoading,
     t,
     navigate,
   ]);
