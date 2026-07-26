@@ -30,6 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth/use-profile";
 import { formatTimeIn, wallClockIn } from "@/lib/time/family-tz";
+import { CARE_EVENT_META } from "@/lib/carenest/care-event-meta";
 
 export const Route = createFileRoute("/_authenticated/events")({
   head: () => ({
