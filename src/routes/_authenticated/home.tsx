@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useMyMembership, useSession } from "@/lib/auth/use-profile";
+import { useIsAdmin } from "@/lib/auth/use-is-admin";
 import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/_authenticated/home")({
