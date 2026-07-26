@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Loader2, Mail, Lock, Eye, EyeOff, Users2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/auth/login")({
   head: () => ({ meta: [{ title: "Log in — CareNest" }] }),
   component: LoginPage,
 });
+
 
 /** Map a Supabase auth error to an i18n key. Invalid-credential errors are the
  * only ones that should read as "wrong email or password"; anything else
@@ -36,7 +37,9 @@ function mapAuthError(t: (k: string) => string, message: string | undefined): st
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<"email" | "team">("email");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -46,17 +49,57 @@ function LoginPage() {
     email: z.string().trim().email(t("auth.invalidEmail")),
     password: z.string().min(1, t("auth.passwordRequired")),
   });
+  const teamSchema = z.object({
+    username: z.string().trim().min(1, t("auth.usernameRequired")),
+    password: z.string().min(1, t("auth.passwordRequired")),
+  });
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
-    const parsed = schema.safeParse({ email, password });
+    if (mode === "email") {
+      const parsed = schema.safeParse({ email, password });
+      if (!parsed.success) {
+        setFormError(parsed.error.errors[0]?.message ?? "");
+        return;
+      }
+      setSubmitting(true);
+      const { error } = await supabase.auth.signInWithPassword(parsed.data);
+      setSubmitting(false);
+      if (error) {
+        setFormError(mapAuthError(t, error.message));
+        return;
+      }
+      navigate({ to: "/home" });
+      return;
+    }
+
+    // Team username → lookup_team_email → signInWithPassword
+    const parsed = teamSchema.safeParse({ username: username.trim().toLowerCase(), password });
     if (!parsed.success) {
       setFormError(parsed.error.errors[0]?.message ?? "");
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    const { data: resolvedEmail, error: lookupErr } = await supabase.rpc(
+      "lookup_team_email",
+      { _username: parsed.data.username },
+    );
+    if (lookupErr) {
+      setSubmitting(false);
+      setFormError(t("auth.genericError"));
+      return;
+    }
+    if (!resolvedEmail) {
+      setSubmitting(false);
+      // Treat "username not found" as bad-creds to avoid enumeration.
+      setFormError(t("auth.badCreds"));
+      return;
+    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email: resolvedEmail as string,
+      password: parsed.data.password,
+    });
     setSubmitting(false);
     if (error) {
       setFormError(mapAuthError(t, error.message));
@@ -64,6 +107,7 @@ function LoginPage() {
     }
     navigate({ to: "/home" });
   }
+
 
   async function oauth(provider: "google" | "apple") {
     setFormError(null);
