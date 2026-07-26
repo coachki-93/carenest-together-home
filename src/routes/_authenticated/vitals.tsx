@@ -69,7 +69,7 @@ import {
   useLogVital,
   useDeleteVital,
   DEFAULT_UNIT,
-  VITAL_TYPES,
+  VITAL_TYPES as _VITAL_TYPES_UNUSED,
   VITAL_CONTEXTS,
   getVitalRanges,
   parseRangeOverrides,
