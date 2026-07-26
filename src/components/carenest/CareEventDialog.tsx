@@ -184,7 +184,7 @@ export function CareEventDialog({
             </Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
               {orderedTypes.map((k) => {
-                const { icon: Icon, tone } = KIND_META[k];
+                const { icon: Icon, bg, text } = CARE_EVENT_META[k];
                 const selected = type === k;
                 return (
                   <button
