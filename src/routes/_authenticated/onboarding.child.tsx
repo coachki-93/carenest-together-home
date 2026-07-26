@@ -16,7 +16,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/lib/notify";
 import { useCreateInvite, useInvites } from "@/lib/data/family";
 import { CareNeedsPicker } from "@/components/carenest/CareNeedsPicker";
+import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
 import { parseCareNeeds, type CareNeeds } from "@/lib/care-needs/parse";
+
 
 
 const stepSchema = z.object({
@@ -719,7 +721,169 @@ function StepFirstMedication({
 }
 
 /* --------------------- Step 4: Invite caregivers (optional) ---------------- */
+/* ---------------------- Step 5: Team account (Phase 5.4) ------------------- */
+function StepTeam({
+  onBack,
+  onContinue,
+  onSkip,
+}: {
+  onBack: () => void;
+  onContinue: () => void;
+  onSkip: () => void;
+}) {
+  const { t } = useTranslation();
+  const membership = useMyMembership();
+  const familyId = membership.data?.family_id;
+  const isOwner = membership.data?.role === "owner";
+  const [choice, setChoice] = useState<"unset" | "yes" | "no" | "advanced">("unset");
+
+  return (
+    <div className="card-soft p-6 md:p-8 space-y-6">
+      <div className="space-y-2 text-center">
+        <div className="size-14 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto">
+          <Users className="size-7" />
+        </div>
+        <h2 className="text-2xl md:text-3xl font-extrabold">
+          {t("wizard.teamTitle")}
+        </h2>
+        <p className="text-muted-foreground">{t("wizard.teamSub")}</p>
+      </div>
+
+      {choice === "unset" && (
+        <div className="grid gap-3">
+          <button
+            type="button"
+            onClick={() => setChoice("yes")}
+            className="rounded-2xl border-2 border-primary/30 hover:border-primary bg-primary-soft/30 hover:bg-primary-soft/60 p-5 text-left transition"
+          >
+            <div className="font-bold text-lg">{t("wizard.teamYes")}</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t("wizard.teamYesDesc")}
+            </p>
+          </button>
+          <button
+            type="button"
+            onClick={() => { setChoice("no"); onSkip(); }}
+            className="rounded-2xl border-2 border-border hover:border-primary/40 bg-card p-5 text-left transition"
+          >
+            <div className="font-bold text-lg">{t("wizard.teamNo")}</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t("wizard.teamNoDesc")}
+            </p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setChoice("advanced")}
+            className="text-xs text-muted-foreground hover:text-primary underline underline-offset-4 py-2"
+          >
+            {t("wizard.teamAdvanced")}
+          </button>
+        </div>
+      )}
+
+      {choice === "yes" && familyId && (
+        <TeamAccountCard familyId={familyId} isOwner={!!isOwner} variant="onboarding" />
+      )}
+
+      {choice === "advanced" && (
+        <StepInviteInline />
+      )}
+
+      {choice !== "unset" && (
+        <StepFooter
+          onBack={choice === "yes" || choice === "advanced" ? () => setChoice("unset") : onBack}
+          onSkip={onSkip}
+          primaryLabel={t("wizard.continue")}
+          onPrimary={onContinue}
+        />
+      )}
+      {choice === "unset" && (
+        <div className="flex justify-start">
+          <Button type="button" variant="ghost" className="rounded-full" onClick={onBack}>
+            {t("wizard.back")}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Inline version of the legacy invite UI (no outer card / footer). */
+function StepInviteInline() {
+  const { t } = useTranslation();
+  const { user } = useSession();
+  const membership = useMyMembership();
+  const familyId = membership.data?.family_id;
+  const invites = useInvites(familyId);
+  const createInvite = useCreateInvite();
+  const existingPending = useMemo(
+    () => (invites.data ?? []).find((i) => i.status === "pending"),
+    [invites.data],
+  );
+  const [code, setCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (existingPending && !code) setCode(existingPending.code);
+  }, [existingPending, code]);
+
+  async function generate() {
+    if (!familyId || !user) return;
+    try {
+      const inv = await createInvite.mutateAsync({ familyId, createdBy: user.id });
+      setCode(inv.code);
+      toast.success(t("wizard.inviteCreated"));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground text-center">
+        {t("wizard.inviteSub")}
+      </p>
+      {code ? (
+        <div className="rounded-2xl border-2 border-primary/40 bg-primary-soft/40 p-6 text-center">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+            {t("wizard.inviteCodeLabel")}
+          </p>
+          <div className="text-3xl font-extrabold tracking-widest mb-4 font-mono">
+            {code}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full"
+            onClick={() => {
+              void navigator.clipboard?.writeText(code);
+              toast.success(t("wizard.copied"));
+            }}
+          >
+            <Copy className="size-4" /> {t("wizard.copy")}
+          </Button>
+          <p className="text-xs text-muted-foreground mt-4">
+            {t("wizard.inviteHowto")}
+          </p>
+        </div>
+      ) : (
+        <div className="text-center py-2">
+          <Button
+            className="rounded-full font-bold"
+            onClick={generate}
+            disabled={createInvite.isPending || !familyId}
+          >
+            {createInvite.isPending && <Loader2 className="size-4 animate-spin" />}
+            {t("wizard.generateInvite")}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* --------------------- Step 4: Invite caregivers (legacy) ------------------ */
 function StepInvite({
+
   onBack,
   onContinue,
   onSkip,
