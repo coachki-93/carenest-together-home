@@ -147,6 +147,11 @@ export const sv = {
     conditionDetails: "Tillstånd & utrustning",
     conditionDetailsHelp: "En längre beskrivning som visas på nödskärmen — utrustning (trakeostomi, PEG…), viktig bakgrund. Använd tomma rader för stycken och börja en rad med \"-\" för punkter.",
     conditionDetailsPh: "t.ex.\nApert syndrom — påverkar skalle och lemmar.\n\n- Trakeostomi för andningsstöd\n- PEG-sond för matning",
+    careNeedsStep: {
+      title: "Berätta om {{name}}s omsorg",
+      titleFallback: "Berätta om ditt barns omsorg",
+      subtitle: "Välj det som stämmer så anpassar CareNest sig från start — vitala värden, moduler och påminnelser följer med. Du kan ändra allt senare på barnprofilen.",
+    },
   },
   onboardingCaregiver: {
     title: "Välkommen, vårdgivare",
