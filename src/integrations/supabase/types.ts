@@ -1921,6 +1921,41 @@ export type Database = {
           },
         ]
       }
+      team_accounts: {
+        Row: {
+          created_at: string
+          created_by: string
+          family_id: string
+          synthetic_email: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          family_id: string
+          synthetic_email: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          family_id?: string
+          synthetic_email?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_accounts_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: true
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tidy_checklist_items: {
         Row: {
           active: boolean
@@ -2313,6 +2348,7 @@ export type Database = {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
+      is_team_account: { Args: { _user_id: string }; Returns: boolean }
       lookup_invite: {
         Args: { _code: string }
         Returns: {
@@ -2323,6 +2359,7 @@ export type Database = {
           status: Database["public"]["Enums"]["invite_status"]
         }[]
       }
+      lookup_team_email: { Args: { _username: string }; Returns: string }
       mark_maintenance_done: {
         Args: {
           _caregiver_profile_id?: string
