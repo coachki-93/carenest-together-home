@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 import {
   Thermometer,
   Heart,
@@ -27,6 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/notify";
 import { useLogVital, DEFAULT_UNIT, VITAL_CONTEXTS, type VitalType, type VitalContext } from "@/lib/data/vitals";
+import { useCreateCareEvent, type CareEventType } from "@/lib/data/care-events";
+import { useCurrentActor, guardActingProfile } from "@/lib/data/current-actor";
 
 type PresetKey =
   | "temperature"
@@ -39,26 +42,36 @@ type PresetKey =
   | "vomit"
   | "note";
 
-type Preset = {
-  key: PresetKey;
-  icon: LucideIcon;
-  tone: string;
-  vitalType: VitalType;
-  needsValue: boolean;
-  defaultNote?: string;
-};
+type Preset =
+  | {
+      kind: "vital";
+      key: PresetKey;
+      icon: LucideIcon;
+      tone: string;
+      vitalType: VitalType;
+      needsValue: boolean;
+    }
+  | {
+      kind: "event";
+      key: PresetKey;
+      icon: LucideIcon;
+      tone: string;
+      eventType: CareEventType;
+      needsValue: false;
+    };
 
 const PRESETS: Preset[] = [
-  { key: "temperature", icon: Thermometer, tone: "bg-rose-50 text-rose-600", vitalType: "temperature", needsValue: true },
-  { key: "heart_rate", icon: Heart, tone: "bg-pink-50 text-pink-600", vitalType: "heart_rate", needsValue: true },
-  { key: "spo2", icon: Wind, tone: "bg-sky-50 text-sky-600", vitalType: "spo2", needsValue: true },
-  { key: "breathing", icon: Activity, tone: "bg-cyan-50 text-cyan-600", vitalType: "breathing", needsValue: true },
-  { key: "fluids", icon: Droplet, tone: "bg-blue-50 text-blue-600", vitalType: "fluids", needsValue: true },
-  { key: "diaper", icon: Baby, tone: "bg-amber-50 text-amber-700", vitalType: "other", needsValue: false },
-  { key: "seizure", icon: Zap, tone: "bg-violet-50 text-violet-600", vitalType: "seizure", needsValue: true },
-  { key: "vomit", icon: Frown, tone: "bg-emerald-50 text-emerald-600", vitalType: "other", needsValue: false },
-  { key: "note", icon: StickyNote, tone: "bg-slate-100 text-slate-700", vitalType: "other", needsValue: false },
+  { kind: "vital", key: "temperature", icon: Thermometer, tone: "bg-rose-50 text-rose-600", vitalType: "temperature", needsValue: true },
+  { kind: "vital", key: "heart_rate", icon: Heart, tone: "bg-pink-50 text-pink-600", vitalType: "heart_rate", needsValue: true },
+  { kind: "vital", key: "spo2", icon: Wind, tone: "bg-sky-50 text-sky-600", vitalType: "spo2", needsValue: true },
+  { kind: "vital", key: "breathing", icon: Activity, tone: "bg-cyan-50 text-cyan-600", vitalType: "breathing", needsValue: true },
+  { kind: "vital", key: "fluids", icon: Droplet, tone: "bg-blue-50 text-blue-600", vitalType: "fluids", needsValue: true },
+  { kind: "vital", key: "diaper", icon: Baby, tone: "bg-amber-50 text-amber-700", vitalType: "other", needsValue: false },
+  { kind: "event", key: "seizure", icon: Zap, tone: "bg-violet-50 text-violet-600", eventType: "seizure", needsValue: false },
+  { kind: "event", key: "vomit", icon: Frown, tone: "bg-emerald-50 text-emerald-600", eventType: "vomiting", needsValue: false },
+  { kind: "event", key: "note", icon: StickyNote, tone: "bg-slate-100 text-slate-700", eventType: "other", needsValue: false },
 ];
+
 
 function toLocalInput(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
