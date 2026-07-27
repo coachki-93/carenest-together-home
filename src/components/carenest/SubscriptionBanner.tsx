@@ -65,9 +65,11 @@ export function SubscriptionBanner() {
           size="sm"
           variant="outline"
           className="rounded-full bg-white"
-          onClick={() => navigate({ to: "/settings" })}
+          onClick={() => navigate({ to: "/billing" })}
         >
-          {t("billing.banner.manage")}
+          {sub.data?.isActive && !sub.data?.isCanceled
+            ? t("billing.banner.manage")
+            : t("billing.banner.subscribe")}
         </Button>
       )}
     </div>

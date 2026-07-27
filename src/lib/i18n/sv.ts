@@ -3031,6 +3031,7 @@ export const sv = {
       pastDue: "Betalningen misslyckades. Uppdatera kortet — snart pausas loggningen.",
       readOnly: "Endast läsning. Er data är kvar — teckna abonnemang för att logga igen.",
       manage: "Hantera abonnemang",
+      subscribe: "Teckna abonnemang",
     },
     card: {
       title: "Abonnemang",

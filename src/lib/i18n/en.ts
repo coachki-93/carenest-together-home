@@ -3032,6 +3032,7 @@ export const en = {
       pastDue: "Payment failed. Please update your card — writing is paused soon.",
       readOnly: "Read-only. Your data is safe — subscribe to log again.",
       manage: "Manage billing",
+      subscribe: "Subscribe",
     },
     card: {
       title: "Subscription",
