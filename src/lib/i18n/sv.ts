@@ -203,6 +203,7 @@ export const sv = {
     child: "Barnets profil",
     caregivers: "Vårdteam",
     shifts: "Pass",
+    billing: "Prenumeration",
     settings: "Inställningar",
   },
   shiftsPage: {
