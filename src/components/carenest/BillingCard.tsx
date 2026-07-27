@@ -121,8 +121,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
           </div>
 
           <div className="flex flex-wrap gap-2 pt-1">
-            {s?.row?.status &&
-            ["active", "trialing", "past_due"].includes(s.row.status) ? (
+            {s?.isActive ? (
               <Button
                 onClick={() => openPortal.mutate()}
                 disabled={openPortal.isPending || redirecting}
