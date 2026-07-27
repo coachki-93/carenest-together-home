@@ -15,6 +15,7 @@ import { UsesEquipmentSettings } from "@/components/carenest/UsesEquipmentSettin
 import { ScaffoldsResetSettings } from "@/components/carenest/ScaffoldsResetSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
+import { BillingCard } from "@/components/carenest/BillingCard";
 
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
 import { ActiveProfileSwitcher } from "@/components/carenest/ActiveProfileSwitcher";
@@ -454,6 +455,8 @@ function SettingsPage() {
               <UsesEquipmentSettings familyId={familyId} isOwner={isOwner} />
               <ScaffoldsResetSettings familyId={familyId} />
               {familyId && <TeamAccountCard familyId={familyId} isOwner={isOwner} />}
+              {familyId && <BillingCard familyId={familyId} isOwner={isOwner} />}
+
 
             </div>
           </div>
