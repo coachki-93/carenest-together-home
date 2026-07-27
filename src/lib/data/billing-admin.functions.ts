@@ -73,11 +73,19 @@ export interface AdminCouponDTO {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toCouponDTO(promo: any): AdminCouponDTO {
-  const coupon = promo.coupon ?? {};
+function toCouponDTO(promo: any, couponOverride?: any): AdminCouponDTO {
+  const rawCoupon =
+    couponOverride ??
+    (promo.promotion && typeof promo.promotion === "object"
+      ? promo.promotion.coupon
+      : promo.coupon);
+  const coupon = rawCoupon && typeof rawCoupon === "object" ? rawCoupon : {};
   return {
     promotionCodeId: String(promo.id),
-    couponId: String(coupon.id ?? ""),
+    couponId: String(
+      coupon.id ??
+        (typeof rawCoupon === "string" ? rawCoupon : ""),
+    ),
     code: String(promo.code ?? ""),
     active: promo.active !== false,
     timesRedeemed: Number(promo.times_redeemed ?? 0),
