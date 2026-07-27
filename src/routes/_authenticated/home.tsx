@@ -58,15 +58,23 @@ function HomeRouter() {
 
   useEffect(() => {
     if (processingInvite) return;
+    // Wait for the session AND the enabled-when-user queries to actually
+    // resolve. Without the !user guard, disabled queries report
+    // isLoading=false and this effect races: profile.data is undefined,
+    // we bounce to /onboarding/child, and HomeRouter unmounts before the
+    // admin branch ever gets to run.
+    if (sessionLoading || !user) return;
     if (profile.isLoading || membership.isLoading || isAdmin.isLoading) return;
     if (profile.isError || membership.isError) {
       toast.error(t("home.loadFailed"));
       navigate({ to: "/auth/login", replace: true });
       return;
     }
-    // Platform admin with no family membership → dedicated /admin surface.
-    // The self-read is scoped by RLS to the caller (is_platform_admin), so
-    // no enumeration of other admins is possible.
+    // Platform admin → dedicated /admin surface. Takes precedence over
+    // profile-driven routing: a support-only admin account has
+    // account_type='family' and onboarded=false from handle_new_user, so
+    // the family branches below would otherwise hijack the redirect.
+    // Only defer to family routing when this admin ALSO belongs to a family.
     if (isAdmin.data === true && !membership.data) {
       navigate({ to: "/admin", replace: true });
       return;
@@ -91,6 +99,8 @@ function HomeRouter() {
     navigate({ to: "/dashboard" });
   }, [
     processingInvite,
+    sessionLoading,
+    user,
     profile.data,
     membership.data,
     profile.isLoading,
@@ -102,6 +112,7 @@ function HomeRouter() {
     t,
     navigate,
   ]);
+
 
   return (
     <div className="min-h-screen flex items-center justify-center">
