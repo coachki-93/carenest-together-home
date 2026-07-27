@@ -445,24 +445,19 @@ function Landing() {
             </p>
           </Reveal>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <PriceCard
-              label={t("marketing.pricing.monthlyLabel")}
-              price={t("marketing.pricing.monthlyPrice")}
-              sub={t("marketing.pricing.monthlySub")}
-              featuresLabel={t("marketing.pricing.featuresLabel")}
-              cta={t("marketing.pricing.monthlyCta")}
-            />
+          <div className="max-w-xl mx-auto">
             <PriceCard
               accent
-              badge={t("marketing.pricing.annualBadge")}
-              label={t("marketing.pricing.annualLabel")}
-              price={t("marketing.pricing.annualPrice")}
-              sub={t("marketing.pricing.annualSub")}
+              badge={t("marketing.pricing.badge")}
+              label={t("marketing.pricing.label")}
+              price={t("marketing.pricing.price")}
+              thenPrice={t("marketing.pricing.thenPrice")}
+              sub={t("marketing.pricing.sub2")}
               featuresLabel={t("marketing.pricing.featuresLabel")}
-              cta={t("marketing.pricing.annualCta")}
+              cta={t("marketing.pricing.cta")}
             />
           </div>
+
         </div>
       </section>
 
