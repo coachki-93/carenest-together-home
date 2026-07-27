@@ -10,8 +10,8 @@ import { createFileRoute } from "@tanstack/react-router";
  *     SubtleCrypto — the sync constructEvent will throw). Return 400 on
  *     any mismatch BEFORE any DB write.
  *  3. Insert into stripe_webhook_events (idempotency ledger) BEFORE
- *     processing. ON CONFLICT DO NOTHING → if the row already existed,
- *     we already processed this event id; return 200 and skip.
+ *     processing. Unique-violation → we already processed this event;
+ *     return 200 and skip.
  *  4. All subscription state is written via supabaseAdmin. RLS forbids
  *     authenticated writes on family_subscriptions, so no signed-in
  *     client can forge status='active'.
@@ -32,12 +32,16 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
         const rawBody = await request.text();
 
         // ---- 2. Signature verification --------------------------------
-        // Dynamic imports keep server-only modules out of any client graph.
-        const { getStripeClient, getWebhookSecret, mapStripeStatus } =
-          await import("@/lib/billing/stripe.server");
+        const {
+          getStripeClient,
+          getWebhookSecret,
+          mapStripeStatus,
+          subscriptionPeriodEndIso,
+          invoiceSubscriptionId,
+        } = await import("@/lib/billing/stripe.server");
 
         const stripe = getStripeClient();
-        let event;
+        let event: import("stripe").Stripe.Event;
         try {
           event = await stripe.webhooks.constructEventAsync(
             rawBody,
@@ -56,33 +60,35 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
         );
 
         // ---- 3. Idempotency: record BEFORE processing -----------------
-        const { error: ledgerErr, count } = await supabaseAdmin
+        const { error: ledgerErr } = await supabaseAdmin
           .from("stripe_webhook_events")
-          .insert(
-            { event_id: event.id, event_type: event.type },
-            { count: "exact" },
-          )
-          .select("event_id", { count: "exact", head: true });
+          .insert({ event_id: event.id, event_type: event.type });
 
-        // The PostgREST client returns a unique-violation error (code 23505)
-        // when the event_id already exists. Treat that as "already processed"
-        // and return 200 so Stripe stops retrying.
         if (ledgerErr) {
-          const isDuplicate =
-            "code" in ledgerErr && (ledgerErr as { code?: string }).code === "23505";
-          if (isDuplicate) {
+          // 23505 = unique_violation → this event was already processed.
+          const code = (ledgerErr as { code?: string }).code;
+          if (code === "23505") {
             return new Response("Already processed", { status: 200 });
           }
           console.error("[stripe webhook] ledger insert failed:", ledgerErr.message);
           return new Response("Ledger write failed", { status: 500 });
         }
-        void count;
+
+        // Type alias for a subscription row update payload.
+        type SubUpdate = {
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          status?: "trialing" | "active" | "past_due" | "canceled" | "none";
+          plan?: "founding" | "standard";
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+        };
 
         // ---- 4. Process event (admin-only writes) ---------------------
         try {
           switch (event.type) {
             case "checkout.session.completed": {
-              const session = event.data.object as import("stripe").Stripe.Checkout.Session;
+              const session = event.data.object;
               const familyId = session.metadata?.family_id ?? null;
               const subscriptionId =
                 typeof session.subscription === "string"
@@ -94,24 +100,22 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
                   : session.customer?.id ?? null;
 
               if (familyId && subscriptionId) {
-                // Fetch the subscription for authoritative status/period.
-                const sub = await stripe.subscriptions.retrieve(subscriptionId);
-                const plan =
-                  (sub.metadata?.plan === "standard" ? "standard" : "founding") as
-                    | "founding"
-                    | "standard";
+                const sub = (await stripe.subscriptions.retrieve(
+                  subscriptionId,
+                )) as unknown as import("stripe").Stripe.Subscription;
+                const plan: "founding" | "standard" =
+                  sub.metadata?.plan === "standard" ? "standard" : "founding";
+                const update: SubUpdate = {
+                  stripe_customer_id: customerId,
+                  stripe_subscription_id: sub.id,
+                  status: mapStripeStatus(sub.status),
+                  plan,
+                  current_period_end: subscriptionPeriodEndIso(sub),
+                  cancel_at_period_end: sub.cancel_at_period_end,
+                };
                 await supabaseAdmin
                   .from("family_subscriptions")
-                  .update({
-                    stripe_customer_id: customerId,
-                    stripe_subscription_id: sub.id,
-                    status: mapStripeStatus(sub.status),
-                    plan,
-                    current_period_end: new Date(
-                      sub.current_period_end * 1000,
-                    ).toISOString(),
-                    cancel_at_period_end: sub.cancel_at_period_end,
-                  })
+                  .update(update)
                   .eq("family_id", familyId);
               }
               break;
@@ -120,49 +124,44 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
             case "customer.subscription.created":
             case "customer.subscription.updated":
             case "customer.subscription.deleted": {
-              const sub = event.data.object as import("stripe").Stripe.Subscription;
+              const sub = event.data.object;
               const familyId = sub.metadata?.family_id ?? null;
               if (familyId) {
-                const plan =
-                  (sub.metadata?.plan === "standard" ? "standard" : "founding") as
-                    | "founding"
-                    | "standard";
+                const plan: "founding" | "standard" =
+                  sub.metadata?.plan === "standard" ? "standard" : "founding";
+                const update: SubUpdate = {
+                  stripe_subscription_id: sub.id,
+                  status: mapStripeStatus(sub.status),
+                  plan,
+                  current_period_end: subscriptionPeriodEndIso(sub),
+                  cancel_at_period_end: sub.cancel_at_period_end,
+                };
                 await supabaseAdmin
                   .from("family_subscriptions")
-                  .update({
-                    stripe_subscription_id: sub.id,
-                    status: mapStripeStatus(sub.status),
-                    plan,
-                    current_period_end: new Date(
-                      sub.current_period_end * 1000,
-                    ).toISOString(),
-                    cancel_at_period_end: sub.cancel_at_period_end,
-                  })
+                  .update(update)
                   .eq("family_id", familyId);
               }
               break;
             }
 
             case "invoice.payment_failed": {
-              // Stripe will also emit customer.subscription.updated → past_due,
-              // but we mirror explicitly to avoid depending on event order.
-              const invoice = event.data.object as import("stripe").Stripe.Invoice;
-              const subscriptionId =
-                typeof invoice.subscription === "string"
-                  ? invoice.subscription
-                  : invoice.subscription?.id ?? null;
+              // Stripe also emits customer.subscription.updated → past_due,
+              // but we mirror explicitly so ordering doesn't matter.
+              const invoice = event.data.object;
+              const subscriptionId = invoiceSubscriptionId(invoice);
               if (subscriptionId) {
-                const sub = await stripe.subscriptions.retrieve(subscriptionId);
+                const sub = (await stripe.subscriptions.retrieve(
+                  subscriptionId,
+                )) as unknown as import("stripe").Stripe.Subscription;
                 const familyId = sub.metadata?.family_id ?? null;
                 if (familyId) {
+                  const update: SubUpdate = {
+                    status: mapStripeStatus(sub.status),
+                    current_period_end: subscriptionPeriodEndIso(sub),
+                  };
                   await supabaseAdmin
                     .from("family_subscriptions")
-                    .update({
-                      status: mapStripeStatus(sub.status),
-                      current_period_end: new Date(
-                        sub.current_period_end * 1000,
-                      ).toISOString(),
-                    })
+                    .update(update)
                     .eq("family_id", familyId);
                 }
               }
@@ -170,18 +169,18 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
             }
 
             default:
-              // Ignore other event types — the ledger row already commits,
-              // so Stripe won't retry.
+              // Unhandled event types still record in the ledger so Stripe
+              // stops retrying them.
               break;
           }
         } catch (err) {
           const msg = err instanceof Error ? err.message : "unknown";
           console.error(`[stripe webhook] handler ${event.type} failed:`, msg);
-          // Return 500 so Stripe retries. The ledger row will still exist,
-          // but the retry will hit the duplicate-key path and 200 out —
-          // which means a handler failure is NOT auto-retried. Trade-off:
+          // Return 500 → Stripe retries. The ledger row already exists, so
+          // the retry hits the duplicate-key path and 200s — meaning a
+          // handler failure is NOT auto-retried. Deliberate trade-off:
           // predictable no-double-processing over automatic recovery.
-          // Alerting on this log line covers the recovery gap.
+          // Alert on this log line to close the recovery gap.
           return new Response("Handler error", { status: 500 });
         }
 
