@@ -30,6 +30,9 @@ import {
   Users,
   Heart,
   Mail,
+  NotebookPen,
+  Sparkles,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
