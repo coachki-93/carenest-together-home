@@ -3051,6 +3051,7 @@ export const sv = {
       statusNone: "Inget abonnemang än.",
       dataPreserved: "Om abonnemanget upphör blir appen endast läsning. Er data raderas aldrig.",
     },
+    ownerOnly: "Endast familjens ägare kan hantera abonnemanget.",
   },
 };
 
