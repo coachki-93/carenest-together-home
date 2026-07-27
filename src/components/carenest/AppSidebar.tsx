@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   AlertTriangle,
   Wrench,
+  CreditCard,
 } from "lucide-react";
 
 
