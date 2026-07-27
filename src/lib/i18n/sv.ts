@@ -2193,7 +2193,7 @@ export const sv = {
       f5: "Vårdplatskontroller med larm direkt vid kritiska svar",
       f6: "Lager, varningar vid låg nivå & delad inköpslista",
       f7: "Attribution per vårdgivare — vem gjorde vad, när",
-      f8: "Obegränsat med vårdgivare, inbjudningskoder, svenska & engelska",
+      f8: "Obegränsat med vårdgivare, gemensamt teamkonto eller inbjudningskoder, svenska & engelska",
     },
     faq: {
       kicker: "Vanliga frågor",
