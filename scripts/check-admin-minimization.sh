@@ -61,38 +61,39 @@ FORBIDDEN=(
   scaffolds
 )
 
-# Strip comment lines so the module's own contract text (which enumerates
-# the forbidden tables in its docstring) isn't flagged.
-CODE_ONLY="$(grep -Ev '^\s*(\*|//)' "$FILE")"
-
 fail=0
-for name in "${FORBIDDEN[@]}"; do
-  # Match .from("name"), .from('name'), or bare "name" / 'name' string.
-  if echo "$CODE_ONLY" | grep -Eq "\.from\(\s*['\"]${name}['\"]|['\"]${name}['\"]"; then
-    echo "FORBIDDEN: $FILE references health/operational table '${name}'" >&2
+
+for FILE in "${FILES[@]}"; do
+  # Strip comment lines so the module's own contract text (which enumerates
+  # the forbidden tables in its docstring) isn't flagged.
+  CODE_ONLY="$(grep -Ev '^\s*(\*|//)' "$FILE")"
+
+  for name in "${FORBIDDEN[@]}"; do
+    # Match .from("name"), .from('name'), or bare "name" / 'name' string.
+    if echo "$CODE_ONLY" | grep -Eq "\.from\(\s*['\"]${name}['\"]|['\"]${name}['\"]"; then
+      echo "FORBIDDEN: $FILE references health/operational table '${name}'" >&2
+      fail=1
+    fi
+  done
+
+  if echo "$CODE_ONLY" | grep -Eq "\.select\(\s*['\"]\*['\"]"; then
+    echo "FORBIDDEN: $FILE uses select('*') — every column must be explicit" >&2
     fail=1
+  fi
+
+  if echo "$CODE_ONLY" | grep -Eq "\.rpc\("; then
+    # is_platform_admin is called through supabase.rpc from the caller's
+    # RLS-scoped client. That's the only allowed rpc call. Verify.
+    if ! grep -q 'rpc("is_platform_admin"' "$FILE"; then
+      echo "FORBIDDEN: $FILE uses .rpc() beyond the is_platform_admin gate" >&2
+      fail=1
+    fi
   fi
 done
 
-# Additional structural checks (reuse CODE_ONLY defined above).
-
-if echo "$CODE_ONLY" | grep -Eq "\.select\(\s*['\"]\*['\"]"; then
-  echo "FORBIDDEN: $FILE uses select('*') — every column must be explicit" >&2
-  fail=1
-fi
-
-if echo "$CODE_ONLY" | grep -Eq "\.rpc\("; then
-  # is_platform_admin is called through supabase.rpc from the caller's
-  # RLS-scoped client. That's the only allowed rpc call. Verify.
-  if ! grep -q 'rpc("is_platform_admin"' "$FILE"; then
-    echo "FORBIDDEN: $FILE uses .rpc() beyond the is_platform_admin gate" >&2
-    fail=1
-  fi
-fi
-
 if [[ $fail -ne 0 ]]; then
   echo "" >&2
-  echo "N1 data-minimization contract violated. Fix $FILE." >&2
+  echo "N1 data-minimization contract violated." >&2
   exit 1
 fi
 
