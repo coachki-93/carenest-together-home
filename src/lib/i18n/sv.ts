@@ -2119,9 +2119,9 @@ export const sv = {
       fluids: { label: "Vätska" },
       fluidsToday: "idag",
       glucose: {
-        label: "Glukos",
-        planned: "Planerad",
-        a11y: "Glukos — planerad funktion",
+        label: "Blodsocker",
+        planned: "mmol/L",
+        a11y: "Blodsocker — loggas i mmol/L",
       },
     },
     teams: {
@@ -2130,7 +2130,9 @@ export const sv = {
       body1:
         "Hela assistentens jobb i CareNest är en lista: nästa uppgift, med klockslag. Kan de följa en lista kan de redan systemet.",
       body2:
-        "Du behöver aldrig agera IT-support. En engångskod släpper in dem, de trycker på sitt namn och dagen visar själv vad som ska göras — i webbläsaren, inget att installera, inget konto att skapa.",
+        "Du behöver aldrig agera IT-support. Ni skapar en gemensam inloggning för teamet; varje vårdgivare trycker på sitt namn och dagen visar själv vad som ska göras — i webbläsaren, inget att installera, inget personligt konto att skapa.",
+      body2b:
+        "Vill ni hellre bjuda in personer var för sig? Det går också — skicka en engångskod istället.",
       body3:
         "Och när något ändå missas — en dos blir sen, en tillsyn glöms bort — märker CareNest det och säger till. Du behöver inte kontrollera att alla har kontrollerat.",
       closing:
@@ -2138,10 +2140,10 @@ export const sv = {
     },
     teamsMock: {
       title: "Första passet",
-      step1Label: "Inbjuden med engångskod",
-      step1Email: "ryan@example.se",
-      step1Code: "H3K9PQ2M",
-      step1Status: "Accepterad",
+      step1Label: "En gemensam inloggning för hela teamet",
+      step1Email: "andersson-team",
+      step1Code: "••••••••••",
+      step1Status: "Inloggad",
       step2Label: "Trycker på sitt namn",
       step3Label: "Dagen finns redan där",
       step3Time: "07:15",
