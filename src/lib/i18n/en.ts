@@ -2632,8 +2632,8 @@ export const en = {
       b2: "Per-child reference ranges the owner can tune",
       b3: "24 hours, 7 days, 30 days at a tap",
       b4: "Alerts after repeated out-of-range readings",
-      b5: "Heart rate, SpO₂, temperature, weight, seizures, fluids and breathing rate — all tracked",
-      b6: "More measurement types planned — glucose and others",
+      b5: "Heart rate, SpO₂, temperature, weight, seizures, fluids, breathing rate and blood sugar — all tracked",
+      b6: "Ranges appear only for what your child needs — set diabetes as a care need and glucose (mmol/L) shows up automatically",
     },
     meds: {
       kicker: "MEDICATIONS",
