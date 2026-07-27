@@ -454,8 +454,7 @@ function SettingsPage() {
               <OwnerNotifyLevelSettings familyId={familyId} isOwner={isOwner} />
               <UsesEquipmentSettings familyId={familyId} isOwner={isOwner} />
               <ScaffoldsResetSettings familyId={familyId} />
-              {familyId && <TeamAccountCard familyId={familyId} isOwner={isOwner} />}
-              {familyId && <BillingCard familyId={familyId} isOwner={isOwner} />}
+              {familyId && <TeamAccountCard familyId={familyId} isOwner={isOwner} />
 
 
             </div>
