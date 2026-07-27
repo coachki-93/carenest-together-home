@@ -2194,7 +2194,7 @@ export const en = {
       f5: "Care Place Control checklists with instant critical alerts",
       f6: "Inventory, low-stock warnings & shared shopping list",
       f7: "Per-caregiver attribution — who did what, when",
-      f8: "Unlimited caregivers, invite codes, English & Swedish",
+      f8: "Unlimited caregivers, shared team account or invite codes, English & Swedish",
     },
     faq: {
       kicker: "Frequently asked",
