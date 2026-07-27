@@ -63,3 +63,40 @@ export function mapStripeStatus(
       return "none";
   }
 }
+
+/**
+ * Extract current_period_end from a Subscription across API-version drift.
+ * Newer API versions moved this field onto subscription items; we fall
+ * back through the known locations and return ISO or null.
+ */
+export function subscriptionPeriodEndIso(sub: unknown): string | null {
+  const s = sub as {
+    current_period_end?: number | null;
+    items?: { data?: Array<{ current_period_end?: number | null }> };
+  };
+  const seconds =
+    s?.current_period_end ??
+    s?.items?.data?.[0]?.current_period_end ??
+    null;
+  return seconds ? new Date(seconds * 1000).toISOString() : null;
+}
+
+/**
+ * Extract the subscription id from an Invoice across API-version drift.
+ * Old shape: invoice.subscription. New shape: invoice.parent
+ * .subscription_details.subscription. Returns the id or null.
+ */
+export function invoiceSubscriptionId(invoice: unknown): string | null {
+  const i = invoice as {
+    subscription?: string | { id?: string } | null;
+    parent?: {
+      subscription_details?: {
+        subscription?: string | { id?: string } | null;
+      };
+    };
+  };
+  const candidate =
+    i?.subscription ?? i?.parent?.subscription_details?.subscription ?? null;
+  if (!candidate) return null;
+  return typeof candidate === "string" ? candidate : candidate.id ?? null;
+}
