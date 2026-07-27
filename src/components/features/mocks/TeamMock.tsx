@@ -1,11 +1,11 @@
-import { Copy, ShieldCheck } from "lucide-react";
+import { KeyRound, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 /**
- * TeamMock — bilingual invite-code card mirroring /caregivers.
- * Code respects the real generateCode alphabet (no I/O/0/1) from
- * src/lib/data/family.ts. Expiry copy locked to 14 days
- * (useCreateInvite default daysValid = 14). Two-role enum only.
+ * TeamMock — bilingual team-account card mirroring the shipped
+ * TeamAccountCard flow. Shows the shared username + a masked password
+ * chip and a subtle "Reset password" affordance. The three-role team
+ * strip stays unchanged.
  */
 export function TeamMock() {
   const { t } = useTranslation();
@@ -23,32 +23,51 @@ export function TeamMock() {
         {t(`${K}.kicker`)}
       </p>
 
-      {/* Big code block */}
+      {/* Username + masked password block */}
       <div
-        className="rounded-2xl border border-marketing-line px-5 py-6 mb-3 relative overflow-hidden"
+        className="rounded-2xl border border-marketing-line px-5 py-5 mb-3 relative overflow-hidden"
         style={{
           background:
             "linear-gradient(135deg, color-mix(in oklab, var(--color-marketing-sage) 10%, var(--color-marketing-bg)) 0%, var(--color-marketing-bg) 100%)",
         }}
       >
         <p
-          className="text-3xl md:text-4xl font-bold text-marketing-ink tabular-nums tracking-[0.25em] text-center select-all"
+          className="text-2xl md:text-3xl font-bold text-marketing-ink tabular-nums tracking-tight text-center select-all"
           style={{ fontFamily: "var(--font-mono, ui-monospace)" }}
         >
           {t(`${K}.code`)}
         </p>
-        <div className="flex items-center justify-center gap-2 mt-3 text-[11px] text-marketing-muted">
-          <Copy className="size-3.5" />
-          <span>{t(`${K}.codeHint`)}</span>
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-marketing-muted">
+            {t(`${K}.passwordLabel`)}
+          </span>
+          <span
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-marketing-line bg-marketing-bg text-[12px] font-semibold text-marketing-ink tabular-nums"
+            style={{ fontFamily: "var(--font-mono, ui-monospace)" }}
+          >
+            <KeyRound className="size-3 text-marketing-muted" aria-hidden />
+            {t(`${K}.passwordMasked`)}
+          </span>
         </div>
+        <p className="text-[11px] text-marketing-muted text-center mt-3">
+          {t(`${K}.codeHint`)}
+        </p>
       </div>
 
-      <div className="flex items-center gap-2 text-[12px] text-marketing-muted mb-5">
-        <ShieldCheck
-          className="size-3.5 flex-none"
-          style={{ color: "var(--color-marketing-sage)" }}
-        />
-        <span>{t(`${K}.expiry`)}</span>
+      <div className="flex items-center justify-between gap-2 text-[12px] text-marketing-muted mb-5">
+        <span className="flex items-center gap-1.5">
+          <RotateCcw
+            className="size-3.5 flex-none"
+            style={{ color: "var(--color-marketing-sage)" }}
+            aria-hidden
+          />
+          <span>{t(`${K}.expiry`)}</span>
+        </span>
+        <span
+          className="text-[11px] font-semibold text-marketing-sage border border-marketing-sage-line rounded-full px-2.5 py-0.5 flex-none"
+        >
+          {t(`${K}.resetPassword`)}
+        </span>
       </div>
 
       {/* Team strip */}
