@@ -15,7 +15,7 @@ import { UsesEquipmentSettings } from "@/components/carenest/UsesEquipmentSettin
 import { ScaffoldsResetSettings } from "@/components/carenest/ScaffoldsResetSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
-import { BillingCard } from "@/components/carenest/BillingCard";
+
 
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
 import { ActiveProfileSwitcher } from "@/components/carenest/ActiveProfileSwitcher";
