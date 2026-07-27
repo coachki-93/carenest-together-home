@@ -3023,6 +3023,34 @@ export const sv = {
       teamLogoutWarning: "Alla som använder det delade kontot loggas ut inom en timme. De behöver det nya lösenordet för att logga in igen.",
     },
   },
+  billing: {
+    banner: {
+      trial_one: "Provperiod — 1 dag kvar. Teckna abonnemang för att fortsätta logga efter det.",
+      trial_other: "Provperiod — {{count}} dagar kvar. Teckna abonnemang för att fortsätta logga efter det.",
+      pastDue: "Betalningen misslyckades. Uppdatera kortet — snart pausas loggningen.",
+      readOnly: "Endast läsning. Er data är kvar — teckna abonnemang för att logga igen.",
+      manage: "Hantera abonnemang",
+    },
+    card: {
+      title: "Abonnemang",
+      subtitle: "Ett abonnemang per familj. Ägaren sköter betalningen.",
+      foundingPlan: "Grundare — månadsvis",
+      standardPlan: "Standard — månadsvis",
+      foundingLocked: "Grundarpris — låst för alltid som tidig familj.",
+      monthlyOnly: "Faktureras månadsvis. Säg upp när som helst; er data bevaras.",
+      subscribe: "Starta abonnemang",
+      managePortal: "Hantera abonnemang",
+      statusTrial_one: "Provperiod — 1 dag kvar (slutar {{date}}).",
+      statusTrial_other: "Provperiod — {{count}} dagar kvar (slutar {{date}}).",
+      statusActive: "Aktivt. Nästa betalning {{date}}.",
+      statusCancelsAt: "Aktivt till {{date}}, sedan avslutas det.",
+      statusPastDue: "Betalningen misslyckades. Respittid slutar {{date}}.",
+      statusCanceled: "Avslutat. Teckna abonnemang för att logga igen.",
+      statusInactive: "Inte aktivt. Teckna abonnemang för att kunna logga.",
+      statusNone: "Inget abonnemang än.",
+      dataPreserved: "Om abonnemanget upphör blir appen endast läsning. Er data raderas aldrig.",
+    },
+  },
 };
 
 
