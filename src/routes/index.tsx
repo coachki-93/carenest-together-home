@@ -397,6 +397,8 @@ function Landing() {
                 { icon: Calendar, key: "i3" },
                 { icon: BookOpen, key: "i4" },
                 { icon: Siren, key: "i5" },
+                { icon: Users, key: "i9" },
+                { icon: NotebookPen, key: "i10" },
               ].map((r) => ({ icon: r.icon, label: t(`marketing.essentials.${r.key}`) }))}
             />
             <ComparisonCard
@@ -409,6 +411,8 @@ function Landing() {
                 { icon: Wrench, key: "i3" },
                 { icon: ShieldCheck, key: "i4" },
                 { icon: RefreshCw, key: "i5" },
+                { icon: Sparkles, key: "i7" },
+                { icon: Layers, key: "i8" },
               ].map((r) => ({ icon: r.icon, label: t(`marketing.complex.${r.key}`) }))}
             />
           </div>
