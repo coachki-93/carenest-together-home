@@ -167,6 +167,12 @@ function Landing() {
                     {t("marketing.teams.body2")}
                   </p>
                   <p
+                    className="mk-slide-in text-marketing-muted/80 text-sm md:text-base leading-[1.7]"
+                    style={{ ["--mk-delay" as string]: "210ms" }}
+                  >
+                    {t("marketing.teams.body2b")}
+                  </p>
+                  <p
                     className="mk-slide-in text-marketing-muted text-base md:text-lg leading-[1.7]"
                     style={{ ["--mk-delay" as string]: "280ms" }}
                   >
