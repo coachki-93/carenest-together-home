@@ -33,14 +33,18 @@ import {
   adminGetAccount,
   adminTriggerPasswordReset,
 } from "@/lib/data/admin.functions";
+import { AdminCoupons } from "@/components/carenest/AdminCoupons";
 import { toast } from "@/lib/notify";
 
-type AdminSearch = { tab?: "accounts" | "families" };
+type AdminTab = "accounts" | "families" | "coupons";
+type AdminSearch = { tab?: AdminTab };
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  validateSearch: (s: Record<string, unknown>): AdminSearch => ({
-    tab: s.tab === "families" ? "families" : "accounts",
-  }),
+  validateSearch: (s: Record<string, unknown>): AdminSearch => {
+    const tab: AdminTab =
+      s.tab === "families" || s.tab === "coupons" ? s.tab : "accounts";
+    return { tab };
+  },
   head: () => ({
     meta: [
       { title: "Platform admin — CareNest" },
@@ -55,7 +59,7 @@ function AdminPage() {
   const navigate = useNavigate();
   const isAdmin = useIsAdmin();
   const search = useSearch({ from: "/_authenticated/admin" });
-  const tab = search.tab ?? "accounts";
+  const tab: AdminTab = search.tab ?? "accounts";
 
   useEffect(() => {
     if (isAdmin.isSuccess && isAdmin.data === false) {
@@ -71,19 +75,26 @@ function AdminPage() {
     );
   }
 
+  const titleKey =
+    tab === "families"
+      ? "admin.families.title"
+      : tab === "coupons"
+        ? "admin.coupons.title"
+        : "admin.accounts.title";
+
   return (
-    <AdminLayout
-      title={
-        tab === "families"
-          ? t("admin.families.title")
-          : t("admin.accounts.title")
-      }
-      subtitle={t("admin.subtitle")}
-    >
-      {tab === "families" ? <FamiliesSection /> : <AccountsSection />}
+    <AdminLayout title={t(titleKey)} subtitle={t("admin.subtitle")}>
+      {tab === "families" ? (
+        <FamiliesSection />
+      ) : tab === "coupons" ? (
+        <AdminCoupons />
+      ) : (
+        <AccountsSection />
+      )}
     </AdminLayout>
   );
 }
+
 
 
 // ---------------------------------------------------------------------------
