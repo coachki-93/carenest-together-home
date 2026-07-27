@@ -84,7 +84,9 @@ export function AppSidebar() {
     { title: t("nav.child"), url: "/child", icon: Baby },
   ];
 
+  const isOwner = membership.data?.role === "owner";
   const settingsItem = { title: t("nav.settings"), url: "/settings", icon: Settings };
+  const billingItem = { title: t("nav.billing"), url: "/billing", icon: CreditCard };
 
   const isActive = (url: string) =>
     pathname === url || pathname.startsWith(url + "/");
