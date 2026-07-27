@@ -930,6 +930,7 @@ export type Database = {
         Row: {
           at_hospital_since: string | null
           created_at: string
+          founding_member: boolean
           handover_reminder_duration_minutes: number
           handover_reminder_minutes: number
           hospital_paused: Json | null
@@ -947,6 +948,7 @@ export type Database = {
         Insert: {
           at_hospital_since?: string | null
           created_at?: string
+          founding_member?: boolean
           handover_reminder_duration_minutes?: number
           handover_reminder_minutes?: number
           hospital_paused?: Json | null
@@ -964,6 +966,7 @@ export type Database = {
         Update: {
           at_hospital_since?: string | null
           created_at?: string
+          founding_member?: boolean
           handover_reminder_duration_minutes?: number
           handover_reminder_minutes?: number
           hospital_paused?: Json | null
@@ -1013,6 +1016,56 @@ export type Database = {
             foreignKeyName: "family_members_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          family_id: string
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"] | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          family_id: string
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"] | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          family_id?: string
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"] | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_subscriptions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: true
             referencedRelation: "families"
             referencedColumns: ["id"]
           },
@@ -1972,6 +2025,24 @@ export type Database = {
           },
         ]
       }
+      stripe_webhook_events: {
+        Row: {
+          event_id: string
+          event_type: string
+          received_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type: string
+          received_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string
+          received_at?: string
+        }
+        Relationships: []
+      }
       team_accounts: {
         Row: {
           created_at: string
@@ -2395,6 +2466,10 @@ export type Database = {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
+      is_family_subscription_active: {
+        Args: { _family_id: string }
+        Returns: boolean
+      }
       is_material_manager: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
@@ -2532,6 +2607,13 @@ export type Database = {
         | "other"
       member_role: "owner" | "caregiver"
       shift_label: "morning" | "afternoon" | "night" | "custom"
+      subscription_plan: "founding" | "standard"
+      subscription_status:
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "none"
       unit_kind: "pcs" | "box" | "pack" | "ml" | "l" | "g" | "kg"
       vital_type:
         | "heart_rate"
@@ -2740,6 +2822,14 @@ export const Constants = {
       med_route: ["oral", "g_tube", "injection", "topical", "inhaled", "other"],
       member_role: ["owner", "caregiver"],
       shift_label: ["morning", "afternoon", "night", "custom"],
+      subscription_plan: ["founding", "standard"],
+      subscription_status: [
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "none",
+      ],
       unit_kind: ["pcs", "box", "pack", "ml", "l", "g", "kg"],
       vital_type: [
         "heart_rate",
