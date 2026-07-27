@@ -45,7 +45,7 @@ export const en = {
     feat1Title: "Built around your child",
     feat1Body: "One clear schedule of meds, feeds, vitals and care tasks.",
     feat2Title: "Your whole care team",
-    feat2Body: "Invite caregivers, hand over shifts, leave notes that don't get lost.",
+    feat2Body: "One shared team login, hand over shifts, leave notes that don't get lost.",
     feat3Title: "Private and secure",
     feat3Body: "Your child's information stays with the people you trust.",
   },
