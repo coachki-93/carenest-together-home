@@ -307,6 +307,7 @@ function TeamBand() {
     t("featuresV2.team.b2"),
     t("featuresV2.team.b3"),
     t("featuresV2.team.b4"),
+    t("featuresV2.team.b5"),
   ];
   return (
     <section

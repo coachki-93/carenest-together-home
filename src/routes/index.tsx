@@ -30,6 +30,9 @@ import {
   Users,
   Heart,
   Mail,
+  NotebookPen,
+  Sparkles,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -165,6 +168,12 @@ function Landing() {
                     style={{ ["--mk-delay" as string]: "140ms" }}
                   >
                     {t("marketing.teams.body2")}
+                  </p>
+                  <p
+                    className="mk-slide-in text-marketing-muted/80 text-sm md:text-base leading-[1.7]"
+                    style={{ ["--mk-delay" as string]: "210ms" }}
+                  >
+                    {t("marketing.teams.body2b")}
                   </p>
                   <p
                     className="mk-slide-in text-marketing-muted text-base md:text-lg leading-[1.7]"
@@ -388,6 +397,8 @@ function Landing() {
                 { icon: Calendar, key: "i3" },
                 { icon: BookOpen, key: "i4" },
                 { icon: Siren, key: "i5" },
+                { icon: Users, key: "i9" },
+                { icon: NotebookPen, key: "i10" },
               ].map((r) => ({ icon: r.icon, label: t(`marketing.essentials.${r.key}`) }))}
             />
             <ComparisonCard
@@ -400,6 +411,8 @@ function Landing() {
                 { icon: Wrench, key: "i3" },
                 { icon: ShieldCheck, key: "i4" },
                 { icon: RefreshCw, key: "i5" },
+                { icon: Sparkles, key: "i7" },
+                { icon: Layers, key: "i8" },
               ].map((r) => ({ icon: r.icon, label: t(`marketing.complex.${r.key}`) }))}
             />
           </div>
