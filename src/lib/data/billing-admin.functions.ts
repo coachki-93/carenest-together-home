@@ -249,13 +249,12 @@ export const adminDeactivateCoupon = createServerFn({ method: "POST" })
     });
 
     // Fetch the coupon so the returned DTO is consistent with list/create.
+    const rawCoupon = promo.promotion?.coupon;
     const couponId =
-      typeof promo.coupon === "string" ? promo.coupon : promo.coupon?.id;
-    const coupon = couponId
-      ? await stripe.coupons.retrieve(couponId)
-      : promo.coupon;
+      typeof rawCoupon === "string" ? rawCoupon : rawCoupon?.id ?? null;
+    const coupon = couponId ? await stripe.coupons.retrieve(couponId) : rawCoupon;
 
-    const dto = toCouponDTO({ ...promo, coupon });
+    const dto = toCouponDTO(promo, coupon);
 
     await logAdminAction(userId, "coupon.deactivate", {
       promotion_code_id: dto.promotionCodeId,
