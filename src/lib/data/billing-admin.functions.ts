@@ -164,7 +164,7 @@ export const adminCreateCoupon = createServerFn({ method: "POST" })
     let promo;
     try {
       promo = await stripe.promotionCodes.create({
-        coupon: coupon.id,
+        promotion: { type: "coupon", coupon: coupon.id },
         code: data.code,
         metadata: { created_by_admin: userId },
       });
@@ -182,7 +182,7 @@ export const adminCreateCoupon = createServerFn({ method: "POST" })
       throw new Error(`Failed to create promotion code: ${msg}`);
     }
 
-    const dto = toCouponDTO({ ...promo, coupon });
+    const dto = toCouponDTO(promo, coupon);
 
     await logAdminAction(userId, "coupon.create", {
       code: dto.code,
