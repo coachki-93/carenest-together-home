@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { LogOut, ShieldAlert } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
-import { useMyMembership } from "@/lib/auth/use-profile";
+import { LanguageToggle } from "./LanguageToggle";
+import { Button } from "@/components/ui/button";
+import { useMyMembership, useSession } from "@/lib/auth/use-profile";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminLayoutProps {
   title: string;
@@ -15,8 +18,15 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ title, subtitle, actions, children }: AdminLayoutProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const membership = useMyMembership();
+  const { user } = useSession();
   const hasFamily = !!membership.data;
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth/login", replace: true });
+  }
 
   return (
     <SidebarProvider>
@@ -24,6 +34,29 @@ export function AdminLayout({ title, subtitle, actions, children }: AdminLayoutP
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-10 backdrop-blur-md bg-amber-50/80 border-b-2 border-amber-300 safe-pt">
+            {/* Top utility bar: identity + language + sign out */}
+            <div className="flex items-center justify-between gap-2 px-3 md:px-8 py-1.5 border-b border-amber-200/70">
+              <div className="flex items-center gap-2 min-w-0">
+                <ShieldAlert className="size-3.5 text-amber-800 shrink-0" aria-hidden />
+                <span className="text-xs font-semibold text-amber-900 truncate">
+                  {user?.email ?? "—"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <LanguageToggle compact />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="rounded-full text-amber-900 hover:bg-amber-100 gap-1.5 h-8"
+                >
+                  <LogOut className="size-4" aria-hidden />
+                  <span className="hidden sm:inline text-xs font-semibold">
+                    {t("common.signOut")}
+                  </span>
+                </Button>
+              </div>
+            </div>
             <div className="flex items-center justify-between gap-2 px-3 md:px-8 py-2 md:py-3">
               <div className="flex items-center gap-2 md:gap-3 min-w-0">
                 <SidebarTrigger className="rounded-full tap" />
