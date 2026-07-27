@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/home")({
 function HomeRouter() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useSession();
+  const { user, loading: sessionLoading } = useSession();
   const profile = useProfile();
   const membership = useMyMembership();
   const isAdmin = useIsAdmin();
@@ -23,6 +23,7 @@ function HomeRouter() {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem("carenest:pending_invite");
   });
+
 
   // Process any pending invite BEFORE routing, so the user is never
   // misclassified as a family owner when they arrived via an invite link.
