@@ -39,8 +39,8 @@ export function BillingCard({ familyId, isOwner }: Props) {
       return checkoutFn({
         data: {
           familyId,
-          successUrl: `${origin}/settings?billing=success`,
-          cancelUrl: `${origin}/settings?billing=canceled`,
+          successUrl: `${origin}/billing?billing=success`,
+          cancelUrl: `${origin}/billing?billing=canceled`,
         },
       });
     },
@@ -56,7 +56,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
     mutationFn: async () => {
       const origin = window.location.origin;
       return portalFn({
-        data: { familyId, returnUrl: `${origin}/settings` },
+        data: { familyId, returnUrl: `${origin}/billing` },
       });
     },
     onSuccess: (res) => {
