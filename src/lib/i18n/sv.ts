@@ -2952,8 +2952,16 @@ export const sv = {
   },
   admin: {
     navLabel: "Plattformsadmin",
+    consoleTitle: "CareNest Admin",
+    exit: "Lämna admin",
+    nav: {
+      sections: "Sektioner",
+      accounts: "Konton",
+      families: "Familjer",
+    },
     title: "Plattformsadmin — supportverktyg",
     subtitle: "Endast metadata. Ingen hälsodata är åtkomlig härifrån.",
+
     banner: {
       title: "Supportverktyg",
       body: "Du ser konto- och familjemetadata för att hjälpa till med support. Hälsodata är strukturellt oåtkomlig från denna yta. Varje visning och åtgärd skrivs till en granskningslogg.",
