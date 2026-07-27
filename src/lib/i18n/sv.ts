@@ -45,7 +45,7 @@ export const sv = {
     feat1Title: "Byggt kring ditt barn",
     feat1Body: "Ett tydligt schema för mediciner, måltider, vitalvärden och uppgifter.",
     feat2Title: "Hela ditt vårdteam",
-    feat2Body: "Bjud in vårdgivare, lämna över pass, skriv anteckningar som inte glöms bort.",
+    feat2Body: "Ett gemensamt teamkonto, lämna över pass, skriv anteckningar som inte glöms bort.",
     feat3Title: "Privat och säkert",
     feat3Body: "Ditt barns information stannar hos dem du litar på.",
   },
