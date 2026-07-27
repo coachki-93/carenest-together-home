@@ -970,6 +970,7 @@ function ComparisonCard({
 function PriceCard({
   label,
   price,
+  thenPrice,
   sub,
   featuresLabel,
   cta,
@@ -978,6 +979,7 @@ function PriceCard({
 }: {
   label: string;
   price: string;
+  thenPrice?: string;
   sub: string;
   featuresLabel: string;
   cta: string;
@@ -1002,7 +1004,11 @@ function PriceCard({
       <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
         {price}
       </p>
-      <p className="text-sm text-marketing-muted mb-6">{sub}</p>
+      {thenPrice && (
+        <p className="text-sm font-medium text-marketing-ink mb-2">{thenPrice}</p>
+      )}
+      <p className="text-sm text-marketing-muted mb-6 leading-[1.6]">{sub}</p>
+
       <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
         {featuresLabel}
       </p>
