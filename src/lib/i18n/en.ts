@@ -203,6 +203,7 @@ export const en = {
     child: "Child profile",
     caregivers: "Care team",
     shifts: "Shifts",
+    billing: "Subscription",
     settings: "Settings",
   },
   shiftsPage: {
