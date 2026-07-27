@@ -445,24 +445,19 @@ function Landing() {
             </p>
           </Reveal>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <PriceCard
-              label={t("marketing.pricing.monthlyLabel")}
-              price={t("marketing.pricing.monthlyPrice")}
-              sub={t("marketing.pricing.monthlySub")}
-              featuresLabel={t("marketing.pricing.featuresLabel")}
-              cta={t("marketing.pricing.monthlyCta")}
-            />
+          <div className="max-w-xl mx-auto">
             <PriceCard
               accent
-              badge={t("marketing.pricing.annualBadge")}
-              label={t("marketing.pricing.annualLabel")}
-              price={t("marketing.pricing.annualPrice")}
-              sub={t("marketing.pricing.annualSub")}
+              badge={t("marketing.pricing.badge")}
+              label={t("marketing.pricing.label")}
+              price={t("marketing.pricing.price")}
+              thenPrice={t("marketing.pricing.thenPrice")}
+              sub={t("marketing.pricing.sub2")}
               featuresLabel={t("marketing.pricing.featuresLabel")}
-              cta={t("marketing.pricing.annualCta")}
+              cta={t("marketing.pricing.cta")}
             />
           </div>
+
         </div>
       </section>
 
@@ -975,6 +970,7 @@ function ComparisonCard({
 function PriceCard({
   label,
   price,
+  thenPrice,
   sub,
   featuresLabel,
   cta,
@@ -983,6 +979,7 @@ function PriceCard({
 }: {
   label: string;
   price: string;
+  thenPrice?: string;
   sub: string;
   featuresLabel: string;
   cta: string;
@@ -1007,7 +1004,11 @@ function PriceCard({
       <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
         {price}
       </p>
-      <p className="text-sm text-marketing-muted mb-6">{sub}</p>
+      {thenPrice && (
+        <p className="text-sm font-medium text-marketing-ink mb-2">{thenPrice}</p>
+      )}
+      <p className="text-sm text-marketing-muted mb-6 leading-[1.6]">{sub}</p>
+
       <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
         {featuresLabel}
       </p>
