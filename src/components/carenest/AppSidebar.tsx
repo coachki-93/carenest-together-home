@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   AlertTriangle,
   Wrench,
+  CreditCard,
 } from "lucide-react";
 
 
@@ -83,7 +84,9 @@ export function AppSidebar() {
     { title: t("nav.child"), url: "/child", icon: Baby },
   ];
 
+  const isOwner = membership.data?.role === "owner";
   const settingsItem = { title: t("nav.settings"), url: "/settings", icon: Settings };
+  const billingItem = { title: t("nav.billing"), url: "/billing", icon: CreditCard };
 
   const isActive = (url: string) =>
     pathname === url || pathname.startsWith(url + "/");
@@ -133,6 +136,21 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="px-3 py-3 safe-pb space-y-2 border-t">
         <SidebarMenu>
+          {isOwner && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive(billingItem.url)}
+                className="rounded-xl h-11"
+                tooltip={billingItem.title}
+              >
+                <Link to={billingItem.url} className="flex items-center gap-3">
+                  <billingItem.icon className="size-5" />
+                  {!collapsed && <span className="font-semibold">{billingItem.title}</span>}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild

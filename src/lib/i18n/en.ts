@@ -203,6 +203,7 @@ export const en = {
     child: "Child profile",
     caregivers: "Care team",
     shifts: "Shifts",
+    billing: "Subscription",
     settings: "Settings",
   },
   shiftsPage: {
@@ -3051,6 +3052,7 @@ export const en = {
       statusNone: "No subscription yet.",
       dataPreserved: "If your subscription lapses, the app becomes read-only. Your data is never deleted.",
     },
+    ownerOnly: "Only the family owner can manage the subscription.",
   },
 };
 

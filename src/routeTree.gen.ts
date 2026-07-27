@@ -39,6 +39,7 @@ import { Route as AuthenticatedEmergencyRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedChildRouteImport } from './routes/_authenticated/child'
 import { Route as AuthenticatedCaregiversRouteImport } from './routes/_authenticated/caregivers'
+import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authenticated/appointments'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
@@ -201,6 +202,11 @@ const AuthenticatedCaregiversRoute = AuthenticatedCaregiversRouteImport.update({
   path: '/caregivers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppointmentsRoute =
   AuthenticatedAppointmentsRouteImport.update({
     id: '/appointments',
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/offline': typeof OfflineRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByTo {
   '/offline': typeof OfflineRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/caregivers': typeof AuthenticatedCaregiversRoute
   '/child': typeof AuthenticatedChildRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -345,6 +353,7 @@ export interface FileRoutesById {
   '/offline': typeof OfflineRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/appointments': typeof AuthenticatedAppointmentsRoute
+  '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/caregivers': typeof AuthenticatedCaregiversRoute
   '/_authenticated/child': typeof AuthenticatedChildRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/admin'
     | '/appointments'
+    | '/billing'
     | '/caregivers'
     | '/child'
     | '/dashboard'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/admin'
     | '/appointments'
+    | '/billing'
     | '/caregivers'
     | '/child'
     | '/dashboard'
@@ -468,6 +479,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/_authenticated/admin'
     | '/_authenticated/appointments'
+    | '/_authenticated/billing'
     | '/_authenticated/caregivers'
     | '/_authenticated/child'
     | '/_authenticated/dashboard'
@@ -729,6 +741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaregiversRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/appointments': {
       id: '/_authenticated/appointments'
       path: '/appointments'
@@ -798,6 +817,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAppointmentsRoute: typeof AuthenticatedAppointmentsRoute
+  AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedCaregiversRoute: typeof AuthenticatedCaregiversRoute
   AuthenticatedChildRoute: typeof AuthenticatedChildRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -822,6 +842,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAppointmentsRoute: AuthenticatedAppointmentsRoute,
+  AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedCaregiversRoute: AuthenticatedCaregiversRoute,
   AuthenticatedChildRoute: AuthenticatedChildRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

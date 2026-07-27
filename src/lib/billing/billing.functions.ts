@@ -71,10 +71,10 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       .eq("family_id", data.familyId)
       .maybeSingle();
 
-    if (existing?.status === "active" || existing?.status === "trialing") {
-      throw new Error(
-        "This family already has an active or trialing subscription",
-      );
+    // Trialing families may convert early to a paid subscription.
+    // Block only truly-active paid subscriptions to avoid double-charging.
+    if (existing?.status === "active") {
+      throw new Error("This family already has an active subscription");
     }
 
     // ---- 3. Escalate — Stripe + admin writes -------------------------
