@@ -18,8 +18,8 @@ import {
   ShoppingCart,
   AlertTriangle,
   Wrench,
-  ShieldAlert,
 } from "lucide-react";
+
 
 
 import {
@@ -39,8 +39,8 @@ import { Logo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
 import { HospitalToggle } from "./HospitalToggle";
 import { useMyMembership } from "@/lib/auth/use-profile";
-import { useIsAdmin } from "@/lib/auth/use-is-admin";
 import { useFamily } from "@/lib/data/family";
+
 
 
 
@@ -51,7 +51,7 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const membership = useMyMembership();
   const { data: familyRow } = useFamily(membership.data?.family_id);
-  const isAdmin = useIsAdmin();
+
   // Undefined (loading) → treat as visible to avoid a flash-out.
   const showMaintenance = familyRow?.uses_equipment !== false;
 
