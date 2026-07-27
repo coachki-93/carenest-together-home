@@ -3024,6 +3024,34 @@ export const en = {
       teamLogoutWarning: "Everyone using the shared account will be logged out within the hour. They'll need the new password to sign back in.",
     },
   },
+  billing: {
+    banner: {
+      trial_one: "Free trial — 1 day left. Add a subscription to keep writing after that.",
+      trial_other: "Free trial — {{count}} days left. Add a subscription to keep writing after that.",
+      pastDue: "Payment failed. Please update your card — writing is paused soon.",
+      readOnly: "Read-only. Your data is safe — subscribe to log again.",
+      manage: "Manage billing",
+    },
+    card: {
+      title: "Subscription",
+      subtitle: "One subscription per family. The owner manages billing.",
+      foundingPlan: "Founding member — monthly",
+      standardPlan: "Standard — monthly",
+      foundingLocked: "Founding rate — locked for life as an early family.",
+      monthlyOnly: "Billed monthly. Cancel any time; your data is preserved.",
+      subscribe: "Start subscription",
+      managePortal: "Manage billing",
+      statusTrial_one: "Free trial — 1 day left (ends {{date}}).",
+      statusTrial_other: "Free trial — {{count}} days left (ends {{date}}).",
+      statusActive: "Active. Next charge on {{date}}.",
+      statusCancelsAt: "Active until {{date}}, then cancels.",
+      statusPastDue: "Payment failed. Grace period ends {{date}}.",
+      statusCanceled: "Canceled. Subscribe to restore writing.",
+      statusInactive: "Not active. Subscribe to enable writing.",
+      statusNone: "No subscription yet.",
+      dataPreserved: "If your subscription lapses, the app becomes read-only. Your data is never deleted.",
+    },
+  },
 };
 
 
