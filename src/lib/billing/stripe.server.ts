@@ -11,7 +11,7 @@ export function getStripeClient(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
   return new Stripe(key, {
-    apiVersion: "2024-11-20.acacia",
+    apiVersion: "2026-06-24.dahlia",
     httpClient: Stripe.createFetchHttpClient(),
   });
 }
