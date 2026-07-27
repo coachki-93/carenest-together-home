@@ -2121,8 +2121,8 @@ export const en = {
       fluidsToday: "today",
       glucose: {
         label: "Glucose",
-        planned: "Planned",
-        a11y: "Glucose — planned feature",
+        planned: "mmol/L",
+        a11y: "Glucose — logged in mmol/L",
       },
     },
     teams: {
@@ -2131,7 +2131,9 @@ export const en = {
       body1:
         "A caregiver's whole job in CareNest is a list: the next task, with its time. If they can follow a list, they already know the system.",
       body2:
-        "You never have to play IT support. A single-use code lets them in, they tap their name, and the day itself shows them what to do — in the browser, nothing to install, no account to create.",
+        "You never have to play IT support. You give your team one shared login; each caregiver taps their name and the day itself shows them what to do — in the browser, nothing to install, no personal account to create.",
+      body2b:
+        "Prefer to invite people individually? You still can — send a single-use invite code instead.",
       body3:
         "And when something does slip — a dose runs late, a check is forgotten — CareNest notices and tells you. You don't have to check that everyone checked.",
       closing:
@@ -2139,10 +2141,10 @@ export const en = {
     },
     teamsMock: {
       title: "First shift",
-      step1Label: "Invited with a one-time code",
-      step1Email: "ryan@example.se",
-      step1Code: "H3K9PQ2M",
-      step1Status: "Accepted",
+      step1Label: "One shared login for the whole team",
+      step1Email: "andersson-team",
+      step1Code: "••••••••••",
+      step1Status: "Signed in",
       step2Label: "Taps his name",
       step3Label: "The day is already there",
       step3Time: "07:15",
