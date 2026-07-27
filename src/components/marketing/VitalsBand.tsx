@@ -9,10 +9,11 @@ const display = { fontFamily: "var(--font-display)", fontWeight: 600 } as const;
 /**
  * VITALS band — deep-violet section showing the app's real vitals snapshot
  * treatment. Age-adjusted screening bands with a demo 4-year-old profile:
- * HR 70–115 bpm, breathing 20–25 br/min, SpO2 95–100 %, temp 36.0–37.9 °C.
- * Fluids has no reference band → running-total treatment. Glucose is a
- * planned-feature tile with a muted outline pill.
+ * HR 70–115 bpm, breathing 20–25 br/min, SpO2 95–100 %, temp 36.0–37.9 °C,
+ * glucose 4.0–10.0 mmol/L (screening reference). Fluids has no reference band
+ * → running-total treatment.
  */
+
 export function VitalsBand() {
   const { t } = useTranslation();
   return (
@@ -97,12 +98,18 @@ export function VitalsBand() {
                     unit="ml"
                     runningTotalLabel={t("marketing.vitals.fluidsToday")}
                   />
-                  <PlannedTile
+                  <VitalTile
                     tileDelayMs={400}
+                    icon={<Droplet className="size-4 text-marketing-sage" />}
                     label={t("marketing.vitals.glucose.label")}
-                    plannedText={t("marketing.vitals.glucose.planned")}
-                    a11y={t("marketing.vitals.glucose.a11y")}
+                    value="5.5"
+                    unit="mmol/L"
+                    low={4.0}
+                    high={10.0}
+                    reading={5.5}
+                    rangeCaption={t("marketing.vitals.glucose.range")}
                   />
+
                 </div>
                 <p className="mt-4 text-[11px] text-marketing-muted leading-snug px-1">
                   {t("marketing.vitals.footnote")}
@@ -206,47 +213,7 @@ function VitalTile({
   );
 }
 
-function PlannedTile({
-  label,
-  plannedText,
-  a11y,
-  tileDelayMs = 0,
-}: {
-  label: string;
-  plannedText: string;
-  a11y: string;
-  tileDelayMs?: number;
-}) {
-  return (
-    <div
-      className="mk-slide-in rounded-2xl border border-dashed border-marketing-line bg-transparent p-3.5 md:p-4 opacity-80"
-      style={{ ["--mk-delay" as string]: `${tileDelayMs}ms` }}
-      aria-label={a11y}
-      role="group"
-    >
-      <div className="flex items-center gap-1.5">
-        <Droplet className="size-4 text-marketing-muted" />
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-marketing-muted">
-          {label}
-        </p>
-      </div>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span
-          className="text-2xl text-marketing-muted/70"
-          style={display}
-          aria-hidden
-        >
-          — 
-        </span>
-        <span className="text-xs text-marketing-muted">mmol/L</span>
-      </div>
-      <div className="mt-3">
-        <span className="inline-flex items-center rounded-full border border-marketing-line px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-marketing-muted bg-transparent">
-          {plannedText}
-        </span>
-      </div>
-    </div>
-  );
-}
+
+
 
 export default VitalsBand;

@@ -2121,9 +2121,10 @@ export const en = {
       fluidsToday: "today",
       glucose: {
         label: "Glucose",
-        planned: "mmol/L",
+        range: "4.0 – 10.0 mmol/L",
         a11y: "Glucose — logged in mmol/L",
       },
+
     },
     teams: {
       kicker: "Built for rotating teams",

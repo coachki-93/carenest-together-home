@@ -2120,9 +2120,10 @@ export const sv = {
       fluidsToday: "idag",
       glucose: {
         label: "Blodsocker",
-        planned: "mmol/L",
+        range: "4,0 – 10,0 mmol/L",
         a11y: "Blodsocker — loggas i mmol/L",
       },
+
     },
     teams: {
       kicker: "Byggd för roterande team",
