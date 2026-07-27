@@ -2631,8 +2631,8 @@ export const sv = {
       b2: "Referensintervall per barn som ägaren kan justera",
       b3: "24 timmar, 7 dagar, 30 dagar med ett tryck",
       b4: "Varningar vid upprepade värden utanför intervall",
-      b5: "Puls, SpO₂, temperatur, vikt, anfall, vätska och andningsfrekvens — allt loggas",
-      b6: "Fler mätvärden planerade — blodsocker med flera",
+      b5: "Puls, SpO₂, temperatur, vikt, anfall, vätska, andningsfrekvens och blodsocker — allt loggas",
+      b6: "Intervall visas bara för det ert barn behöver — sätt diabetes som ett vårdbehov så dyker blodsocker (mmol/L) upp automatiskt",
     },
     meds: {
       kicker: "MEDICINER",
