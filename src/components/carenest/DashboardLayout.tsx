@@ -5,6 +5,8 @@ import { AlertTriangle } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { ProfileSelector } from "./ProfileSelector";
+import { SubscriptionBanner } from "./SubscriptionBanner";
+import { ReadOnlyProvider } from "@/lib/billing/WriteGate";
 
 
 interface DashboardLayoutProps {
