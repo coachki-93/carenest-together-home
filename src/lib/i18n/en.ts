@@ -3052,6 +3052,7 @@ export const en = {
       statusNone: "No subscription yet.",
       dataPreserved: "If your subscription lapses, the app becomes read-only. Your data is never deleted.",
     },
+    ownerOnly: "Only the family owner can manage the subscription.",
   },
 };
 
