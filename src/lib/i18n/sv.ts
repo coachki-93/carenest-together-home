@@ -2079,9 +2079,11 @@ export const sv = {
       i3: "Gemensam kalender",
       i4: "Vårdinstruktioner",
       i5: "Nödinformation",
-      i6: "Vårdteam — bjud in med en kod; ägare och vårdgivare med rätt åtkomst",
+      i6: "Vårdteam — gemensamt teamkonto eller personliga inbjudningar; roller för ägare och vårdgivare",
       i7: "Inköpslista — delad, enkel, kopplad till era förråd",
       i8: "Lugna notiser — en knuff när något är sent, tyst när allt är bra",
+      i9: "Gemensamt teamkonto — en inloggning för hela vårdteamet; byt lösenord för att ta bort åtkomsten",
+      i10: "Händelsedagbok — logga anfall, andningshändelser eller en missad måltid; det följer med till nästa överlämning",
     },
     complex: {
       title: "För avancerad omvårdnad",
@@ -2093,6 +2095,8 @@ export const sv = {
       i4: "Vårdplatskontroll",
       i5: "Passöverlämningar",
       i6: "Passöverlämningar med förifyllning, läskvitton och attribution per vårdgivare",
+      i7: "Anpassar sig efter ert barn — vitalvärden, syrgas, underhåll och kort på översikten dyker upp bara om de är relevanta",
+      i8: "Föreslagna upplägg för sondmatning, andning och metabol vård — CareNest ger strukturen, ni fyller i vad ert vårdteam har ordinerat",
     },
     team: {
       mockLabel: "Vårdplatskontroll · 14:12",
