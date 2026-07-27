@@ -2953,8 +2953,16 @@ export const en = {
   },
   admin: {
     navLabel: "Platform admin",
+    consoleTitle: "CareNest Admin",
+    exit: "Exit admin",
+    nav: {
+      sections: "Sections",
+      accounts: "Accounts",
+      families: "Families",
+    },
     title: "Platform admin — support tools",
     subtitle: "Metadata only. No health data is accessible from here.",
+
     banner: {
       title: "Support tooling",
       body: "You're viewing account and family metadata to help with support. Health data is structurally out of reach from this surface. Every view and action is written to an audit log.",

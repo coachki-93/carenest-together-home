@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import {
-  ShieldAlert,
   Loader2,
   Search,
   Users2,
@@ -16,7 +15,7 @@ import {
   EyeOff,
   ExternalLink,
 } from "lucide-react";
-import { DashboardLayout } from "@/components/carenest/DashboardLayout";
+import { AdminLayout } from "@/components/carenest/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,7 +35,12 @@ import {
 } from "@/lib/data/admin.functions";
 import { toast } from "@/lib/notify";
 
+type AdminSearch = { tab?: "accounts" | "families" };
+
 export const Route = createFileRoute("/_authenticated/admin")({
+  validateSearch: (s: Record<string, unknown>): AdminSearch => ({
+    tab: s.tab === "families" ? "families" : "accounts",
+  }),
   head: () => ({
     meta: [
       { title: "Platform admin — CareNest" },
@@ -50,6 +54,8 @@ function AdminPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isAdmin = useIsAdmin();
+  const search = useSearch({ from: "/_authenticated/admin" });
+  const tab = search.tab ?? "accounts";
 
   useEffect(() => {
     if (isAdmin.isSuccess && isAdmin.data === false) {
@@ -66,28 +72,19 @@ function AdminPage() {
   }
 
   return (
-    <DashboardLayout
-      title={t("admin.title")}
+    <AdminLayout
+      title={
+        tab === "families"
+          ? t("admin.families.title")
+          : t("admin.accounts.title")
+      }
       subtitle={t("admin.subtitle")}
     >
-      <div className="space-y-6">
-        <div
-          role="alert"
-          className="rounded-2xl border-2 border-amber-400 bg-amber-50 text-amber-950 p-4 flex items-start gap-3"
-        >
-          <ShieldAlert className="size-5 shrink-0 mt-0.5" aria-hidden />
-          <div className="text-sm">
-            <p className="font-bold">{t("admin.banner.title")}</p>
-            <p>{t("admin.banner.body")}</p>
-          </div>
-        </div>
-
-        <FamiliesSection />
-        <AccountsSection />
-      </div>
-    </DashboardLayout>
+      {tab === "families" ? <FamiliesSection /> : <AccountsSection />}
+    </AdminLayout>
   );
 }
+
 
 // ---------------------------------------------------------------------------
 // Families
