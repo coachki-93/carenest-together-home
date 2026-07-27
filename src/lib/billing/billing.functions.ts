@@ -121,7 +121,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           plan: fam.founding_member ? "founding" : "standard",
         },
       },
-      allow_promotion_codes: false,
+      allow_promotion_codes: true,
       billing_address_collection: "auto",
     });
 

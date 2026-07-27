@@ -10,12 +10,17 @@
 
 set -euo pipefail
 
-FILE="src/lib/data/admin.functions.ts"
+FILES=(
+  "src/lib/data/admin.functions.ts"
+  "src/lib/data/billing-admin.functions.ts"
+)
 
-if [[ ! -f "$FILE" ]]; then
-  echo "check-admin-minimization: $FILE not found" >&2
-  exit 1
-fi
+for FILE in "${FILES[@]}"; do
+  if [[ ! -f "$FILE" ]]; then
+    echo "check-admin-minimization: $FILE not found" >&2
+    exit 1
+  fi
+done
 
 # Allow-list (informational — for humans reading this script):
 #   families, family_members, profiles, team_accounts,

@@ -211,7 +211,7 @@ export const adminListCoupons = createServerFn({ method: "POST" })
 
     const list = await stripe.promotionCodes.list({
       limit: 100,
-      expand: ["data.coupon"],
+      expand: ["data.promotion.coupon"],
     });
 
     const coupons = list.data.map(toCouponDTO);
