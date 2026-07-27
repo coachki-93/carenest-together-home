@@ -1,6 +1,6 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Users2, UserCircle2, LogOut, ShieldAlert } from "lucide-react";
+import { Users2, UserCircle2, LogOut, ShieldAlert, Ticket } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -29,7 +29,10 @@ export function AdminSidebar() {
   const search = useRouterState({ select: (s) => s.location.search }) as {
     tab?: string;
   };
-  const activeTab = search.tab === "families" ? "families" : "accounts";
+  const activeTab: "accounts" | "families" | "coupons" =
+    search.tab === "families" || search.tab === "coupons"
+      ? search.tab
+      : "accounts";
   const membership = useMyMembership();
   const hasFamily = !!membership.data;
   const navigate = useNavigate();
@@ -46,6 +49,12 @@ export function AdminSidebar() {
       title: t("admin.nav.families"),
       icon: Users2,
       tab: "families" as const,
+    },
+    {
+      key: "coupons",
+      title: t("admin.nav.coupons"),
+      icon: Ticket,
+      tab: "coupons" as const,
     },
   ];
 
