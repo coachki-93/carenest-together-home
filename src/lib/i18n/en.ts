@@ -2080,9 +2080,11 @@ export const en = {
       i3: "Shared calendar",
       i4: "Care instructions",
       i5: "Emergency info",
-      i6: "Care team — invite with a code; owners and caregivers with the right access",
+      i6: "Care team — shared team account or personal invites; owner and caregiver roles",
       i7: "Shopping list — shared, simple, connected to your supplies",
       i8: "Quiet notifications — a nudge when something is late, silence when all is well",
+      i9: "Shared team account — one login for the whole care team; rotate the password to remove access",
+      i10: "Care events journal — log seizures, breathing episodes or a missed feed; it flows into the next handover",
     },
     complex: {
       title: "For complex care",
@@ -2094,6 +2096,8 @@ export const en = {
       i4: "Care Place Control",
       i5: "Shift handovers",
       i6: "Shift handovers with prefill, read receipts, and per-caregiver attribution",
+      i7: "Fits your child — vitals, oxygen, maintenance and dashboard cards appear only if they're relevant",
+      i8: "Suggested setups for feeding, respiratory and metabolic care — CareNest offers the structure, you fill in your clinician's specifics",
     },
     team: {
       mockLabel: "Care place check · 14:12",
