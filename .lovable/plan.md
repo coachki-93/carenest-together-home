@@ -1,163 +1,53 @@
-# Handover reminder + editing — revised plan (v2)
+# Unified "+ Log" dialog (Today + Events)
 
-Repo check applied: `handovers` has an existing `Authors can update their handovers` UPDATE policy (no time gate) and a `handovers_set_updated_at` BEFORE UPDATE trigger. Real columns: `shift` (not `shift_label`), `shift_start`, `shift_end`, `summary`, `sleep`, `mood`, `seizures`, `fluids`, `meds`, `notes`, `edited_at`.
+One dialog component, used identically on the Today (dashboard) page and the Events page. Vitals stay quick; events gain the full incident detail that only the Events page had.
 
----
+## What changes
 
-## Decisions per your corrections
+- New shared component `src/components/carenest/UnifiedLogDialog.tsx`, built by extending the existing QuickLogDialog structure (it already handles both vitals and events, the actor guard, and the preset picker). CareEventDialog's rich fields move in as the "event selected" branch.
+- Today page (`dashboard.tsx`) swaps `QuickLogDialog` → `UnifiedLogDialog`.
+- Events page (`events.tsx`) uses `UnifiedLogDialog` for the "+ Log event" (create) button.
+- `QuickLogDialog.tsx` is deleted once nothing imports it.
 
-### 1. UPDATE policy approach — **tighten the existing policy** (do not add a second)
+### Why extend QuickLog rather than CareEventDialog
 
-Alter the existing policy in place to add the server-side time gate. This keeps a single UPDATE policy on the table (no overlap), keeps the `updated_at` trigger, and blocks direct client UPDATEs after the window. The RPC is `SECURITY DEFINER` and does its own author + window check, so the policy is belt-and-braces.
+QuickLog already owns the two-step "pick a tile, then fill fields" flow and the vital write path; CareEventDialog owns a single flat event form. Adding a step to CareEventDialog would mean rebuilding the picker plus the vitals hook wiring, so the QuickLog shell is the cheaper, lower-risk base.
 
-Diff:
+## Option catalog (identical on both pages)
 
-```sql
--- Replace the broad update policy with a time-gated one.
-DROP POLICY "Authors can update their handovers" ON public.handovers;
+Step 1 of the dialog shows two labelled groups:
 
-CREATE POLICY "Authors can update their handovers within window"
-  ON public.handovers
-  FOR UPDATE
-  TO authenticated
-  USING (
-    author_id = auth.uid()
-    AND private.is_family_member(family_id, auth.uid())
-    AND created_at > now() - interval '2 hours'
-  )
-  WITH CHECK (
-    author_id = auth.uid()
-    AND private.is_family_member(family_id, auth.uid())
-    AND created_at > now() - interval '2 hours'
-  );
-```
+- Vitals: temperature, heart_rate, spo2, breathing, fluids, diaper (unchanged presets, same icons/tones).
+- Events: the full `CareEventType` list ordered by `orderedEventTypesFor(child.care_needs)` — seizure, desaturation, vomiting, feed_issue, breathing_difficulty, behavioural, injury, other — using `CARE_EVENT_META` icons so tiles match the Events page.
 
-DELETE policy and `handovers_set_updated_at` trigger untouched.
+The old QuickLog "note" tile is dropped; `other` from the event list replaces it (same underlying `type: "other"`).
 
-**Why tighten rather than REVOKE:** the client currently issues no direct UPDATEs (all edits will go through the RPC), so functionally either works. Tightening is safer if any future code path forgets and calls `.update()` directly — it still gets blocked after 2h. REVOKE would also break the trigger-free path future code might legitimately want. Tightening wins on defense-in-depth.
+## Progressive fields (step 2)
 
-### 2. Edit window — **2h constant, defined once, mirrored in UI**
+Selected a VITAL:
+- numeric value + unit chip, context chips, notes, `datetime-local` time with a "Now" shortcut. Same as today — a quick temp stays 2 taps.
 
-Single source of truth: `HANDOVER_EDIT_WINDOW_MINUTES = 120` exported from `src/lib/data/handovers.ts`. The RPC hardcodes `interval '2 hours'` and the UI gate calls `canEditHandover(h, uid, now)` which uses the exported constant. Both are literals; a code review diff of one place is required to change either. A comment on the constant flags "must equal the RPC's interval." (Not derivable from the DB without a round-trip; keeping it a plain constant.)
+Selected an EVENT:
+- date + time inputs in the family timezone (`dateInputIn` / `timeInputIn` read, `zonedWallClockToDate` write), severity chips (none/mild/moderate/severe), duration min+sec, description (required), action taken.
 
-UI gate is cosmetic — hides/disables the Edit button; server RPC + policy are the real enforcement.
+A "← change type" link returns to the picker in both cases.
 
-### 3. Atomic RPC (`edit_handover`) — re-checks author + window internally
+## Writes (unchanged shape)
 
-`SECURITY DEFINER` → RLS bypassed → RPC MUST enforce author + window itself. Confirmed in the SQL below (`RAISE EXCEPTION` on either violation, before any write). Reads-delete runs inside the same function after the UPDATE, so no half-apply.
+- Vitals → `useLogVital` exactly as now.
+- Events → `useCreateCareEvent` with `severity`, `action_taken`, `duration_seconds` now populated from the form instead of hardcoded `null`. That is the functional upgrade.
+- Caregiver attribution stays `useCurrentActor` + `guardActingProfile`; `created_by` is the signed-in user id.
 
-After the reads-delete + query invalidation:
-- `useHandoverReadsBulk` refetches → other viewers' `isUnreadForViewer` re-evaluates against the new empty reads array AND the fresh `edited_at`, both routes give unread=true.
-- `HandoverUnreadBanner` recomputes because it already keys off `edited_at` and reads.
-- Author's own view: their receipt is also deleted; the card's "read by" pill goes back to empty. Acceptable — author knows they just edited.
+## CareEventDialog stays — for editing only
 
----
+`events.tsx` passes `event={editing}` for the pencil action gated by `canEditCareEvent` (2h window), and CareEventDialog is the only thing wired to `useEditCareEvent`. It is kept, unchanged, for that edit flow; only its create usage is replaced. Editing is untouched.
 
-## Migration (RPC + policy tighten)
+## Cross-appearance
 
-```sql
--- 1) Tighten existing UPDATE policy to add server-side 2h window.
-DROP POLICY "Authors can update their handovers" ON public.handovers;
+Events logged from Today already write to `care_events`, so they appear on the Events page — confirmed, no change needed. Vitals go to the vitals system and do not appear in the events list; that is expected and stays.
 
-CREATE POLICY "Authors can update their handovers within window"
-  ON public.handovers
-  FOR UPDATE
-  TO authenticated
-  USING (
-    author_id = auth.uid()
-    AND private.is_family_member(family_id, auth.uid())
-    AND created_at > now() - interval '2 hours'
-  )
-  WITH CHECK (
-    author_id = auth.uid()
-    AND private.is_family_member(family_id, auth.uid())
-    AND created_at > now() - interval '2 hours'
-  );
+## Technical notes
 
--- 2) Atomic edit RPC.
-CREATE OR REPLACE FUNCTION public.edit_handover(
-  _id uuid,
-  _shift public.shift_label,
-  _shift_start timestamptz,
-  _shift_end timestamptz,
-  _summary text,
-  _sleep text,
-  _mood text,
-  _seizures text,
-  _fluids text,
-  _meds text,
-  _notes text
-)
-RETURNS public.handovers
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  v_uid uuid := auth.uid();
-  v_row public.handovers%ROWTYPE;
-BEGIN
-  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
-
-  SELECT * INTO v_row FROM public.handovers WHERE id = _id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'Handover not found'; END IF;
-  IF v_row.author_id <> v_uid THEN RAISE EXCEPTION 'Not the author'; END IF;
-  IF v_row.created_at <= now() - interval '2 hours' THEN
-    RAISE EXCEPTION 'Edit window closed';
-  END IF;
-
-  UPDATE public.handovers
-    SET shift = _shift,
-        shift_start = _shift_start,
-        shift_end = _shift_end,
-        summary = _summary,
-        sleep = _sleep,
-        mood = _mood,
-        seizures = _seizures,
-        fluids = _fluids,
-        meds = _meds,
-        notes = _notes,
-        edited_at = now()
-    WHERE id = _id
-    RETURNING * INTO v_row;
-  -- updated_at is bumped by the existing handovers_set_updated_at trigger.
-
-  -- Reset read receipts so every viewer (incl. those who already read)
-  -- gets re-prompted on the new content.
-  DELETE FROM public.handover_reads WHERE handover_id = _id;
-
-  RETURN v_row;
-END;
-$$;
-
-REVOKE ALL ON FUNCTION public.edit_handover(uuid, public.shift_label, timestamptz, timestamptz, text, text, text, text, text, text, text) FROM public;
-GRANT EXECUTE ON FUNCTION public.edit_handover(uuid, public.shift_label, timestamptz, timestamptz, text, text, text, text, text, text, text) TO authenticated;
-```
-
-Notes:
-- `author_id`, `caregiver_profile_id`, `family_id`, `child_id`, `created_at` intentionally not touched — attribution preserved.
-- The RPC signature matches every field the current create dialog writes; no schema changes.
-
----
-
-## Client work (after migration approved)
-
-- `src/lib/data/handovers.ts`: export `HANDOVER_EDIT_WINDOW_MINUTES = 120`, `canEditHandover(h, uid, now)`, `useEditHandover()` calling `supabase.rpc('edit_handover', {...})`; invalidates `handovers`, `handovers-latest`, `handover-reads`.
-- `src/lib/data/handover-due.ts`: add `latestHandover: { created_at; shift_start; shift_end } | null` arg. A candidate window `[at, until)` is "covered" iff a latest handover exists whose `shift_start` (fallback `created_at`) lies within `[at - 60min, until)` in family-tz. Hook returns `{ ...item, covered }` instead of `null`, so the dashboard can pick state (a) vs (b).
-- Dashboard: soft banner variant when `covered`, deep-linking to `/handover?edit={latest.id}`.
-- `src/routes/_authenticated/handover.tsx`: accept `?edit=` param; if editable → open dialog prefilled → save via `useEditHandover`. Author but expired → disabled button + `editLocked` tooltip. Non-author → no Edit control. Show "redigerad {HH:mm}" marker (family-tz) on cards with `edited_at`.
-- i18n en/sv: `handoverReminder.softTitle`, `softBody`, `softAction`, `editedMarker`, `editLocked`.
-
----
-
-## Verification plan (must pass before I say done)
-
-- `bunx tsgo --noEmit` clean.
-- (a) **Author within 2h, via UI**: edit succeeds, `edited_at` set, `handover_reads` for that id empty, second caregiver's unread banner reappears.
-- (b) **Author after 2h, via direct API** (the important one): using a Playwright-authenticated browser session, `await supabase.rpc('edit_handover', {...})` on a hand-picked >2h-old handover → expect `Edit window closed`. Then `await supabase.from('handovers').update({...}).eq('id', ...)` on the same row → expect an RLS/permission error (0 rows updated). Log both responses in the summary.
-- (c) **Non-author RPC call**: signed in as a different family member → `Not the author`.
-- (d) **Banner**: with reminder time active and no handover → write reminder shows; write a handover → banner switches to soft final-notes; edit + save → banner still soft (still covered); manual dismiss → hidden until next window.
-
----
-
-Ready for approval on the migration above; I'll apply it, then build.
+- No schema, RLS, query, or billing changes. No change to the events list, filters, archive, or edit-window logic.
+- i18n: reuse existing `careEvents.*` and `vitals.*` keys; only new keys are the two group headings (`quickLog.groups.vitals` / `quickLog.groups.events`), added to both `en.ts` and `sv.ts`.
+- Verified green with `tsgo` and the existing vitest suite.
