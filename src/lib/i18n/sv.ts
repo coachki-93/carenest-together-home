@@ -531,6 +531,7 @@ export const sv = {
     resumeDismiss: "Dölj",
   },
   quickLog: {
+    groups: { vitals: "Värden", events: "Händelser" },
     title: "Snabblogg",
     subtitle: "Logga en spontan händelse som sker just nu.",
     changeType: "Välj en annan händelse",
