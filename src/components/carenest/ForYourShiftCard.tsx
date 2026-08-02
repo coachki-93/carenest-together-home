@@ -25,7 +25,7 @@ interface Props {
  * `is_critical` (or similar) flag by the user will also render here.
  * Non-critical schedule items live on their own pages by design.
  *
- * Note: Event logging is centralised in QuickLogDialog (dashboard) and the
+ * Note: Event logging is centralised in UnifiedLogDialog (dashboard) and the
  * /events page. Do not add a duplicate "Log event" entry point here.
  */
 export function ForYourShiftCard({ familyId }: Props) {
