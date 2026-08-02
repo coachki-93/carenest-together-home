@@ -531,6 +531,7 @@ export const en = {
     resumeDismiss: "Dismiss",
   },
   quickLog: {
+    groups: { vitals: "Vitals", events: "Events" },
     title: "Quick log",
     subtitle: "Log a spontaneous event happening right now.",
     changeType: "Choose a different event",

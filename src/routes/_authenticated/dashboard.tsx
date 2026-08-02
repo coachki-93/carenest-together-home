@@ -91,7 +91,7 @@ import {
   type NotesSpec,
 } from "@/components/carenest/TaskActionDialog";
 import { ByProfile } from "@/components/carenest/ByProfile";
-import { QuickLogDialog } from "@/components/carenest/QuickLogDialog";
+import { UnifiedLogDialog } from "@/components/carenest/UnifiedLogDialog";
 import { WelcomeTour } from "@/components/carenest/WelcomeTour";
 import { buildWelcomePages } from "@/lib/onboarding/welcome-scenario";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
@@ -1675,11 +1675,12 @@ function DashboardPage() {
         onClose={closeTour}
         onFinish={closeTour}
       />
-      <QuickLogDialog
+      <UnifiedLogDialog
         open={quickLogOpen}
         onOpenChange={setQuickLogOpen}
         familyId={familyId}
         childId={child?.id ?? null}
+        careNeeds={child?.care_needs}
         loggedBy={user?.id ?? null}
       />
     </DashboardLayout>

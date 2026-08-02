@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { CareEventDialog } from "@/components/carenest/CareEventDialog";
+import { UnifiedLogDialog } from "@/components/carenest/UnifiedLogDialog";
 import {
   useCareEvents,
   useSetCareEventActive,
@@ -96,6 +97,7 @@ function EventsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<CareEvent | null>(null);
+  const [logOpen, setLogOpen] = useState(false);
   const setActive = useSetCareEventActive();
 
   const { data: events, isLoading } = useCareEvents(familyId, {
@@ -137,10 +139,7 @@ function EventsPage() {
           <LanguageToggle />
           <Button
             size="sm"
-            onClick={() => {
-              setEditing(null);
-              setDialogOpen(true);
-            }}
+            onClick={() => setLogOpen(true)}
             className="rounded-full font-semibold"
           >
             <Plus className="size-4 mr-1" />
@@ -334,6 +333,17 @@ function EventsPage() {
       </div>
 
       {familyId && (
+        <UnifiedLogDialog
+          open={logOpen}
+          onOpenChange={setLogOpen}
+          familyId={familyId}
+          childId={child?.id ?? null}
+          careNeeds={child?.care_needs}
+        />
+      )}
+
+      {/* Edit-only: the 2h author edit window still uses CareEventDialog. */}
+      {familyId && editing && (
         <CareEventDialog
           open={dialogOpen}
           onOpenChange={(o) => {
