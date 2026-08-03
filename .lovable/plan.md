@@ -1,61 +1,67 @@
-# Fix: trialing family without a Stripe customer sees "Manage subscription"
+# Fix: portal-initiated subscription webhooks never update the row
 
-## Cause
+## Problem
 
-Both billing surfaces branch on `isActive`, which is intentionally true during a
-trial. A trial family has no `stripe_customer_id` yet, so the Portal call throws
-"No Stripe customer for this family yet". The gate should be customer existence.
+`customer.subscription.updated` / `.deleted` events triggered from the Stripe
+billing portal arrive with empty subscription metadata. The handler resolves
+the family only through `sub.metadata?.family_id`, so `familyId` is `null`, the
+update block is skipped entirely, and the request falls through to `200` with
+no database write and no log line. That matches what Stripe shows: two events
+delivered 200, row untouched.
 
-`stripe_customer_id` is already selected by `getFamilySubscription`, so no data
-change is needed.
+## Change
 
-## Changes
+One file: `src/routes/api/public/hooks/stripe.ts`, only the
+`customer.subscription.created / .updated / .deleted` case.
 
-### src/components/carenest/BillingCard.tsx
+1. Keep `sub.metadata?.family_id` as the primary lookup.
+2. When it is missing, fall back to selecting `family_id` from
+   `family_subscriptions` where `stripe_subscription_id = sub.id`.
+3. Plan is only overwritten when subscription metadata actually carries one, so
+   the fallback path does not clobber `founding` with a default.
+4. If the family is still unresolved, log an error including the Stripe event id
+   and subscription id instead of returning a silent 200.
 
-```diff
-+  const hasCustomer = !!s?.row?.stripe_customer_id;
-...
--            {s?.isActive ? (
-+            {hasCustomer ? (
-               <Button onClick={() => openPortal.mutate()} ...>
+Untouched: signature verification, the idempotency ledger, the
+`checkout.session.completed` path, `invoice.payment_failed`.
+
+## Diff (conceptual)
+
+```text
+case "customer.subscription.updated": {
+  const sub = event.data.object;
+- const familyId = sub.metadata?.family_id ?? null;
++ let familyId = sub.metadata?.family_id ?? null;
++ if (!familyId) {
++   const { data } = await supabaseAdmin
++     .from("family_subscriptions")
++     .select("family_id")
++     .eq("stripe_subscription_id", sub.id)
++     .maybeSingle();
++   familyId = data?.family_id ?? null;
++ }
+  if (familyId) {
+-   const plan = sub.metadata?.plan === "standard" ? "standard" : "founding";
+    const update: SubUpdate = {
+      stripe_subscription_id: sub.id,
+      status: mapStripeStatus(sub.status),
+-     plan,
+      current_period_end: subscriptionPeriodEndIso(sub),
+      cancel_at_period_end: sub.cancel_at_period_end,
+    };
++   if (sub.metadata?.plan) update.plan = sub.metadata.plan === "standard" ? "standard" : "founding";
+    ...
++ } else {
++   console.error("[stripe webhook] unresolved family", event.id, sub.id);
+  }
+}
 ```
-
-### src/components/carenest/SubscriptionBanner.tsx
-
-```diff
--          {sub.data?.isActive && !sub.data?.isCanceled
-+          {sub.data?.row?.stripe_customer_id
-             ? t("billing.banner.manage")
-             : t("billing.banner.subscribe")}
-```
-
-Banner visibility logic (line 26) stays untouched. Note: the banner button
-navigates to `/billing`, it never calls Portal directly — the label is the only
-thing corrected there.
-
-### src/lib/billing/billing.functions.ts (createPortalSession)
-
-Keep the throw (server must stay authoritative) but make the message
-actionable rather than internal-sounding:
-
-```diff
--      throw new Error("No Stripe customer for this family yet");
-+      throw new Error(
-+        "This family doesn't have a payment account yet — start a subscription first.",
-+      );
-```
-
-## Why Portal can no longer be called without a customer
-
-`createPortalSession` is invoked from exactly one place: `openPortal.mutate()` in
-`BillingCard`, inside the branch now guarded by `hasCustomer`. The banner only
-navigates. So the throw becomes unreachable from the UI and remains a
-defense-in-depth guard for direct RPC calls.
 
 ## Verification
 
-- Trial family (no customer): card and banner both read "Subscribe"; Subscribe
-  opens Stripe Checkout, which creates the customer.
-- After subscribing: `stripe_customer_id` present → both read "Manage"; Portal opens.
-- `tsgo --noEmit` clean; screenshot of the trial-state billing page.
+- `tsgo --noEmit` clean.
+- Re-cancel via the portal: the row should become `status: active`,
+  `cancel_at_period_end: true`, `updated_at` refreshed; the Subscription page
+  should render "Cancels on [date]".
+- Re-subscribe still activates through `checkout.session.completed` (unchanged
+  code path).
