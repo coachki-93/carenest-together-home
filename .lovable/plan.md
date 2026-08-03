@@ -1,52 +1,61 @@
-# Fix: admin coupons show "—%" / "once"
+# Fix: trialing family without a Stripe customer sees "Manage subscription"
 
-## Actual root cause (differs from the reported one)
+## Cause
 
-`toCouponDTO(promo, couponOverride?)` already prefers `couponOverride` and already
-falls back to `promo.promotion.coupon` (the list call does expand
-`data.promotion.coupon`, so the list data is fine).
+Both billing surfaces branch on `isActive`, which is intentionally true during a
+trial. A trial family has no `stripe_customer_id` yet, so the Portal call throws
+"No Stripe customer for this family yet". The gate should be customer existence.
 
-The real bug is the call site on line 217:
+`stripe_customer_id` is already selected by `getFamilySubscription`, so no data
+change is needed.
 
-```ts
-const coupons = list.data.map(toCouponDTO);
-```
+## Changes
 
-`Array.prototype.map` passes `(item, index, array)`, so `couponOverride` receives
-the **array index**. For the first row that's `0`; `0 ?? x` is `0` (not nullish),
-so `rawCoupon = 0`, `coupon = {}` → `percentOff: null` → `"—%"` and
-`duration: "once"`. Every row after index 0 gets a number too, same result.
-So *all* rows in the list render "—%" / "once", regardless of what Stripe holds.
-
-## Changes (src/lib/data/billing-admin.functions.ts only)
+### src/components/carenest/BillingCard.tsx
 
 ```diff
--  const rawCoupon =
--    couponOverride ??
--    (promo.promotion && typeof promo.promotion === "object"
--      ? promo.promotion.coupon
--      : promo.coupon);
-+  // Only trust couponOverride when it is a real object — guards against
-+  // accidental positional args (e.g. Array#map's index).
-+  const rawCoupon =
-+    couponOverride && typeof couponOverride === "object"
-+      ? couponOverride
-+      : promo.promotion && typeof promo.promotion === "object"
-+        ? promo.promotion.coupon
-+        : promo.coupon;
++  const hasCustomer = !!s?.row?.stripe_customer_id;
+...
+-            {s?.isActive ? (
++            {hasCustomer ? (
+               <Button onClick={() => openPortal.mutate()} ...>
 ```
+
+### src/components/carenest/SubscriptionBanner.tsx
 
 ```diff
--    const coupons = list.data.map(toCouponDTO);
-+    const coupons = list.data.map((promo) => toCouponDTO(promo));
+-          {sub.data?.isActive && !sub.data?.isCanceled
++          {sub.data?.row?.stripe_customer_id
+             ? t("billing.banner.manage")
+             : t("billing.banner.subscribe")}
 ```
 
-No other file changes. Create and deactivate paths already pass a full coupon
-object and keep working unchanged.
+Banner visibility logic (line 26) stays untouched. Note: the banner button
+navigates to `/billing`, it never calls Portal directly — the label is the only
+thing corrected there.
+
+### src/lib/billing/billing.functions.ts (createPortalSession)
+
+Keep the throw (server must stay authoritative) but make the message
+actionable rather than internal-sounding:
+
+```diff
+-      throw new Error("No Stripe customer for this family yet");
++      throw new Error(
++        "This family doesn't have a payment account yet — start a subscription first.",
++      );
+```
+
+## Why Portal can no longer be called without a customer
+
+`createPortalSession` is invoked from exactly one place: `openPortal.mutate()` in
+`BillingCard`, inside the branch now guarded by `hasCustomer`. The banner only
+navigates. So the throw becomes unreachable from the UI and remains a
+defense-in-depth guard for direct RPC calls.
 
 ## Verification
 
-- `tsgo --noEmit` clean.
-- Create 100% / forever → list shows `100%` + Forever/Alltid.
-- Create 25% / repeating 3 months → list shows `25%` + 3-month duration.
-- Cross-check the two coupons in Stripe.
+- Trial family (no customer): card and banner both read "Subscribe"; Subscribe
+  opens Stripe Checkout, which creates the customer.
+- After subscribing: `stripe_customer_id` present → both read "Manage"; Portal opens.
+- `tsgo --noEmit` clean; screenshot of the trial-state billing page.
