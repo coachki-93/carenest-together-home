@@ -156,6 +156,12 @@ export function BillingCard({ familyId, isOwner }: Props) {
             )}
           </div>
 
+          {hasCustomer && (
+            <p className="text-xs text-muted-foreground">
+              {t("billing.card.historyHint")}
+            </p>
+          )}
+
           <p className="text-xs text-muted-foreground">
             {t("billing.card.dataPreserved")}
           </p>
