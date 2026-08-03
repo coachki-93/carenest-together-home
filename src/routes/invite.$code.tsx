@@ -46,7 +46,7 @@ function InvitePage() {
     return (
       <Center>
         <div className="card-soft p-8 w-full max-w-md space-y-5 text-center">
-          <Logo size={48} className="mx-auto" />
+          <Logo size={44} className="mx-auto" />
           <h1 className="text-2xl font-extrabold">{t("invite.youInvited")}</h1>
           <p className="text-muted-foreground text-sm">{t("invite.createCgAccount")}</p>
           <div className="flex flex-col gap-2">
@@ -138,7 +138,7 @@ function Center({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="px-8 pt-6 flex items-center justify-between">
-        <Logo size={40} withWordmark />
+        <Logo size={32} withWordmark />
         <LanguageToggle />
       </header>
       <main className="flex-1 flex items-center justify-center px-4">{children}</main>

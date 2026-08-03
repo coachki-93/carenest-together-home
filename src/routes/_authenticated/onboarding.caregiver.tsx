@@ -70,7 +70,7 @@ function CaregiverOnboarding() {
     <div className="min-h-screen px-4 py-10">
       <div className="max-w-xl mx-auto space-y-8">
         <header className="flex items-center justify-between">
-          <Logo size={40} withWordmark />
+          <Logo size={32} withWordmark />
           <LanguageToggle />
         </header>
         <div className="text-center space-y-3">
