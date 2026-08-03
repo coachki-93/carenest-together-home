@@ -74,7 +74,11 @@ export function BillingCard({ familyId, isOwner }: Props) {
   // trials (by design, for access-gating), but a trial family has no customer
   // yet — gating on it sent them to a Portal call that always failed.
   const hasCustomer = !!s?.row?.stripe_customer_id;
-  const founding = s?.row?.plan === "founding" || s?.row?.plan == null;
+  // A paid plan only exists once Stripe has a subscription. Trial families
+  // have plan: null, which previously fell through to "founding".
+  const hasSubscription = !!s?.row?.stripe_subscription_id;
+  const onTrial = !!s?.isTrial && !hasSubscription;
+  const founding = hasSubscription && s?.row?.plan !== "standard";
   const priceLabel = founding ? PRICE_FOUNDING_LABEL : PRICE_STANDARD_LABEL;
   const dateFmt = new Intl.DateTimeFormat(
     i18n.language?.startsWith("sv") ? "sv-SE" : "en-GB",
