@@ -47,7 +47,7 @@ import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
 
-const SITE = "https://carenest-together-home.lovable.app";
+const SITE = "https://tillsa.app";
 const OG_IMAGE = SITE + "/og-image.jpg";
 
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";

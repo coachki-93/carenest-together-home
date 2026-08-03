@@ -19,7 +19,7 @@ import {
 
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
-const SITE = "https://carenest-together-home.lovable.app";
+const SITE = "https://tillsa.app";
 const OG_IMAGE = SITE + "/og-image.jpg";
 const CONTACT_EMAIL = "hello@carenest.app";
 
