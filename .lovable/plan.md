@@ -1,53 +1,51 @@
-# Unified "+ Log" dialog (Today + Events)
+# Brand rename: CareNest → Tillsa (visible text only)
 
-One dialog component, used identically on the Today (dashboard) page and the Events page. Vitals stay quick; events gain the full incident detail that only the Events page had.
+Text-only pass. No identifiers, storage keys, filenames, paths, or domains change.
 
-## What changes
+## Files to edit
 
-- New shared component `src/components/carenest/UnifiedLogDialog.tsx`, built by extending the existing QuickLogDialog structure (it already handles both vitals and events, the actor guard, and the preset picker). CareEventDialog's rich fields move in as the "event selected" branch.
-- Today page (`dashboard.tsx`) swaps `QuickLogDialog` → `UnifiedLogDialog`.
-- Events page (`events.tsx`) uses `UnifiedLogDialog` for the "+ Log event" (create) button.
-- `QuickLogDialog.tsx` is deleted once nothing imports it.
+**Translations (bulk, both languages)**
+- `src/lib/i18n/en.ts` — 66 occurrences → Tillsa
+- `src/lib/i18n/sv.ts` — 67 occurrences → Tillsa, with Swedish grammar preserved (`CareNests` → `Tillsas`, `CareNest-konto` → `Tillsa-konto`, `CareNest:s` → `Tillsas`)
 
-### Why extend QuickLog rather than CareEventDialog
+**Static assets / worker**
+- `public/manifest.webmanifest` — `name`, `short_name`
+- `public/push-sw.js` — header comment, push title fallback (2 spots)
 
-QuickLog already owns the two-step "pick a tile, then fill fields" flow and the vital write path; CareEventDialog owns a single flat event form. Adding a step to CareEventDialog would mean rebuilding the picker plus the vitals hook wiring, so the QuickLog shell is the cheaper, lower-risk base.
+**Components**
+- `src/components/carenest/Logo.tsx` — `alt`, 2 comments
+- `src/components/carenest/MarketingHeader.tsx` — `aria-label`, `alt`, 1 comment
+- `src/components/carenest/MarketingFooter.tsx` — `alt`, copyright line
 
-## Option catalog (identical on both pages)
+**Route head() metadata + visible copy** (page titles, descriptions, og/twitter titles)
+- `src/routes/__root.tsx` (title, description, author, og/twitter titles, apple-mobile-web-app-title)
+- `src/routes/index.tsx`, `about.tsx`, `features.tsx`, `install.tsx`, `offline.tsx`
+- `src/routes/invite.index.tsx`, `invite.$code.tsx`
+- `src/routes/auth.login.tsx`, `auth.signup.tsx`, `auth.forgot-password.tsx`, `auth.reset-password.tsx`
+- `src/routes/_authenticated/`: dashboard, home, settings, child, vitals, oxygen, medications, schedule, shifts, handover, appointments, maintenance, inventory, instructions, emergency, caregivers, events, billing, admin, onboarding.child, onboarding.caregiver
 
-Step 1 of the dialog shows two labelled groups:
+**Other user-visible strings**
+- `src/lib/push/use-push-subscription.ts` — iOS "add CareNest to your Home Screen" hint
+- `src/routes/api/public/hooks/dispatch-task-notifications.ts` — 4 push-title fallbacks `"CareNest"` → `"Tillsa"`
+- `src/styles.css` — 2 design-system comments (cosmetic)
 
-- Vitals: temperature, heart_rate, spo2, breathing, fluids, diaper (unchanged presets, same icons/tones).
-- Events: the full `CareEventType` list ordered by `orderedEventTypesFor(child.care_needs)` — seizure, desaturation, vomiting, feed_issue, breathing_difficulty, behavioural, injury, other — using `CARE_EVENT_META` icons so tiles match the Events page.
+## Explicitly untouched
 
-The old QuickLog "note" tile is dropped; `other` from the event list replaces it (same underlying `type: "other"`).
+- `team.carenest.local` and its comment in `team-account.functions.ts`
+- `carenest_lang`, `carenest:lang`, `carenest:pending_invite`, `carenest.tour.*`, `carenest.active-profile.*`, `carenest.handover-skipped.*`, `carenest.resume.dismissed.*`
+- `https://carenest-together-home.lovable.app` URLs (separate pass)
+- all filenames/paths: `src/assets/carenest-*`, `src/components/carenest/`, `/landing/carenest-*.png|webp`, `/carenest-logo-nav-white.png`
 
-## Progressive fields (step 2)
+## Occurrences I want your call on (not changing unless you say so)
 
-Selected a VITAL:
-- numeric value + unit chip, context chips, notes, `datetime-local` time with a "Now" shortcut. Same as today — a quick temp stays 2 taps.
+1. `hello@carenest.app` (about.tsx, MarketingFooter.tsx) and `mailto:admin@carenest.app` VAPID fallbacks (5 files) — these are email addresses on a real domain, not brand text. Leaving as-is.
+2. `"CareNest Connect is a web app…"` in `__root.tsx` twitter:description — reads like a stale product name; I'd render it "Tillsa is a web app…". Say if you'd rather keep "Connect".
+3. `alt="CareNest"` on the wordmark images — the image files still show the old wordmark art. Alt text will say Tillsa while the artwork says CareNest until new art is supplied.
+4. `src/styles.css` comments — comments only, zero visible effect; included for consistency.
 
-Selected an EVENT:
-- date + time inputs in the family timezone (`dateInputIn` / `timeInputIn` read, `zonedWallClockToDate` write), severity chips (none/mild/moderate/severe), duration min+sec, description (required), action taken.
+## Verification
 
-A "← change type" link returns to the picker in both cases.
-
-## Writes (unchanged shape)
-
-- Vitals → `useLogVital` exactly as now.
-- Events → `useCreateCareEvent` with `severity`, `action_taken`, `duration_seconds` now populated from the form instead of hardcoded `null`. That is the functional upgrade.
-- Caregiver attribution stays `useCurrentActor` + `guardActingProfile`; `created_by` is the signed-in user id.
-
-## CareEventDialog stays — for editing only
-
-`events.tsx` passes `event={editing}` for the pencil action gated by `canEditCareEvent` (2h window), and CareEventDialog is the only thing wired to `useEditCareEvent`. It is kept, unchanged, for that edit flow; only its create usage is replaced. Editing is untouched.
-
-## Cross-appearance
-
-Events logged from Today already write to `care_events`, so they appear on the Events page — confirmed, no change needed. Vitals go to the vitals system and do not appear in the events list; that is expected and stays.
-
-## Technical notes
-
-- No schema, RLS, query, or billing changes. No change to the events list, filters, archive, or edit-window logic.
-- i18n: reuse existing `careEvents.*` and `vitals.*` keys; only new keys are the two group headings (`quickLog.groups.vitals` / `quickLog.groups.events`), added to both `en.ts` and `sv.ts`.
-- Verified green with `tsgo` and the existing vitest suite.
+1. `grep -ri carenest src/lib/i18n/` → zero
+2. Manual check: push title, manifest, admin console header, marketing hero
+3. en/sv key parity unchanged (no keys added/removed; sv `storyLede` asymmetry left alone)
+4. `tsgo --noEmit` clean
