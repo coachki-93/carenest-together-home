@@ -445,7 +445,7 @@ function Landing() {
             </p>
           </Reveal>
 
-          <div className="max-w-xl mx-auto">
+          <div className="max-w-md mx-auto">
             <PriceCard
               accent
               badge={t("marketing.pricing.badge")}
@@ -997,14 +997,14 @@ function PriceCard({
           {badge}
         </span>
       )}
-      <div className="w-full flex flex-col items-center text-center mb-7 mt-1">
+      <div className="w-full mb-7 mt-1">
         <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
           {price}
         </p>
         {thenPrice && (
           <p className="text-sm font-medium text-marketing-ink mb-2">{thenPrice}</p>
         )}
-        <p className="text-sm text-marketing-muted leading-[1.6] max-w-md">{sub}</p>
+        <p className="text-sm text-marketing-muted leading-[1.6]">{sub}</p>
       </div>
 
 
