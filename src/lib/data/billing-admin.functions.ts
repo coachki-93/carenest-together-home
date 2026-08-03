@@ -74,11 +74,14 @@ export interface AdminCouponDTO {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toCouponDTO(promo: any, couponOverride?: any): AdminCouponDTO {
+  // Only trust couponOverride when it is a real object — guards against
+  // accidental positional args (e.g. Array#map's index).
   const rawCoupon =
-    couponOverride ??
-    (promo.promotion && typeof promo.promotion === "object"
-      ? promo.promotion.coupon
-      : promo.coupon);
+    couponOverride && typeof couponOverride === "object"
+      ? couponOverride
+      : promo.promotion && typeof promo.promotion === "object"
+        ? promo.promotion.coupon
+        : promo.coupon;
   const coupon = rawCoupon && typeof rawCoupon === "object" ? rawCoupon : {};
   return {
     promotionCodeId: String(promo.id),
@@ -214,7 +217,7 @@ export const adminListCoupons = createServerFn({ method: "POST" })
       expand: ["data.promotion.coupon"],
     });
 
-    const coupons = list.data.map(toCouponDTO);
+    const coupons = list.data.map((promo) => toCouponDTO(promo));
 
     await logAdminAction(userId, "coupon.list", {
       returned: coupons.length,
