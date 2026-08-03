@@ -115,7 +115,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="px-3 py-4">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <Logo size={collapsed ? 38 : 76} />
+          <Logo size={collapsed ? 28 : 32} iconOnly={collapsed} />
         </Link>
       </SidebarHeader>
       <SidebarContent data-tour="sidebar">
