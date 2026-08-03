@@ -3061,9 +3061,12 @@ export const en = {
       trial_one: "Free trial — 1 day left. Add a subscription to keep writing after that.",
       trial_other: "Free trial — {{count}} days left. Add a subscription to keep writing after that.",
       pastDue: "Payment failed. Please update your card — writing is paused soon.",
-      readOnly: "Read-only. Your data is safe — subscribe to log again.",
+      cancelScheduled:
+        "Subscription cancelled — active until {{date}}. Resubscribe to keep access.",
+      readOnly: "Read-only. Your data is safe — subscribe to use the app again.",
       manage: "Manage billing",
       subscribe: "Subscribe",
+      resubscribe: "Resubscribe",
     },
     card: {
       title: "Subscription",
