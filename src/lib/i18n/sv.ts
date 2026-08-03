@@ -3060,9 +3060,13 @@ export const sv = {
       trial_one: "Provperiod — 1 dag kvar. Teckna abonnemang för att fortsätta logga efter det.",
       trial_other: "Provperiod — {{count}} dagar kvar. Teckna abonnemang för att fortsätta logga efter det.",
       pastDue: "Betalningen misslyckades. Uppdatera kortet — snart pausas loggningen.",
-      readOnly: "Endast läsning. Er data är kvar — teckna abonnemang för att logga igen.",
+      cancelScheduled:
+        "Abonnemang uppsagt — aktivt till {{date}}. Teckna igen för att behålla åtkomst.",
+      readOnly:
+        "Endast läsning. Er data är kvar — teckna abonnemang för att använda systemet igen.",
       manage: "Hantera abonnemang",
       subscribe: "Teckna abonnemang",
+      resubscribe: "Teckna igen",
     },
     card: {
       title: "Abonnemang",
