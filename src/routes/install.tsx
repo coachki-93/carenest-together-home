@@ -28,20 +28,20 @@ const OG_IMAGE = SITE + "/og-image.jpg";
 
 const INSTALL_META = {
   en: {
-    title: "Install CareNest on your phone or tablet — CareNest",
+    title: "Install Tillsa on your phone or tablet — Tillsa",
     description:
-      "Add CareNest to your home screen and it opens full-screen like an app. Step-by-step for iPhone/iPad (Safari) and Android (Chrome).",
-    ogTitle: "Install CareNest on your device",
+      "Add Tillsa to your home screen and it opens full-screen like an app. Step-by-step for iPhone/iPad (Safari) and Android (Chrome).",
+    ogTitle: "Install Tillsa on your device",
     ogDescription:
-      "A quick guide to add CareNest to your home screen — no app store needed. Notifications work once installed.",
+      "A quick guide to add Tillsa to your home screen — no app store needed. Notifications work once installed.",
   },
   sv: {
-    title: "Installera CareNest på din telefon eller surfplatta — CareNest",
+    title: "Installera Tillsa på din telefon eller surfplatta — Tillsa",
     description:
-      "Lägg till CareNest på hemskärmen så öppnas den i helskärm som en app. Steg för steg för iPhone/iPad (Safari) och Android (Chrome).",
-    ogTitle: "Installera CareNest på din enhet",
+      "Lägg till Tillsa på hemskärmen så öppnas den i helskärm som en app. Steg för steg för iPhone/iPad (Safari) och Android (Chrome).",
+    ogTitle: "Installera Tillsa på din enhet",
     ogDescription:
-      "En snabb guide för att lägga till CareNest på hemskärmen — ingen appbutik behövs. Aviseringar fungerar när den är installerad.",
+      "En snabb guide för att lägga till Tillsa på hemskärmen — ingen appbutik behövs. Aviseringar fungerar när den är installerad.",
   },
 } as const;
 

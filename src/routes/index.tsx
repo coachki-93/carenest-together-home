@@ -54,18 +54,18 @@ import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
 const LANDING_META = {
   en: {
-    title: "CareNest — A calm home base for your child's care team",
+    title: "Tillsa — A calm home base for your child's care team",
     description:
-      "CareNest is the shared home base for families of children with special needs. Meds, vitals, oxygen, schedules and handovers — visible to every caregiver you trust.",
-    ogTitle: "CareNest — Care, together",
+      "Tillsa is the shared home base for families of children with special needs. Meds, vitals, oxygen, schedules and handovers — visible to every caregiver you trust.",
+    ogTitle: "Tillsa — Care, together",
     ogDescription:
       "Everything about your child's care — out of your head, into one calm place. Bilingual, tablet-friendly, built with families.",
   },
   sv: {
-    title: "CareNest — En lugn hemmabas för ditt barns vårdteam",
+    title: "Tillsa — En lugn hemmabas för ditt barns vårdteam",
     description:
-      "CareNest är den gemensamma hemmabasen för familjer med barn med särskilda behov. Mediciner, vitala värden, syrgas, scheman och överlämningar — synligt för varje assistent du litar på.",
-    ogTitle: "CareNest — Omsorg, tillsammans",
+      "Tillsa är den gemensamma hemmabasen för familjer med barn med särskilda behov. Mediciner, vitala värden, syrgas, scheman och överlämningar — synligt för varje assistent du litar på.",
+    ogTitle: "Tillsa — Omsorg, tillsammans",
     ogDescription:
       "Allt om ditt barns vård — ut ur ditt huvud, in på ett lugnt ställe. Tvåspråkigt, surfplatte-vänligt, byggt med familjer.",
   },
@@ -134,7 +134,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* ── 4. A day with CareNest — pinned timeline ── */}
+      {/* ── 4. A day with Tillsa — pinned timeline ── */}
       <DayTimeline />
 
       {/* ── 5. Outcomes — fanned deck ── */}
@@ -580,7 +580,7 @@ function IdentityChip({
 
 
 
-/* ─── Problem section — old-way / CareNest-way cards ─────────────────────── */
+/* ─── Problem section — old-way / Tillsa-way cards ─────────────────────── */
 
 function ProblemOldCard() {
   const { t } = useTranslation();

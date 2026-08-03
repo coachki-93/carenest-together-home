@@ -11,7 +11,7 @@ import { toast } from "@/lib/notify";
 import { Logo } from "@/components/carenest/Logo";
 
 export const Route = createFileRoute("/auth/forgot-password")({
-  head: () => ({ meta: [{ title: "Reset password — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Reset password — Tillsa" }] }),
   component: ForgotPage,
 });
 

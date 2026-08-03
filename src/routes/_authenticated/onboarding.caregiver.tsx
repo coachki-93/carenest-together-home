@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/_authenticated/onboarding/caregiver")({
-  head: () => ({ meta: [{ title: "Set up your caregiver profile — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Set up your caregiver profile — Tillsa" }] }),
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) return;

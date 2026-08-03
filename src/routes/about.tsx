@@ -25,20 +25,20 @@ const CONTACT_EMAIL = "hello@carenest.app";
 
 const ABOUT_META = {
   en: {
-    title: "About CareNest — built with families",
+    title: "About Tillsa — built with families",
     description:
-      "CareNest is the calm, shared place for what keeps a medically complex child safe — built with the families living it.",
-    ogTitle: "About CareNest",
+      "Tillsa is the calm, shared place for what keeps a medically complex child safe — built with the families living it.",
+    ogTitle: "About Tillsa",
     ogDescription:
-      "Why CareNest exists, what it believes, how your family's data is handled, and how to get in touch.",
+      "Why Tillsa exists, what it believes, how your family's data is handled, and how to get in touch.",
   },
   sv: {
-    title: "Om CareNest — byggt med familjer",
+    title: "Om Tillsa — byggt med familjer",
     description:
-      "CareNest är den lugna, gemensamma platsen för det som håller ett barn med komplexa vårdbehov tryggt — byggt med familjerna som lever det.",
-    ogTitle: "Om CareNest",
+      "Tillsa är den lugna, gemensamma platsen för det som håller ett barn med komplexa vårdbehov tryggt — byggt med familjerna som lever det.",
+    ogTitle: "Om Tillsa",
     ogDescription:
-      "Varför CareNest finns, vad vi tror på, hur familjens data hanteras, och hur du kontaktar oss.",
+      "Varför Tillsa finns, vad vi tror på, hur familjens data hanteras, och hur du kontaktar oss.",
   },
 } as const;
 

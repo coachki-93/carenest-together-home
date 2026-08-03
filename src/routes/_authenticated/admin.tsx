@@ -47,7 +47,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   },
   head: () => ({
     meta: [
-      { title: "Platform admin — CareNest" },
+      { title: "Platform admin — Tillsa" },
       { name: "robots", content: "noindex" },
     ],
   }),

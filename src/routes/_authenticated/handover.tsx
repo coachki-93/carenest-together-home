@@ -80,7 +80,7 @@ function inferredShiftStart(now: Date): Date {
 }
 
 export const Route = createFileRoute("/_authenticated/handover")({
-  head: () => ({ meta: [{ title: "Handover — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Handover — Tillsa" }] }),
   validateSearch: handoverSearchSchema,
   component: HandoverPage,
 });

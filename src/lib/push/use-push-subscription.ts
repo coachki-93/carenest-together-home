@@ -60,7 +60,7 @@ export function usePushSubscription(familyId: string | null | undefined) {
       window.navigator.standalone === true;
     if (isIos && !isStandalone) {
       throw new Error(
-        "On iPad/iPhone, add CareNest to your Home Screen first, then open it from the icon and tap Enable.",
+        "On iPad/iPhone, add Tillsa to your Home Screen first, then open it from the icon and tap Enable.",
       );
     }
     setLoading(true);

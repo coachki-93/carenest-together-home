@@ -10,7 +10,7 @@ import { toast } from "@/lib/notify";
 import { Logo } from "@/components/carenest/Logo";
 
 export const Route = createFileRoute("/auth/reset-password")({
-  head: () => ({ meta: [{ title: "Set new password — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Set new password — Tillsa" }] }),
   component: ResetPage,
 });
 

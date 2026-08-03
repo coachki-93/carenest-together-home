@@ -1,4 +1,4 @@
-// CareNest push service worker
+// Tillsa push service worker
 // Only handles push + notification clicks. No app-shell caching, no offline.
 
 self.addEventListener("install", (event) => {
@@ -14,10 +14,10 @@ self.addEventListener("push", (event) => {
   try {
     payload = event.data ? event.data.json() : {};
   } catch (_) {
-    payload = { title: "CareNest", body: event.data ? event.data.text() : "" };
+    payload = { title: "Tillsa", body: event.data ? event.data.text() : "" };
   }
 
-  const title = payload.title || "CareNest";
+  const title = payload.title || "Tillsa";
   const options = {
     body: payload.body || "",
     icon: "/icon-192.png",

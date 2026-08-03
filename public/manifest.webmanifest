@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "CareNest",
-  "short_name": "CareNest",
+  "name": "Tillsa",
+  "short_name": "Tillsa",
   "description": "Coordinate care for medically complex children with your caregivers.",
   "start_url": "/dashboard",
   "scope": "/",

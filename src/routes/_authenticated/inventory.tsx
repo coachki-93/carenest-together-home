@@ -73,7 +73,7 @@ import { narrateAdjustments } from "@/lib/data/inventory-narrate";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/inventory")({
-  head: () => ({ meta: [{ title: "Förråd — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Förråd — Tillsa" }] }),
   component: InventoryPage,
 });
 

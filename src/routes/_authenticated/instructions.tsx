@@ -36,7 +36,7 @@ import { useMyMembership, useSession } from "@/lib/auth/use-profile";
 type Instruction = Database["public"]["Tables"]["care_instructions"]["Row"];
 
 export const Route = createFileRoute("/_authenticated/instructions")({
-  head: () => ({ meta: [{ title: "Instructions — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Instructions — Tillsa" }] }),
   component: InstructionsPage,
 });
 

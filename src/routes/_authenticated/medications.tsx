@@ -62,7 +62,7 @@ import { ByProfile } from "@/components/carenest/ByProfile";
 import { useSession } from "@/lib/auth/use-profile";
 
 export const Route = createFileRoute("/_authenticated/medications")({
-  head: () => ({ meta: [{ title: "Medications — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Medications — Tillsa" }] }),
   component: MedicationsPage,
 });
 

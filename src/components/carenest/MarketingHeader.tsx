@@ -20,7 +20,7 @@ export function MarketingHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Deep violet ink — CareNest primary hue, very low lightness.
+  // Deep violet ink — Tillsa primary hue, very low lightness.
   // Even more liquid: let the aurora glow through.
   const pillBg = scrolled
     ? "color-mix(in oklab, var(--primary) 22%, #0a0612 55%)"
@@ -64,11 +64,11 @@ export function MarketingHeader() {
             <Link
               to="/"
               className="flex items-center hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-full"
-              aria-label="CareNest"
+              aria-label="Tillsa"
             >
               <img
                 src="/carenest-logo-nav-white.png"
-                alt="CareNest"
+                alt="Tillsa"
                 width={157}
                 height={70}
                 className="h-[22px] w-auto select-none"

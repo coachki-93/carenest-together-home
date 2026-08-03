@@ -12,7 +12,7 @@ import { toast } from "@/lib/notify";
 import { Logo } from "@/components/carenest/Logo";
 
 export const Route = createFileRoute("/auth/login")({
-  head: () => ({ meta: [{ title: "Log in — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Log in — Tillsa" }] }),
   component: LoginPage,
 });
 

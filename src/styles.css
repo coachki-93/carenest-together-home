@@ -10,7 +10,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * CareNest design system
+ * Tillsa design system
  * Warm, calm, trustworthy. Soft purple primary, white surfaces,
  * lavender accents, deep navy text. Rounded, generous, tablet-first.
  */
@@ -283,7 +283,7 @@
   height: 0;
 }
 
-/* ----- Marketing / landing tokens — mapped to the CareNest design system ----- */
+/* ----- Marketing / landing tokens — mapped to the Tillsa design system ----- */
 @theme inline {
   --color-marketing-bg: var(--background);
   --color-marketing-surface: var(--lavender);

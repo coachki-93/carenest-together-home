@@ -36,13 +36,13 @@ import { CARE_EVENT_META } from "@/lib/carenest/care-event-meta";
 export const Route = createFileRoute("/_authenticated/events")({
   head: () => ({
     meta: [
-      { title: "Händelser · CareNest" },
+      { title: "Händelser · Tillsa" },
       {
         name: "description",
         content:
           "Logga och följ upp händelser: anfall, desaturationer, kräkningar och andra medicinska incidenter.",
       },
-      { property: "og:title", content: "Händelser · CareNest" },
+      { property: "og:title", content: "Händelser · Tillsa" },
       {
         property: "og:description",
         content:

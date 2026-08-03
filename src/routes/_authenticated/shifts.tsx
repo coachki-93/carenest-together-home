@@ -40,7 +40,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/shifts")({
-  head: () => ({ meta: [{ title: "Shifts — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Shifts — Tillsa" }] }),
   component: ShiftsPage,
 });
 

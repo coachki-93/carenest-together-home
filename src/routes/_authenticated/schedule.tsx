@@ -137,7 +137,7 @@ type SavePayload = {
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
-  head: () => ({ meta: [{ title: "Schedule — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Schedule — Tillsa" }] }),
   component: SchedulePage,
 });
 
