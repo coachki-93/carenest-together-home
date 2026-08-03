@@ -47,7 +47,7 @@ function ResetPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
-        <Logo size={48} />
+        <Logo size={38} />
       </div>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-extrabold">{t("auth.setNewPassword")}</h1>
