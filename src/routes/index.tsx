@@ -451,7 +451,7 @@ function Landing() {
               badge={t("marketing.pricing.badge")}
               price={t("marketing.pricing.price")}
               thenPrice={t("marketing.pricing.thenPrice")}
-              sub={t("marketing.pricing.sub2")}
+              
               featuresLabel={t("marketing.pricing.featuresLabel")}
               cta={t("marketing.pricing.cta")}
             />
