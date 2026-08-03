@@ -1,51 +1,58 @@
-# Brand rename: CareNest → Tillsa (visible text only)
+# Tillsa brand image swap + horizontal-logo fit
 
-Text-only pass. No identifiers, storage keys, filenames, paths, or domains change.
+All paths/names stay identical; only file contents change (plus two new maskable icons).
 
-## Files to edit
+## 1. Direct `public/` replacements (I place these)
 
-**Translations (bulk, both languages)**
-- `src/lib/i18n/en.ts` — 66 occurrences → Tillsa
-- `src/lib/i18n/sv.ts` — 67 occurrences → Tillsa, with Swedish grammar preserved (`CareNests` → `Tillsas`, `CareNest-konto` → `Tillsa-konto`, `CareNest:s` → `Tillsas`)
+| Upload | Destination | Note |
+|---|---|---|
+| E | `public/icon-192.png` | overwrite |
+| F | `public/icon-512.png` | overwrite |
+| G | `public/icon-maskable-192.png` | new file |
+| H | `public/icon-maskable-512.png` | new file |
+| D | `public/favicon.ico` | overwrite |
+| A (purple lockup) | `public/carenest-logo-nav.png` | overwrite |
+| A (purple lockup) | `public/landing/carenest-wordmark.png` | overwrite |
+| B (white lockup) | `public/carenest-logo-nav-white.png` | overwrite |
+| J | `public/landing/carenest-app-icon.webp` | PNG→webp via cwebp, name kept |
 
-**Static assets / worker**
-- `public/manifest.webmanifest` — `name`, `short_name`
-- `public/push-sw.js` — header comment, push title fallback (2 spots)
+## 2. CDN assets (`.asset.json` pointers)
 
-**Components**
-- `src/components/carenest/Logo.tsx` — `alt`, 2 comments
-- `src/components/carenest/MarketingHeader.tsx` — `aria-label`, `alt`, 1 comment
-- `src/components/carenest/MarketingFooter.tsx` — `alt`, copyright line
+All four source images are already in the sandbox upload mount, so I can mint the
+pointers myself with the asset CLI — no manual upload needed from you. Existing
+pointer files are replaced in place (same filenames, new asset IDs); old CDN
+objects are deleted.
 
-**Route head() metadata + visible copy** (page titles, descriptions, og/twitter titles)
-- `src/routes/__root.tsx` (title, description, author, og/twitter titles, apple-mobile-web-app-title)
-- `src/routes/index.tsx`, `about.tsx`, `features.tsx`, `install.tsx`, `offline.tsx`
-- `src/routes/invite.index.tsx`, `invite.$code.tsx`
-- `src/routes/auth.login.tsx`, `auth.signup.tsx`, `auth.forgot-password.tsx`, `auth.reset-password.tsx`
-- `src/routes/_authenticated/`: dashboard, home, settings, child, vitals, oxygen, medications, schedule, shifts, handover, appointments, maintenance, inventory, instructions, emergency, caregivers, events, billing, admin, onboarding.child, onboarding.caregiver
+| Pointer file | Source |
+|---|---|
+| `src/assets/carenest-logo.png.asset.json` | A (full purple lockup) |
+| `src/assets/carenest-icon-only.png.asset.json` | C (glyph) |
+| `src/assets/carenest-wordmark.png.asset.json` | A |
+| `src/assets/apple-touch-icon.png.asset.json` | I |
 
-**Other user-visible strings**
-- `src/lib/push/use-push-subscription.ts` — iOS "add CareNest to your Home Screen" hint
-- `src/routes/api/public/hooks/dispatch-task-notifications.ts` — 4 push-title fallbacks `"CareNest"` → `"Tillsa"`
-- `src/styles.css` — 2 design-system comments (cosmetic)
+## 3. Component changes
 
-## Explicitly untouched
+`src/components/carenest/Logo.tsx`
+- Height-driven render: `height={size}`, `width="auto"`, drop forced square + `object-contain`.
+- New `iconOnly?: boolean` — true renders `carenest-icon-only.png.asset.json` (square), false/absent renders the full horizontal lockup.
+- `alt="Tillsa"` kept. Legacy `withWordmark` prop left as-is (still inert).
 
-- `team.carenest.local` and its comment in `team-account.functions.ts`
-- `carenest_lang`, `carenest:lang`, `carenest:pending_invite`, `carenest.tour.*`, `carenest.active-profile.*`, `carenest.handover-skipped.*`, `carenest.resume.dismissed.*`
-- `https://carenest-together-home.lovable.app` URLs (separate pass)
-- all filenames/paths: `src/assets/carenest-*`, `src/components/carenest/`, `/landing/carenest-*.png|webp`, `/carenest-logo-nav-white.png`
+`src/components/carenest/AppSidebar.tsx` (~line 118)
+- `<Logo size={collapsed ? 28 : 32} iconOnly={collapsed} />`
 
-## Occurrences I want your call on (not changing unless you say so)
+## 4. Code edits
 
-1. `hello@carenest.app` (about.tsx, MarketingFooter.tsx) and `mailto:admin@carenest.app` VAPID fallbacks (5 files) — these are email addresses on a real domain, not brand text. Leaving as-is.
-2. `"CareNest Connect is a web app…"` in `__root.tsx` twitter:description — reads like a stale product name; I'd render it "Tillsa is a web app…". Say if you'd rather keep "Connect".
-3. `alt="CareNest"` on the wordmark images — the image files still show the old wordmark art. Alt text will say Tillsa while the artwork says CareNest until new art is supplied.
-4. `src/styles.css` comments — comments only, zero visible effect; included for consistency.
+- `public/manifest.webmanifest` — the two `"purpose": "maskable"` entries point at `/icon-maskable-192.png` and `/icon-maskable-512.png`; the `"any"` entries stay on `/icon-192.png` / `/icon-512.png`.
+- `src/routes/__root.tsx` — add `{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }` to `head().links` (currently absent; only the two PNG icon links and apple-touch-icon exist).
+
+## Out of scope
+
+No i18n/text edits. No filename or route changes. `og-image.jpg`, `badge-96.png`, `public/og/*` untouched.
 
 ## Verification
 
-1. `grep -ri carenest src/lib/i18n/` → zero
-2. Manual check: push title, manifest, admin console header, marketing hero
-3. en/sv key parity unchanged (no keys added/removed; sv `storyLede` asymmetry left alone)
-4. `tsgo --noEmit` clean
+1. Logo renders at natural aspect; expanded sidebar (256px) shows the lockup without overflow.
+2. Collapsed rail shows the glyph only.
+3. Marketing header/footer, login, onboarding show the full Tillsa lockup (browser screenshots).
+4. Manifest `any` ≠ `maskable` sources; favicon link present in rendered head.
+5. `tsgo --noEmit` clean.
