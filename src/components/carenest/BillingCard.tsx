@@ -110,18 +110,20 @@ export function BillingCard({ familyId, isOwner }: Props) {
             state={s}
             dateFmt={dateFmt}
             foundingRateLine={
-              founding ? t("billing.card.foundingLocked") : null
+              founding && !onTrial ? t("billing.card.foundingLocked") : null
             }
           />
 
           <div className="rounded-xl border border-border/70 bg-muted/40 px-4 py-3 text-sm">
             <div className="flex items-baseline justify-between gap-4">
               <span className="font-semibold">
-                {founding
-                  ? t("billing.card.foundingPlan")
-                  : t("billing.card.standardPlan")}
+                {onTrial
+                  ? t("billing.card.freeTrialPlan")
+                  : founding
+                    ? t("billing.card.foundingPlan")
+                    : t("billing.card.standardPlan")}
               </span>
-              <span className="tabular-nums">{priceLabel}</span>
+              {!onTrial && <span className="tabular-nums">{priceLabel}</span>}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {t("billing.card.monthlyOnly")}
