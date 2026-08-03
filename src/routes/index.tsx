@@ -969,7 +969,6 @@ function ComparisonCard({
 function PriceCard({
   price,
   thenPrice,
-  sub,
   featuresLabel,
   cta,
   badge,
@@ -977,7 +976,6 @@ function PriceCard({
 }: {
   price: string;
   thenPrice?: string;
-  sub: string;
   featuresLabel: string;
   cta: string;
   badge?: string;
@@ -993,19 +991,25 @@ function PriceCard({
       }`}
     >
       {badge && (
-        <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-marketing-sage text-marketing-bg px-3 py-1 text-xs font-semibold tracking-wide">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap inline-flex items-center rounded-full bg-marketing-sage text-marketing-bg px-3 py-1 text-xs font-semibold tracking-wide">
           {badge}
         </span>
       )}
       <div className="w-full mb-7 mt-1">
-        <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
+        <p className="text-4xl md:text-5xl text-marketing-ink mb-2 text-center" style={display}>
           {price}
         </p>
         {thenPrice && (
           <p className="text-sm font-medium text-marketing-ink mb-2">{thenPrice}</p>
         )}
-        <p className="text-sm text-marketing-muted leading-[1.6]">{sub}</p>
+        <a
+          href="#faq"
+          className="text-sm text-marketing-sage underline underline-offset-4 hover:opacity-80"
+        >
+          {t("marketing.pricing.readMore")}
+        </a>
       </div>
+
 
 
       <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
