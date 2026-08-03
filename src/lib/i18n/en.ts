@@ -3068,10 +3068,12 @@ export const en = {
     card: {
       title: "Subscription",
       subtitle: "One subscription per family. The owner manages billing.",
+      freeTrialPlan: "Free trial",
       foundingPlan: "Founding member — monthly",
       standardPlan: "Standard — monthly",
       foundingLocked: "Founding rate — locked for life as an early family.",
       monthlyOnly: "Billed monthly. Cancel any time; your data is preserved.",
+      historyHint: "View invoices and payment history in the billing portal.",
       subscribe: "Start subscription",
       managePortal: "Manage billing",
       statusTrial_one: "Free trial — 1 day left (ends {{date}}).",
