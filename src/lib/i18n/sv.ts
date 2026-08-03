@@ -3067,10 +3067,12 @@ export const sv = {
     card: {
       title: "Abonnemang",
       subtitle: "Ett abonnemang per familj. Ägaren sköter betalningen.",
+      freeTrialPlan: "Gratis provperiod",
       foundingPlan: "Grundare — månadsvis",
       standardPlan: "Standard — månadsvis",
       foundingLocked: "Grundarpris — låst för alltid som tidig familj.",
       monthlyOnly: "Faktureras månadsvis. Säg upp när som helst; er data bevaras.",
+      historyHint: "Se fakturor och betalningshistorik i betalningsportalen.",
       subscribe: "Starta abonnemang",
       managePortal: "Hantera abonnemang",
       statusTrial_one: "Provperiod — 1 dag kvar (slutar {{date}}).",
