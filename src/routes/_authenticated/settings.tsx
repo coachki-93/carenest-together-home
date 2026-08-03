@@ -36,7 +36,7 @@ import { writeLangCookieClient, type Lang } from "@/lib/i18n/cookie";
 import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Settings — Tillsa" }] }),
   component: SettingsPage,
 });
 

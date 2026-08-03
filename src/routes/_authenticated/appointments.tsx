@@ -71,7 +71,7 @@ import {
 import { wallClockIn, formatTimeIn, dateInputIn, zonedWallClockToDate } from "@/lib/time/family-tz";
 
 export const Route = createFileRoute("/_authenticated/appointments")({
-  head: () => ({ meta: [{ title: "Appointments — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Appointments — Tillsa" }] }),
   component: AppointmentsPage,
 });
 

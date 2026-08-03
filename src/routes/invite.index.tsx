@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/invite/")({
-  head: () => ({ meta: [{ title: "Join with invite — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Join with invite — Tillsa" }] }),
   component: InviteEntry,
 });
 

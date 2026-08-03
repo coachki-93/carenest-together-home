@@ -26,7 +26,7 @@ import {
 } from "@/lib/data/emergency-steps";
 
 export const Route = createFileRoute("/_authenticated/emergency")({
-  head: () => ({ meta: [{ title: "Emergency info — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Emergency info — Tillsa" }] }),
   component: EmergencyPage,
 });
 

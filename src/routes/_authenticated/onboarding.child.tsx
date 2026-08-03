@@ -27,7 +27,7 @@ const stepSchema = z.object({
 
 
 export const Route = createFileRoute("/_authenticated/onboarding/child")({
-  head: () => ({ meta: [{ title: "Welcome to CareNest" }] }),
+  head: () => ({ meta: [{ title: "Welcome to Tillsa" }] }),
   validateSearch: stepSchema,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();

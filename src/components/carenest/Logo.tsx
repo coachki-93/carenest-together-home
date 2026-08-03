@@ -5,20 +5,20 @@ interface LogoProps {
   /** Height of the logo in pixels. */
   size?: number;
   /**
-   * Kept for backward compatibility; the current CareNest logo already
+   * Kept for backward compatibility; the current Tillsa logo already
    * includes the wordmark, so this prop no longer changes rendering.
    */
   withWordmark?: boolean;
   className?: string;
 }
 
-/** CareNest brand mark (CDN-hosted artwork). */
+/** Tillsa brand mark (CDN-hosted artwork). */
 export function Logo({ size = 40, className }: LogoProps) {
   return (
     <div className={cn("flex items-center", className)}>
       <img
         src={logoAsset.url}
-        alt="CareNest"
+        alt="Tillsa"
         width={size}
         height={size}
         style={{ height: size, width: size }}

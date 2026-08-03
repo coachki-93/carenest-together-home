@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/invite/$code")({
-  head: () => ({ meta: [{ title: "Join family — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Join family — Tillsa" }] }),
   component: InvitePage,
 });
 

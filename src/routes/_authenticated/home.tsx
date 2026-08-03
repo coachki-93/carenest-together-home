@@ -8,7 +8,7 @@ import { useIsAdmin } from "@/lib/auth/use-is-admin";
 import { toast } from "@/lib/notify";
 
 export const Route = createFileRoute("/_authenticated/home")({
-  head: () => ({ meta: [{ title: "Home — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Home — Tillsa" }] }),
   component: HomeRouter,
 });
 

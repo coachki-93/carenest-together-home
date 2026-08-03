@@ -5,7 +5,7 @@ import { BillingCard } from "@/components/carenest/BillingCard";
 import { useMyMembership } from "@/lib/auth/use-profile";
 
 export const Route = createFileRoute("/_authenticated/billing")({
-  head: () => ({ meta: [{ title: "Subscription — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Subscription — Tillsa" }] }),
   component: BillingPage,
 });
 

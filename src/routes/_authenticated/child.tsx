@@ -27,7 +27,7 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/child")({
-  head: () => ({ meta: [{ title: "Child profile — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Child profile — Tillsa" }] }),
   component: ChildProfilePage,
 });
 

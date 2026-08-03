@@ -44,7 +44,7 @@ import {
 } from "@/lib/oxygen/tanks";
 
 export const Route = createFileRoute("/_authenticated/oxygen")({
-  head: () => ({ meta: [{ title: "Oxygen — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Oxygen — Tillsa" }] }),
   component: OxygenPage,
 });
 

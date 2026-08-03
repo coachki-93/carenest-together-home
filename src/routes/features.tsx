@@ -34,12 +34,12 @@ const OG_IMAGE = SITE + "/og-image.jpg";
 
 const FEATURES_META = {
   en: {
-    title: "Features — everything CareNest does, in one place",
+    title: "Features — everything Tillsa does, in one place",
     description:
       "Today's tasks, vitals, medications, oxygen, handovers, team and household — every part of the day on one calm page.",
   },
   sv: {
-    title: "Funktioner — allt CareNest gör, på ett ställe",
+    title: "Funktioner — allt Tillsa gör, på ett ställe",
     description:
       "Dagens uppgifter, vitalvärden, mediciner, syrgas, överlämningar, team och hushåll — hela dagen på en lugn sida.",
   },

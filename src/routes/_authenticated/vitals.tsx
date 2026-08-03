@@ -90,7 +90,7 @@ import { cn } from "@/lib/utils";
 
 
 export const Route = createFileRoute("/_authenticated/vitals")({
-  head: () => ({ meta: [{ title: "Vitals — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Vitals — Tillsa" }] }),
   component: VitalsPage,
 });
 

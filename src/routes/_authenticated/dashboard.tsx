@@ -118,7 +118,7 @@ const dashboardSearch = z.object({
 });
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Tillsa" }] }),
   validateSearch: dashboardSearch,
   component: DashboardPage,
 });

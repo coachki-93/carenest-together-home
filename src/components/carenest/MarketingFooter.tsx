@@ -35,7 +35,7 @@ export function MarketingFooter() {
           <div className="space-y-5">
             <img
               src="/landing/carenest-wordmark.png"
-              alt="CareNest"
+              alt="Tillsa"
               className="h-7 md:h-8 w-auto select-none"
               draggable={false}
             />
@@ -82,7 +82,7 @@ export function MarketingFooter() {
 
         {/* Legal bar */}
         <div className="mt-14 pt-6 border-t border-marketing-line/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-marketing-muted">
-          <p>© {new Date().getFullYear()} CareNest</p>
+          <p>© {new Date().getFullYear()} Tillsa</p>
           <p className="italic">{t("marketing.footer.tagline")}</p>
         </div>
       </div>

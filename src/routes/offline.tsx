@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { WifiOff, RefreshCw, Home } from "lucide-react";
 
 export const Route = createFileRoute("/offline")({
-  head: () => ({ meta: [{ title: "Offline — CareNest" }] }),
+  head: () => ({ meta: [{ title: "Offline — Tillsa" }] }),
   component: OfflinePage,
 });
 
