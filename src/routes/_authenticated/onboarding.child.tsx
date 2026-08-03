@@ -68,7 +68,7 @@ function ChildOnboarding() {
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-2xl mx-auto space-y-6">
         <header className="flex items-center justify-between">
-          <Logo size={40} withWordmark />
+          <Logo size={32} withWordmark />
           <LanguageToggle />
         </header>
 

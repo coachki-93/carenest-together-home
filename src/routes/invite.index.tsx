@@ -31,7 +31,7 @@ function InviteEntry() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="px-8 pt-6 flex items-center justify-between">
-        <Logo size={40} withWordmark />
+        <Logo size={32} withWordmark />
         <LanguageToggle />
       </header>
       <main className="flex-1 flex items-center justify-center px-4">
