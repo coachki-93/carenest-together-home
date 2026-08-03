@@ -150,7 +150,8 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
                   stripe_subscription_id: sub.id,
                   status: mapStripeStatus(sub.status),
                   current_period_end: subscriptionPeriodEndIso(sub),
-                  cancel_at_period_end: sub.cancel_at_period_end,
+                  cancel_at_period_end:
+                    sub.cancel_at_period_end === true || sub.cancel_at != null,
                 };
                 // Only overwrite plan when the event actually carries one —
                 // portal events must not relabel a standard family as founding.
