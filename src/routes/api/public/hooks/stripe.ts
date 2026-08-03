@@ -127,7 +127,7 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
               const sub = event.data.object;
               // Portal-initiated events carry no metadata, so fall back to
               // resolving the family by the Stripe subscription id.
-              let familyId = sub.metadata?.family_id ?? null;
+              let familyId: string | null = sub.metadata?.family_id ?? null;
               if (!familyId) {
                 const { data: existing, error: lookupErr } = await supabaseAdmin
                   .from("family_subscriptions")
