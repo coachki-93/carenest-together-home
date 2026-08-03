@@ -967,7 +967,6 @@ function ComparisonCard({
 }
 
 function PriceCard({
-  label,
   price,
   thenPrice,
   sub,
@@ -976,7 +975,6 @@ function PriceCard({
   badge,
   accent,
 }: {
-  label: string;
   price: string;
   thenPrice?: string;
   sub: string;
@@ -999,14 +997,16 @@ function PriceCard({
           {badge}
         </span>
       )}
-      <p className="text-sm font-medium text-marketing-muted mb-4">{label}</p>
-      <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
-        {price}
-      </p>
-      {thenPrice && (
-        <p className="text-sm font-medium text-marketing-ink mb-2">{thenPrice}</p>
-      )}
-      <p className="text-sm text-marketing-muted mb-6 leading-[1.6]">{sub}</p>
+      <div className="w-full flex flex-col items-center text-center mb-7 mt-1">
+        <p className="text-4xl md:text-5xl text-marketing-ink mb-2" style={display}>
+          {price}
+        </p>
+        {thenPrice && (
+          <p className="text-sm font-medium text-marketing-ink mb-2">{thenPrice}</p>
+        )}
+        <p className="text-sm text-marketing-muted leading-[1.6] max-w-md">{sub}</p>
+      </div>
+
 
       <p className="text-xs font-semibold uppercase tracking-wider text-marketing-muted mb-3">
         {featuresLabel}
