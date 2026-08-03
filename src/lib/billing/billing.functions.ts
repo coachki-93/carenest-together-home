@@ -165,7 +165,9 @@ export const createPortalSession = createServerFn({ method: "POST" })
       .eq("family_id", data.familyId)
       .maybeSingle();
     if (!sub?.stripe_customer_id) {
-      throw new Error("No Stripe customer for this family yet");
+      throw new Error(
+        "This family doesn't have a payment account yet — start a subscription first.",
+      );
     }
 
     // ---- 3. Escalate — Stripe only, no DB writes needed --------------

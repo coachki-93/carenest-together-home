@@ -70,6 +70,10 @@ export function BillingCard({ familyId, isOwner }: Props) {
   if (!isOwner) return null;
 
   const s = sub.data;
+  // Portal requires an existing Stripe customer. `isActive` is true during
+  // trials (by design, for access-gating), but a trial family has no customer
+  // yet — gating on it sent them to a Portal call that always failed.
+  const hasCustomer = !!s?.row?.stripe_customer_id;
   const founding = s?.row?.plan === "founding" || s?.row?.plan == null;
   const priceLabel = founding ? PRICE_FOUNDING_LABEL : PRICE_STANDARD_LABEL;
   const dateFmt = new Intl.DateTimeFormat(
@@ -121,7 +125,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
           </div>
 
           <div className="flex flex-wrap gap-2 pt-1">
-            {s?.isActive ? (
+            {hasCustomer ? (
               <Button
                 onClick={() => openPortal.mutate()}
                 disabled={openPortal.isPending || redirecting}
