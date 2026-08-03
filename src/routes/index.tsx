@@ -449,7 +449,6 @@ function Landing() {
             <PriceCard
               accent
               badge={t("marketing.pricing.badge")}
-              label={t("marketing.pricing.label")}
               price={t("marketing.pricing.price")}
               thenPrice={t("marketing.pricing.thenPrice")}
               sub={t("marketing.pricing.sub2")}
