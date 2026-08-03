@@ -125,21 +125,44 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
             case "customer.subscription.updated":
             case "customer.subscription.deleted": {
               const sub = event.data.object;
-              const familyId = sub.metadata?.family_id ?? null;
+              // Portal-initiated events carry no metadata, so fall back to
+              // resolving the family by the Stripe subscription id.
+              let familyId: string | null = sub.metadata?.family_id ?? null;
+              if (!familyId) {
+                const { data: existing, error: lookupErr } = await supabaseAdmin
+                  .from("family_subscriptions")
+                  .select("family_id")
+                  .eq("stripe_subscription_id", sub.id)
+                  .maybeSingle();
+                if (lookupErr) {
+                  console.error(
+                    `[stripe webhook] family lookup failed for event ${event.id} sub ${sub.id}:`,
+                    lookupErr.message,
+                  );
+                }
+                familyId = existing?.family_id ?? null;
+              }
               if (familyId) {
-                const plan: "founding" | "standard" =
-                  sub.metadata?.plan === "standard" ? "standard" : "founding";
                 const update: SubUpdate = {
                   stripe_subscription_id: sub.id,
                   status: mapStripeStatus(sub.status),
-                  plan,
                   current_period_end: subscriptionPeriodEndIso(sub),
                   cancel_at_period_end: sub.cancel_at_period_end,
                 };
+                // Only overwrite plan when the event actually carries one —
+                // portal events must not relabel a standard family as founding.
+                if (sub.metadata?.plan) {
+                  update.plan =
+                    sub.metadata.plan === "standard" ? "standard" : "founding";
+                }
                 await supabaseAdmin
                   .from("family_subscriptions")
                   .update(update)
                   .eq("family_id", familyId);
+              } else {
+                console.error(
+                  `[stripe webhook] ${event.type}: no family for event ${event.id} subscription ${sub.id}`,
+                );
               }
               break;
             }
