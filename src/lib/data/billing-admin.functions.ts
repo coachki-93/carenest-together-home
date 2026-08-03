@@ -217,7 +217,7 @@ export const adminListCoupons = createServerFn({ method: "POST" })
       expand: ["data.promotion.coupon"],
     });
 
-    const coupons = list.data.map(toCouponDTO);
+    const coupons = list.data.map((promo) => toCouponDTO(promo));
 
     await logAdminAction(userId, "coupon.list", {
       returned: coupons.length,
