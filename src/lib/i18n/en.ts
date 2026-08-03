@@ -2206,7 +2206,7 @@ export const en = {
       q3Q: "Does Tillsa give medical advice?",
       q3A: "No. The reference ranges and reminders are screening aids, not medical advice. Always follow your care team's guidance.",
       q4Q: "What does it cost?",
-      q4A: "Every family gets a 30-day free trial. After that it's 199 kr/month for founding families — locked for life — or 299 kr/month for families joining later. One subscription per family, unlimited caregivers, monthly, cancel anytime.",
+      q4A: "Every family gets a 30-day free trial. Start your subscription before 31 Dec 2026 and you lock 199 kr/month for as long as you subscribe; families joining after that pay 299 kr/month. One subscription per family, unlimited caregivers, billed monthly, cancel anytime.",
       q5Q: "What languages do you support?",
       q5A: "English and Swedish today — every screen and notification is fully translated.",
       q6Q: "Does it work offline?",
