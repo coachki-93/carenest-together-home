@@ -111,7 +111,10 @@ export const Route = createFileRoute("/api/public/hooks/stripe")({
                   status: mapStripeStatus(sub.status),
                   plan,
                   current_period_end: subscriptionPeriodEndIso(sub),
-                  cancel_at_period_end: sub.cancel_at_period_end,
+                  // Portal cancels now arrive as `cancel_at` with the boolean
+                  // still false — treat either signal as "scheduled to cancel".
+                  cancel_at_period_end:
+                    sub.cancel_at_period_end === true || sub.cancel_at != null,
                 };
                 await supabaseAdmin
                   .from("family_subscriptions")
