@@ -2205,7 +2205,7 @@ export const sv = {
       q3Q: "Ger Tillsa medicinska råd?",
       q3A: "Nej. Referensintervall och påminnelser är hjälpmedel, inte medicinsk rådgivning. Följ alltid ert vårdteam.",
       q4Q: "Vad kostar det?",
-      q4A: "Varje familj får 30 dagars gratis provperiod. Därefter kostar det 199 kr/månad för grundarfamiljer — låst för alltid — eller 299 kr/månad för familjer som ansluter senare. Ett abonnemang per familj, obegränsat med vårdgivare, faktureras månadsvis, säg upp när som helst.",
+      q4A: "Varje familj får 30 dagars gratis provperiod. Börjar du prenumerera före 31 dec 2026 låser du 199 kr/månad så länge du är prenumerant; familjer som ansluter efter det betalar 299 kr/månad. Ett abonnemang per familj, obegränsat med vårdgivare, faktureras månadsvis, säg upp när som helst.",
       q5Q: "Vilka språk stöds?",
       q5A: "Svenska och engelska i dag — varje skärm och notis är fullt översatt.",
       q6Q: "Fungerar det offline?",
