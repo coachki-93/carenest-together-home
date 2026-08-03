@@ -1,58 +1,52 @@
-# Tillsa brand image swap + horizontal-logo fit
+# Fix: admin coupons show "—%" / "once"
 
-All paths/names stay identical; only file contents change (plus two new maskable icons).
+## Actual root cause (differs from the reported one)
 
-## 1. Direct `public/` replacements (I place these)
+`toCouponDTO(promo, couponOverride?)` already prefers `couponOverride` and already
+falls back to `promo.promotion.coupon` (the list call does expand
+`data.promotion.coupon`, so the list data is fine).
 
-| Upload | Destination | Note |
-|---|---|---|
-| E | `public/icon-192.png` | overwrite |
-| F | `public/icon-512.png` | overwrite |
-| G | `public/icon-maskable-192.png` | new file |
-| H | `public/icon-maskable-512.png` | new file |
-| D | `public/favicon.ico` | overwrite |
-| A (purple lockup) | `public/carenest-logo-nav.png` | overwrite |
-| A (purple lockup) | `public/landing/carenest-wordmark.png` | overwrite |
-| B (white lockup) | `public/carenest-logo-nav-white.png` | overwrite |
-| J | `public/landing/carenest-app-icon.webp` | PNG→webp via cwebp, name kept |
+The real bug is the call site on line 217:
 
-## 2. CDN assets (`.asset.json` pointers)
+```ts
+const coupons = list.data.map(toCouponDTO);
+```
 
-All four source images are already in the sandbox upload mount, so I can mint the
-pointers myself with the asset CLI — no manual upload needed from you. Existing
-pointer files are replaced in place (same filenames, new asset IDs); old CDN
-objects are deleted.
+`Array.prototype.map` passes `(item, index, array)`, so `couponOverride` receives
+the **array index**. For the first row that's `0`; `0 ?? x` is `0` (not nullish),
+so `rawCoupon = 0`, `coupon = {}` → `percentOff: null` → `"—%"` and
+`duration: "once"`. Every row after index 0 gets a number too, same result.
+So *all* rows in the list render "—%" / "once", regardless of what Stripe holds.
 
-| Pointer file | Source |
-|---|---|
-| `src/assets/carenest-logo.png.asset.json` | A (full purple lockup) |
-| `src/assets/carenest-icon-only.png.asset.json` | C (glyph) |
-| `src/assets/carenest-wordmark.png.asset.json` | A |
-| `src/assets/apple-touch-icon.png.asset.json` | I |
+## Changes (src/lib/data/billing-admin.functions.ts only)
 
-## 3. Component changes
+```diff
+-  const rawCoupon =
+-    couponOverride ??
+-    (promo.promotion && typeof promo.promotion === "object"
+-      ? promo.promotion.coupon
+-      : promo.coupon);
++  // Only trust couponOverride when it is a real object — guards against
++  // accidental positional args (e.g. Array#map's index).
++  const rawCoupon =
++    couponOverride && typeof couponOverride === "object"
++      ? couponOverride
++      : promo.promotion && typeof promo.promotion === "object"
++        ? promo.promotion.coupon
++        : promo.coupon;
+```
 
-`src/components/carenest/Logo.tsx`
-- Height-driven render: `height={size}`, `width="auto"`, drop forced square + `object-contain`.
-- New `iconOnly?: boolean` — true renders `carenest-icon-only.png.asset.json` (square), false/absent renders the full horizontal lockup.
-- `alt="Tillsa"` kept. Legacy `withWordmark` prop left as-is (still inert).
+```diff
+-    const coupons = list.data.map(toCouponDTO);
++    const coupons = list.data.map((promo) => toCouponDTO(promo));
+```
 
-`src/components/carenest/AppSidebar.tsx` (~line 118)
-- `<Logo size={collapsed ? 28 : 32} iconOnly={collapsed} />`
-
-## 4. Code edits
-
-- `public/manifest.webmanifest` — the two `"purpose": "maskable"` entries point at `/icon-maskable-192.png` and `/icon-maskable-512.png`; the `"any"` entries stay on `/icon-192.png` / `/icon-512.png`.
-- `src/routes/__root.tsx` — add `{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }` to `head().links` (currently absent; only the two PNG icon links and apple-touch-icon exist).
-
-## Out of scope
-
-No i18n/text edits. No filename or route changes. `og-image.jpg`, `badge-96.png`, `public/og/*` untouched.
+No other file changes. Create and deactivate paths already pass a full coupon
+object and keep working unchanged.
 
 ## Verification
 
-1. Logo renders at natural aspect; expanded sidebar (256px) shows the lockup without overflow.
-2. Collapsed rail shows the glyph only.
-3. Marketing header/footer, login, onboarding show the full Tillsa lockup (browser screenshots).
-4. Manifest `any` ≠ `maskable` sources; favicon link present in rendered head.
-5. `tsgo --noEmit` clean.
+- `tsgo --noEmit` clean.
+- Create 100% / forever → list shows `100%` + Forever/Alltid.
+- Create 25% / repeating 3 months → list shows `25%` + 3-month duration.
+- Cross-check the two coupons in Stripe.
