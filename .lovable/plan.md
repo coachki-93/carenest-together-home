@@ -1,45 +1,58 @@
-# Fix: portal cancels signalled via `cancel_at`, not `cancel_at_period_end`
+# Cancel-scheduled subscription banner
 
-## Problem
+Fix: a subscription that is active but scheduled to cancel currently hits the red read-only "Lock" banner, even though the family keeps full access until the cancel date.
 
-Stripe now marks a portal cancellation with `cancel_at` (future timestamp) +
-`canceled_at`, leaving `cancel_at_period_end: false`. Our webhook reads only the
-boolean, writes `false`, and the app renders plain "Active".
+## 1. `src/components/carenest/SubscriptionBanner.tsx`
 
-## Schema question — answered: no migration needed
+- Visibility guard stays: hide only for healthy active, non-trial, non-past-due, non-cancelled subs.
+- New branch between trial and past-due:
 
-Ground truth for Laila's sub `sub_1U0QqT…`:
-
-```text
-cancel_at            = 1788461031 = 2026-09-03 18:43:51 UTC
-current_period_end   =              2026-09-03 18:43:51 UTC   (row in DB)
+```diff
+     if (s.isActive && !s.isTrial && !s.isPastDue && !s.isCanceled) return null;
+     if (s.isTrial) { ...unchanged... }
++    if (s.isActive && s.isCanceled) {
++      return {
++        tone: "info" as const,          // amber, not the red warn tone
++        icon: Clock,
++        cta: "resubscribe" as const,
++        message: t("billing.banner.cancelScheduled", {
++          date: s.endsAt ? dateFmt.format(s.endsAt) : "",
++        }),
++      };
++    }
+     if (s.isPastDue) { ...unchanged... }
+     return { tone: "warn", icon: Lock, message: t("billing.banner.readOnly") };
 ```
 
-They are identical, so `state.endsAt` (derived from `current_period_end`)
-already displays the correct cancel date. No new column, no migration.
+- The final read-only branch is now only reachable when `!s.isActive` (all active paths return above), so a cancel-scheduled family never gets read-only treatment.
+- Date formatting matches BillingCard: `Intl.DateTimeFormat(i18n.language?.startsWith("sv") ? "sv-SE" : "en-GB", { day: "numeric", month: "long", year: "numeric" })` → "3 September 2026".
+- Owner CTA: in the cancel-scheduled state the button reads `billing.banner.resubscribe` ("Resubscribe" / "Teckna igen"); other states keep the existing Manage/Subscribe logic. `Lock` import stays (still used by the read-only branch).
 
-## Change
+## 2. i18n (`src/lib/i18n/en.ts` + `sv.ts`, identical key order)
 
-One file: `src/routes/api/public/hooks/stripe.ts`. Two update payloads only.
-
-```text
-  // checkout.session.completed (~line 114)
-- cancel_at_period_end: sub.cancel_at_period_end,
-+ cancel_at_period_end: sub.cancel_at_period_end === true || sub.cancel_at != null,
-
-  // customer.subscription.created/.updated/.deleted (~line 150)
-- cancel_at_period_end: sub.cancel_at_period_end,
-+ cancel_at_period_end: sub.cancel_at_period_end === true || sub.cancel_at != null,
+```diff
+       pastDue: "..."
++      cancelScheduled: "Subscription cancelled — active until {{date}}. Resubscribe to keep access.",
+-      readOnly: "Read-only. Your data is safe — subscribe to log again.",
++      readOnly: "Read-only. Your data is safe — subscribe to use the app again.",
+       manage: "Manage billing",
+       subscribe: "Subscribe",
++      resubscribe: "Resubscribe",
 ```
 
-Untouched: signature verification, idempotency ledger, family-resolution
-fallback, plan-overwrite guard, `invoice.payment_failed`.
+Swedish:
+```diff
++      cancelScheduled: "Abonnemang uppsagt — aktivt till {{date}}. Teckna igen för att behålla åtkomst.",
+-      readOnly: "Endast läsning. Er data är kvar — teckna abonnemang för att logga igen.",
++      readOnly: "Endast läsning. Er data är kvar — teckna abonnemang för att använda systemet igen.",
++      resubscribe: "Teckna igen",
+```
+
+No change to `deriveState` (`isReadOnly` is already false when `isActive`), billing server functions, or the Stripe webhook.
 
 ## Verification
 
-- `tsgo --noEmit` clean.
-- Re-cancel (or replay the event) → Laila's row shows
-  `cancel_at_period_end: true`; Subscription page renders
-  "Cancels on 3 September 2026".
-- A non-cancelled sub has `cancel_at: null` and `cancel_at_period_end: false`,
-  so the expression stays `false` and the page still shows plain "Active".
+- Cancel-scheduled family (Laila's): amber banner with "active until 3 September 2026" + Resubscribe CTA, no read-only.
+- Lapsed family: red read-only banner with the new copy.
+- Healthy active: no banner. Trial: unchanged.
+- en/sv key parity; `tsgo --noEmit` clean.
