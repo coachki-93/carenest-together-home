@@ -2180,7 +2180,6 @@ export const sv = {
       title: "Prova gratis i 30 dagar.",
       sub: "Varje familj börjar med 30 dagars gratis provperiod. Grundarfamiljer låser priset 199 kr/månad för alltid.",
       badge: "Grundarfamiljer",
-      label: "30 dagars gratis provperiod",
       price: "Gratis i 30 dagar",
       thenPrice: "sedan 199 kr/månad — grundarpris, låst för alltid",
       sub2: "Ett pris per familj, obegränsat med vårdgivare. Grundarfamiljer behåller 199 kr/månad för alltid; familjer som ansluter senare betalar 299 kr/månad. Säg upp när som helst — er data bevaras alltid.",

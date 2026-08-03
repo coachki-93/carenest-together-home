@@ -2181,7 +2181,6 @@ export const en = {
       title: "Start free for 30 days.",
       sub: "Every family starts with a 30-day free trial. Founding families lock in 199 kr/month for life.",
       badge: "Founding families",
-      label: "30-day free trial",
       price: "Free for 30 days",
       thenPrice: "then 199 kr/month — founding rate, locked for life",
       sub2: "One price per family, unlimited caregivers. Founding families keep 199 kr/month for life; families joining later pay 299 kr/month. Cancel anytime — your data is always preserved.",
