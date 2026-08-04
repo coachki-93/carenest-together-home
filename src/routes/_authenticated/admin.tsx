@@ -83,7 +83,9 @@ function AdminPage() {
       ? "admin.families.title"
       : tab === "coupons"
         ? "admin.coupons.title"
-        : "admin.accounts.title";
+        : tab === "bugs"
+          ? "admin.bugs.title"
+          : "admin.accounts.title";
 
   return (
     <AdminLayout title={t(titleKey)} subtitle={t("admin.subtitle")}>
@@ -91,6 +93,8 @@ function AdminPage() {
         <FamiliesSection />
       ) : tab === "coupons" ? (
         <AdminCoupons />
+      ) : tab === "bugs" ? (
+        <AdminBugReports />
       ) : (
         <AccountsSection />
       )}
