@@ -15,7 +15,6 @@ import { UsesEquipmentSettings } from "@/components/carenest/UsesEquipmentSettin
 import { ScaffoldsResetSettings } from "@/components/carenest/ScaffoldsResetSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
-import { ReportBugCard } from "@/components/carenest/ReportBugCard";
 
 
 import { FamilyLocaleSettings } from "@/components/carenest/FamilyLocaleSettings";
@@ -398,9 +397,6 @@ function SettingsPage() {
                 </Button>
               </div>
             </section>
-
-            {/* Report a bug */}
-            <ReportBugCard />
 
             {/* Sign out */}
             <section className="card-soft p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">

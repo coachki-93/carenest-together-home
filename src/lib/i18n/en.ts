@@ -205,6 +205,7 @@ export const en = {
     shifts: "Shifts",
     billing: "Subscription",
     settings: "Settings",
+    reportBug: "Report a bug",
   },
   shiftsPage: {
     title: "Shifts",

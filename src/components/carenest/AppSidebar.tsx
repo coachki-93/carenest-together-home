@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   Wrench,
   CreditCard,
+  Bug,
 } from "lucide-react";
 
 
@@ -87,6 +88,7 @@ export function AppSidebar() {
   const isOwner = membership.data?.role === "owner";
   const settingsItem = { title: t("nav.settings"), url: "/settings", icon: Settings };
   const billingItem = { title: t("nav.billing"), url: "/billing", icon: CreditCard };
+  const reportBugItem = { title: t("nav.reportBug"), url: "/report-bug", icon: Bug };
 
   const isActive = (url: string) =>
     pathname === url || pathname.startsWith(url + "/");
@@ -161,6 +163,19 @@ export function AppSidebar() {
               <Link to={settingsItem.url} className="flex items-center gap-3">
                 <settingsItem.icon className="size-5" />
                 {!collapsed && <span className="font-semibold">{settingsItem.title}</span>}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive(reportBugItem.url)}
+              className="rounded-xl h-11"
+              tooltip={reportBugItem.title}
+            >
+              <Link to={reportBugItem.url} className="flex items-center gap-3">
+                <reportBugItem.icon className="size-5" />
+                {!collapsed && <span className="font-semibold">{reportBugItem.title}</span>}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

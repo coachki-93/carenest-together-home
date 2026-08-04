@@ -205,6 +205,7 @@ export const sv = {
     shifts: "Pass",
     billing: "Prenumeration",
     settings: "Inställningar",
+    reportBug: "Rapportera bugg",
   },
   shiftsPage: {
     title: "Arbetspass",
