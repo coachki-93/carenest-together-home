@@ -2209,6 +2209,18 @@ export const sv = {
     },
 
     faq: {
+      usingKicker: "Använda Tillsa",
+      usingTitle: "Frågor från familjer som använder appen",
+      u1Q: "Hur lägger jag till en vårdgivare till?",
+      u1A: "Öppna Vårdteam. Du kan bjuda in en person med en inbjudningslänk så att hen får ett eget konto, eller använda det delade teamkontot — en inloggning som hela teamet kan använda, som ägaren skapar i Inställningar. Varje person får också en vårdgivarprofil, så att loggarna visar vem som gjort vad, inte bara vilken inloggning som användes.",
+      u2Q: "Vad händer med våra uppgifter om vi säger upp?",
+      u2A: "Ni har kvar åtkomsten till den betalda perioden tar slut. Därefter blir appen skrivskyddad: allt ni har loggat finns kvar att läsa, ni kan bara inte lägga till eller ändra förrän ni tecknar en ny prenumeration. Uppgifterna sparas, de raderas inte — och ni kan be oss exportera eller radera dem.",
+      u3Q: "Kan vi byta plan?",
+      u3A: "Det är en prenumeration per familj, med månadsbetalning. Ägaren trycker på Hantera på prenumerationssidan för att öppna betalportalen, där ni kan byta betalsätt, se fakturor och säga upp. Grundarfamiljer behåller sitt låsta pris så länge prenumerationen löper.",
+      u4Q: "Hur lägger jag in ett läkemedel som ges flera gånger om dagen?",
+      u4A: "Lägg till en tidpunkt per dos på läkemedlet. Varje tidpunkt blir en dos varje dag och visas på Idag och i Schema i tidsordning. För en tidsbegränsad kur slår du på kuralternativet och anger första dosen och totalt antal doser.",
+      u5Q: "Hur fungerar överlämningen mellan pass?",
+      u5A: "En överlämning är en skriven rapport mellan pass, med en sammanfattning och korta fält för sömn, humör, anfall, vätska och läkemedel. Utkastet kan förifyllas från passets tidsfönster — givna eller missade läkemedel, mätvärden, besök, syrgas och händelser blir punktlistor, och förifyllningen skriver aldrig över det du själv skrivit. Övriga markerar den som läst; den som skrev kan ändra i två timmar, vilket ber de andra läsa den igen.",
       kicker: "Vanliga frågor",
       title: "Några saker familjer brukar fråga",
       q1Q: "Är vårt barns information privat?",
@@ -2307,6 +2319,29 @@ export const sv = {
       formTitle: "Skicka ett meddelande",
       formBody:
         "Berätta vad det gäller så återkommer vi via e-post.",
+      safetyTitle: "Tillsa är inte vård",
+      safetyBody:
+        "Tillsa hjälper en familj att samordna omvårdnad — det ersätter inte medicinsk rådgivning, behandling eller akutsjukvård. Vid akut fara, ring ditt lokala nödnummer.",
+      troubleshootKicker: "Felsökning",
+      troubleshootTitle: "Något som inte fungerar?",
+      troubleshoot: {
+        notifQ: "Aviseringar kommer inte fram",
+        notifA:
+          "Aviseringar aktiveras per enhet. Öppna Inställningar på den enhet du vill ha dem på och tryck på Aktivera i aviseringskortet. Kortet har en inbyggd diagnostik — öppna den för att se behörighet och enhetsstatus. På iPhone och iPad fungerar push-aviseringar bara när Tillsa är installerad på hemskärmen som en app; de fungerar aldrig i en flik i Safari. Om du tidigare nekade behörighet kan appen inte fråga igen — tillåt aviseringar för Tillsa i enhetens eller webbläsarens webbplatsinställningar och tryck sedan på Aktivera igen.",
+        emailQ: "Jag fick inget bekräftelse- eller lösenordsmejl",
+        emailA:
+          "Titta först i skräpposten — vår avsändardomän är ny, så filtren är försiktiga. Vänta sedan ett par minuter: mejlen läggs i kö och kommer inte alltid direkt. Har det ändå inte kommit, begär ett nytt från inloggningssidan.",
+        offlineQ: "Vad fungerar utan internet?",
+        offlineA:
+          "Akutinformationen sparas på din enhet och går att läsa utan uppkoppling, så den finns där i ett akut läge. Allt annat i Tillsa behöver internet för att laddas och sparas.",
+        loginQ: "Problem med inloggning eller det delade teamkontot",
+        loginA:
+          "Det finns två sätt att logga in. Ett personligt konto använder din e-post och ditt lösenord — använd e-postfliken, och länken för glömt lösenord om du behöver ett nytt. Ett delat teamkonto använder ett användarnamn, inte en e-postadress: ägaren skapar det i Inställningar under Teamkonto, och lösenordet visas bara en gång, direkt när det skapas eller återställs. Byt till teamfliken på inloggningssidan och ange användarnamnet och lösenordet. Om lösenordet tappats bort återställer ägaren det i Inställningar, vilket ger ett nytt att dela med teamet.",
+      },
+      contactKicker: "Fortfarande fast?",
+      contactTitle: "Hittade du inte svaret?",
+      contactBody:
+        "Hör av dig så hjälper vi till. En riktig människa läser varje meddelande — vi svarar oftast inom en eller ett par dagar.",
     },
     contact: {
       metaTitle: "Kontakta Tillsa — vi läser varje meddelande",

@@ -2210,6 +2210,18 @@ export const en = {
     },
 
     faq: {
+      usingKicker: "Using Tillsa",
+      usingTitle: "Questions from families using it",
+      u1Q: "How do I add another caregiver?",
+      u1A: "Open Care team. You can invite a person with an invitation link so they get their own account, or use the shared team account — one login the whole team can use, created by the owner in Settings. Each person also gets a caregiver profile, so log entries show who did what, not just which login was used.",
+      u2Q: "What happens to our data if we cancel?",
+      u2A: "You keep access until the paid period ends. After that the app becomes read-only: everything you have logged is still there to read, you just can't add or change entries until you subscribe again. Your data is kept, not deleted — and you can ask us to export or delete it.",
+      u3Q: "Can I change our plan?",
+      u3A: "There is one subscription per family, billed monthly. The owner opens Manage on the subscription page to reach the billing portal, where you can update the payment method, see invoices and cancel. Founding families keep their locked rate for as long as the subscription runs.",
+      u4Q: "How do I set up a medication given more than once a day?",
+      u4A: "Add one time of day per dose on the medication. Each time becomes a dose every day, and they appear on Today and Schedule in time order. For a limited treatment, turn on the course option and set the first dose and the total number of doses.",
+      u5Q: "How does handover between shifts work?",
+      u5A: "A handover is a written note passed between shifts, with a summary and short fields for sleep, mood, seizures, fluids and medicines. A draft can be prefilled from the shift window — medicines given or missed, vitals, appointments, oxygen and events become bullet lines, and prefill never overwrites what you typed. Everyone else marks it read; the author can edit it for two hours, which asks the others to read it again.",
       kicker: "Frequently asked",
       title: "A few things families ask",
       q1Q: "Is my child's information private?",
@@ -2308,6 +2320,29 @@ export const en = {
       formTitle: "Send us a message",
       formBody:
         "Tell us what is going on and we will get back to you by email.",
+      safetyTitle: "Tillsa is not medical care",
+      safetyBody:
+        "Tillsa helps a family coordinate care — it is not a substitute for professional medical advice, treatment or emergency services. If something is urgent, call your local emergency number.",
+      troubleshootKicker: "Troubleshooting",
+      troubleshootTitle: "Something is not working?",
+      troubleshoot: {
+        notifQ: "Notifications aren't arriving",
+        notifA:
+          "Notifications are enabled per device. Open Settings on the device you want them on and press Enable in the notification card. The card has built-in diagnostics — open them to see the permission and device status. On iPhone and iPad, push notifications only work when Tillsa is installed to the home screen as an app; they never work in a Safari browser tab. If you denied permission earlier, the app cannot ask again — re-enable notifications for Tillsa in your device or browser site settings, then press Enable again.",
+        emailQ: "I didn't get my confirmation or password-reset email",
+        emailA:
+          "Check your spam or junk folder first — our sender domain is new, so filters are cautious. Then wait a couple of minutes: emails are queued and are not always instant. If it still hasn't arrived, request it again from the login screen.",
+        offlineQ: "What works without an internet connection?",
+        offlineA:
+          "Emergency info is saved on your device and stays readable with no connection, so it is there in an urgent moment. Everything else in Tillsa needs an internet connection to load and to save.",
+        loginQ: "Login or shared team-account trouble",
+        loginA:
+          "There are two ways to sign in. A personal account uses your email and password — use the email tab, and the forgot-password link if you need a new one. A shared team account uses a username, not an email: the owner creates it in Settings under Team account, and its password is shown only once, right after it is created or reset. On the login screen, switch to the team tab and enter that username and password. If the password is lost, the owner resets it in Settings, which produces a new one to share with the team.",
+      },
+      contactKicker: "Still stuck?",
+      contactTitle: "Didn't find your answer?",
+      contactBody:
+        "Contact us and we'll help. A real person reads every message — we usually reply within a day or two.",
     },
     contact: {
       metaTitle: "Contact Tillsa — we read every message",
