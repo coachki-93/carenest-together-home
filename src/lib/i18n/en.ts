@@ -3833,7 +3833,7 @@ export const en = {
           {
             heading: "Family settings",
             body: [
-              "These are only shown to the owner.",
+              "Your-account settings are yours; family settings that affect everyone are managed by the owner.",
             ],
             steps: [
               "At hospital, which pauses parts of the app while the child is admitted.",
