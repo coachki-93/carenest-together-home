@@ -2290,7 +2290,41 @@ export const en = {
       readyBody: "Install takes seconds. Setup takes a couple of minutes.",
       backHome: "Back to home",
     },
+    contact: {
+      metaTitle: "Contact Tillsa — we read every message",
+      metaDescription:
+        "Questions, feedback or something not working? Send us a message and we'll get back to you.",
+      ogTitle: "Contact Tillsa",
+      ogDescription: "Send us a message — a real person reads every one.",
+      kicker: "Contact",
+      title: "Say hello,",
+      titleB: "we read every message.",
+      intro:
+        "Questions, feedback, or something that isn't working? Write to us and we'll get back to you as soon as we can.",
+      nameLabel: "Your name",
+      namePlaceholder: "Anna Lindqvist",
+      emailLabel: "Your email",
+      emailPlaceholder: "you@example.com",
+      messageLabel: "Message",
+      messagePlaceholder: "What's on your mind?",
+      submit: "Send message",
+      sending: "Sending…",
+      errorName: "Please enter your name.",
+      errorEmail: "Please enter a valid email address.",
+      errorMessage: "Please write at least 10 characters.",
+      errorMessageLong: "Please keep your message under 5000 characters.",
+      successTitle: "Thanks — we got your message",
+      successBody:
+        "We'll get back to you at the email address you gave us, usually within a couple of days.",
+      successAgain: "Send another message",
+      errorTitle: "That didn't go through",
+      errorBody: "Something went wrong sending your message. Please try again in a moment.",
+      rateLimited: "You've sent a few messages already. Please wait a little while before sending another.",
+      privacyNote:
+        "We only use your email to reply to you. Nothing else, ever.",
+    },
     about: {
+
       kicker: "About Tillsa",
       title: "One parent's head",
       titleB: "is not a care plan.",
