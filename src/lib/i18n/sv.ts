@@ -3739,7 +3739,7 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Pass är ett veckoschema över vem som arbetar. Det finns en rad per aktiv vårdgivarprofil, plus en rad för pass utan tilldelad person, och du kan bläddra mellan veckor eller hoppa tillbaka till i dag.",
+              "Pass visar vem som är i tjänst under veckan. Det är ett veckoschema med en rad per aktiv vårdgivarprofil, plus en rad för pass utan tilldelad person, och du kan bläddra mellan veckor eller hoppa tillbaka till i dag.",
             ],
           },
           {
