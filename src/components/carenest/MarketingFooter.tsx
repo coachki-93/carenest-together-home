@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 
-const CONTACT_EMAIL = "support@tillsa.app";
 
 
 
@@ -68,12 +67,10 @@ export function MarketingFooter() {
           {/* About */}
           <FooterCol title={t("marketing.footer.about")}>
             <FooterLink to="/about">{t("marketing.nav.about")}</FooterLink>
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="block text-sm text-marketing-ink/85 hover:text-marketing-sage transition-colors"
-            >
+            <FooterLink to="/contact">
               {t("marketing.footer.contact")}
-            </a>
+            </FooterLink>
+
             <FooterLink to="/privacy">
               {t("marketing.footer.privacy")}
             </FooterLink>
