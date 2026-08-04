@@ -46,10 +46,10 @@ export function FaqSection({
         <Accordion
           type="single"
           collapsible
-          defaultValue="q1"
+          defaultValue={keys[0]}
           className="mk-glass rounded-3xl px-5 md:px-7 divide-y divide-marketing-line/60"
         >
-          {KEYS.map((k) => (
+          {keys.map((k) => (
             <AccordionItem key={k} value={k} className="border-0">
               <AccordionTrigger
                 className="text-left text-lg py-5 hover:no-underline [&[data-state=open]>svg]:hidden text-marketing-ink"
