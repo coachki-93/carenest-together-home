@@ -62,6 +62,7 @@ function InstructionsPage() {
   const { user } = useSession();
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
+  const isOwner = membership?.role === "owner";
   const { data: instructions, isLoading } = useInstructions(familyId);
 
   const [editing, setEditing] = useState<Instruction | null>(null);
