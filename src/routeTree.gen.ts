@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as InstallRouteImport } from './routes/install'
@@ -66,6 +67,11 @@ import { Route as ApiPublicHooksCarePlaceMissedSweepRouteImport } from './routes
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -350,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
@@ -404,6 +411,7 @@ export interface FileRoutesByTo {
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
@@ -460,6 +468,7 @@ export interface FileRoutesById {
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/appointments': typeof AuthenticatedAppointmentsRoute
@@ -516,6 +525,7 @@ export interface FileRouteTypes {
     | '/install'
     | '/offline'
     | '/privacy'
+    | '/support'
     | '/terms'
     | '/admin'
     | '/appointments'
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/install'
     | '/offline'
     | '/privacy'
+    | '/support'
     | '/terms'
     | '/admin'
     | '/appointments'
@@ -625,6 +636,7 @@ export interface FileRouteTypes {
     | '/install'
     | '/offline'
     | '/privacy'
+    | '/support'
     | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/appointments'
@@ -681,6 +693,7 @@ export interface RootRouteChildren {
   InstallRoute: typeof InstallRoute
   OfflineRoute: typeof OfflineRoute
   PrivacyRoute: typeof PrivacyRoute
+  SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
@@ -706,6 +719,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -1158,6 +1178,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstallRoute: InstallRoute,
   OfflineRoute: OfflineRoute,
   PrivacyRoute: PrivacyRoute,
+  SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
