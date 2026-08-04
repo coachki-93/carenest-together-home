@@ -155,7 +155,6 @@ export function AppSidebar() {
             </SidebarMenuItem>
           )}
           <SidebarMenuItem>
-          <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={isActive(guidebookItem.url)}
