@@ -3363,7 +3363,7 @@ export const sv = {
       family: "Familj",
       account: "Konto",
     },
-    reviewNote: "Markerat [NEEDS REVIEW] — den här detaljen är inte bekräftad och håller på att kontrolleras.",
+    
     sections: {
       dashboard: {
         title: "Idag",
