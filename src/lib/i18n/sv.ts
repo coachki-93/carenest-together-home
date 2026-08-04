@@ -3714,7 +3714,7 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Vårdteam har tre delar: kontona som har tillgång till familjen, vårdgivarprofilerna som används för att visa vem som gjort vad, och inbjudningarna.",
+              "Vårdteam är där du hanterar vilka som ingår i vården av barnet och hur deras insatser registreras. Den har tre delar: kontona som har tillgång till familjen, vårdgivarprofilerna som loggposter tillskrivs (så att historiken visar personen, inte bara inloggningen) och inbjudningar för att ta in nya personer.",
             ],
           },
           {
