@@ -88,6 +88,7 @@ export function AppSidebar() {
   const isOwner = membership.data?.role === "owner";
   const settingsItem = { title: t("nav.settings"), url: "/settings", icon: Settings };
   const billingItem = { title: t("nav.billing"), url: "/billing", icon: CreditCard };
+  const guidebookItem = { title: t("nav.guidebook"), url: "/guidebook", icon: BookOpen };
   const reportBugItem = { title: t("nav.reportBug"), url: "/report-bug", icon: Bug };
 
   const isActive = (url: string) =>
