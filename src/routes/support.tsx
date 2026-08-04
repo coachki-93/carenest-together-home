@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { BookOpen, MessageSquareText } from "lucide-react";
+import { Plus, ShieldAlert } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { FaqSection } from "@/components/carenest/FaqSection";
