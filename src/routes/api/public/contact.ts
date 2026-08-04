@@ -169,6 +169,20 @@ export const Route = createFileRoute('/api/public/contact')({
           status: 'pending',
         })
 
+        // Provider requires an unsubscribe_token on transactional sends.
+        // Recipient is our own support inbox, so this link is internal.
+        const unsubscribeToken = await getUnsubscribeToken(supabase, CONTACT_RECIPIENT)
+        if (!unsubscribeToken) {
+          await supabase.from('email_send_log').insert({
+            message_id: messageId,
+            template_name: TEMPLATE_NAME,
+            recipient_email: CONTACT_RECIPIENT,
+            status: 'failed',
+            error_message: 'Failed to prepare unsubscribe token',
+          })
+          return Response.json({ error: 'send_failed' }, { status: 500 })
+        }
+
         const { error } = await supabase.rpc('enqueue_email', {
           queue_name: 'transactional_emails',
           payload: {
@@ -183,9 +197,11 @@ export const Route = createFileRoute('/api/public/contact')({
             purpose: 'transactional',
             label: TEMPLATE_NAME,
             idempotency_key: messageId,
+            unsubscribe_token: unsubscribeToken,
             queued_at: new Date().toISOString(),
           },
         })
+
 
         if (error) {
           console.error('Failed to enqueue contact email', { error })
