@@ -399,6 +399,9 @@ function SettingsPage() {
               </div>
             </section>
 
+            {/* Report a bug */}
+            <ReportBugCard />
+
             {/* Sign out */}
             <section className="card-soft p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
