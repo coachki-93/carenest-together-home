@@ -3780,7 +3780,12 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Prenumerationssidan är bara för familjens ägare. Övriga medlemmar ser en kort notis om att ägaren hanterar den.",
+              "Prenumeration är där familjens plan och betalning finns. Efter den 30 dagar långa provperioden håller en aktiv prenumeration appen fullt användbar; utan den blir den skrivskyddad (er data sparas). Här kan du prenumerera, se förnyelsedatum och pris, och öppna betalportalen för att hantera betalsätt eller säga upp.",
+            ],
+          },
+          {
+            body: [
+              "Bara familjens ägare hanterar betalningen; övriga medlemmar ser en kort notis om att ägaren sköter den.",
             ],
           },
           {
