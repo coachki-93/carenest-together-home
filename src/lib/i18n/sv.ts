@@ -3402,7 +3402,8 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Schema är dagsvyn. Den visar medicindoser och besök för en dag, och du bläddrar mellan dagar med föregående, i dag och nästa.",
+              "Schema är er plan dag för dag. Den visar en dag i taget — varje medicindos och besök den dagen, i tidsordning — så att du kan blicka framåt eller bakåt på en enskild dag utan bruset från Idags arbetsvy.",
+              "Bläddra mellan dagar med föregående, i dag och nästa.",
             ],
           },
           {
