@@ -45,6 +45,8 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicHooksStripeRouteImport } from './routes/api/public/hooks/stripe'
 import { Route as ApiPublicHooksOxygenLowSweepRouteImport } from './routes/api/public/hooks/oxygen-low-sweep'
 import { Route as ApiPublicHooksInventoryLowSweepRouteImport } from './routes/api/public/hooks/inventory-low-sweep'
@@ -237,6 +239,16 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksStripeRoute = ApiPublicHooksStripeRouteImport.update({
   id: '/api/public/hooks/stripe',
   path: '/api/public/hooks/stripe',
@@ -307,6 +319,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
   '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
@@ -349,6 +363,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
   '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
@@ -393,6 +409,8 @@ export interface FileRoutesById {
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
   '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
@@ -437,6 +455,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
     | '/api/public/hooks/stripe'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -479,6 +499,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
     | '/api/public/hooks/stripe'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   id:
     | '__root__'
@@ -522,6 +544,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
     | '/api/public/hooks/stripe'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
@@ -540,6 +564,8 @@ export interface RootRouteChildren {
   ApiPublicHooksInventoryLowSweepRoute: typeof ApiPublicHooksInventoryLowSweepRoute
   ApiPublicHooksOxygenLowSweepRoute: typeof ApiPublicHooksOxygenLowSweepRoute
   ApiPublicHooksStripeRoute: typeof ApiPublicHooksStripeRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -797,6 +823,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/stripe': {
       id: '/api/public/hooks/stripe'
       path: '/api/public/hooks/stripe'
@@ -921,8 +961,20 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksInventoryLowSweepRoute: ApiPublicHooksInventoryLowSweepRoute,
   ApiPublicHooksOxygenLowSweepRoute: ApiPublicHooksOxygenLowSweepRoute,
   ApiPublicHooksStripeRoute: ApiPublicHooksStripeRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
