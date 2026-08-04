@@ -146,24 +146,26 @@ function InstructionsPage() {
             <article key={ins.id} className="card-soft p-5">
               <header className="flex items-start justify-between gap-3 mb-2">
                 <h3 className="font-bold text-lg leading-tight">{ins.title}</h3>
-                <div className="flex gap-1 shrink-0">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setEditing(ins)}
-                    aria-label={t("common.edit")}
-                  >
-                    <Pencil className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setDeleting(ins)}
-                    aria-label={t("common.delete")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
+                {isOwner && (
+                  <div className="flex gap-1 shrink-0">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setEditing(ins)}
+                      aria-label={t("common.edit")}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setDeleting(ins)}
+                      aria-label={t("common.delete")}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                )}
               </header>
               {ins.body ? (
                 <div
