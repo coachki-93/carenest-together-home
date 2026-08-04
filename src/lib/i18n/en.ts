@@ -2245,6 +2245,7 @@ export const en = {
       about: "About",
       privacy: "Privacy Policy",
       terms: "Terms of Service",
+      support: "Support",
       contact: "Contact",
       language: "Language",
       trustLine: "Built with families of medically complex children.",
@@ -2290,6 +2291,23 @@ export const en = {
       readyTitle: "Set up your family's space",
       readyBody: "Install takes seconds. Setup takes a couple of minutes.",
       backHome: "Back to home",
+    },
+    support: {
+      kicker: "Support",
+      title: "How can",
+      titleB: "we help?",
+      intro:
+        "Feature how-tos live in the Guidebook inside the app. Common questions are answered below — and anything else, send it our way with the form at the bottom.",
+      guidebookTitle: "Already using Tillsa?",
+      guidebookBody:
+        "The in-app Guidebook explains every feature — what it does, who can see it, and how it fits the rest of the app. Sign in and open Guidebook in the sidebar.",
+      writeTitle: "Account, billing or something else?",
+      writeBody:
+        "Write to us with the form below. It reaches a real person — there is no phone line and no ticket queue, just us reading and replying.",
+      formKicker: "Get in touch",
+      formTitle: "Send us a message",
+      formBody:
+        "Tell us what is going on and we will get back to you by email.",
     },
     contact: {
       metaTitle: "Contact Tillsa — we read every message",
