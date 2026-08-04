@@ -15,19 +15,34 @@ const KEYS = ["q1", "q2", "q4", "q5", "q6", "q7", "q8", "q9", "q10"];
 
 /**
  * Marketing FAQ — shared by the landing page (§12) and /support so the two
- * surfaces can't drift. `id` is a prop so each host owns its own anchor.
+ * surfaces can't drift. `id` is a prop so each host owns its own anchor, and
+ * `keys`/`kicker`/`title` let /support render a second group ("Using Tillsa")
+ * from the same markup. Defaults reproduce the landing-page block exactly.
  */
-export function FaqSection({ id = "faq" }: { id?: string }) {
+export function FaqSection({
+  id = "faq",
+  keys = KEYS,
+  kicker = "marketing.faq.kicker",
+  title = "marketing.faq.title",
+  className = "px-6 md:px-8 py-20 md:py-28",
+}: {
+  id?: string;
+  keys?: string[];
+  kicker?: string;
+  title?: string;
+  className?: string;
+}) {
   const { t } = useTranslation();
   return (
-    <section id={id} className="px-6 md:px-8 py-20 md:py-28">
+    <section id={id} className={className}>
       <div className="max-w-3xl mx-auto">
         <Reveal className="text-center mb-12 space-y-3">
-          <Kicker>{t("marketing.faq.kicker")}</Kicker>
+          <Kicker>{t(kicker)}</Kicker>
           <h2 className="text-display-md text-marketing-ink" style={display}>
-            {t("marketing.faq.title")}
+            {t(title)}
           </h2>
         </Reveal>
+
         <Accordion
           type="single"
           collapsible
