@@ -3739,7 +3739,7 @@ export const en = {
         blocks: [
           {
             body: [
-              "Shifts is a weekly grid of who is on duty. There is one row per active caregiver profile, plus a row for shifts with nobody assigned, and you can move between weeks or jump back to today.",
+              "Shifts shows who is on duty across the week. It is a weekly grid with one row per active caregiver profile, plus a row for shifts with nobody assigned, and you can move between weeks or jump back to today.",
             ],
           },
           {
