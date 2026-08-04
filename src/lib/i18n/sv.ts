@@ -3410,7 +3410,7 @@ export const sv = {
             heading: "Så använder du den",
             steps: [
               "Använd plusknappen för att skapa ett besök på den dag du tittar på.",
-              "Markera en dos som Given eller Hoppa över. Schema använder en kort bekräftelse i stället för den fylligare rutan på Idag, så ingen orsak sparas här.",
+              "Markera en dos som Given eller Hoppa över. Att markera doser här går snabbt; för en fullständig logg med orsak, använd Idag.",
               "Ångra tar bort loggposten för dosen.",
               "När du ändrar eller tar bort ett återkommande besök får du frågan om det gäller bara det tillfället eller hela serien.",
             ],
