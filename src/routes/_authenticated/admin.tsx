@@ -34,15 +34,18 @@ import {
   adminTriggerPasswordReset,
 } from "@/lib/data/admin.functions";
 import { AdminCoupons } from "@/components/carenest/AdminCoupons";
+import { AdminBugReports } from "@/components/carenest/AdminBugReports";
 import { toast } from "@/lib/notify";
 
-type AdminTab = "accounts" | "families" | "coupons";
+type AdminTab = "accounts" | "families" | "coupons" | "bugs";
 type AdminSearch = { tab?: AdminTab };
 
 export const Route = createFileRoute("/_authenticated/admin")({
   validateSearch: (s: Record<string, unknown>): AdminSearch => {
     const tab: AdminTab =
-      s.tab === "families" || s.tab === "coupons" ? s.tab : "accounts";
+      s.tab === "families" || s.tab === "coupons" || s.tab === "bugs"
+        ? s.tab
+        : "accounts";
     return { tab };
   },
   head: () => ({
