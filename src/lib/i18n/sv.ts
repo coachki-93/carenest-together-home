@@ -205,6 +205,7 @@ export const sv = {
     shifts: "Pass",
     billing: "Prenumeration",
     settings: "Inställningar",
+    guidebook: "Handbok",
     reportBug: "Rapportera bugg",
   },
   shiftsPage: {
@@ -3335,6 +3336,512 @@ export const sv = {
         }
       ]
     }
+  },
+  guidebook: {
+    title: "Handbok",
+    subtitle: "Så fungerar varje del av Tillsa.",
+    intro: {
+      heading: "Vad Tillsa är",
+      body: [
+        "Tillsa är ett gemensamt verktyg för en familj och dess vårdteam. Alla med tillgång ser samma plan, samma logg och samma instruktioner, så ingenting hänger på att en person kommer ihåg.",
+        "Tillsa är inte medicinsk rådgivning och bestämmer ingenting om vården. Appen registrerar det ni planerar och gör, och visar vem som gjorde vad och när.",
+        "Nästan allt du loggar kopplas både till ditt konto och till en vårdgivarprofil, så historiken visar personen och inte bara inloggningen.",
+      ],
+      stepsHeading: "Kom igång",
+      steps: [
+        "Fyll i barnets profil: namn, diagnos, allergier, nödkontakter och läkare.",
+        "Välj vårdbehoven i barnets profil. De styr vilka mätvärden och moduler som visas i resten av appen.",
+        "Lägg in medicinerna med sina klockslag, så börjar doserna dyka upp på Idag och i Schema.",
+        "Bjud in resten av vårdteamet från Vårdteam och skapa en vårdgivarprofil för varje person.",
+        "Ställ in familjens tidszon, överlämningstider och övriga familjeinställningar i Inställningar.",
+        "Slå på aviseringar i Inställningar på varje enhet som ska få påminnelser.",
+      ],
+    },
+    groups: {
+      care: "Omsorg",
+      caregivers: "Vårdgivare",
+      family: "Familj",
+      account: "Konto",
+    },
+    reviewNote: "Markerat [NEEDS REVIEW] — den här detaljen är inte bekräftad och håller på att kontrolleras.",
+    sections: {
+      dashboard: {
+        title: "Idag",
+        blocks: [
+          {
+            body: [
+              "Idag är arbetsvyn. Den samlar allt som är planerat för dagen i en lista i tidsordning: medicindoser, besök och de mätvärden som redan är loggade i dag.",
+            ],
+          },
+          {
+            heading: "Vad du kan göra med en uppgift",
+            steps: [
+              "Klar — öppnar en ruta där du bekräftar vilken vårdgivarprofil som gjorde det. Vissa uppgifter frågar också efter en anteckning eller, för ett mätbesök, ett värde som då sparas som ett mätvärde.",
+              "Markera pågående — finns på uppgifter som tillåter det. Det registrerar vem som startade och när, pausar räkningen mot sen och missad, och skickar en avisering till familjen.",
+              "Hoppa över — kräver en orsak. Du kan välja en färdig orsak eller skriva egen.",
+              "Skjut upp — en orsak plus ny dag och tid, som föreslås en timme senare.",
+              "Ångra — tar bort loggposten igen, så uppgiften blir ogjord.",
+            ],
+          },
+          {
+            heading: "Snabblogg",
+            body: [
+              "Knappen Logga i sidhuvudet öppnar snabbrutan där du registrerar ett mätvärde eller en händelse utan att byta sida.",
+            ],
+          },
+          {
+            heading: "Resten av vyn",
+            body: [
+              "Idag visar också rutor för mätvärden, ett syrgaskort när syrgas används, nedräkning till nästa överlämning, underhåll som ska göras och genvägar till övriga sidor. Vilka rutor som visas styrs av vårdbehoven i barnets profil, och underhållskortet döljs om familjen har stängt av utrustning i Inställningar.",
+            ],
+          },
+        ],
+      },
+      schedule: {
+        title: "Schema",
+        blocks: [
+          {
+            body: [
+              "Schema är dagsvyn. Den visar medicindoser och besök för en dag, och du bläddrar mellan dagar med föregående, i dag och nästa.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "Använd plusknappen för att skapa ett besök på den dag du tittar på.",
+              "Markera en dos som Given eller Hoppa över. Schema använder en kort bekräftelse i stället för den fylligare rutan på Idag, så ingen orsak sparas här.",
+              "Ångra tar bort loggposten för dosen.",
+              "När du ändrar eller tar bort ett återkommande besök får du frågan om det gäller bara det tillfället eller hela serien.",
+            ],
+          },
+        ],
+      },
+      appointments: {
+        title: "Besök",
+        blocks: [
+          {
+            body: [
+              "Besök är en månadskalender med besök och andra planerade tillfällen. Välj en dag för att se den, och använd plusknappen för att lägga till ett nytt.",
+            ],
+          },
+          {
+            heading: "Skapa och ändra",
+            steps: [
+              "Tryck på ett tillfälle för att se en kort förhandsvisning med titel, tid, plats och upprepning, och välj sedan Redigera för hela formuläret.",
+              "Formuläret har titel, start- och sluttid eller heldag, färg, plats och anteckningar, en påminnelse i minuter före start, och upprepning: ingen, dagligen, veckovis, månadsvis eller var N:e, med veckodagar för veckovis upprepning.",
+              "Titel är obligatoriskt och sluttiden måste vara efter starttiden.",
+              "När du sparar eller tar bort ett återkommande besök får du frågan om ändringen gäller det tillfället eller hela serien.",
+            ],
+          },
+          {
+            heading: "Aviseringar",
+            body: [
+              "Familjen kan få en avisering före start enligt påminnelsen du satt, vid starttiden, när besöket blir sent och när det räknas som missat utan att något loggats. Varje tillfälle aviseras bara en gång per sort.",
+            ],
+          },
+        ],
+      },
+      medications: {
+        title: "Mediciner",
+        blocks: [
+          {
+            body: [
+              "Mediciner är listan över barnets läkemedel och tiderna de ges. Den är källan till de doser som visas på Idag och i Schema.",
+            ],
+          },
+          {
+            heading: "Lägga till en medicin",
+            steps: [
+              "Bara familjens ägare kan lägga till, ändra eller ta bort en medicin.",
+              "Fyll i namn, dosmängd och enhet samt administrationssätt, till exempel oralt, via sond, injektion, inhalation eller på huden.",
+              "Lägg in ett klockslag per dos, i timmar och minuter. Varje klockslag blir en dos varje dag.",
+              "Välj en färg så att medicinen är lätt att känna igen i listorna.",
+              "Slå på kurinställningen för en tidsbegränsad behandling och ange då datum och tid för första dosen samt totalt antal doser.",
+            ],
+          },
+          {
+            heading: "Så skapas doserna",
+            body: [
+              "Varje aktiv medicin ger en dos per angivet klockslag för den aktuella dagen, i familjens tidszon. Arkiverade eller inaktiva mediciner ger inga doser.",
+              "För en kur begränsas doserna till fönstret som börjar vid den första dosen du angav och slutar vid den sista dosen i antalet. Det betyder att första dagen bara visar de tider som ligger efter första dosen, och att sista dagen slutar efter den sista dosen. Ingenting behöver avslutas manuellt.",
+              "Doserna kopplas till det du redan loggat utifrån medicin och planerad tid, så en omladdning skapar aldrig dubbletter.",
+            ],
+          },
+          {
+            heading: "Markera en dos",
+            body: [
+              "När du markerar en dos som given sparas status, tiden den gavs, ditt konto och den vårdgivarprofil som gjorde det. Att hoppa över eller skjuta upp kräver en orsak, och vid uppskjutning sparas även den nya tiden.",
+              "Historiken på varje medicin visar tidigare doser, nyast först, med personen som loggade och den uppskjutna tiden där det är aktuellt, femtio i taget.",
+              "Arkivera håller en gammal medicin borta från dagslistan utan att ta bort historiken. Visa tidigare tar fram de arkiverade igen.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Timer",
+            body: [
+              "[NEEDS REVIEW: dosposten har fält för en startad timer, men vi kunde inte bekräfta var i gränssnittet en timer startas, så timers beskrivs inte här.]",
+            ],
+          },
+        ],
+      },
+      vitals: {
+        title: "Mätvärden",
+        blocks: [
+          {
+            body: [
+              "Mätvärden innehåller de mätningar ni gör: till exempel temperatur, puls, syremättnad, andning, vätska, vikt och blöjor. Vilka som visas styrs av vårdbehoven i barnets profil.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "Använd Logga för att lägga in en mätning: värdet, tiden, valfria sammanhangsetiketter och en anteckning.",
+              "Varje ruta visar senaste värdet med färg för lågt, normalt eller högt, och markerar att det är dags för en ny kontroll när senaste mätningen är gammal.",
+              "Diagrammen visar trenden för den period du väljer. Vätska visas som staplar och vikt har ett eget diagram med förändringen sedan förra mätningen.",
+              "Historiken kan fällas ut, och en enskild mätning kan tas bort efter en bekräftelse.",
+            ],
+          },
+          {
+            heading: "Normalvärden",
+            body: [
+              "Färgerna utgår från åldersbaserade standardintervall. Ägaren kan ändra undre och övre gräns per mätvärde i barnets profil och återställa till standard igen.",
+            ],
+          },
+        ],
+      },
+      events: {
+        title: "Händelser",
+        blocks: [
+          {
+            body: [
+              "Händelser är loggen över sådant som inträffar och är värt att dokumentera, till exempel ett anfall eller en annan incident. Vilka typer som erbjuds beror på vårdbehoven i barnets profil.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "Använd Logga händelse och välj en typ, fyll sedan i datum och tid, allvarlighetsgrad, längd i minuter och sekunder, en beskrivning som är obligatorisk, samt vad som gjordes.",
+              "Filtrera listan på typ och visa eller dölj arkiverade händelser.",
+              "Händelserna grupperas per dag i familjens tidszon och visar vem som loggade dem.",
+              "Den som skrev en händelse kan arkivera den, vilket döljer den utan att ta bort den, och ta fram den igen.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Redigering",
+            body: [
+              "[NEEDS REVIEW: en händelse kan redigeras av den som skrev den under en begränsad tid efteråt, men vi kunde inte bekräfta exakt hur lång tiden är eller om någon annan får redigera.]",
+            ],
+          },
+        ],
+      },
+      oxygen: {
+        title: "Syrgas",
+        blocks: [
+          {
+            body: [
+              "Syrgas håller reda på tuben som används och hur mycket tid som är kvar i den, utifrån flödet.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "Starta tub: välj flöde, där varje alternativ visar hur länge tuben räcker vid det flödet, och lägg till en anteckning om du vill.",
+              "Kortet för aktuell tub visar status normal, låg, kritisk, tom eller pausad, tiden som är kvar med nedräkning, hur mycket som är kvar som en stapel, flödet, när den startades och beräknad tid då den tar slut.",
+              "Ändra flöde visar vad återstående tid blir vid det nya flödet innan du sparar.",
+              "Byt tub avslutar den aktuella tuben och startar en ny, med eget flöde och anteckning.",
+              "Historikkortet listar tidigare tuber med start- och bytestider.",
+            ],
+          },
+          {
+            heading: "Sjukhusläge",
+            body: [
+              "När familjen är markerad som på sjukhus visas tuben som pausad.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Tubtyper",
+            body: [
+              "[NEEDS REVIEW: startrutan använder i dag en enda fast tubtyp, så ingen tubtyp går att välja i gränssnittet trots att flera finns i modellen.]",
+            ],
+          },
+        ],
+      },
+      handover: {
+        title: "Överlämning",
+        blocks: [
+          {
+            body: [
+              "Överlämning är den skrivna rapporten mellan pass. Sidan listar de senaste överlämningarna med vem som skrev dem.",
+            ],
+          },
+          {
+            heading: "Skriva en",
+            steps: [
+              "En överlämning har ett pass, en sammanfattning och korta fält för sömn, humör, anfall, vätska och mediciner, samt fria anteckningar.",
+              "Ett utkast kan fyllas i automatiskt från passets tidsfönster: givna eller missade mediciner, mätvärden, besök, syrgas, händelser och underhåll blir punktrader. Ifyllningen skriver aldrig över text du redan skrivit.",
+              "Den som skrev överlämningen kan ändra den i två timmar efteråt. En ändring nollställer läskvittona så att de andra får läsa igen.",
+              "Den som skrev den kan också ta bort den efter en bekräftelse.",
+            ],
+          },
+          {
+            heading: "Läsa",
+            body: [
+              "Alla utom den som skrev ser knappen Markera som läst på en överlämning de inte läst. Du behöver ha en aktiv vårdgivarprofil vald för att kunna markera den som läst.",
+              "Överlämningen visar vilka som läst den och när, och markerar tydligt om någon läste den innan den ändrades.",
+            ],
+          },
+          {
+            heading: "Påminnelser",
+            body: [
+              "När en överlämning ska göras enligt överlämningstiderna i Inställningar visas en banner i appen. Om en överlämning redan skrivits strax innan tiden byter bannern till en mjukare påminnelse om sista noteringar. En bortklickad banner förblir bortklickad på den enheten.",
+            ],
+          },
+        ],
+      },
+      instructions: {
+        title: "Instruktioner",
+        blocks: [
+          {
+            body: [
+              "Instruktioner innehåller de skrivna rutinerna för barnet, till exempel hur en utrustning används eller hur en rutin görs. Varje instruktion har en titel och en formaterad text, och listan sorteras med senast uppdaterad först.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "Lägg till öppnar ett formulär med titel och en textredigerare för innehållet.",
+              "Varje instruktion kan redigeras, och när du tar bort en får du en bekräftelse med instruktionens namn.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Vem får redigera",
+            body: [
+              "[NEEDS REVIEW: vi hittade ingen begränsning till ägaren på den här sidan, så alla i familjen verkar kunna lägga till, ändra och ta bort instruktioner. Bekräfta att det är avsikten.]",
+            ],
+          },
+        ],
+      },
+      inventory: {
+        title: "Förråd",
+        blocks: [
+          {
+            body: [
+              "Förråd håller reda på materialet: hur mycket som finns kvar, när något börjar ta slut och när det går ut. Ägaren och de som är markerade som materialansvariga kan ändra; övriga ser samma information men skrivskyddad.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "En vara har antal, lägsta godtagbara nivå, kategori, plats, leverantör med valfri beställningslänk och utgångsdatum.",
+              "En banner högst upp räknar de varor som är låga, snart utgångna eller redan utgångna, och flikarna filtrerar till dem.",
+              "Minus och plus ändrar antalet med ett och skrivs till varans historik.",
+              "Markera beställd noterar att en leverans är på väg, med förväntat datum, och kan tas bort igen.",
+              "Markera mottagen lägger till det levererade antalet med en valfri notering.",
+              "Lägg till i nästa runda sätter upp en låg vara på listan till nästa materialrunda.",
+              "Varje vara har en historik, och sidan avslutas med ett flöde över de senaste ändringarna och vem som gjorde dem.",
+            ],
+          },
+        ],
+      },
+      maintenance: {
+        title: "Underhåll",
+        blocks: [
+          {
+            body: [
+              "Underhåll håller reda på utrustning och de återkommande uppgifter den kräver, som att byta filter eller rengöra en del.",
+            ],
+          },
+          {
+            heading: "När den visas",
+            body: [
+              "Hela funktionen stängs av med utrustningsinställningen i Inställningar. När den är av visar sidan bara en förklaring och en länk till Inställningar, och menyvalet försvinner.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "Ägaren och materialansvariga kan hantera maskiner och uppgifter; övriga ser den skrivskyddad.",
+              "En maskin har namn, typ och undertyp, tillverkare, modell, serienummer och anteckningar, och kan arkiveras eller tas bort.",
+              "Varje maskin har uppgifter med ett intervall, och varje uppgift visas som ok, snart dags, försenad eller vid behov.",
+              "Markera utförd registrerar uppgiften som gjord nu, med en valfri notering och den vårdgivarprofil som gjorde den, och syns i uppgiftens historik.",
+            ],
+          },
+        ],
+      },
+      shopping: {
+        title: "Inköpslista",
+        blocks: [
+          {
+            body: [
+              "Inköpslistan är en skrivskyddad vy över det som Förråd säger behöver köpas. Den har två delar: att beställa, som är allt under sin lägsta nivå som inte är beställt, och beställt, som visar vad som redan är beställt och när det väntas.",
+            ],
+          },
+          {
+            body: [
+              "Varje rad visar antalet mot sin gräns och leverantören, med länk där det finns. Antal, beställningar och leveranser ändras på sidan Förråd, inte här.",
+            ],
+          },
+        ],
+      },
+      emergency: {
+        title: "Nödinformation",
+        blocks: [
+          {
+            body: [
+              "Nödinformation är en skrivskyddad vy för lägen där det inte finns tid att leta. Den öppnar direkt på det viktigaste och sparas på enheten så att den fungerar utan uppkoppling, med en notis när du är offline.",
+            ],
+          },
+          {
+            heading: "Vad den innehåller",
+            steps: [
+              "En knapp för att ringa 112, och en knapp för att ringa den första nödkontakten som har ett nummer.",
+              "Diagnos och beskrivning av tillståndet, samt allergierna markerade.",
+              "Åtgärderna i ordning, var och en märkt som kritisk, att bevaka eller information.",
+              "De aktiva medicinerna, nödkontakterna och läkarna, samt när informationen senast uppdaterades.",
+            ],
+          },
+          {
+            heading: "Hålla den korrekt",
+            body: [
+              "Innehållet kommer från barnets profil, där ägaren också skriver åtgärderna. Ägare får en länk härifrån till det formuläret.",
+            ],
+          },
+        ],
+      },
+      caregivers: {
+        title: "Vårdteam",
+        blocks: [
+          {
+            body: [
+              "Vårdteam har tre delar: kontona som har tillgång till familjen, vårdgivarprofilerna som används för att visa vem som gjort vad, och inbjudningarna.",
+            ],
+          },
+          {
+            heading: "Konton och profiler",
+            steps: [
+              "Ägaren är markerad med en krona; övriga är teammedlemmar.",
+              "Ägaren kan markera en medlem som materialansvarig, vilket ger den personen möjlighet att hantera Förråd och Underhåll.",
+              "Ägaren kan ta bort en medlem efter en bekräftelse och kan skapa en vårdgivarprofil åt vem som helst. Övriga medlemmar kan skapa en profil åt sig själva.",
+              "En vårdgivarprofil har namn och färg, hör till ett konto och kan markeras som inaktiv. Den kan ändras eller tas bort av kontot som äger den eller av familjens ägare.",
+            ],
+          },
+          {
+            heading: "Inbjudningar",
+            body: [
+              "Bara ägaren ser inbjudningsdelen. Ny inbjudan frågar efter en e-postadress, skapar inbjudan, öppnar ett förberett mejl med inbjudningslänken och visar länken så att den kan kopieras och skickas på annat sätt. Väntande inbjudningar visar adress, inbjudningskod och giltighetstid, och kan skickas igen eller återkallas.",
+            ],
+          },
+        ],
+      },
+      shifts: {
+        title: "Pass",
+        blocks: [
+          {
+            body: [
+              "Pass är ett veckoschema över vem som arbetar. Det finns en rad per aktiv vårdgivarprofil, plus en rad för pass utan tilldelad person, och du kan bläddra mellan veckor eller hoppa tillbaka till i dag.",
+            ],
+          },
+          {
+            heading: "Så använder du den",
+            steps: [
+              "Bara ägaren kan skapa och ändra pass; övriga ser samma schema utan knapparna.",
+              "Tryck på en tom ruta eller använd Lägg till pass för att skapa ett, och tryck på ett befintligt pass för att ändra det.",
+              "Ett pass har en vårdgivarprofil, start- och sluttid i familjens tidszon, en fritextkategori och en färg.",
+              "Ett pass kan upprepas dagligen eller veckovis, med intervall, valda veckodagar för veckovis upprepning och ett slutdatum.",
+              "Sluttiden måste vara efter starttiden, och ett befintligt pass kan tas bort från samma formulär.",
+            ],
+          },
+        ],
+      },
+      child: {
+        title: "Barnets profil",
+        blocks: [
+          {
+            body: [
+              "Barnets profil är källan till den information som resten av appen använder. Bara ägaren kan ändra den; övriga ser den skrivskyddad.",
+            ],
+          },
+          {
+            heading: "Vad den innehåller",
+            steps: [
+              "Foto, namn och födelsedatum.",
+              "Diagnos, beskrivning av tillståndet och allergier, som visas i Nödinformation.",
+              "Nödkontakter med namn, relation och telefonnummer, och läkare med namn, specialitet och telefonnummer.",
+              "Åtgärderna vid akutläge, i den ordning de ska följas, var och en med en allvarlighetsgrad.",
+              "Vårdbehoven, som styr vilka mätvärden, händelsetyper och moduler som syrgas som visas i resten av appen.",
+              "Egna normalintervall för puls, syremättnad, temperatur och andning, var och en med återställning till det åldersbaserade standardvärdet.",
+            ],
+          },
+        ],
+      },
+      billing: {
+        title: "Prenumeration",
+        blocks: [
+          {
+            body: [
+              "Prenumerationssidan är bara för familjens ägare. Övriga medlemmar ser en kort notis om att ägaren hanterar den.",
+            ],
+          },
+          {
+            heading: "Vad den visar",
+            steps: [
+              "Nuvarande läge: provperiod med antal dagar kvar, aktiv, avslutas ett visst datum, obetald, avslutad eller inaktiv.",
+              "Planen och priset, utom under provperioden då inget pris visas.",
+              "Prenumerera, som öppnar betalningskassan, när familjen ännu inte har någon betalningskund.",
+              "Hantera, som öppnar betalningsportalen för betalsätt, fakturor och uppsägning, när familjen redan har en.",
+            ],
+          },
+          {
+            body: [
+              "Fakturor och kvitton finns i portalen. Er data sparas om prenumerationen upphör.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Efter uppsägning",
+            body: [
+              "[NEEDS REVIEW: vi kunde inte bekräfta vad en familj som sagt upp men fortfarande har en betalningskund ser, så guiden beskriver inget separat flöde för att prenumerera igen.]",
+            ],
+          },
+        ],
+      },
+      settings: {
+        title: "Inställningar",
+        blocks: [
+          {
+            heading: "Ditt konto",
+            steps: [
+              "Profil: bild, namn, färg och din e-postadress.",
+              "Aktiv vårdgivarprofil, som visas när ditt konto har fler än en och avgör vem din loggning tillskrivs.",
+              "Språk, engelska eller svenska, som sparas på enheten.",
+              "Aviseringar, där du tillåter push-aviseringar på den här enheten.",
+              "Lösenord, där du sätter ett nytt.",
+              "Hjälp: spela upp introduktionen igen eller starta om guiden.",
+              "Logga ut.",
+            ],
+          },
+          {
+            heading: "Familjeinställningar",
+            body: [
+              "De här visas bara för ägaren.",
+            ],
+            steps: [
+              "På sjukhus, som pausar delar av appen medan barnet är inlagt.",
+              "Familjens språk och tidszon, som avgör vad i dag betyder i appen.",
+              "Inställningar för materialrundor och uppstädning.",
+              "Överlämningspåminnelser, som styr när överlämningsbannern visas.",
+              "Hur mycket ägaren aviseras.",
+              "Om familjen använder utrustning, vilket slår på eller av Underhåll.",
+              "Återställning av det föreslagna startinnehållet.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Teamkonto",
+            body: [
+              "[NEEDS REVIEW: inställningssidan visar också ett kort för teamkonto vars exakta innehåll och funktioner vi inte har bekräftat, så det beskrivs inte här.]",
+            ],
+          },
+        ],
+      },
+    },
   },
 };
 
