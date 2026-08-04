@@ -3780,7 +3780,12 @@ export const en = {
         blocks: [
           {
             body: [
-              "The subscription page is only for the family owner. Other members see a short note that the owner handles it.",
+              "Subscription is where the family's plan and billing live. After the 30-day trial, an active subscription keeps the app fully usable; without one it becomes read-only (your data is kept). Here you can subscribe, see your renewal date and price, and open the billing portal to manage payment or cancel.",
+            ],
+          },
+          {
+            body: [
+              "Only the family owner manages billing; other members see a short note that the owner handles it.",
             ],
           },
           {
