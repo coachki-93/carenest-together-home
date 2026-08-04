@@ -3678,7 +3678,8 @@ export const en = {
           },
           {
             body: [
-              "Each item shows the quantity against its threshold and the supplier, with a link where one exists. Quantities, orders and deliveries are changed on the Inventory page, not here.",
+              "It's read-only here — you tick things off and update stock levels in Inventory (Förråd), not on this page. It's split into what needs ordering now and what is already on order with its expected date.",
+              "Each item shows the quantity against its threshold and the supplier, with a link where one exists.",
             ],
           },
         ],
