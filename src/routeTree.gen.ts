@@ -44,6 +44,7 @@ import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicHooksStripeRouteImport } from './routes/api/public/hooks/stripe'
 import { Route as ApiPublicHooksOxygenLowSweepRouteImport } from './routes/api/public/hooks/oxygen-low-sweep'
 import { Route as ApiPublicHooksInventoryLowSweepRouteImport } from './routes/api/public/hooks/inventory-low-sweep'
@@ -230,6 +231,12 @@ const AuthenticatedOnboardingCaregiverRoute =
     path: '/onboarding/caregiver',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksStripeRoute = ApiPublicHooksStripeRouteImport.update({
   id: '/api/public/hooks/stripe',
   path: '/api/public/hooks/stripe',
@@ -300,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
   '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -341,6 +349,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
   '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -384,6 +393,7 @@ export interface FileRoutesById {
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
   '/api/public/hooks/oxygen-low-sweep': typeof ApiPublicHooksOxygenLowSweepRoute
   '/api/public/hooks/stripe': typeof ApiPublicHooksStripeRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
     | '/api/public/hooks/stripe'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -468,6 +479,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
     | '/api/public/hooks/stripe'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -510,6 +522,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/inventory-low-sweep'
     | '/api/public/hooks/oxygen-low-sweep'
     | '/api/public/hooks/stripe'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -527,6 +540,7 @@ export interface RootRouteChildren {
   ApiPublicHooksInventoryLowSweepRoute: typeof ApiPublicHooksInventoryLowSweepRoute
   ApiPublicHooksOxygenLowSweepRoute: typeof ApiPublicHooksOxygenLowSweepRoute
   ApiPublicHooksStripeRoute: typeof ApiPublicHooksStripeRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -776,6 +790,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingCaregiverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/stripe': {
       id: '/api/public/hooks/stripe'
       path: '/api/public/hooks/stripe'
@@ -900,17 +921,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksInventoryLowSweepRoute: ApiPublicHooksInventoryLowSweepRoute,
   ApiPublicHooksOxygenLowSweepRoute: ApiPublicHooksOxygenLowSweepRoute,
   ApiPublicHooksStripeRoute: ApiPublicHooksStripeRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
