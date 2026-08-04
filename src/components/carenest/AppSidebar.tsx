@@ -155,6 +155,20 @@ export function AppSidebar() {
             </SidebarMenuItem>
           )}
           <SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive(guidebookItem.url)}
+              className="rounded-xl h-11"
+              tooltip={guidebookItem.title}
+            >
+              <Link to={guidebookItem.url} className="flex items-center gap-3">
+                <guidebookItem.icon className="size-5" />
+                {!collapsed && <span className="font-semibold">{guidebookItem.title}</span>}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={isActive(settingsItem.url)}
