@@ -3673,7 +3673,7 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Inköpslistan är en skrivskyddad vy över det som Förråd säger behöver köpas. Den har två delar: att beställa, som är allt under sin lägsta nivå som inte är beställt, och beställt, som visar vad som redan är beställt och när det väntas.",
+              "Inköpslistan är er inköpslista, som byggs automatiskt från Förråd — så att ni slipper hålla reda på det för hand. Den samlar allt som håller på att ta slut eller är slut på ett ställe, att ta med till affären.",
             ],
           },
           {
