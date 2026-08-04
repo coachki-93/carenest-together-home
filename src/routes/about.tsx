@@ -21,7 +21,7 @@ import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
 const SITE = "https://tillsa.app";
 const OG_IMAGE = SITE + "/og-image.jpg";
-const CONTACT_EMAIL = "hello@carenest.app";
+const CONTACT_EMAIL = "support@tillsa.app";
 
 const ABOUT_META = {
   en: {

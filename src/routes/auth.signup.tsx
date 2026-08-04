@@ -203,7 +203,15 @@ function SignUpPage() {
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox checked={agree} onCheckedChange={(v) => { setAgree(!!v); if (formError) setFormError(null); }} className="mt-0.5" />
-          <span className="text-muted-foreground">{t("auth.agreeTerms")}</span>
+          <span className="text-muted-foreground">
+            <Trans
+              i18nKey="auth.agreeTerms"
+              components={{
+                1: <LegalLink to="/terms" />,
+                3: <LegalLink to="/privacy" />,
+              }}
+            />
+          </span>
         </label>
         <div aria-live="polite" className="min-h-[1.25rem]">
           {formError && (
@@ -245,6 +253,19 @@ function SignUpPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LegalLink({ to, children }: { to: string; children?: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary font-medium underline underline-offset-2 hover:opacity-80"
+    >
+      {children}
+    </Link>
   );
 }
 

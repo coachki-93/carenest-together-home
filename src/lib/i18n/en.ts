@@ -67,7 +67,7 @@ export const en = {
     signupSubCaregiver: "You've been invited to help care for a child.",
     confirmPassword: "Confirm password",
     atLeast8: "At least 8 characters",
-    agreeTerms: "I agree to the Terms and Privacy Policy.",
+    agreeTerms: "I agree to the <1>Terms</1> and <3>Privacy Policy</3>.",
     creatingAccount: "Creating account…",
     create: "Create account",
     alreadyAccount: "Already have an account?",
@@ -2230,7 +2230,8 @@ export const en = {
       product: "Product",
       families: "Families",
       about: "About",
-      privacy: "Privacy",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
       contact: "Contact",
       language: "Language",
       trustLine: "Built with families of medically complex children.",
@@ -3089,6 +3090,190 @@ export const en = {
       dataPreserved: "If your subscription lapses, the app becomes read-only. Your data is never deleted.",
     },
     ownerOnly: "Only the family owner can manage the subscription.",
+  },
+  legal: {
+    "privacy": {
+      "title": "Privacy Policy",
+      "updated": "Last updated: 2026-08-03",
+      "intro": "How Tillsa handles your family's data.",
+      "sections": [
+        {
+          "heading": "1. Who we are (Data Controller)",
+          "body": [
+            "Tillsa (“we”, “us”) is operated by Kim Isaksson, an individual sole operator based in Sweden. For any privacy matter, contact: support@tillsa.app."
+          ]
+        },
+        {
+          "heading": "2. What this service is",
+          "body": [
+            "Tillsa is a care-coordination tool for families of children with special or complex care needs. It helps a family and its caregivers keep a shared, accurate picture of a child's daily care (schedules, medications, vital-sign logs, handovers, appointments, supplies). Tillsa is not a medical device and does not provide medical advice — see our Terms of Service."
+          ]
+        },
+        {
+          "heading": "3. What data we process",
+          "body": [
+            "Because the service coordinates a child's care, we necessarily process health-related data about a child (a minor), entered by the family and their caregivers. This includes:",
+            "— Child health data — vital-sign readings (e.g. heart rate, SpO₂, temperature), medications and doses, oxygen use, care tasks, symptoms and notes in handovers, appointments. This is “special category” data under GDPR Article 9.",
+            "— Caregiver and account data — names of caregivers, the account owner's email, and (for team accounts) a shared team login. Attribution of who logged what, and when.",
+            "— Billing data — handled by Stripe (see §6). We do not store your card number.",
+            "— Technical data — minimal operational data needed to run the app (e.g. push-notification subscription tokens for the device you enable notifications on).",
+            "— We do not run third-party advertising or behavioural-tracking analytics."
+          ]
+        },
+        {
+          "heading": "4. Who the data is about, and the role of the family",
+          "body": [
+            "The account owner and caregivers enter data about the child. The child is a data subject who cannot themselves consent; the parent or guardian who owns the account acts on the child's behalf."
+          ]
+        },
+        {
+          "heading": "5. Legal basis for processing",
+          "body": [
+            "— For the child's health data, we rely on the explicit consent of the account owner (parent or guardian), given at signup, as the Article 9(2)(a) condition for processing special-category data — combined with the necessity of processing to provide the coordination service the family has asked for (Art. 6(1)(b), performance of a contract).",
+            "— For billing, processing is necessary to perform the subscription contract (Art. 6(1)(b)) and to meet legal and accounting obligations (Art. 6(1)(c))."
+          ]
+        },
+        {
+          "heading": "6. Where your data is stored, and who processes it",
+          "body": [
+            "We keep the number of third parties to a minimum:",
+            "— Supabase — our database and authentication provider. Your data is hosted in the European Union.",
+            "— Stripe — processes subscription payments. Stripe may process some data outside the EU (e.g. the United States) under its own safeguards; we never see or store your full card details.",
+            "— Push notifications — delivered using self-hosted web push (VAPID). Notification delivery does not route your data through a third-party push provider (no Firebase or OneSignal).",
+            "We do not sell your data, and we do not share it with anyone other than the processors above, except where legally required."
+          ]
+        },
+        {
+          "heading": "7. International transfers",
+          "body": [
+            "Your core data (database, authentication) stays in the EU. The main exception is Stripe for payments, which may involve transfers outside the EU under Stripe's own transfer safeguards (e.g. Standard Contractual Clauses)."
+          ]
+        },
+        {
+          "heading": "8. How long we keep data, and your right to deletion",
+          "body": [
+            "— We do not automatically delete your family's data when you turn a feature off (e.g. hiding a vital sign hides it but keeps the history) or when a subscription lapses (the app becomes read-only, but your data is preserved so you don't lose a child's care history).",
+            "— This retention is a product-safety choice, not a refusal to delete. You can request full deletion of your family's data at any time by contacting us, and we will erase it (your GDPR Article 17 “right to erasure”), subject only to data we must keep for legal or accounting reasons (e.g. invoice records)."
+          ]
+        },
+        {
+          "heading": "9. Your rights (GDPR)",
+          "body": [
+            "You have the right to: access your data; correct it; delete it (§8); export it (data portability); restrict or object to processing; and withdraw consent. To exercise any of these, contact support@tillsa.app. You also have the right to complain to the Swedish data protection authority, Integritetsskyddsmyndigheten (IMY) — imy.se."
+          ]
+        },
+        {
+          "heading": "10. Security",
+          "body": [
+            "Data is protected by row-level security (each family can only access its own data), encrypted in transit, and access is limited."
+          ]
+        },
+        {
+          "heading": "11. Children",
+          "body": [
+            "Tillsa is used by adults (parents, guardians and caregivers) to coordinate care for a child. It is not intended to be used by children, and we do not knowingly create accounts for minors as users."
+          ]
+        },
+        {
+          "heading": "12. Changes to this policy",
+          "body": [
+            "We may update this policy; material changes will be communicated to account owners. The “last updated” date reflects the current version."
+          ]
+        },
+        {
+          "heading": "13. Contact",
+          "body": [
+            "Kim Isaksson — support@tillsa.app."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "updated": "Last updated: 2026-08-03",
+      "intro": "The terms that apply when you use Tillsa.",
+      "sections": [
+        {
+          "heading": "1. Who provides the service",
+          "body": [
+            "Tillsa is provided by Kim Isaksson, a sole operator in Sweden (“we”, “us”). By creating an account or using Tillsa, you (“you”, the account owner) agree to these Terms."
+          ]
+        },
+        {
+          "heading": "2. What Tillsa is — and is not",
+          "body": [
+            "Tillsa is a care-coordination tool. It helps families and caregivers organise and share information about a child's daily care.",
+            "— Tillsa does NOT provide medical advice, diagnosis, or treatment. It is not a medical device and is not a substitute for professional medical judgement.",
+            "— Information shown in Tillsa (schedules, reminders, ranges, alerts) is a coordination aid that reflects what caregivers have entered. It must never be relied upon as a clinical source of truth. Always follow your child's care team and professional medical guidance.",
+            "— Notifications and reminders are a convenience feature and may be delayed or fail to deliver for reasons outside our control (device settings, connectivity, OS behaviour). You must not rely on Tillsa notifications as the sole safeguard for time-critical care such as medication timing or monitoring."
+          ]
+        },
+        {
+          "heading": "3. Accounts and caregivers",
+          "body": [
+            "One subscription covers one family. The account owner manages billing and may invite caregivers (or use a shared team login). The owner is responsible for who they give access to and for the accuracy of information entered by the family and its caregivers."
+          ]
+        },
+        {
+          "heading": "4. Subscription, pricing, and trial",
+          "body": [
+            "— Every family starts with a 30-day free trial. No charge during the trial.",
+            "— After the trial, a subscription is required to keep using the app (without it, the app becomes read-only — your data is preserved, see §6).",
+            "— Founding price: families who subscribe before 31 December 2026 pay 199 SEK/month and keep that price for as long as their subscription remains active (“locked for life”). Families who subscribe after that date pay 299 SEK/month.",
+            "— One price per family, unlimited caregivers. Billed monthly. You can cancel at any time; cancellation takes effect at the end of the current paid period.",
+            "— Payments are processed by Stripe."
+          ]
+        },
+        {
+          "heading": "5. Coupons and offers",
+          "body": [
+            "We may issue discount codes. Their terms (amount, duration, expiry) are shown when issued and are subject to these Terms."
+          ]
+        },
+        {
+          "heading": "6. What happens if you cancel or lapse",
+          "body": [
+            "If your subscription is cancelled or lapses, the app becomes read-only — you can still view your family's data, but not add new entries — until you resubscribe. We do not delete your data when this happens. You may request full deletion at any time (see the Privacy Policy)."
+          ]
+        },
+        {
+          "heading": "7. Acceptable use",
+          "body": [
+            "You agree not to misuse the service: no unlawful use, no attempts to breach security or access other families' data, no reselling access. We may suspend accounts that violate these Terms."
+          ]
+        },
+        {
+          "heading": "8. Availability",
+          "body": [
+            "We aim to keep Tillsa available and reliable, but we do not guarantee uninterrupted or error-free service. We may perform maintenance, and features may change."
+          ]
+        },
+        {
+          "heading": "9. Limitation of liability",
+          "body": [
+            "To the maximum extent permitted by law, Tillsa and its operator are not liable for any harm arising from: reliance on the app as a clinical or medical source; delayed, missed, or failed notifications; data entered incorrectly by users; or interruptions in service. Tillsa is a coordination aid, not a medical or safety-critical system."
+          ]
+        },
+        {
+          "heading": "10. Changes to these Terms",
+          "body": [
+            "We may update these Terms; material changes will be communicated to account owners. Continued use after changes means acceptance."
+          ]
+        },
+        {
+          "heading": "11. Governing law and disputes",
+          "body": [
+            "These Terms are governed by Swedish law."
+          ]
+        },
+        {
+          "heading": "12. Contact",
+          "body": [
+            "Kim Isaksson — support@tillsa.app."
+          ]
+        }
+      ]
+    }
   },
 };
 

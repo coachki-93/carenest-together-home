@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 
-const CONTACT_EMAIL = "hello@carenest.app";
+const CONTACT_EMAIL = "support@tillsa.app";
 
 
 
@@ -74,6 +74,10 @@ export function MarketingFooter() {
             >
               {t("marketing.footer.contact")}
             </a>
+            <FooterLink to="/privacy">
+              {t("marketing.footer.privacy")}
+            </FooterLink>
+            <FooterLink to="/terms">{t("marketing.footer.terms")}</FooterLink>
             <p className="mt-3 text-xs text-marketing-muted leading-relaxed">
               {t("marketing.footer.disclaimer")}
             </p>
