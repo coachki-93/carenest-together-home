@@ -1,71 +1,70 @@
-# Fix contact-form email sending
+# In-app Guidebook
 
-Two code changes, then a live end-to-end test.
+A new logged-in page that explains every feature of Tillsa, accurately, based on what the code actually does today. Grouped exactly like the sidebar so users navigate with the same mental model.
 
-## 1. `src/routes/api/public/contact.ts` — add the unsubscribe token
+## Files
 
-The email provider rejects any `purpose: "transactional"` send without an
-`unsubscribe_token` (HTTP 400 `missing_unsubscribe`). The contact endpoint
-enqueues without one, so every contact email fails on its first attempt.
+| File | Change |
+| --- | --- |
+| `src/routes/_authenticated/guidebook.tsx` | New. Route `/guidebook`, `DashboardLayout` + intro + accordion sections. |
+| `src/components/carenest/GuidebookSection.tsx` | New. Small renderer that turns a structured i18n body (headings / paragraphs / step lists) into readable long-form markup inside an accordion row. |
+| `src/components/carenest/AppSidebar.tsx` | Add `Guidebook` footer nav item (lucide `BookOpen`), placed above Settings, visible to all logged-in users (not owner-gated). |
+| `src/lib/i18n/en.ts` | Add `nav.guidebook` + full `guidebook.*` content tree. |
+| `src/lib/i18n/sv.ts` | Same keys, natural Swedish. |
 
-Fix: before enqueueing, get-or-create the unsubscribe token for the fixed
-support recipient in `email_unsubscribe_tokens` (same logic the scaffolded
-send route already uses: look up by email, create a random 32-byte hex token
-if none exists, re-read after upsert to survive races), then include
-`unsubscribe_token` in the enqueue payload.
+No other files change. No data, schema, or feature-behaviour changes.
 
-Recipient is our own support inbox, so the link is internal — it just
-satisfies the provider requirement. No caller-supplied data is involved, so
-the open-relay-proof properties of this endpoint are unchanged.
+## Key structure
 
-```diff
-+function generateToken(): string { /* 32 random bytes, hex */ }
-+
-+async function getUnsubscribeToken(supabase, email): Promise<string | null> {
-+  // select token by email -> reuse if present
-+  // otherwise upsert(onConflict: 'email', ignoreDuplicates) + re-read
-+}
-...
-+        const unsubscribeToken = await getUnsubscribeToken(supabase, CONTACT_RECIPIENT)
-+        if (!unsubscribeToken) { log failed row; return 500 send_failed }
-...
-           idempotency_key: messageId,
-+          unsubscribe_token: unsubscribeToken,
-           queued_at: new Date().toISOString(),
+```text
+nav.guidebook
+guidebook.title / .intro.*        (what Tillsa is + first steps)
+guidebook.groups.care | .caregivers | .family | .account
+guidebook.sections.<key>.title
+guidebook.sections.<key>.body     (array of blocks: {h}, {p}, {steps:[...]})
 ```
 
-## 2. `src/routes/lovable/email/queue/process.ts` — per-attempt idempotency key
+Section keys, in sidebar order:
 
-Today every retry re-sends with the same `idempotency_key`. The provider
-permanently locks a key after a failed run (409 `run_failed`), so one
-transient failure guarantees 5 doomed retries and a dead-letter.
+- Care: `dashboard`, `schedule`, `appointments`, `medications`, `vitals`, `events`, `oxygen`, `handover`, `instructions`, `inventory`, `maintenance`, `shopping`, `emergency`
+- Caregivers: `caregivers`, `shifts`
+- Family: `child`
+- Account: `billing`, `settings`
 
-Fix: derive the key sent to the provider from the stored key plus the
-attempt number:
+18 sections + intro.
 
-```diff
--              idempotency_key: payload.idempotency_key,
-+              idempotency_key: attemptKey,  // `${payload.idempotency_key}:a${failedAttempts}`
-```
+## Content rules
 
-Why this does not reintroduce double sends:
+- Describes only behaviour confirmed in the current code (routes, dialogs, mutations).
+- Explains the app, never care or medical judgement; the existing "coordination tool, not medical advice" framing is repeated once in the intro.
+- Each section: one short "what it is" paragraph, then "how to use it" steps where the feature has clear steps, then any conditions (owner-only, hidden when equipment is off, module-gated).
+- Anything not verifiable gets an inline `[NEEDS REVIEW: ...]` marker in the copy so you can spot it on the page.
 
-- `failedAttempts` is derived from the durable count of `failed` rows in
-  `email_send_log` for that `message_id` — not from a random value. Two
-  workers picking up the *same* attempt compute the *same* key, so the
-  provider still deduplicates a genuine duplicate delivery.
-- The existing pre-send guard (skip + delete when a `sent` row already
-  exists for the `message_id`) stays in place.
-- The key only advances after a real send failure is recorded, i.e. after
-  the provider has already refused that attempt.
+## Accuracy notes already gathered (will be reflected in the copy)
 
-## 3. Test
+- Medications: doses are generated from each medication's list of times, in the family timezone, for active medications only; a course limits doses by a first-dose datetime plus a total dose count. Marking a dose stores status, time, the acting account and the selected caregiver profile; skip/postpone require a reason; Undo deletes the log row.
+- Schedule uses a simple confirm for given/skipped; the dashboard uses the richer dialog with reason, postpone time, notes and (for some appointments) a vital value.
+- Events: author-only archive, author edit within a limited window.
+- Handover: author-only edit within 2 hours, editing clears read receipts, drafts are prefilled from the shift window, read receipts show who read and flag reads made before an edit.
+- Maintenance is hidden entirely when the family has equipment turned off in Settings.
+- Shopping list is read-only; ordering and stock changes happen in Förråd.
+- Emergency is read-only, cached for offline, with 112 and contact call links; steps are edited on the child page.
+- Billing is owner-only; families with a Stripe customer get "Manage" (portal), others get "Subscribe".
 
-The 3 dead-lettered contact messages have burned keys and cannot be revived.
-Submit a fresh contact message (new `message_id`, new key), trigger the queue
-processor, and report the resulting `email_send_log` status.
+## Sections that will carry `[NEEDS REVIEW]` markers
+
+These behaviours could not be confirmed with certainty and will be flagged rather than guessed:
+
+1. Medications — whether any UI starts the per-item timer fields.
+2. Events — the exact length/ownership rule of the edit window.
+3. Instructions — no permission gate found; copy will say all members can add and edit, flagged for confirmation.
+4. Billing — what a cancelled family that still has a Stripe customer sees.
+5. Settings — the exact contents of the team/account card.
+6. Oxygen — only one tank type is selectable in the UI.
 
 ## Verification
 
-- `email_send_log` shows `sent` for the new `contact_form` message.
+- `/guidebook` reachable from the sidebar for a non-owner account.
+- All 18 sections render, grouped by the four sidebar groups.
+- en/sv key parity check.
 - `tsgo --noEmit` clean.
