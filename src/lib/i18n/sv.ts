@@ -3090,6 +3090,190 @@ export const sv = {
     },
     ownerOnly: "Endast familjens ägare kan hantera abonnemanget.",
   },
+  legal: {
+    "privacy": {
+      "title": "Integritetspolicy",
+      "updated": "Senast uppdaterad: 2026-08-03",
+      "intro": "Hur Tillsa hanterar er familjs uppgifter.",
+      "sections": [
+        {
+          "heading": "1. Vilka vi är (personuppgiftsansvarig)",
+          "body": [
+            "Tillsa (”vi”, ”oss”) drivs av Kim Isaksson, en enskild näringsidkare i Sverige. För frågor om integritet, kontakta: support@tillsa.app."
+          ]
+        },
+        {
+          "heading": "2. Vad tjänsten är",
+          "body": [
+            "Tillsa är ett verktyg för vårdsamordning för familjer med barn med särskilda eller komplexa vårdbehov. Det hjälper en familj och dess vårdgivare att hålla en gemensam, korrekt bild av barnets dagliga vård (scheman, mediciner, vitalvärden, överlämningar, besök, förråd). Tillsa är inte en medicinteknisk produkt och ger inte medicinsk rådgivning — se våra användarvillkor."
+          ]
+        },
+        {
+          "heading": "3. Vilka uppgifter vi behandlar",
+          "body": [
+            "Eftersom tjänsten samordnar ett barns vård behandlar vi nödvändigtvis hälsorelaterade uppgifter om ett barn (en minderårig), som anges av familjen och deras vårdgivare. Detta omfattar:",
+            "— Barnets hälsouppgifter — vitalvärden (t.ex. puls, SpO₂, temperatur), mediciner och doser, syrgasanvändning, vårduppgifter, symtom och anteckningar i överlämningar, besök. Detta är ”särskild kategori” av uppgifter enligt artikel 9 i GDPR.",
+            "— Vårdgivar- och kontouppgifter — vårdgivares namn, kontoägarens e-post och (för teamkonton) en gemensam teaminloggning. Attribution av vem som loggade vad, och när.",
+            "— Betaluppgifter — hanteras av Stripe (se §6). Vi lagrar inte ditt kortnummer.",
+            "— Tekniska uppgifter — minimal driftdata som behövs för att köra appen (t.ex. prenumerationstoken för push-notiser på den enhet du aktiverar notiser på).",
+            "— Vi kör inte tredjeparts-annonsering eller beteendespårande analys."
+          ]
+        },
+        {
+          "heading": "4. Vem uppgifterna gäller, och familjens roll",
+          "body": [
+            "Kontoägaren och vårdgivarna anger uppgifter om barnet. Barnet är en registrerad person som inte själv kan samtycka; föräldern eller vårdnadshavaren som äger kontot agerar för barnets räkning."
+          ]
+        },
+        {
+          "heading": "5. Rättslig grund för behandlingen",
+          "body": [
+            "— För barnets hälsouppgifter förlitar vi oss på uttryckligt samtycke från kontoägaren (förälder eller vårdnadshavare) vid registrering, som villkor enligt artikel 9.2 a för behandling av känsliga uppgifter — i kombination med att behandlingen är nödvändig för att tillhandahålla den samordningstjänst familjen efterfrågat (art. 6.1 b, fullgörande av avtal).",
+            "— För betalning är behandlingen nödvändig för att fullgöra prenumerationsavtalet (art. 6.1 b) och för att uppfylla rättsliga och bokföringsmässiga skyldigheter (art. 6.1 c)."
+          ]
+        },
+        {
+          "heading": "6. Var dina uppgifter lagras, och vem som behandlar dem",
+          "body": [
+            "Vi håller antalet tredje parter till ett minimum:",
+            "— Supabase — vår databas- och autentiseringsleverantör. Dina uppgifter lagras inom EU.",
+            "— Stripe — hanterar prenumerationsbetalningar. Stripe kan behandla vissa uppgifter utanför EU (t.ex. USA) enligt egna skyddsåtgärder; vi ser eller lagrar aldrig dina fullständiga kortuppgifter.",
+            "— Push-notiser — levereras via egenhostad web-push (VAPID). Notisleverans dirigerar inte dina uppgifter genom en tredjeparts push-leverantör (ingen Firebase eller OneSignal).",
+            "Vi säljer inte dina uppgifter och delar dem inte med någon annan än leverantörerna ovan, utom där lagen kräver det."
+          ]
+        },
+        {
+          "heading": "7. Överföringar till tredjeland",
+          "body": [
+            "Dina kärnuppgifter (databas, autentisering) stannar inom EU. Det huvudsakliga undantaget är Stripe för betalningar, som kan innebära överföringar utanför EU enligt Stripes egna skyddsåtgärder (t.ex. standardavtalsklausuler)."
+          ]
+        },
+        {
+          "heading": "8. Hur länge vi sparar uppgifter, och din rätt till radering",
+          "body": [
+            "— Vi raderar inte automatiskt familjens uppgifter när du stänger av en funktion (t.ex. döljer ett vitalvärde men behåller historiken) eller när en prenumeration upphör (appen blir skrivskyddad, men uppgifterna bevaras så att ni inte förlorar ett barns vårdhistorik).",
+            "— Denna lagring är ett produktsäkerhetsval, inte en vägran att radera. Du kan när som helst begära fullständig radering av familjens uppgifter genom att kontakta oss, och vi raderar dem (din rätt till radering enligt artikel 17), med undantag endast för uppgifter vi måste behålla av rättsliga eller bokföringsmässiga skäl (t.ex. fakturaunderlag)."
+          ]
+        },
+        {
+          "heading": "9. Dina rättigheter (GDPR)",
+          "body": [
+            "Du har rätt att: få tillgång till dina uppgifter; rätta dem; radera dem (§8); exportera dem (dataportabilitet); begränsa eller invända mot behandling; och återkalla samtycke. Kontakta support@tillsa.app. Du har även rätt att klaga till Integritetsskyddsmyndigheten (IMY) — imy.se."
+          ]
+        },
+        {
+          "heading": "10. Säkerhet",
+          "body": [
+            "Uppgifter skyddas med radnivåsäkerhet (varje familj kommer endast åt sina egna uppgifter), krypteras under överföring och åtkomst är begränsad."
+          ]
+        },
+        {
+          "heading": "11. Barn",
+          "body": [
+            "Tillsa används av vuxna (föräldrar, vårdnadshavare och vårdgivare) för att samordna vård för ett barn. Det är inte avsett att användas av barn, och vi skapar inte medvetet konton för minderåriga som användare."
+          ]
+        },
+        {
+          "heading": "12. Ändringar i denna policy",
+          "body": [
+            "Vi kan uppdatera policyn; väsentliga ändringar meddelas kontoägare. ”Senast uppdaterad”-datumet återspeglar aktuell version."
+          ]
+        },
+        {
+          "heading": "13. Kontakt",
+          "body": [
+            "Kim Isaksson — support@tillsa.app."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Användarvillkor",
+      "updated": "Senast uppdaterad: 2026-08-03",
+      "intro": "Villkoren som gäller när du använder Tillsa.",
+      "sections": [
+        {
+          "heading": "1. Vem som tillhandahåller tjänsten",
+          "body": [
+            "Tillsa tillhandahålls av Kim Isaksson, en enskild näringsidkare i Sverige (”vi”, ”oss”). Genom att skapa ett konto eller använda Tillsa godkänner du (kontoägaren) dessa villkor."
+          ]
+        },
+        {
+          "heading": "2. Vad Tillsa är — och inte är",
+          "body": [
+            "Tillsa är ett verktyg för vårdsamordning. Det hjälper familjer och vårdgivare att organisera och dela information om ett barns dagliga vård.",
+            "— Tillsa ger INTE medicinsk rådgivning, diagnos eller behandling. Det är inte en medicinteknisk produkt och ersätter inte professionell medicinsk bedömning.",
+            "— Information som visas i Tillsa (scheman, påminnelser, intervall, larm) är ett samordningsstöd som återspeglar vad vårdgivare har angett. Det får aldrig förlitas på som en klinisk sanningskälla. Följ alltid barnets vårdteam och professionell medicinsk vägledning.",
+            "— Notiser och påminnelser är en bekvämlighetsfunktion och kan försenas eller utebli av skäl utanför vår kontroll (enhetsinställningar, uppkoppling, operativsystemets beteende). Du får inte förlita dig på Tillsa-notiser som enda skydd för tidskritisk vård såsom medicintider eller övervakning."
+          ]
+        },
+        {
+          "heading": "3. Konton och vårdgivare",
+          "body": [
+            "En prenumeration omfattar en familj. Kontoägaren hanterar betalning och kan bjuda in vårdgivare (eller använda en gemensam teaminloggning). Ägaren ansvarar för vem denne ger åtkomst till och för att den information som familjen och dess vårdgivare anger är korrekt."
+          ]
+        },
+        {
+          "heading": "4. Prenumeration, pris och provperiod",
+          "body": [
+            "— Varje familj börjar med en 30 dagars gratis provperiod. Ingen debitering under perioden.",
+            "— Efter provperioden krävs en prenumeration för att fortsätta använda appen (utan den blir appen skrivskyddad — era uppgifter bevaras, se §6).",
+            "— Grundarpris: familjer som börjar prenumerera före 31 december 2026 betalar 199 kr/månad och behåller det priset så länge prenumerationen är aktiv (”låst för alltid”). Familjer som ansluter efter det datumet betalar 299 kr/månad.",
+            "— Ett pris per familj, obegränsat med vårdgivare. Faktureras månadsvis. Du kan säga upp när som helst; uppsägningen träder i kraft vid slutet av den innevarande betalperioden.",
+            "— Betalningar hanteras av Stripe."
+          ]
+        },
+        {
+          "heading": "5. Rabattkoder och erbjudanden",
+          "body": [
+            "Vi kan utfärda rabattkoder. Deras villkor (belopp, längd, giltighet) visas när de utfärdas och omfattas av dessa villkor."
+          ]
+        },
+        {
+          "heading": "6. Vad som händer om du säger upp eller prenumerationen upphör",
+          "body": [
+            "Om din prenumeration sägs upp eller upphör blir appen skrivskyddad — du kan fortfarande se familjens uppgifter, men inte lägga till nya — tills du prenumererar igen. Vi raderar inte dina uppgifter när detta sker. Du kan begära fullständig radering när som helst (se integritetspolicyn)."
+          ]
+        },
+        {
+          "heading": "7. Tillåten användning",
+          "body": [
+            "Du godkänner att inte missbruka tjänsten: ingen olaglig användning, inga försök att bryta säkerheten eller komma åt andra familjers uppgifter, ingen återförsäljning av åtkomst. Vi kan stänga av konton som bryter mot villkoren."
+          ]
+        },
+        {
+          "heading": "8. Tillgänglighet",
+          "body": [
+            "Vi strävar efter att hålla Tillsa tillgängligt och tillförlitligt, men vi garanterar inte oavbruten eller felfri drift. Vi kan utföra underhåll, och funktioner kan ändras."
+          ]
+        },
+        {
+          "heading": "9. Ansvarsbegränsning",
+          "body": [
+            "I den utsträckning lagen tillåter ansvarar Tillsa och dess operatör inte för skada som uppstår från: förlitan på appen som en klinisk eller medicinsk källa; försenade, missade eller uteblivna notiser; uppgifter som angetts felaktigt av användare; eller avbrott i tjänsten. Tillsa är ett samordningsstöd, inte ett medicinskt eller säkerhetskritiskt system."
+          ]
+        },
+        {
+          "heading": "10. Ändringar av dessa villkor",
+          "body": [
+            "Vi kan uppdatera villkoren; väsentliga ändringar meddelas kontoägare. Fortsatt användning efter ändringar innebär godkännande."
+          ]
+        },
+        {
+          "heading": "11. Tillämplig lag och tvister",
+          "body": [
+            "Dessa villkor regleras av svensk lag."
+          ]
+        },
+        {
+          "heading": "12. Kontakt",
+          "body": [
+            "Kim Isaksson — support@tillsa.app."
+          ]
+        }
+      ]
+    }
+  },
 };
 
 
