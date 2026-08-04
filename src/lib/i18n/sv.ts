@@ -3833,7 +3833,7 @@ export const sv = {
           {
             heading: "Familjeinställningar",
             body: [
-              "De här visas bara för ägaren.",
+              "Inställningarna för ditt konto är dina; familjeinställningar som påverkar alla hanteras av ägaren.",
             ],
             steps: [
               "På sjukhus, som pausar delar av appen medan barnet är inlagt.",
