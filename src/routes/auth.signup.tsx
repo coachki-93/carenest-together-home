@@ -203,7 +203,15 @@ function SignUpPage() {
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox checked={agree} onCheckedChange={(v) => { setAgree(!!v); if (formError) setFormError(null); }} className="mt-0.5" />
-          <span className="text-muted-foreground">{t("auth.agreeTerms")}</span>
+          <span className="text-muted-foreground">
+            <Trans
+              i18nKey="auth.agreeTerms"
+              components={{
+                1: <LegalLink to="/terms" />,
+                3: <LegalLink to="/privacy" />,
+              }}
+            />
+          </span>
         </label>
         <div aria-live="polite" className="min-h-[1.25rem]">
           {formError && (
