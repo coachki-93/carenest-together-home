@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InviteIndexRouteImport } from './routes/invite.index'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
@@ -45,8 +46,11 @@ import { Route as AuthenticatedCaregiversRouteImport } from './routes/_authentic
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authenticated/appointments'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -108,6 +112,11 @@ const InviteIndexRoute = InviteIndexRouteImport.update({
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -239,6 +248,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOnboardingChildRoute =
   AuthenticatedOnboardingChildRouteImport.update({
     id: '/onboarding/child',
@@ -250,6 +264,18 @@ const AuthenticatedOnboardingCaregiverRoute =
     id: '/onboarding/caregiver',
     path: '/onboarding/caregiver',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
@@ -331,10 +357,12 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/invite/': typeof InviteIndexRoute
   '/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
@@ -343,6 +371,8 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -378,10 +408,12 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/invite': typeof InviteIndexRoute
   '/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
@@ -390,6 +422,8 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -427,10 +461,12 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/invite/': typeof InviteIndexRoute
   '/_authenticated/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/_authenticated/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
   '/api/public/hooks/inventory-low-sweep': typeof ApiPublicHooksInventoryLowSweepRoute
@@ -439,6 +475,8 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -476,10 +514,12 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/email/unsubscribe'
     | '/invite/$code'
     | '/invite/'
     | '/onboarding/caregiver'
     | '/onboarding/child'
+    | '/lovable/email/suppression'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
     | '/api/public/hooks/inventory-low-sweep'
@@ -488,6 +528,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -523,10 +565,12 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/email/unsubscribe'
     | '/invite/$code'
     | '/invite'
     | '/onboarding/caregiver'
     | '/onboarding/child'
+    | '/lovable/email/suppression'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
     | '/api/public/hooks/inventory-low-sweep'
@@ -535,6 +579,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -571,10 +617,12 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/email/unsubscribe'
     | '/invite/$code'
     | '/invite/'
     | '/_authenticated/onboarding/caregiver'
     | '/_authenticated/onboarding/child'
+    | '/lovable/email/suppression'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
     | '/api/public/hooks/inventory-low-sweep'
@@ -583,6 +631,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -595,8 +645,10 @@ export interface RootRouteChildren {
   OfflineRoute: typeof OfflineRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
   InviteIndexRoute: typeof InviteIndexRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksCarePlaceMissedSweepRoute: typeof ApiPublicHooksCarePlaceMissedSweepRoute
   ApiPublicHooksDispatchTaskNotificationsRoute: typeof ApiPublicHooksDispatchTaskNotificationsRoute
   ApiPublicHooksInventoryLowSweepRoute: typeof ApiPublicHooksInventoryLowSweepRoute
@@ -605,6 +657,8 @@ export interface RootRouteChildren {
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -684,6 +738,13 @@ declare module '@tanstack/react-router' {
       path: '/invite/$code'
       fullPath: '/invite/$code'
       preLoaderRoute: typeof InviteCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -861,6 +922,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/onboarding/child': {
       id: '/_authenticated/onboarding/child'
       path: '/onboarding/child'
@@ -874,6 +942,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/onboarding/caregiver'
       preLoaderRoute: typeof AuthenticatedOnboardingCaregiverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -1015,8 +1097,10 @@ const rootRouteChildren: RootRouteChildren = {
   OfflineRoute: OfflineRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
   InviteIndexRoute: InviteIndexRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksCarePlaceMissedSweepRoute:
     ApiPublicHooksCarePlaceMissedSweepRoute,
   ApiPublicHooksDispatchTaskNotificationsRoute:
@@ -1027,6 +1111,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
