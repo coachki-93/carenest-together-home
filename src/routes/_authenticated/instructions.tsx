@@ -115,10 +115,12 @@ function InstructionsPage() {
     <DashboardLayout title={t("instructions.title")}>
       <div className="flex items-center justify-between mb-6">
         <p className="text-muted-foreground">{t("instructions.subtitle")}</p>
-        <Button onClick={() => setCreating(true)} disabled={!familyId}>
-          <Plus className="size-4 mr-2" />
-          {t("instructions.add")}
-        </Button>
+        {isOwner && (
+          <Button onClick={() => setCreating(true)} disabled={!familyId}>
+            <Plus className="size-4 mr-2" />
+            {t("instructions.add")}
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
