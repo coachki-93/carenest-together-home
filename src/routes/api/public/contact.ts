@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render } from '@react-email/render'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import {
@@ -56,6 +56,61 @@ function rateLimited(ip: string): boolean {
   if (hits.size > 5000) hits.clear()
   return false
 }
+
+// Cryptographically random 32-byte hex token
+function generateToken(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+// Get-or-create the unsubscribe token for the fixed support recipient.
+// The provider requires unsubscribe_token on every transactional send.
+async function getUnsubscribeToken(
+  supabase: SupabaseClient<any, any>,
+  email: string,
+): Promise<string | null> {
+  const normalized = email.toLowerCase()
+
+  const { data: existing, error: lookupError } = await supabase
+    .from('email_unsubscribe_tokens')
+    .select('token')
+    .eq('email', normalized)
+    .maybeSingle()
+
+  if (lookupError) {
+    console.error('Unsubscribe token lookup failed', { error: lookupError })
+    return null
+  }
+  if (existing?.token) return existing.token as string
+
+  const { error: upsertError } = await supabase
+    .from('email_unsubscribe_tokens')
+    .upsert(
+      { token: generateToken(), email: normalized },
+      { onConflict: 'email', ignoreDuplicates: true },
+    )
+  if (upsertError) {
+    console.error('Unsubscribe token create failed', { error: upsertError })
+    return null
+  }
+
+  // Re-read: a concurrent insert may have won the upsert race.
+  const { data: stored, error: reReadError } = await supabase
+    .from('email_unsubscribe_tokens')
+    .select('token')
+    .eq('email', normalized)
+    .maybeSingle()
+
+  if (reReadError || !stored?.token) {
+    console.error('Unsubscribe token read-back failed', { error: reReadError })
+    return null
+  }
+  return stored.token as string
+}
+
 
 export const Route = createFileRoute('/api/public/contact')({
   server: {
@@ -114,6 +169,20 @@ export const Route = createFileRoute('/api/public/contact')({
           status: 'pending',
         })
 
+        // Provider requires an unsubscribe_token on transactional sends.
+        // Recipient is our own support inbox, so this link is internal.
+        const unsubscribeToken = await getUnsubscribeToken(supabase, CONTACT_RECIPIENT)
+        if (!unsubscribeToken) {
+          await supabase.from('email_send_log').insert({
+            message_id: messageId,
+            template_name: TEMPLATE_NAME,
+            recipient_email: CONTACT_RECIPIENT,
+            status: 'failed',
+            error_message: 'Failed to prepare unsubscribe token',
+          })
+          return Response.json({ error: 'send_failed' }, { status: 500 })
+        }
+
         const { error } = await supabase.rpc('enqueue_email', {
           queue_name: 'transactional_emails',
           payload: {
@@ -128,9 +197,11 @@ export const Route = createFileRoute('/api/public/contact')({
             purpose: 'transactional',
             label: TEMPLATE_NAME,
             idempotency_key: messageId,
+            unsubscribe_token: unsubscribeToken,
             queued_at: new Date().toISOString(),
           },
         })
+
 
         if (error) {
           console.error('Failed to enqueue contact email', { error })

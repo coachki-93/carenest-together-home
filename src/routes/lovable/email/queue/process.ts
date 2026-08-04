@@ -220,6 +220,18 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               }
             }
 
+            // Each retry must use a FRESH idempotency key: the provider
+            // permanently locks a key once its run failed (409 run_failed).
+            // The suffix is derived from the durable failed-attempt count, so
+            // it is deterministic — two workers handling the same attempt
+            // compute the same key and the provider still dedupes a genuine
+            // duplicate delivery.
+            const attemptKey = payload.idempotency_key
+              ? failedAttempts > 0
+                ? `${payload.idempotency_key}:a${failedAttempts}`
+                : payload.idempotency_key
+              : undefined
+
             try {
               await sendLovableEmail(
                 {
@@ -234,12 +246,13 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   text: payload.text,
                   purpose: payload.purpose,
                   label: payload.label,
-                  idempotency_key: payload.idempotency_key,
+                  idempotency_key: attemptKey,
                   unsubscribe_token: payload.unsubscribe_token,
                   message_id: payload.message_id,
                 },
                 { apiKey, sendUrl: process.env['LOVABLE_SEND_URL'] }
               )
+
 
               // Log success
               await supabase.from('email_send_log').insert({
