@@ -3402,14 +3402,15 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Schema är dagsvyn. Den visar medicindoser och besök för en dag, och du bläddrar mellan dagar med föregående, i dag och nästa.",
+              "Schema är er plan dag för dag. Den visar en dag i taget — varje medicindos och besök den dagen, i tidsordning — så att du kan blicka framåt eller bakåt på en enskild dag utan bruset från Idags arbetsvy.",
+              "Bläddra mellan dagar med föregående, i dag och nästa.",
             ],
           },
           {
             heading: "Så använder du den",
             steps: [
               "Använd plusknappen för att skapa ett besök på den dag du tittar på.",
-              "Markera en dos som Given eller Hoppa över. Schema använder en kort bekräftelse i stället för den fylligare rutan på Idag, så ingen orsak sparas här.",
+              "Markera en dos som Given eller Hoppa över. Att markera doser här går snabbt; för en fullständig logg med orsak, använd Idag.",
               "Ångra tar bort loggposten för dosen.",
               "När du ändrar eller tar bort ett återkommande besök får du frågan om det gäller bara det tillfället eller hela serien.",
             ],
@@ -3672,12 +3673,13 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Inköpslistan är en skrivskyddad vy över det som Förråd säger behöver köpas. Den har två delar: att beställa, som är allt under sin lägsta nivå som inte är beställt, och beställt, som visar vad som redan är beställt och när det väntas.",
+              "Inköpslistan är er inköpslista, som byggs automatiskt från Förråd — så att ni slipper hålla reda på det för hand. Den samlar allt som håller på att ta slut eller är slut på ett ställe, att ta med till affären.",
             ],
           },
           {
             body: [
-              "Varje rad visar antalet mot sin gräns och leverantören, med länk där det finns. Antal, beställningar och leveranser ändras på sidan Förråd, inte här.",
+              "Här är den skrivskyddad — du bockar av och ändrar saldon i Förråd, inte på den här sidan. Den är uppdelad i vad som behöver beställas nu och vad som redan är beställt med väntat datum.",
+              "Varje rad visar antalet mot sin gräns och leverantören, med länk där det finns.",
             ],
           },
         ],
@@ -3712,7 +3714,7 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Vårdteam har tre delar: kontona som har tillgång till familjen, vårdgivarprofilerna som används för att visa vem som gjort vad, och inbjudningarna.",
+              "Vårdteam är där du hanterar vilka som ingår i vården av barnet och hur deras insatser registreras. Den har tre delar: kontona som har tillgång till familjen, vårdgivarprofilerna som loggposter tillskrivs (så att historiken visar personen, inte bara inloggningen) och inbjudningar för att ta in nya personer.",
             ],
           },
           {
@@ -3737,7 +3739,7 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Pass är ett veckoschema över vem som arbetar. Det finns en rad per aktiv vårdgivarprofil, plus en rad för pass utan tilldelad person, och du kan bläddra mellan veckor eller hoppa tillbaka till i dag.",
+              "Pass visar vem som är i tjänst under veckan. Det är ett veckoschema med en rad per aktiv vårdgivarprofil, plus en rad för pass utan tilldelad person, och du kan bläddra mellan veckor eller hoppa tillbaka till i dag.",
             ],
           },
           {
@@ -3778,7 +3780,12 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Prenumerationssidan är bara för familjens ägare. Övriga medlemmar ser en kort notis om att ägaren hanterar den.",
+              "Prenumeration är där familjens plan och betalning finns. Efter den 30 dagar långa provperioden håller en aktiv prenumeration appen fullt användbar; utan den blir den skrivskyddad (er data sparas). Här kan du prenumerera, se förnyelsedatum och pris, och öppna betalportalen för att hantera betalsätt eller säga upp.",
+            ],
+          },
+          {
+            body: [
+              "Bara familjens ägare hanterar betalningen; övriga medlemmar ser en kort notis om att ägaren sköter den.",
             ],
           },
           {
@@ -3807,6 +3814,11 @@ export const sv = {
         title: "Inställningar",
         blocks: [
           {
+            body: [
+              "Inställningar är där du hanterar ditt eget konto och familjens gemensamma inställningar. Den har två delar: Ditt konto — din profil, ditt lösenord, appens språk, din aktiva vårdgivarprofil, aviseringar på den här enheten och utloggning — och Familjeinställningar — familjens tidszon, tider för överlämningspåminnelser, om utrustningsfunktioner är på, sjukhusläge och (för ägaren) det gemensamma teamkontot.",
+            ],
+          },
+          {
             heading: "Ditt konto",
             steps: [
               "Profil: bild, namn, färg och din e-postadress.",
@@ -3821,7 +3833,7 @@ export const sv = {
           {
             heading: "Familjeinställningar",
             body: [
-              "De här visas bara för ägaren.",
+              "Inställningarna för ditt konto är dina; familjeinställningar som påverkar alla hanteras av ägaren.",
             ],
             steps: [
               "På sjukhus, som pausar delar av appen medan barnet är inlagt.",

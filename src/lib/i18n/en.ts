@@ -3402,14 +3402,15 @@ export const en = {
         blocks: [
           {
             body: [
-              "Schedule is the day view. It shows medication doses and appointments for one day and lets you move between days with previous, today and next.",
+              "Schedule is your day-by-day plan. It shows one day at a time — every medication dose and appointment for that day, in time order — so you can look ahead or back at any single day without the noise of Today's live working view.",
+              "Move between days with previous, today and next.",
             ],
           },
           {
             heading: "How to use it",
             steps: [
               "Use the plus button to create an appointment for the day you are looking at.",
-              "Mark a dose Given or Skip. Schedule uses a short confirmation rather than the fuller dialog on Today, so no reason is recorded here.",
+              "Mark a dose Given or Skip. Marking doses here is quick; for a full log with a reason, use Today.",
               "Undo removes the log entry for that dose.",
               "Editing or deleting a repeating appointment asks whether you mean only that occurrence or the whole series.",
             ],
@@ -3672,12 +3673,13 @@ export const en = {
         blocks: [
           {
             body: [
-              "The shopping list is a read-only view of what Inventory says needs buying. It has two parts: to order, which is everything below its lowest level that has not been ordered, and on order, which shows what is already ordered and when it is expected.",
+              "The shopping list is your buy list, built automatically from Inventory — so you don't track it by hand. It gathers everything running low or out of stock into one place to take to the shop.",
             ],
           },
           {
             body: [
-              "Each item shows the quantity against its threshold and the supplier, with a link where one exists. Quantities, orders and deliveries are changed on the Inventory page, not here.",
+              "It's read-only here — you tick things off and update stock levels in Inventory (Förråd), not on this page. It's split into what needs ordering now and what is already on order with its expected date.",
+              "Each item shows the quantity against its threshold and the supplier, with a link where one exists.",
             ],
           },
         ],
@@ -3712,7 +3714,7 @@ export const en = {
         blocks: [
           {
             body: [
-              "Care team has three parts: the accounts with access to the family, the caregiver profiles used to attribute what is logged, and the invitations.",
+              "Care team is where you manage who is part of caring for the child and how their actions are recorded. It has three parts: the accounts that can access the family, the caregiver profiles that log entries are attributed to (so history shows the person, not just the login), and invitations to bring new people in.",
             ],
           },
           {
@@ -3737,7 +3739,7 @@ export const en = {
         blocks: [
           {
             body: [
-              "Shifts is a weekly grid of who is on duty. There is one row per active caregiver profile, plus a row for shifts with nobody assigned, and you can move between weeks or jump back to today.",
+              "Shifts shows who is on duty across the week. It is a weekly grid with one row per active caregiver profile, plus a row for shifts with nobody assigned, and you can move between weeks or jump back to today.",
             ],
           },
           {
@@ -3778,7 +3780,12 @@ export const en = {
         blocks: [
           {
             body: [
-              "The subscription page is only for the family owner. Other members see a short note that the owner handles it.",
+              "Subscription is where the family's plan and billing live. After the 30-day trial, an active subscription keeps the app fully usable; without one it becomes read-only (your data is kept). Here you can subscribe, see your renewal date and price, and open the billing portal to manage payment or cancel.",
+            ],
+          },
+          {
+            body: [
+              "Only the family owner manages billing; other members see a short note that the owner handles it.",
             ],
           },
           {
@@ -3807,6 +3814,11 @@ export const en = {
         title: "Settings",
         blocks: [
           {
+            body: [
+              "Settings is where you manage your own account and the family's shared configuration. It has two parts: Your account — your profile, password, app language, your active caregiver profile, notifications on this device, and sign out — and Family settings — the family timezone, handover reminder times, whether equipment features are on, hospital mode, and (for the owner) the shared team account.",
+            ],
+          },
+          {
             heading: "Your account",
             steps: [
               "Profile: picture, name, colour and your email address.",
@@ -3821,7 +3833,7 @@ export const en = {
           {
             heading: "Family settings",
             body: [
-              "These are only shown to the owner.",
+              "Your-account settings are yours; family settings that affect everyone are managed by the owner.",
             ],
             steps: [
               "At hospital, which pauses parts of the app while the child is admitted.",
