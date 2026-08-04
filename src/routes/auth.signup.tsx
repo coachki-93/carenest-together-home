@@ -256,6 +256,19 @@ function SignUpPage() {
   );
 }
 
+function LegalLink({ to, children }: { to: string; children?: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary font-medium underline underline-offset-2 hover:opacity-80"
+    >
+      {children}
+    </Link>
+  );
+}
+
 function GoogleIcon() {
   return (
     <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">

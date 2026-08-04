@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as InstallRouteImport } from './routes/install'
 import { Route as FeaturesRouteImport } from './routes/features'
@@ -53,6 +55,16 @@ import { Route as ApiPublicHooksInventoryLowSweepRouteImport } from './routes/ap
 import { Route as ApiPublicHooksDispatchTaskNotificationsRouteImport } from './routes/api/public/hooks/dispatch-task-notifications'
 import { Route as ApiPublicHooksCarePlaceMissedSweepRouteImport } from './routes/api/public/hooks/care-place-missed-sweep'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
@@ -286,6 +298,8 @@ export interface FileRoutesByFullPath {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
   '/billing': typeof AuthenticatedBillingRoute
@@ -330,6 +344,8 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
   '/billing': typeof AuthenticatedBillingRoute
@@ -376,6 +392,8 @@ export interface FileRoutesById {
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/appointments': typeof AuthenticatedAppointmentsRoute
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
@@ -422,6 +440,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/privacy'
+    | '/terms'
     | '/admin'
     | '/appointments'
     | '/billing'
@@ -466,6 +486,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/privacy'
+    | '/terms'
     | '/admin'
     | '/appointments'
     | '/billing'
@@ -511,6 +533,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/install'
     | '/offline'
+    | '/privacy'
+    | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/appointments'
     | '/_authenticated/billing'
@@ -557,6 +581,8 @@ export interface RootRouteChildren {
   FeaturesRoute: typeof FeaturesRoute
   InstallRoute: typeof InstallRoute
   OfflineRoute: typeof OfflineRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   InviteCodeRoute: typeof InviteCodeRoute
   InviteIndexRoute: typeof InviteIndexRoute
   ApiPublicHooksCarePlaceMissedSweepRoute: typeof ApiPublicHooksCarePlaceMissedSweepRoute
@@ -571,6 +597,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/offline': {
       id: '/offline'
       path: '/offline'
@@ -952,6 +992,8 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesRoute: FeaturesRoute,
   InstallRoute: InstallRoute,
   OfflineRoute: OfflineRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   InviteCodeRoute: InviteCodeRoute,
   InviteIndexRoute: InviteIndexRoute,
   ApiPublicHooksCarePlaceMissedSweepRoute:
