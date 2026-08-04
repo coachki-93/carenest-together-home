@@ -1,51 +1,27 @@
-# Care instructions: owner-only writes
+# Resolve the 6 guidebook [NEEDS REVIEW] markers
 
-Care instructions can currently be created, edited and deleted by any family member. They should be owner-only. Reading stays open to every member.
+Replace placeholder hedging copy with confirmed behavior in `src/lib/i18n/en.ts` and `src/lib/i18n/sv.ts`. No component changes.
 
-## 1. Database rules (the real enforcement)
+## Timer question (Kim)
 
-Confirmed the three existing write rules exist under exactly these names, so the drops are not silent no-ops:
+Checked the app: the timer is a countdown a caregiver starts on the task, and the task auto-completes when it ends (see the existing field help: "Caregivers can start a countdown. The task is auto-completed when the timer ends."). So it is a duration/wait countdown tied to the dose task, not a separately labelled observation window. Copy is phrased that way.
 
-- `Family members can insert instructions`
-- `Family members can update instructions`
-- `Family members can delete instructions`
+## Edits (en.ts / sv.ts, same line numbers in both)
 
-The read rule `Family members can view instructions` is left untouched.
+| Line | Section | Change |
+|---|---|---|
+| 3366 | `reviewNote` | delete unused key (only existed for the markers) |
+| 3479–3481 | Medications → Timers | heading `Timers`; body: optional timer 1–120 min set when adding/editing; caregiver starts the countdown, task auto-completes at zero |
+| 3529–3531 | Events → Editing | heading `Editing`; body: only the author, only within 2 hours; otherwise read-only |
+| 3561–3563 | Oxygen → Tank types | heading `Tank types`; body: one tank type today, so no type choice when starting a tank |
+| 3616–3618 | Instructions → Who can edit | heading `Who can edit`; body: only the family owner adds/edits/deletes, all caregivers can read |
+| 3799–3801 | Subscription → After cancelling | heading `After cancelling`; body: access until paid period ends, page shows "Active until [date], then cancels" plus Manage → billing portal to resubscribe or change payment |
+| 3837–3839 | Settings → Team account | heading `Team account`; body: owners manage a shared team login as an alternative to individual invites |
 
-```sql
-DROP POLICY "Family members can insert instructions" ON public.care_instructions;
-DROP POLICY "Family members can update instructions" ON public.care_instructions;
-DROP POLICY "Family members can delete instructions" ON public.care_instructions;
-
-CREATE POLICY "Family owners can insert instructions"
-ON public.care_instructions FOR INSERT TO authenticated
-WITH CHECK (public.is_family_owner(family_id, auth.uid()) AND created_by = auth.uid());
-
-CREATE POLICY "Family owners can update instructions"
-ON public.care_instructions FOR UPDATE TO authenticated
-USING (public.is_family_owner(family_id, auth.uid()))
-WITH CHECK (public.is_family_owner(family_id, auth.uid()));
-
-CREATE POLICY "Family owners can delete instructions"
-ON public.care_instructions FOR DELETE TO authenticated
-USING (public.is_family_owner(family_id, auth.uid()));
-```
-
-## 2. Interface
-
-`src/routes/_authenticated/instructions.tsx` already loads the current user's membership via `useMyMembership()`. Derive `isOwner` from `membership?.role === "owner"` — the same derivation the billing page uses.
-
-When the viewer is not the owner:
-
-- the "Add instruction" button in the header is hidden
-- the empty-state add button is hidden (empty state becomes a plain message)
-- the pencil and trash buttons on each instruction card are hidden
-
-Owners keep the full add/edit/delete experience. No text changes, no new keys.
+Swedish is a natural translation, not literal; keys stay identical.
 
 ## Verification
 
-- Non-owner: page is read-only, and a forced write is rejected by the database.
-- Owner: add, edit and delete all work.
-- All members can still read instructions.
-- `tsgo --noEmit` clean.
+- `rg -n "NEEDS REVIEW" src/` → no matches
+- en/sv key parity script
+- `tsgo --noEmit`
