@@ -1,6 +1,13 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Users2, UserCircle2, LogOut, ShieldAlert, Ticket } from "lucide-react";
+import {
+  Users2,
+  UserCircle2,
+  LogOut,
+  ShieldAlert,
+  Ticket,
+  Bug,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
