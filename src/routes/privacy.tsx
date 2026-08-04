@@ -3,7 +3,7 @@ import { LegalPage } from "@/components/marketing/LegalPage";
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
 const SITE = "https://tillsa.app";
-const OG_IMAGE = SITE + "/og-image.jpg";
+const OG_IMAGE = SITE + "/og/og-default.png";
 
 const META = {
   en: {
