@@ -57,6 +57,61 @@ function rateLimited(ip: string): boolean {
   return false
 }
 
+// Cryptographically random 32-byte hex token
+function generateToken(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+// Get-or-create the unsubscribe token for the fixed support recipient.
+// The provider requires unsubscribe_token on every transactional send.
+async function getUnsubscribeToken(
+  supabase: ReturnType<typeof createClient>,
+  email: string,
+): Promise<string | null> {
+  const normalized = email.toLowerCase()
+
+  const { data: existing, error: lookupError } = await supabase
+    .from('email_unsubscribe_tokens')
+    .select('token')
+    .eq('email', normalized)
+    .maybeSingle()
+
+  if (lookupError) {
+    console.error('Unsubscribe token lookup failed', { error: lookupError })
+    return null
+  }
+  if (existing?.token) return existing.token as string
+
+  const { error: upsertError } = await supabase
+    .from('email_unsubscribe_tokens')
+    .upsert(
+      { token: generateToken(), email: normalized },
+      { onConflict: 'email', ignoreDuplicates: true },
+    )
+  if (upsertError) {
+    console.error('Unsubscribe token create failed', { error: upsertError })
+    return null
+  }
+
+  // Re-read: a concurrent insert may have won the upsert race.
+  const { data: stored, error: reReadError } = await supabase
+    .from('email_unsubscribe_tokens')
+    .select('token')
+    .eq('email', normalized)
+    .maybeSingle()
+
+  if (reReadError || !stored?.token) {
+    console.error('Unsubscribe token read-back failed', { error: reReadError })
+    return null
+  }
+  return stored.token as string
+}
+
+
 export const Route = createFileRoute('/api/public/contact')({
   server: {
     handlers: {
