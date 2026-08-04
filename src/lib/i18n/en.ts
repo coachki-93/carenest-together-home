@@ -3410,7 +3410,7 @@ export const en = {
             heading: "How to use it",
             steps: [
               "Use the plus button to create an appointment for the day you are looking at.",
-              "Mark a dose Given or Skip. Schedule uses a short confirmation rather than the fuller dialog on Today, so no reason is recorded here.",
+              "Mark a dose Given or Skip. Marking doses here is quick; for a full log with a reason, use Today.",
               "Undo removes the log entry for that dose.",
               "Editing or deleting a repeating appointment asks whether you mean only that occurrence or the whole series.",
             ],
