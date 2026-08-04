@@ -36,8 +36,10 @@ export function AdminSidebar() {
   const search = useRouterState({ select: (s) => s.location.search }) as {
     tab?: string;
   };
-  const activeTab: "accounts" | "families" | "coupons" =
-    search.tab === "families" || search.tab === "coupons"
+  const activeTab: "accounts" | "families" | "coupons" | "bugs" =
+    search.tab === "families" ||
+    search.tab === "coupons" ||
+    search.tab === "bugs"
       ? search.tab
       : "accounts";
   const membership = useMyMembership();
@@ -62,6 +64,12 @@ export function AdminSidebar() {
       title: t("admin.nav.coupons"),
       icon: Ticket,
       tab: "coupons" as const,
+    },
+    {
+      key: "bugs",
+      title: t("admin.nav.bugs"),
+      icon: Bug,
+      tab: "bugs" as const,
     },
   ];
 
