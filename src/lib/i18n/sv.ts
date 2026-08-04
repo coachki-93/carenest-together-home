@@ -3814,6 +3814,11 @@ export const sv = {
         title: "Inställningar",
         blocks: [
           {
+            body: [
+              "Inställningar är där du hanterar ditt eget konto och familjens gemensamma inställningar. Den har två delar: Ditt konto — din profil, ditt lösenord, appens språk, din aktiva vårdgivarprofil, aviseringar på den här enheten och utloggning — och Familjeinställningar — familjens tidszon, tider för överlämningspåminnelser, om utrustningsfunktioner är på, sjukhusläge och (för ägaren) det gemensamma teamkontot.",
+            ],
+          },
+          {
             heading: "Ditt konto",
             steps: [
               "Profil: bild, namn, färg och din e-postadress.",
