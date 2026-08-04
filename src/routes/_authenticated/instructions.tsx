@@ -133,10 +133,12 @@ function InstructionsPage() {
             <BookOpen className="size-7" />
           </div>
           <p className="text-muted-foreground mb-6">{t("instructions.empty")}</p>
-          <Button onClick={() => setCreating(true)} disabled={!familyId}>
-            <Plus className="size-4 mr-2" />
-            {t("instructions.add")}
-          </Button>
+          {isOwner && (
+            <Button onClick={() => setCreating(true)} disabled={!familyId}>
+              <Plus className="size-4 mr-2" />
+              {t("instructions.add")}
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
