@@ -3814,6 +3814,11 @@ export const en = {
         title: "Settings",
         blocks: [
           {
+            body: [
+              "Settings is where you manage your own account and the family's shared configuration. It has two parts: Your account — your profile, password, app language, your active caregiver profile, notifications on this device, and sign out — and Family settings — the family timezone, handover reminder times, whether equipment features are on, hospital mode, and (for the owner) the shared team account.",
+            ],
+          },
+          {
             heading: "Your account",
             steps: [
               "Profile: picture, name, colour and your email address.",
