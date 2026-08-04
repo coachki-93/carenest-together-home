@@ -1130,6 +1130,17 @@ export const en = {
     familyBlockSub: "Shared settings for the whole care team. Owner only.",
     activeProfileTitle: "Active caregiver profile",
     activeProfileSub: "Choose which of your profiles you're acting as right now.",
+    bugReport: {
+      title: "Report a bug",
+      sub: "Something broken or confusing? Tell us and we'll look into it.",
+      label: "What happened?",
+      placeholder: "Describe what you did, what you expected, and what happened instead.",
+      send: "Send report",
+      sent: "Report sent",
+      thanks: "Thanks — your report has been sent to the Tillsa team.",
+      another: "Report another bug",
+      required: "Please describe the problem",
+    },
   },
   usesEquipment: {
     title: "Track equipment maintenance",
@@ -2971,9 +2982,24 @@ export const en = {
       accounts: "Accounts",
       families: "Families",
       coupons: "Coupons",
+      bugs: "Bug reports",
     },
     title: "Platform admin — support tools",
     subtitle: "Metadata only. No health data is accessible from here.",
+    bugs: {
+      title: "Bug reports",
+      filter: "Filter by status",
+      filterAll: "All",
+      empty: "No bug reports.",
+      updated: "Report updated",
+      markRead: "Mark read",
+      markResolved: "Mark resolved",
+      status: {
+        new: "New",
+        read: "Read",
+        resolved: "Resolved",
+      },
+    },
 
     banner: {
       title: "Support tooling",
