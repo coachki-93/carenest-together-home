@@ -3714,7 +3714,7 @@ export const en = {
         blocks: [
           {
             body: [
-              "Care team has three parts: the accounts with access to the family, the caregiver profiles used to attribute what is logged, and the invitations.",
+              "Care team is where you manage who is part of caring for the child and how their actions are recorded. It has three parts: the accounts that can access the family, the caregiver profiles that log entries are attributed to (so history shows the person, not just the login), and invitations to bring new people in.",
             ],
           },
           {
