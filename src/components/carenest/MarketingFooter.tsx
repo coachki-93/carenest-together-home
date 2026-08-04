@@ -67,6 +67,9 @@ export function MarketingFooter() {
           {/* About */}
           <FooterCol title={t("marketing.footer.about")}>
             <FooterLink to="/about">{t("marketing.nav.about")}</FooterLink>
+            <FooterLink to="/support">
+              {t("marketing.footer.support")}
+            </FooterLink>
             <FooterLink to="/contact">
               {t("marketing.footer.contact")}
             </FooterLink>

@@ -2244,6 +2244,7 @@ export const sv = {
       about: "Om",
       privacy: "Integritetspolicy",
       terms: "Användarvillkor",
+      support: "Support",
       contact: "Kontakt",
       language: "Språk",
       trustLine: "Byggt med familjer till medicinskt komplexa barn.",
@@ -2289,6 +2290,23 @@ export const sv = {
       readyTitle: "Skapa er familjeplats",
       readyBody: "Installationen tar sekunder. Uppstarten tar ett par minuter.",
       backHome: "Tillbaka till startsidan",
+    },
+    support: {
+      kicker: "Support",
+      title: "Hur kan vi",
+      titleB: "hjälpa till?",
+      intro:
+        "Hur funktionerna fungerar står i handboken inne i appen. Vanliga frågor besvaras här nedanför — och allt annat skickar du till oss med formuläret längst ner.",
+      guidebookTitle: "Använder du redan Tillsa?",
+      guidebookBody:
+        "Handboken i appen förklarar varje funktion — vad den gör, vem som ser den och hur den hänger ihop med resten. Logga in och öppna Handbok i sidomenyn.",
+      writeTitle: "Konto, betalning eller något annat?",
+      writeBody:
+        "Skriv till oss med formuläret nedan. Det når en riktig människa — ingen telefonlinje och ingen ärendekö, bara vi som läser och svarar.",
+      formKicker: "Hör av dig",
+      formTitle: "Skicka ett meddelande",
+      formBody:
+        "Berätta vad det gäller så återkommer vi via e-post.",
     },
     contact: {
       metaTitle: "Kontakta Tillsa — vi läser varje meddelande",

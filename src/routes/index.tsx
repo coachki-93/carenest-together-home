@@ -17,7 +17,6 @@ import {
   Globe,
   Tablet,
   Check,
-  Plus,
   MessageSquareText,
   ListChecks,
   Calendar,
@@ -37,15 +36,10 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
+import { FaqSection } from "@/components/carenest/FaqSection";
 
 const SITE = "https://tillsa.app";
 const OG_IMAGE = SITE + "/og-image.jpg";
@@ -461,42 +455,8 @@ function Landing() {
       </section>
 
       {/* ── 12. FAQ ── */}
-      <section id="faq" className="px-6 md:px-8 py-20 md:py-28">
-        <div className="max-w-3xl mx-auto">
-          <Reveal className="text-center mb-12 space-y-3">
-            <Kicker>{t("marketing.faq.kicker")}</Kicker>
-            <h2
-              className="text-display-md text-marketing-ink"
-              style={display}
-            >
-              {t("marketing.faq.title")}
-            </h2>
-          </Reveal>
-          <Accordion
-            type="single"
-            collapsible
-            defaultValue="q1"
-            className="mk-glass rounded-3xl px-5 md:px-7 divide-y divide-marketing-line/60"
-          >
-            {["q1", "q2", "q4", "q5", "q6", "q7", "q8", "q9", "q10"].map((k) => (
-              <AccordionItem key={k} value={k} className="border-0">
-                <AccordionTrigger
-                  className="text-left text-lg py-5 hover:no-underline [&[data-state=open]>svg]:hidden text-marketing-ink"
-                  style={display}
-                >
-                  <span className="flex-1 pr-4">{t(`marketing.faq.${k}Q`)}</span>
-                  <span className="text-marketing-sage shrink-0">
-                    <Plus className="size-5 transition-transform [[data-state=open]_&]:rotate-45" />
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-6 text-marketing-muted text-base md:text-lg leading-[1.7]">
-                  {t(`marketing.faq.${k}A`)}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
+      <FaqSection />
+
 
       {/* ── 13. Closing CTA ── */}
       <section className="px-6 md:px-8 py-24 md:py-32 bg-marketing-surface border-t border-marketing-line">
