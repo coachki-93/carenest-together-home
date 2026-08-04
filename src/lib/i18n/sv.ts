@@ -3678,7 +3678,8 @@ export const sv = {
           },
           {
             body: [
-              "Varje rad visar antalet mot sin gräns och leverantören, med länk där det finns. Antal, beställningar och leveranser ändras på sidan Förråd, inte här.",
+              "Här är den skrivskyddad — du bockar av och ändrar saldon i Förråd, inte på den här sidan. Den är uppdelad i vad som behöver beställas nu och vad som redan är beställt med väntat datum.",
+              "Varje rad visar antalet mot sin gräns och leverantören, med länk där det finns.",
             ],
           },
         ],
