@@ -1,45 +1,40 @@
-# Lead 5 guidebook sections with purpose
+# Support page at /support
 
-i18n copy only — `src/lib/i18n/en.ts` and `src/lib/i18n/sv.ts` (identical line ranges in both). No component or behavior changes.
+Assembles existing pieces (FAQ + contact form + help pointers) by extracting them into shared components first — no duplicated markup or logic.
 
-## 1. Schedule (line ~3405)
+## File list
 
-Opening body replaced with the purpose sentence ("day-by-day plan... one day at a time... without the noise of Today's live working view").
+**New**
+- `src/components/carenest/FaqSection.tsx` — the marketing FAQ, lifted verbatim from `index.tsx` §12 (same i18n keys, same Accordion, same `Kicker`/heading markup). Props: optional `id` (default `"faq"`) and optional `className` so the two hosts can differ in anchor/spacing without forking the markup.
+- `src/components/carenest/ContactForm.tsx` — the fields, validation, honeypot, time-trap `startedAt`, POST to `/api/public/contact`, and success/error states, moved verbatim out of `contact.tsx`. Submit logic and security untouched.
+- `src/routes/support.tsx` — new route, `about.tsx` as the structural template.
 
-In "How to use it": the dose step loses the implementation aside and becomes
-"Mark a dose Given or Skip. Marking here is quick; for a full log with a reason, use Today."
-Move-between-days, add appointment, undo, and the occurrence-vs-series point all stay.
+**Edited**
+- `src/routes/index.tsx` — replace the inline §12 FAQ block with `<FaqSection />`; drop the Accordion/`Plus` imports if they become unused.
+- `src/routes/contact.tsx` — replace the inline form with `<ContactForm />`; page shell, hero and head meta unchanged.
+- `src/components/carenest/MarketingFooter.tsx` — add `<FooterLink to="/support">` in the About column, above Contact. Keep `/contact` (direct path).
+- `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts` — new keys only.
 
-## 2. Settings (line ~3806)
+## /support composition
 
-New first block (purpose, no heading): Settings manages your own account plus the family's shared configuration, listing the two parts.
-The "Family settings" block's body changes from "These are only shown to the owner." to
-"Your-account settings are yours; family settings that affect everyone are managed by the owner."
-Step lists unchanged.
+`MarketingHeader` → hero → help info → FAQ → contact → `MarketingFooter`.
+Head meta mirrors `about.tsx`: `SITE = https://tillsa.app`, canonical + `og:url` `/support`, per-language title/description, `og:image` reuses the existing `/og-image.jpg`.
 
-## 3. Subscription (line ~3776)
+1. **Hero** — "How can we help?" plus one line: feature how-tos live in the in-app Guidebook; FAQ and contact are below.
+2. **Help info** — two honest pointers: (a) already using Tillsa → the Guidebook inside the app explains every feature; (b) account, billing and anything else → the form below, a real person reads it. No phone number, no hours, no SLA.
+3. **FAQ** — `<FaqSection id="support-faq" />`.
+4. **Contact** — `<ContactForm />` under a short section heading.
 
-First body becomes the purpose paragraph (trial → active keeps app usable, otherwise read-only with data kept; subscribe, renewal date and price, billing portal).
-The owner-only caveat moves to a second body block right after it.
-"What it shows", the portal/data note and "After cancelling" unchanged.
+## New i18n keys (en + sv, exact parity)
 
-## 4. Shopping list (line ~3670)
+`marketing.footer.support`, and under `marketing.support.*`: `kicker`, `title`, `titleB`, `intro`, `helpKicker`, `helpTitle`, `guidebookTitle`, `guidebookBody`, `contactTitle` (help-info body), `faqTitle`-style section leads as needed, `formKicker`, `formTitle`. Swedish uses "Support" for the footer label as specified.
 
-First body becomes the purpose paragraph (buy list built automatically from Inventory).
-Second body becomes the read-only note (tick off and update stock in Inventory / Förråd) plus the two-part split. The detail sentence about quantity vs threshold and supplier link is kept at the end.
+## Conflicts to flag
 
-## 5. Care team (line ~3710)
-
-First body becomes the purpose paragraph naming the three parts and why profiles matter ("history shows the person, not just the login").
-
-## 6. Shifts (minor, line ~3735)
-
-Opening reworded to lead with purpose: "Shifts shows who is on duty across the week." then the existing grid description.
-
-Swedish is a natural translation of each, same keys, same structure.
+- **Duplicate `id="faq"`.** The footer and home nav link to `/#faq`. Rendering `FaqSection` on `/support` with the same id would put two `id="faq"` nodes in the site (one per page — not invalid, but the support copy would also answer to `/support#faq`). Handled by making the id a prop: `/` keeps `id="faq"`, `/support` uses `id="support-faq"`. No existing link changes.
+- **Guidebook is behind auth** (`/_authenticated/guidebook`). The support page therefore describes it in words rather than linking to it — a link would bounce logged-out visitors to `/auth`. Say the word if you'd rather link it anyway.
+- **Contact page hero copy stays on `/contact`.** `ContactForm` extracts only the card (form + states), not the page hero, so `/contact` keeps its own headline and `/support` gets a section heading instead. Prevents a second `<h1>` on `/support`.
 
 ## Verification
 
-- `rg -n "so no reason is recorded|only shown to the owner" src/lib/i18n` → no matches
-- en/sv key parity script
-- `tsgo --noEmit`
+`/support` in en + sv shows help info, FAQ and a working form; home FAQ and `/contact` render byte-identically to before (screenshot compare); footer links to `/support`; the endpoint and its honeypot/rate limit are untouched; en/sv key parity; `tsgo --noEmit` clean.
