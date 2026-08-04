@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render } from '@react-email/render'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import {
@@ -69,7 +69,7 @@ function generateToken(): string {
 // Get-or-create the unsubscribe token for the fixed support recipient.
 // The provider requires unsubscribe_token on every transactional send.
 async function getUnsubscribeToken(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<any, any>,
   email: string,
 ): Promise<string | null> {
   const normalized = email.toLowerCase()
