@@ -31,7 +31,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "carenest-together-home"
+const SITE_NAME = "Tillsa"
 const SENDER_DOMAIN = "notify.tillsa.app"
 const ROOT_DOMAIN = "tillsa.app"
 const FROM_DOMAIN = "tillsa.app"
