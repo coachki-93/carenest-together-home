@@ -17,7 +17,6 @@ import {
   Globe,
   Tablet,
   Check,
-  Plus,
   MessageSquareText,
   ListChecks,
   Calendar,
@@ -37,12 +36,6 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
