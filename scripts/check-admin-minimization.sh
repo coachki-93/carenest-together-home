@@ -13,7 +13,12 @@ set -euo pipefail
 FILES=(
   "src/lib/data/admin.functions.ts"
   "src/lib/data/billing-admin.functions.ts"
+  "src/lib/data/bug-admin.functions.ts"
 )
+
+# bug_reports is user-submitted support text (never health data) and lives in
+# its own module. Only bug-admin.functions.ts may name it.
+BUG_TABLE_OWNER="src/lib/data/bug-admin.functions.ts"
 
 for FILE in "${FILES[@]}"; do
   if [[ ! -f "$FILE" ]]; then
@@ -59,6 +64,7 @@ FORBIDDEN=(
   events
   push_subscriptions
   scaffolds
+  bug_reports
 )
 
 fail=0
@@ -69,6 +75,9 @@ for FILE in "${FILES[@]}"; do
   CODE_ONLY="$(grep -Ev '^\s*(\*|//)' "$FILE")"
 
   for name in "${FORBIDDEN[@]}"; do
+    if [[ "$name" == "bug_reports" && "$FILE" == "$BUG_TABLE_OWNER" ]]; then
+      continue
+    fi
     # Match .from("name"), .from('name'), or bare "name" / 'name' string.
     if echo "$CODE_ONLY" | grep -Eq "\.from\(\s*['\"]${name}['\"]|['\"]${name}['\"]"; then
       echo "FORBIDDEN: $FILE references health/operational table '${name}'" >&2
