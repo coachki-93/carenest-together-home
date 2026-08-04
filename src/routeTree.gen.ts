@@ -14,6 +14,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as InstallRouteImport } from './routes/install'
 import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -84,6 +85,11 @@ const InstallRoute = InstallRouteImport.update({
 const FeaturesRoute = FeaturesRouteImport.update({
   id: '/features',
   path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
@@ -385,6 +392,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
@@ -439,6 +447,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/install': typeof InstallRoute
   '/offline': typeof OfflineRoute
@@ -493,6 +502,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/contact'
     | '/features'
     | '/install'
     | '/offline'
@@ -545,6 +555,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/contact'
     | '/features'
     | '/install'
     | '/offline'
@@ -598,6 +609,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/contact'
     | '/features'
     | '/install'
     | '/offline'
@@ -652,6 +664,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRouteWithChildren
+  ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
   InstallRoute: typeof InstallRoute
   OfflineRoute: typeof OfflineRoute
@@ -709,6 +722,13 @@ declare module '@tanstack/react-router' {
       path: '/features'
       fullPath: '/features'
       preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1112,6 +1132,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRouteWithChildren,
+  ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
   InstallRoute: InstallRoute,
   OfflineRoute: OfflineRoute,
