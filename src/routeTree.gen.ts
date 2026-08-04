@@ -47,6 +47,7 @@ import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authenticated/appointments'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as AuthenticatedOnboardingChildRouteImport } from './routes/_authenticated/onboarding.child'
 import { Route as AuthenticatedOnboardingCaregiverRouteImport } from './routes/_authenticated/onboarding.caregiver'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -253,6 +254,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
+  id: '/api/public/contact',
+  path: '/api/public/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOnboardingChildRoute =
   AuthenticatedOnboardingChildRouteImport.update({
     id: '/onboarding/child',
@@ -362,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/invite/': typeof InviteIndexRoute
   '/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
@@ -413,6 +420,7 @@ export interface FileRoutesByTo {
   '/invite': typeof InviteIndexRoute
   '/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
@@ -466,6 +474,7 @@ export interface FileRoutesById {
   '/invite/': typeof InviteIndexRoute
   '/_authenticated/onboarding/caregiver': typeof AuthenticatedOnboardingCaregiverRoute
   '/_authenticated/onboarding/child': typeof AuthenticatedOnboardingChildRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/hooks/care-place-missed-sweep': typeof ApiPublicHooksCarePlaceMissedSweepRoute
   '/api/public/hooks/dispatch-task-notifications': typeof ApiPublicHooksDispatchTaskNotificationsRoute
@@ -519,6 +528,7 @@ export interface FileRouteTypes {
     | '/invite/'
     | '/onboarding/caregiver'
     | '/onboarding/child'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/onboarding/caregiver'
     | '/onboarding/child'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
@@ -622,6 +633,7 @@ export interface FileRouteTypes {
     | '/invite/'
     | '/_authenticated/onboarding/caregiver'
     | '/_authenticated/onboarding/child'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/api/public/hooks/care-place-missed-sweep'
     | '/api/public/hooks/dispatch-task-notifications'
@@ -648,6 +660,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
   InviteIndexRoute: typeof InviteIndexRoute
+  ApiPublicContactRoute: typeof ApiPublicContactRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksCarePlaceMissedSweepRoute: typeof ApiPublicHooksCarePlaceMissedSweepRoute
   ApiPublicHooksDispatchTaskNotificationsRoute: typeof ApiPublicHooksDispatchTaskNotificationsRoute
@@ -929,6 +942,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/contact': {
+      id: '/api/public/contact'
+      path: '/api/public/contact'
+      fullPath: '/api/public/contact'
+      preLoaderRoute: typeof ApiPublicContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/onboarding/child': {
       id: '/_authenticated/onboarding/child'
       path: '/onboarding/child'
@@ -1100,6 +1120,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
   InviteIndexRoute: InviteIndexRoute,
+  ApiPublicContactRoute: ApiPublicContactRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksCarePlaceMissedSweepRoute:
     ApiPublicHooksCarePlaceMissedSweepRoute,
