@@ -62,6 +62,7 @@ function InstructionsPage() {
   const { user } = useSession();
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
+  const isOwner = membership?.role === "owner";
   const { data: instructions, isLoading } = useInstructions(familyId);
 
   const [editing, setEditing] = useState<Instruction | null>(null);
@@ -114,10 +115,12 @@ function InstructionsPage() {
     <DashboardLayout title={t("instructions.title")}>
       <div className="flex items-center justify-between mb-6">
         <p className="text-muted-foreground">{t("instructions.subtitle")}</p>
-        <Button onClick={() => setCreating(true)} disabled={!familyId}>
-          <Plus className="size-4 mr-2" />
-          {t("instructions.add")}
-        </Button>
+        {isOwner && (
+          <Button onClick={() => setCreating(true)} disabled={!familyId}>
+            <Plus className="size-4 mr-2" />
+            {t("instructions.add")}
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -130,10 +133,12 @@ function InstructionsPage() {
             <BookOpen className="size-7" />
           </div>
           <p className="text-muted-foreground mb-6">{t("instructions.empty")}</p>
-          <Button onClick={() => setCreating(true)} disabled={!familyId}>
-            <Plus className="size-4 mr-2" />
-            {t("instructions.add")}
-          </Button>
+          {isOwner && (
+            <Button onClick={() => setCreating(true)} disabled={!familyId}>
+              <Plus className="size-4 mr-2" />
+              {t("instructions.add")}
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -141,24 +146,26 @@ function InstructionsPage() {
             <article key={ins.id} className="card-soft p-5">
               <header className="flex items-start justify-between gap-3 mb-2">
                 <h3 className="font-bold text-lg leading-tight">{ins.title}</h3>
-                <div className="flex gap-1 shrink-0">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setEditing(ins)}
-                    aria-label={t("common.edit")}
-                  >
-                    <Pencil className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setDeleting(ins)}
-                    aria-label={t("common.delete")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
+                {isOwner && (
+                  <div className="flex gap-1 shrink-0">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setEditing(ins)}
+                      aria-label={t("common.edit")}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setDeleting(ins)}
+                      aria-label={t("common.delete")}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                )}
               </header>
               {ins.body ? (
                 <div
