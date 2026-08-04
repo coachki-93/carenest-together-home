@@ -3402,7 +3402,8 @@ export const en = {
         blocks: [
           {
             body: [
-              "Schedule is the day view. It shows medication doses and appointments for one day and lets you move between days with previous, today and next.",
+              "Schedule is your day-by-day plan. It shows one day at a time — every medication dose and appointment for that day, in time order — so you can look ahead or back at any single day without the noise of Today's live working view.",
+              "Move between days with previous, today and next.",
             ],
           },
           {
