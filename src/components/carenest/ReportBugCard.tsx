@@ -36,7 +36,7 @@ export function ReportBugCard() {
         reporter_id: user.id,
         family_id: membership.data?.family_id ?? null,
         submitter_email: user.email ?? null,
-        page_context: pageContext ?? "/settings",
+        page_context: pageContext ?? "/report-bug",
         body: text.slice(0, 5000),
       });
       if (error) throw error;
