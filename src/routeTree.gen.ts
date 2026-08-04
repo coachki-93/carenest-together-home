@@ -39,6 +39,7 @@ import { Route as AuthenticatedInventoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInstructionsRouteImport } from './routes/_authenticated/instructions'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHandoverRouteImport } from './routes/_authenticated/handover'
+import { Route as AuthenticatedGuidebookRouteImport } from './routes/_authenticated/guidebook'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedEmergencyRouteImport } from './routes/_authenticated/emergency'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -214,6 +215,11 @@ const AuthenticatedHandoverRoute = AuthenticatedHandoverRouteImport.update({
   path: '/handover',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGuidebookRoute = AuthenticatedGuidebookRouteImport.update({
+  id: '/guidebook',
+  path: '/guidebook',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -353,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/emergency': typeof AuthenticatedEmergencyRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/guidebook': typeof AuthenticatedGuidebookRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
@@ -406,6 +413,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/emergency': typeof AuthenticatedEmergencyRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/guidebook': typeof AuthenticatedGuidebookRoute
   '/handover': typeof AuthenticatedHandoverRoute
   '/home': typeof AuthenticatedHomeRoute
   '/instructions': typeof AuthenticatedInstructionsRoute
@@ -461,6 +469,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/emergency': typeof AuthenticatedEmergencyRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/guidebook': typeof AuthenticatedGuidebookRoute
   '/_authenticated/handover': typeof AuthenticatedHandoverRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/instructions': typeof AuthenticatedInstructionsRoute
@@ -516,6 +525,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/emergency'
     | '/events'
+    | '/guidebook'
     | '/handover'
     | '/home'
     | '/instructions'
@@ -569,6 +579,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/emergency'
     | '/events'
+    | '/guidebook'
     | '/handover'
     | '/home'
     | '/instructions'
@@ -623,6 +634,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/emergency'
     | '/_authenticated/events'
+    | '/_authenticated/guidebook'
     | '/_authenticated/handover'
     | '/_authenticated/home'
     | '/_authenticated/instructions'
@@ -899,6 +911,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHandoverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/guidebook': {
+      id: '/_authenticated/guidebook'
+      path: '/guidebook'
+      fullPath: '/guidebook'
+      preLoaderRoute: typeof AuthenticatedGuidebookRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/events': {
       id: '/_authenticated/events'
       path: '/events'
@@ -1065,6 +1084,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmergencyRoute: typeof AuthenticatedEmergencyRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedGuidebookRoute: typeof AuthenticatedGuidebookRoute
   AuthenticatedHandoverRoute: typeof AuthenticatedHandoverRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInstructionsRoute: typeof AuthenticatedInstructionsRoute
@@ -1091,6 +1111,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmergencyRoute: AuthenticatedEmergencyRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedGuidebookRoute: AuthenticatedGuidebookRoute,
   AuthenticatedHandoverRoute: AuthenticatedHandoverRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInstructionsRoute: AuthenticatedInstructionsRoute,
@@ -1159,13 +1180,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

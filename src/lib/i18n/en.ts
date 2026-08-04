@@ -205,6 +205,7 @@ export const en = {
     shifts: "Shifts",
     billing: "Subscription",
     settings: "Settings",
+    guidebook: "Guidebook",
     reportBug: "Report a bug",
   },
   shiftsPage: {
@@ -3335,6 +3336,512 @@ export const en = {
         }
       ]
     }
+  },
+  guidebook: {
+    title: "Guidebook",
+    subtitle: "How every part of Tillsa works.",
+    intro: {
+      heading: "What Tillsa is",
+      body: [
+        "Tillsa is a shared coordination tool for a family and its care team. Everyone with access sees the same plan, the same log and the same instructions, so nothing depends on one person remembering.",
+        "Tillsa is not medical advice and does not decide anything about care. It records what you and your team plan and do, and shows who did what and when.",
+        "Almost everything you log is attributed to a caregiver profile as well as your account, so the history shows the person, not just the login.",
+      ],
+      stepsHeading: "Getting started",
+      steps: [
+        "Fill in the child profile: name, diagnosis, allergies, emergency contacts and doctors.",
+        "Pick the care needs on the child profile. They decide which vitals and modules appear elsewhere in the app.",
+        "Add medications with their times of day, so doses start appearing on Today and Schedule.",
+        "Invite the rest of the care team from Care team, and create a caregiver profile for each person.",
+        "Set the family timezone, handover times and other family settings in Settings.",
+        "Turn on notifications in Settings on each device that should get reminders.",
+      ],
+    },
+    groups: {
+      care: "Care",
+      caregivers: "Caregivers",
+      family: "Family",
+      account: "Account",
+    },
+    reviewNote: "Marked [NEEDS REVIEW] — this detail has not been confirmed and is being verified.",
+    sections: {
+      dashboard: {
+        title: "Today",
+        blocks: [
+          {
+            body: [
+              "Today is the working screen. It merges everything scheduled for today into one list in time order: medication doses, appointments and the vitals already logged today.",
+            ],
+          },
+          {
+            heading: "What you can do with a task",
+            steps: [
+              "Done — opens a dialog where you confirm which caregiver profile did it. Some tasks also ask for a note or, for a measuring appointment, a value that is then saved as a vital reading.",
+              "Mark ongoing — available on tasks that allow it. It records who started it and when, pauses the late and missed countdown, and sends a notification to the family.",
+              "Skip — a reason is required. You can pick a ready-made reason or write your own.",
+              "Postpone — a reason plus a new date and time, which defaults to one hour later.",
+              "Undo — removes the log entry again, so the task goes back to not done.",
+            ],
+          },
+          {
+            heading: "Quick log",
+            body: [
+              "The Log button in the header opens the quick dialog where you record a vital reading or a care event without going to another page.",
+            ],
+          },
+          {
+            heading: "The rest of the screen",
+            body: [
+              "Today also shows vitals tiles, an oxygen card when oxygen is in use, the countdown to the next handover, maintenance that is due, and shortcuts to the other pages. Which tiles appear depends on the care needs set on the child profile, and the maintenance card is hidden if the family has equipment turned off in Settings.",
+            ],
+          },
+        ],
+      },
+      schedule: {
+        title: "Schedule",
+        blocks: [
+          {
+            body: [
+              "Schedule is the day view. It shows medication doses and appointments for one day and lets you move between days with previous, today and next.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "Use the plus button to create an appointment for the day you are looking at.",
+              "Mark a dose Given or Skip. Schedule uses a short confirmation rather than the fuller dialog on Today, so no reason is recorded here.",
+              "Undo removes the log entry for that dose.",
+              "Editing or deleting a repeating appointment asks whether you mean only that occurrence or the whole series.",
+            ],
+          },
+        ],
+      },
+      appointments: {
+        title: "Appointments",
+        blocks: [
+          {
+            body: [
+              "Appointments is a month calendar of visits and other planned events. Select a day to see it, and use the plus button to add a new one.",
+            ],
+          },
+          {
+            heading: "Creating and editing",
+            steps: [
+              "Tap an entry to see a short preview with title, time, place and repeat, then choose Edit to open the full form.",
+              "The form has title, start and end time or all day, colour, place and notes, a reminder in minutes before the start, and repeat: none, daily, weekly, monthly or every N, with weekdays for weekly repeats.",
+              "A title is required and the end time must be after the start.",
+              "Saving or deleting a repeating appointment asks whether the change applies to that occurrence or the whole series.",
+            ],
+          },
+          {
+            heading: "Notifications",
+            body: [
+              "The family can get a push notification before the start based on the reminder you set, at the start time, when the appointment becomes late, and when it is counted as missed with nothing logged. Each occurrence is only notified once per kind.",
+            ],
+          },
+        ],
+      },
+      medications: {
+        title: "Medications",
+        blocks: [
+          {
+            body: [
+              "Medications is the list of the child medicines and the times they are given. It is the source for the doses that appear on Today and Schedule.",
+            ],
+          },
+          {
+            heading: "Adding a medication",
+            steps: [
+              "Only the family owner can add, edit or delete a medication.",
+              "Fill in the name, the dose amount and unit, and the route, for example oral, tube, injection, inhaled or topical.",
+              "Add one time of day per dose, in hours and minutes. Each time becomes a dose every day.",
+              "Pick a colour so the medicine is easy to recognise in lists.",
+              "Turn on the course option for a limited treatment, then set the date and time of the first dose and the total number of doses.",
+            ],
+          },
+          {
+            heading: "How doses are generated",
+            body: [
+              "Every active medication produces one dose per listed time, for the current day, in the family timezone. Archived or inactive medications produce nothing.",
+              "For a course, the doses are limited to the window that starts at the first dose you set and ends at the last dose of the total count. That means the first day only shows the times that are still ahead of the first dose, and the last day stops after the final dose. Nothing has to be ended manually.",
+              "Doses are matched to what you have already logged by medicine and scheduled time, so reloading never duplicates them.",
+            ],
+          },
+          {
+            heading: "Marking a dose",
+            body: [
+              "Marking a dose given saves the status, the time it was given, your account and the caregiver profile that did it. Skipping or postponing requires a reason, and postponing also stores the new time.",
+              "History on each medicine shows the past doses, newest first, with the person who logged each one and the postponed time where relevant, loaded fifty at a time.",
+              "Archive keeps an old medicine out of the daily list without deleting its history. Show previous reveals archived medicines again.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Timers",
+            body: [
+              "[NEEDS REVIEW: the dose record has fields for a timer start, but we could not confirm which part of the interface starts one, so timers are not described here.]",
+            ],
+          },
+        ],
+      },
+      vitals: {
+        title: "Vitals",
+        blocks: [
+          {
+            body: [
+              "Vitals holds the measurements you take: for example temperature, heart rate, oxygen saturation, breathing, fluids, weight and nappies. Which ones appear is decided by the care needs on the child profile.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "Use Log to add a reading: the value, the time, optional context labels and a note.",
+              "Each tile shows the latest value with a colour for low, normal or high, and marks a vital as due for a check when the last reading is old.",
+              "Charts show the trend over the range you pick. Fluids are shown as bars, and weight has its own chart with the change since the last reading.",
+              "The history list can be expanded, and a single reading can be deleted after a confirmation.",
+            ],
+          },
+          {
+            heading: "Normal ranges",
+            body: [
+              "The colours use age-based default ranges. The owner can override the low and high limits per vital on the child profile and reset them back to the defaults.",
+            ],
+          },
+        ],
+      },
+      events: {
+        title: "Events",
+        blocks: [
+          {
+            body: [
+              "Events is the log of things that happen and are worth recording, such as a seizure or another incident. The types offered depend on the care needs on the child profile.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "Use Log event and pick a type, then fill in date and time, severity, duration in minutes and seconds, a description, which is required, and what was done.",
+              "Filter the list by type, and show or hide archived events.",
+              "Events are grouped by day in the family timezone and show who logged them.",
+              "The person who wrote an event can archive it, which hides it without deleting it, and unarchive it again.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Editing",
+            body: [
+              "[NEEDS REVIEW: an event can be edited by its author for a limited time after it is written, but we could not confirm the exact length of that window or whether anyone else can edit.]",
+            ],
+          },
+        ],
+      },
+      oxygen: {
+        title: "Oxygen",
+        blocks: [
+          {
+            body: [
+              "Oxygen tracks the tank that is in use and how much time is left in it, based on the flow rate.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "Start tank: choose the flow rate, where each option shows how long the tank lasts at that rate, and add a note if you want.",
+              "The current tank card shows a status of normal, low, critical, empty or paused, the time remaining counting down, how much is left as a bar, the flow rate, when it was started and the estimated time it runs out.",
+              "Change flow shows what the remaining time becomes at the new rate before you save it.",
+              "Replace tank closes the current tank and starts a new one, with its own flow rate and note.",
+              "The history card lists earlier tanks with their start and replacement times.",
+            ],
+          },
+          {
+            heading: "Hospital mode",
+            body: [
+              "When the family is marked as being at hospital, the tank is shown as paused.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Tank types",
+            body: [
+              "[NEEDS REVIEW: the start dialog currently uses a single fixed tank type, so no tank type can be chosen in the interface even though several are modelled.]",
+            ],
+          },
+        ],
+      },
+      handover: {
+        title: "Handover",
+        blocks: [
+          {
+            body: [
+              "Handover is the written note passed between shifts. The page lists the most recent handovers with who wrote them.",
+            ],
+          },
+          {
+            heading: "Writing one",
+            steps: [
+              "A handover has a shift, a summary and short fields for sleep, mood, seizures, fluids and medicines, plus free notes.",
+              "A draft can be prefilled from the shift window: medicines given or missed, vitals, appointments, oxygen, events and maintenance are turned into bullet lines. Prefill never overwrites text you have already typed.",
+              "The author can edit their handover for two hours after it is written. Editing clears the read receipts so the others are asked to read it again.",
+              "The author can also delete their handover after a confirmation.",
+            ],
+          },
+          {
+            heading: "Reading",
+            body: [
+              "Everyone except the author sees a Mark read button on a handover they have not read. You need an active caregiver profile selected to mark it read.",
+              "The handover shows who has read it and when, and marks it clearly if someone read it before it was edited.",
+            ],
+          },
+          {
+            heading: "Reminders",
+            body: [
+              "When a handover is due according to the handover times set in Settings, a banner appears on the app. If a handover has already been written just before the time, the banner switches to a softer reminder about final notes instead. A dismissed banner stays dismissed on that device.",
+            ],
+          },
+        ],
+      },
+      instructions: {
+        title: "Instructions",
+        blocks: [
+          {
+            body: [
+              "Instructions holds the written routines for the child, for example how a piece of equipment is used or how a routine is done. Each instruction has a title and a formatted body, and the list is sorted with the most recently updated first.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "Add opens a form with a title and a text editor for the body.",
+              "Each instruction can be edited, and deleting one asks for confirmation and names the instruction.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Who can edit",
+            body: [
+              "[NEEDS REVIEW: we found no owner restriction on this page, so any member of the family appears to be able to add, edit and delete instructions. Confirm this is intended.]",
+            ],
+          },
+        ],
+      },
+      inventory: {
+        title: "Inventory",
+        blocks: [
+          {
+            body: [
+              "Inventory tracks supplies: how much is left, when a thing runs low and when it expires. The owner and members marked as responsible for materials can change things; everyone else sees the same information read only.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "An item has a quantity, a lowest acceptable level, a category, a place, a supplier with an optional order link, and an expiry date.",
+              "A banner at the top counts the items that are low, expiring or already expired, and the tabs filter to those.",
+              "Minus and plus adjust the quantity by one and are written to the item history.",
+              "Mark ordered records that a delivery is on the way, with an expected date, and can be cleared again.",
+              "Mark received adds the delivered quantity with an optional note.",
+              "Add to next round puts a low item on the list for the next supply round.",
+              "Each item has a history, and the page ends with a feed of the most recent changes with who made them.",
+            ],
+          },
+        ],
+      },
+      maintenance: {
+        title: "Maintenance",
+        blocks: [
+          {
+            body: [
+              "Maintenance keeps track of equipment and the recurring tasks it needs, such as changing a filter or cleaning a part.",
+            ],
+          },
+          {
+            heading: "When it is visible",
+            body: [
+              "The whole feature is switched off with the equipment setting in Settings. When it is off, the page only explains that and links to Settings, and the item disappears from the menu.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "The owner and members responsible for materials can manage machines and tasks; everyone else sees it read only.",
+              "A machine has a name, a type and subtype, a manufacturer, a model, a serial number and notes, and can be archived or deleted.",
+              "Each machine has tasks with an interval, and each task shows as fine, due soon, overdue or as needed.",
+              "Mark done records the task as done now, with an optional note and the caregiver profile that did it, and appears in the task history.",
+            ],
+          },
+        ],
+      },
+      shopping: {
+        title: "Shopping list",
+        blocks: [
+          {
+            body: [
+              "The shopping list is a read-only view of what Inventory says needs buying. It has two parts: to order, which is everything below its lowest level that has not been ordered, and on order, which shows what is already ordered and when it is expected.",
+            ],
+          },
+          {
+            body: [
+              "Each item shows the quantity against its threshold and the supplier, with a link where one exists. Quantities, orders and deliveries are changed on the Inventory page, not here.",
+            ],
+          },
+        ],
+      },
+      emergency: {
+        title: "Emergency info",
+        blocks: [
+          {
+            body: [
+              "Emergency info is a read-only screen for a situation where there is no time to search. It opens straight to the essentials and is stored on the device so it still works without a connection, with a notice when you are offline.",
+            ],
+          },
+          {
+            heading: "What it contains",
+            steps: [
+              "A call button for 112, and a call button for the first emergency contact that has a number.",
+              "Diagnosis and condition details, and the allergies highlighted.",
+              "The emergency steps in order, each marked as critical, to monitor or informational.",
+              "The active medications, the emergency contacts and the doctors, and when the information was last updated.",
+            ],
+          },
+          {
+            heading: "Keeping it correct",
+            body: [
+              "The content comes from the child profile, where the owner also writes the emergency steps. Owners get a link from this page to that form.",
+            ],
+          },
+        ],
+      },
+      caregivers: {
+        title: "Care team",
+        blocks: [
+          {
+            body: [
+              "Care team has three parts: the accounts with access to the family, the caregiver profiles used to attribute what is logged, and the invitations.",
+            ],
+          },
+          {
+            heading: "Accounts and profiles",
+            steps: [
+              "The owner is marked with a crown; everyone else is a team member.",
+              "The owner can mark a member as responsible for materials, which gives them management of Inventory and Maintenance.",
+              "The owner can remove a member after a confirmation, and can create a caregiver profile for anyone. Other members can create a profile for themselves.",
+              "A caregiver profile has a name and a colour, belongs to an account, and can be marked inactive. It can be edited or deleted by the account that owns it or by the family owner.",
+            ],
+          },
+          {
+            heading: "Invitations",
+            body: [
+              "Only the owner sees the invitation section. New invite asks for an email address, creates the invitation, opens a prepared email with the invitation link, and shows the link so it can be copied and sent another way. Pending invitations show the address, the invitation code and the expiry date, and can be resent or revoked.",
+            ],
+          },
+        ],
+      },
+      shifts: {
+        title: "Shifts",
+        blocks: [
+          {
+            body: [
+              "Shifts is a weekly grid of who is on duty. There is one row per active caregiver profile, plus a row for shifts with nobody assigned, and you can move between weeks or jump back to today.",
+            ],
+          },
+          {
+            heading: "How to use it",
+            steps: [
+              "Only the owner can create and change shifts; everyone else sees the same plan without the buttons.",
+              "Tap an empty slot or use Add shift to create one, and tap an existing shift to edit it.",
+              "A shift has a caregiver profile, a start and end time in the family timezone, a free-text category and a colour.",
+              "A shift can repeat daily or weekly, with an interval, chosen weekdays for weekly repeats, and an end date.",
+              "The end time must be after the start, and an existing shift can be deleted from the same form.",
+            ],
+          },
+        ],
+      },
+      child: {
+        title: "Child profile",
+        blocks: [
+          {
+            body: [
+              "The child profile is the source of the information the rest of the app uses. Only the owner can change it; everyone else sees it read only.",
+            ],
+          },
+          {
+            heading: "What it holds",
+            steps: [
+              "Photo, name and date of birth.",
+              "Diagnosis, condition details and allergies, which are shown on Emergency info.",
+              "Emergency contacts with name, relation and phone number, and doctors with name, speciality and phone number.",
+              "The emergency steps, in the order they should be followed, each with a severity.",
+              "The care needs, which decide which vitals, event types and modules such as oxygen appear elsewhere in the app.",
+              "Normal range overrides for heart rate, oxygen saturation, temperature and breathing, each with a reset back to the age-based default.",
+            ],
+          },
+        ],
+      },
+      billing: {
+        title: "Subscription",
+        blocks: [
+          {
+            body: [
+              "The subscription page is only for the family owner. Other members see a short note that the owner handles it.",
+            ],
+          },
+          {
+            heading: "What it shows",
+            steps: [
+              "The current state: trial with the days left, active, ending on a date, past due, cancelled or inactive.",
+              "The plan and its price, except during the trial where no price is shown.",
+              "Subscribe, which opens the payment checkout, when the family has no payment customer yet.",
+              "Manage, which opens the payment portal for the payment method, invoices and cancelling, when the family already has one.",
+            ],
+          },
+          {
+            body: [
+              "Invoices and receipts live in the portal. Your data is kept if the subscription ends.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] After cancelling",
+            body: [
+              "[NEEDS REVIEW: we could not confirm what a family that has cancelled but still has a payment customer sees, so the guide does not describe a separate resubscribe flow.]",
+            ],
+          },
+        ],
+      },
+      settings: {
+        title: "Settings",
+        blocks: [
+          {
+            heading: "Your account",
+            steps: [
+              "Profile: picture, name, colour and your email address.",
+              "Active caregiver profile, shown when your account has more than one, which decides who your logging is attributed to.",
+              "Language, English or Swedish, remembered on the device.",
+              "Notifications, where you allow push notifications on this device.",
+              "Password, where you set a new one.",
+              "Help: replay the introduction tour or restart the setup wizard.",
+              "Sign out.",
+            ],
+          },
+          {
+            heading: "Family settings",
+            body: [
+              "These are only shown to the owner.",
+            ],
+            steps: [
+              "At hospital, which pauses parts of the app while the child is admitted.",
+              "Family language and timezone, which decide what today means in the app.",
+              "Supply round checks and tidy-up settings.",
+              "Handover reminders, which set the times the handover banner appears.",
+              "How much the owner is notified.",
+              "Whether the family uses equipment, which turns Maintenance on or off.",
+              "Resetting the suggested setup content.",
+            ],
+          },
+          {
+            heading: "[NEEDS REVIEW] Team account",
+            body: [
+              "[NEEDS REVIEW: the settings page also shows a team account card whose exact contents and actions we have not confirmed, so it is not described here.]",
+            ],
+          },
+        ],
+      },
+    },
   },
 };
 

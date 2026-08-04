@@ -88,6 +88,7 @@ export function AppSidebar() {
   const isOwner = membership.data?.role === "owner";
   const settingsItem = { title: t("nav.settings"), url: "/settings", icon: Settings };
   const billingItem = { title: t("nav.billing"), url: "/billing", icon: CreditCard };
+  const guidebookItem = { title: t("nav.guidebook"), url: "/guidebook", icon: BookOpen };
   const reportBugItem = { title: t("nav.reportBug"), url: "/report-bug", icon: Bug };
 
   const isActive = (url: string) =>
@@ -153,6 +154,19 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive(guidebookItem.url)}
+              className="rounded-xl h-11"
+              tooltip={guidebookItem.title}
+            >
+              <Link to={guidebookItem.url} className="flex items-center gap-3">
+                <guidebookItem.icon className="size-5" />
+                {!collapsed && <span className="font-semibold">{guidebookItem.title}</span>}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
