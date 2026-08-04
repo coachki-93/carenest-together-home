@@ -3476,9 +3476,9 @@ export const sv = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Timer",
+            heading: "Timer",
             body: [
-              "[NEEDS REVIEW: dosposten har fält för en startad timer, men vi kunde inte bekräfta var i gränssnittet en timer startas, så timers beskrivs inte här.]",
+              "En medicin kan ha en valfri timer på 1 till 120 minuter. Du slår på den och anger längden när du lägger till eller ändrar medicinen. En vårdgivare startar nedräkningen från uppgiften, och uppgiften slutförs automatiskt när timern når noll.",
             ],
           },
         ],
@@ -3526,9 +3526,9 @@ export const sv = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Redigering",
+            heading: "Redigering",
             body: [
-              "[NEEDS REVIEW: en händelse kan redigeras av den som skrev den under en begränsad tid efteråt, men vi kunde inte bekräfta exakt hur lång tiden är eller om någon annan får redigera.]",
+              "En händelse kan bara redigeras av den som skrev den, och bara inom 2 timmar efter att den skrevs. Därefter, och för alla andra, går händelsen bara att läsa.",
             ],
           },
         ],
@@ -3558,9 +3558,9 @@ export const sv = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Tubtyper",
+            heading: "Tubtyper",
             body: [
-              "[NEEDS REVIEW: startrutan använder i dag en enda fast tubtyp, så ingen tubtyp går att välja i gränssnittet trots att flera finns i modellen.]",
+              "Det finns en tubtyp, så du väljer ingen typ när du startar en tub.",
             ],
           },
         ],
@@ -3613,9 +3613,9 @@ export const sv = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Vem får redigera",
+            heading: "Vem får redigera",
             body: [
-              "[NEEDS REVIEW: vi hittade ingen begränsning till ägaren på den här sidan, så alla i familjen verkar kunna lägga till, ändra och ta bort instruktioner. Bekräfta att det är avsikten.]",
+              "Bara familjens ägare kan lägga till, ändra eller ta bort vårdinstruktioner. Alla vårdgivare kan läsa dem.",
             ],
           },
         ],
@@ -3796,9 +3796,9 @@ export const sv = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Efter uppsägning",
+            heading: "Efter uppsägning",
             body: [
-              "[NEEDS REVIEW: vi kunde inte bekräfta vad en familj som sagt upp men fortfarande har en betalningskund ser, så guiden beskriver inget separat flöde för att prenumerera igen.]",
+              "En familj som har sagt upp men fortfarande har ett betalkonto behåller full åtkomst tills den betalda perioden tar slut. Prenumerationssidan visar \"Aktiv till [datum], avslutas därefter\" tillsammans med knappen Hantera som öppnar betalportalen, där du kan prenumerera igen eller ändra betalsätt.",
             ],
           },
         ],
@@ -3834,9 +3834,9 @@ export const sv = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Teamkonto",
+            heading: "Teamkonto",
             body: [
-              "[NEEDS REVIEW: inställningssidan visar också ett kort för teamkonto vars exakta innehåll och funktioner vi inte har bekräftat, så det beskrivs inte här.]",
+              "Ägare kan hantera ett gemensamt teamkonto här: en enda delad inloggning som hela vårdteamet kan använda, som ett alternativ till att bjuda in varje vårdgivare för sig.",
             ],
           },
         ],

@@ -3476,9 +3476,9 @@ export const en = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Timers",
+            heading: "Timers",
             body: [
-              "[NEEDS REVIEW: the dose record has fields for a timer start, but we could not confirm which part of the interface starts one, so timers are not described here.]",
+              "A medication can have an optional timer of 1 to 120 minutes. You turn it on and set the length when you add or edit the medication. A caregiver starts the countdown from the task, and the task is completed automatically when the timer reaches zero.",
             ],
           },
         ],
@@ -3526,9 +3526,9 @@ export const en = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Editing",
+            heading: "Editing",
             body: [
-              "[NEEDS REVIEW: an event can be edited by its author for a limited time after it is written, but we could not confirm the exact length of that window or whether anyone else can edit.]",
+              "An event can be edited only by the person who wrote it, and only within 2 hours of writing it. After that, and for everyone else, the event is read-only.",
             ],
           },
         ],
@@ -3558,9 +3558,9 @@ export const en = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Tank types",
+            heading: "Tank types",
             body: [
-              "[NEEDS REVIEW: the start dialog currently uses a single fixed tank type, so no tank type can be chosen in the interface even though several are modelled.]",
+              "There is one tank type, so you do not choose a type when you start a tank.",
             ],
           },
         ],
@@ -3613,9 +3613,9 @@ export const en = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Who can edit",
+            heading: "Who can edit",
             body: [
-              "[NEEDS REVIEW: we found no owner restriction on this page, so any member of the family appears to be able to add, edit and delete instructions. Confirm this is intended.]",
+              "Only the family owner can add, edit or delete care instructions. All caregivers can read them.",
             ],
           },
         ],
@@ -3796,9 +3796,9 @@ export const en = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] After cancelling",
+            heading: "After cancelling",
             body: [
-              "[NEEDS REVIEW: we could not confirm what a family that has cancelled but still has a payment customer sees, so the guide does not describe a separate resubscribe flow.]",
+              "A family that has cancelled but still has a payment account keeps full access until the paid period ends. The subscription page shows \"Active until [date], then cancels\" together with a Manage button that opens the billing portal, where you can resubscribe or change payment details.",
             ],
           },
         ],
@@ -3834,9 +3834,9 @@ export const en = {
             ],
           },
           {
-            heading: "[NEEDS REVIEW] Team account",
+            heading: "Team account",
             body: [
-              "[NEEDS REVIEW: the settings page also shows a team account card whose exact contents and actions we have not confirmed, so it is not described here.]",
+              "Owners can manage a shared team account here: a single shared login that the whole care team can use, as an alternative to inviting each caregiver individually.",
             ],
           },
         ],
