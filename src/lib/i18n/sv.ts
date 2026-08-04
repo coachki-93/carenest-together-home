@@ -1130,6 +1130,17 @@ export const sv = {
     familyBlockSub: "Delade inställningar för hela vårdteamet. Endast ägare.",
     activeProfileTitle: "Aktiv vårdgivarprofil",
     activeProfileSub: "Välj vilken av dina profiler du agerar som just nu.",
+    bugReport: {
+      title: "Rapportera ett fel",
+      sub: "Något som är trasigt eller förvirrande? Berätta så tittar vi på det.",
+      label: "Vad hände?",
+      placeholder: "Beskriv vad du gjorde, vad du förväntade dig och vad som hände i stället.",
+      send: "Skicka rapport",
+      sent: "Rapporten skickad",
+      thanks: "Tack — din rapport har skickats till Tillsa-teamet.",
+      another: "Rapportera ett fel till",
+      required: "Beskriv problemet",
+    },
   },
   usesEquipment: {
     title: "Spåra utrustningsunderhåll",
@@ -2970,9 +2981,24 @@ export const sv = {
       accounts: "Konton",
       families: "Familjer",
       coupons: "Rabattkoder",
+      bugs: "Felrapporter",
     },
     title: "Plattformsadmin — supportverktyg",
     subtitle: "Endast metadata. Ingen hälsodata är åtkomlig härifrån.",
+    bugs: {
+      title: "Felrapporter",
+      filter: "Filtrera på status",
+      filterAll: "Alla",
+      empty: "Inga felrapporter.",
+      updated: "Rapporten uppdaterad",
+      markRead: "Markera som läst",
+      markResolved: "Markera som löst",
+      status: {
+        new: "Ny",
+        read: "Läst",
+        resolved: "Löst",
+      },
+    },
 
     banner: {
       title: "Supportverktyg",

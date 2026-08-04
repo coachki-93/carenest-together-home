@@ -274,6 +274,53 @@ export type Database = {
           },
         ]
       }
+      bug_reports: {
+        Row: {
+          body: string
+          created_at: string
+          family_id: string | null
+          id: string
+          page_context: string | null
+          reporter_id: string | null
+          resolved_at: string | null
+          status: string
+          submitter_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          family_id?: string | null
+          id?: string
+          page_context?: string | null
+          reporter_id?: string | null
+          resolved_at?: string | null
+          status?: string
+          submitter_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          family_id?: string | null
+          id?: string
+          page_context?: string | null
+          reporter_id?: string | null
+          resolved_at?: string | null
+          status?: string
+          submitter_email?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bug_reports_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       care_events: {
         Row: {
           action_taken: string | null
