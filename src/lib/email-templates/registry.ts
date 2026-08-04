@@ -1,4 +1,6 @@
 import type { ComponentType } from 'react'
+import { template as contactFormTemplate } from './contact-form'
+
 
 export interface TemplateEntry {
   component: ComponentType<any>
