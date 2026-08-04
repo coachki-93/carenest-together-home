@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 
-const CONTACT_EMAIL = "support@tillsa.app";
 
 
 
