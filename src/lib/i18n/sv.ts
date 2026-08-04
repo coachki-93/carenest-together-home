@@ -2289,7 +2289,41 @@ export const sv = {
       readyBody: "Installationen tar sekunder. Uppstarten tar ett par minuter.",
       backHome: "Tillbaka till startsidan",
     },
+    contact: {
+      metaTitle: "Kontakta Tillsa — vi läser varje meddelande",
+      metaDescription:
+        "Frågor, feedback eller något som inte fungerar? Skicka ett meddelande så hör vi av oss.",
+      ogTitle: "Kontakta Tillsa",
+      ogDescription: "Skicka ett meddelande — en riktig människa läser varje ett.",
+      kicker: "Kontakt",
+      title: "Hör av dig,",
+      titleB: "vi läser varje meddelande.",
+      intro:
+        "Frågor, feedback eller något som inte fungerar? Skriv till oss så återkommer vi så snart vi kan.",
+      nameLabel: "Ditt namn",
+      namePlaceholder: "Anna Lindqvist",
+      emailLabel: "Din e-post",
+      emailPlaceholder: "du@exempel.se",
+      messageLabel: "Meddelande",
+      messagePlaceholder: "Vad har du på hjärtat?",
+      submit: "Skicka meddelande",
+      sending: "Skickar…",
+      errorName: "Fyll i ditt namn.",
+      errorEmail: "Ange en giltig e-postadress.",
+      errorMessage: "Skriv minst 10 tecken.",
+      errorMessageLong: "Håll meddelandet under 5000 tecken.",
+      successTitle: "Tack — vi har fått ditt meddelande",
+      successBody:
+        "Vi hör av oss till e-postadressen du angav, oftast inom ett par dagar.",
+      successAgain: "Skicka ett till meddelande",
+      errorTitle: "Det gick inte att skicka",
+      errorBody: "Något gick fel när meddelandet skickades. Försök igen om en stund.",
+      rateLimited: "Du har redan skickat några meddelanden. Vänta en liten stund innan du skickar fler.",
+      privacyNote:
+        "Vi använder bara din e-post för att svara dig. Inget annat, någonsin.",
+    },
     about: {
+
       kicker: "Om Tillsa",
       title: "En förälders huvud",
       titleB: "är ingen vårdplan.",
