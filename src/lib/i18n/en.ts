@@ -3673,7 +3673,7 @@ export const en = {
         blocks: [
           {
             body: [
-              "The shopping list is a read-only view of what Inventory says needs buying. It has two parts: to order, which is everything below its lowest level that has not been ordered, and on order, which shows what is already ordered and when it is expected.",
+              "The shopping list is your buy list, built automatically from Inventory — so you don't track it by hand. It gathers everything running low or out of stock into one place to take to the shop.",
             ],
           },
           {
