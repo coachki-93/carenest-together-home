@@ -46,6 +46,7 @@ import {
 import { MarketingHeader } from "@/components/carenest/MarketingHeader";
 import { MarketingFooter } from "@/components/carenest/MarketingFooter";
 import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
+import { FaqSection } from "@/components/carenest/FaqSection";
 
 const SITE = "https://tillsa.app";
 const OG_IMAGE = SITE + "/og-image.jpg";
