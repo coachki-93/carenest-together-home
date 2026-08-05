@@ -1204,7 +1204,7 @@ export const en = {
     b5Title: "Safety nets, quietly",
     b5Body: "We'll warn you about low oxygen and repeated out-of-range vitals.",
     welcomeSub2: "Set up your child's space, your first medication, and invite anyone else who helps with care. About 2 minutes.",
-    medExtraHint: "You can also schedule appointments and inhalations later from the Planner page.",
+    medExtraHint: "You can also add inhalations and other care tasks later from the Planner, and appointments from the Appointments page.",
     inviteRolesHint: "Anyone you invite joins as a caregiver. You can change roles later in Care team.",
     doneCheckTitle: "Quick wins",
     doneCheck1: "Log your first vital reading",
@@ -3462,7 +3462,7 @@ export const en = {
           {
             heading: "How to use it",
             steps: [
-              "Use the plus button to create an appointment for the day you are looking at.",
+              "Use the plus button to add a care task — like feeding, sleep, or a vitals check — for the day you're looking at. Care tasks appear on Today, where caregivers mark them done, skipped, or postponed. External visits (doctor, therapy, etc.) are added on the Appointments page, not here.",
               "Mark a dose Given or Skip. Marking doses here is quick; for a full log with a reason, use Today.",
               "Undo removes the log entry for that dose.",
               "Editing or deleting a repeating appointment asks whether you mean only that occurrence or the whole series.",

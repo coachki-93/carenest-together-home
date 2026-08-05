@@ -1204,7 +1204,7 @@ export const sv = {
     b5Title: "Tysta skyddsnät",
     b5Body: "Vi varnar för låg syrgasnivå och upprepade värden utanför intervallet.",
     welcomeSub2: "Skapa ert barns plats, lägg till första medicinen och bjud in andra som hjälper till. Tar ca 2 minuter.",
-    medExtraHint: "Du kan också schemalägga besök och inhalationer senare från sidan Planeraren.",
+    medExtraHint: "Du kan också lägga till inhalationer och andra vårduppgifter senare i Planeraren, och besök på sidan Besök.",
     inviteRolesHint: "Alla du bjuder in ansluter som vårdgivare. Du kan ändra roller senare i Vårdteam.",
     doneCheckTitle: "Smarta första steg",
     doneCheck1: "Logga ditt första vitalvärde",
@@ -3462,7 +3462,7 @@ export const sv = {
           {
             heading: "Så använder du den",
             steps: [
-              "Använd plusknappen för att skapa ett besök på den dag du tittar på.",
+              "Använd plusknappen för att lägga till en vårduppgift — som matning, sövn eller en vitalitetskontroll — på den dag du tittar på. Vårduppgifter visas på Idag, där vårdgivare markerar dem som gjorda, hoppade över eller uppskjutna. Externa besök (läkare, terapi med mera) läggs till på sidan Besök, inte här.",
               "Markera en dos som Given eller Hoppa över. Att markera doser här går snabbt; för en fullständig logg med orsak, använd Idag.",
               "Ångra tar bort loggposten för dosen.",
               "När du ändrar eller tar bort ett återkommande besök får du frågan om det gäller bara det tillfället eller hela serien.",
