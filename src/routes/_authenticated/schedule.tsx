@@ -90,7 +90,8 @@ import {
   zonedWallClockToDate,
 } from "@/lib/time/family-tz";
 import {
-  APPOINTMENT_KINDS,
+  CARE_TASK_KINDS,
+  isVisitKind,
   useAppointments,
   useCreateAppointment,
   useUpdateAppointment,
@@ -941,7 +942,7 @@ function AppointmentDialog({
   const { t } = useTranslation();
 
   const [title, setTitle] = useState("");
-  const [kind, setKind] = useState<AppointmentKind>("appointment");
+  const [kind, setKind] = useState<AppointmentKind>("task");
   const [date, setDate] = useState(dateInputIn(defaultDay, tz));
   const [time, setTime] = useState("09:00");
   const [endTime, setEndTime] = useState("");
@@ -959,6 +960,14 @@ function AppointmentDialog({
   const [allowOngoing, setAllowOngoing] = useState<boolean>(false);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
+
+  const kindOptions = useMemo<AppointmentKind[]>(
+    () =>
+      editing && isVisitKind(editing.kind) && !CARE_TASK_KINDS.includes(editing.kind)
+        ? [editing.kind, ...CARE_TASK_KINDS]
+        : CARE_TASK_KINDS,
+    [editing],
+  );
 
   const isInstance = !!editing?.is_recurring;
   const showsRepeat = !editing || (editing && !editing.is_recurring);
@@ -992,7 +1001,7 @@ function AppointmentDialog({
       setAllowOngoing(!!(editing as { allow_ongoing?: boolean }).allow_ongoing);
     } else {
       setTitle("");
-      setKind("appointment");
+      setKind("task");
       setDate(dateInputIn(defaultDay, tz));
       setTime("09:00");
       setEndTime("");
@@ -1150,7 +1159,7 @@ function AppointmentDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {APPOINTMENT_KINDS.map((k) => (
+                  {kindOptions.map((k) => (
                     <SelectItem key={k} value={k}>
                       {t(`scheduleEvents.kind.${k}`)}
                     </SelectItem>
