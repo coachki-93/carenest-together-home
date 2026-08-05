@@ -91,7 +91,6 @@ import {
 } from "@/lib/time/family-tz";
 import {
   CARE_TASK_KINDS,
-  isVisitKind,
   useAppointments,
   useCreateAppointment,
   useUpdateAppointment,
