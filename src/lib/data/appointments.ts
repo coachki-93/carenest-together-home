@@ -126,7 +126,7 @@ export function isVisitKind(k: AppointmentKind): k is VisitKind {
 
 /** Non-visit kinds: what Schedule's create dialog offers. Visits live on /appointments. */
 export const CARE_TASK_KINDS: AppointmentKind[] = APPOINTMENT_KINDS.filter(
-  (k) => !isVisitKind(k),
+  (k) => !isVisitKind(k) && k !== "seizure" && k !== "note",
 );
 
 

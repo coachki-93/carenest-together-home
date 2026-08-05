@@ -91,7 +91,6 @@ import {
 } from "@/lib/time/family-tz";
 import {
   CARE_TASK_KINDS,
-  isVisitKind,
   useAppointments,
   useCreateAppointment,
   useUpdateAppointment,
@@ -963,7 +962,7 @@ function AppointmentDialog({
 
   const kindOptions = useMemo<AppointmentKind[]>(
     () =>
-      editing && isVisitKind(editing.kind) && !CARE_TASK_KINDS.includes(editing.kind)
+      editing && !CARE_TASK_KINDS.includes(editing.kind)
         ? [editing.kind, ...CARE_TASK_KINDS]
         : CARE_TASK_KINDS,
     [editing],

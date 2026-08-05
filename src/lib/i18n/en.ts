@@ -184,7 +184,7 @@ export const en = {
     caregiversGroup: "Caregivers",
     family: "Family",
     dashboard: "Today",
-    schedule: "Schedule",
+    schedule: "Planner",
     appointments: "Appointments",
     medications: "Medications",
     vitals: "Vitals",
@@ -340,7 +340,7 @@ export const en = {
     },
   },
   schedule: {
-    title: "Schedule",
+    title: "Planner",
     subtitle: "Today's medications and doses",
     today: "Today",
     allCaughtUp: "All caught up — nothing else pending.",
@@ -478,7 +478,7 @@ export const en = {
         tasksTitle: "Task reminders",
         tasksDesc: "Pause start / late / missed / reminder pushes for scheduled tasks.",
         handoverTitle: "Handover reminders",
-        handoverDesc: "Hide the \"write a handover\" prompt on Dashboard and Schedule.",
+        handoverDesc: "Hide the \"write a handover\" prompt on Dashboard and Planner.",
       },
     },
     vitalsSnapshot: "Vitals snapshot",
@@ -994,7 +994,7 @@ export const en = {
     selectProfilePrompt: "Pick which caregiver profile you're acting as before continuing.",
   },
   scheduleEvents: {
-    new: "New event",
+    new: "Add care task",
     newTitle: "Add to schedule",
     editTitle: "Edit event",
     newBody: "Doctor visits, therapies and care tasks all live here.",
@@ -1204,7 +1204,7 @@ export const en = {
     b5Title: "Safety nets, quietly",
     b5Body: "We'll warn you about low oxygen and repeated out-of-range vitals.",
     welcomeSub2: "Set up your child's space, your first medication, and invite anyone else who helps with care. About 2 minutes.",
-    medExtraHint: "You can also schedule appointments and inhalations later from the Schedule page.",
+    medExtraHint: "You can also schedule appointments and inhalations later from the Planner page.",
     inviteRolesHint: "Anyone you invite joins as a caregiver. You can change roles later in Care team.",
     doneCheckTitle: "Quick wins",
     doneCheck1: "Log your first vital reading",
@@ -1227,7 +1227,7 @@ export const en = {
     teamTitle: "Care team",
     teamBody: "Everyone who can see and log care for this child.",
     navTitle: "Everything else",
-    navBody: "Schedule, Meds, Vitals, Handover, Caregivers and Settings live in the sidebar.",
+    navBody: "Planner, Meds, Vitals, Handover, Caregivers and Settings live in the sidebar.",
   },
   welcome: {
     stepOf: "Step {{current}} of {{total}}",
@@ -1298,7 +1298,7 @@ export const en = {
       titleRequired: "Please add a title.",
       timesLabel: "Times of day",
       timesPlaceholder: "e.g. 07:00, 12:00, 17:00, 21:00",
-      timesHint: "Comma-separated. You can adjust these later on the Schedule.",
+      timesHint: "Comma-separated. You can adjust these later in the Planner.",
       amountLabel: "Volume per feed (ml)",
       amountPlaceholder: "e.g. 200",
       notesLabel: "Notes",
@@ -2219,7 +2219,7 @@ export const en = {
       u3Q: "Can I change our plan?",
       u3A: "There is one subscription per family, billed monthly. The owner opens Manage on the subscription page to reach the billing portal, where you can update the payment method, see invoices and cancel. Founding families keep their locked rate for as long as the subscription runs.",
       u4Q: "How do I set up a medication given more than once a day?",
-      u4A: "Add one time of day per dose on the medication. Each time becomes a dose every day, and they appear on Today and Schedule in time order. For a limited treatment, turn on the course option and set the first dose and the total number of doses.",
+      u4A: "Add one time of day per dose on the medication. Each time becomes a dose every day, and they appear on Today and the Planner in time order. For a limited treatment, turn on the course option and set the first dose and the total number of doses.",
       u5Q: "How does handover between shifts work?",
       u5A: "A handover is a written note passed between shifts, with a summary and short fields for sleep, mood, seizures, fluids and medicines. A draft can be prefilled from the shift window — medicines given or missed, vitals, appointments, oxygen and events become bullet lines, and prefill never overwrites what you typed. Everyone else marks it read; the author can edit it for two hours, which asks the others to read it again.",
       kicker: "Frequently asked",
@@ -2473,7 +2473,7 @@ export const en = {
       b3: "Early warnings at about 60 and 20 minutes remaining",
     },
     schedule: {
-      title: "Schedule",
+      title: "Planner",
       body: "Plan repeating tasks, appointments and inhalations across the week.",
       b1: "Daily, weekly or specific-times-each-day patterns",
       b2: "Icons per task type — SpO₂ checks, inhalations, feeds",
@@ -3404,7 +3404,7 @@ export const en = {
       steps: [
         "Fill in the child profile: name, diagnosis, allergies, emergency contacts and doctors.",
         "Pick the care needs on the child profile. They decide which vitals and modules appear elsewhere in the app.",
-        "Add medications with their times of day, so doses start appearing on Today and Schedule.",
+        "Add medications with their times of day, so doses start appearing on Today and the Planner.",
         "Invite the rest of the care team from Care team, and create a caregiver profile for each person.",
         "Set the family timezone, handover times and other family settings in Settings.",
         "Turn on notifications in Settings on each device that should get reminders.",
@@ -3451,11 +3451,11 @@ export const en = {
         ],
       },
       schedule: {
-        title: "Schedule",
+        title: "Planner",
         blocks: [
           {
             body: [
-              "Schedule is your day-by-day plan. It shows one day at a time — every medication dose and appointment for that day, in time order — so you can look ahead or back at any single day without the noise of Today's live working view.",
+              "The Planner is your day-by-day plan. It shows one day at a time — every medication dose and appointment for that day, in time order — so you can look ahead or back at any single day without the noise of Today's live working view.",
               "Move between days with previous, today and next.",
             ],
           },
@@ -3500,7 +3500,7 @@ export const en = {
         blocks: [
           {
             body: [
-              "Medications is the list of the child medicines and the times they are given. It is the source for the doses that appear on Today and Schedule.",
+              "Medications is the list of the child medicines and the times they are given. It is the source for the doses that appear on Today and the Planner.",
             ],
           },
           {

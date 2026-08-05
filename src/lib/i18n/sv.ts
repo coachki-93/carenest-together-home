@@ -184,7 +184,7 @@ export const sv = {
     caregiversGroup: "Vårdgivare",
     family: "Familj",
     dashboard: "Idag",
-    schedule: "Schema",
+    schedule: "Planerare",
     appointments: "Besök",
     medications: "Mediciner",
     vitals: "Mätvärden",
@@ -340,7 +340,7 @@ export const sv = {
     },
   },
   schedule: {
-    title: "Schema",
+    title: "Planerare",
     subtitle: "Dagens mediciner och doser",
     today: "Idag",
     allCaughtUp: "Allt klart — inget mer kvar.",
@@ -478,7 +478,7 @@ export const sv = {
         tasksTitle: "Uppgiftspåminnelser",
         tasksDesc: "Pausa start / försenad / missad / påminnelse för planerade uppgifter.",
         handoverTitle: "Överlämningspåminnelser",
-        handoverDesc: "Dölj \"skriv överlämning\"-rutan på Startsidan och Schema.",
+        handoverDesc: "Dölj \"skriv överlämning\"-rutan på Startsidan och Planeraren.",
       },
     },
     vitalsSnapshot: "Mätvärden nu",
@@ -994,7 +994,7 @@ export const sv = {
     selectProfilePrompt: "Välj vilken vårdgivarprofil du agerar som innan du fortsätter.",
   },
   scheduleEvents: {
-    new: "Nytt event",
+    new: "Lägg till vårduppgift",
     newTitle: "Lägg till i schemat",
     editTitle: "Redigera event",
     newBody: "Läkarbesök, terapier och vårdsysslor samlas här.",
@@ -1204,7 +1204,7 @@ export const sv = {
     b5Title: "Tysta skyddsnät",
     b5Body: "Vi varnar för låg syrgasnivå och upprepade värden utanför intervallet.",
     welcomeSub2: "Skapa ert barns plats, lägg till första medicinen och bjud in andra som hjälper till. Tar ca 2 minuter.",
-    medExtraHint: "Du kan också schemalägga besök och inhalationer senare från sidan Schema.",
+    medExtraHint: "Du kan också schemalägga besök och inhalationer senare från sidan Planeraren.",
     inviteRolesHint: "Alla du bjuder in ansluter som vårdgivare. Du kan ändra roller senare i Vårdteam.",
     doneCheckTitle: "Smarta första steg",
     doneCheck1: "Logga ditt första vitalvärde",
@@ -1227,7 +1227,7 @@ export const sv = {
     teamTitle: "Vårdteam",
     teamBody: "Alla som kan se och logga vård för det här barnet.",
     navTitle: "Allt annat",
-    navBody: "Schema, mediciner, värden, överlämning, vårdgivare och inställningar finns i sidofältet.",
+    navBody: "Planeraren, mediciner, värden, överlämning, vårdgivare och inställningar finns i sidofältet.",
   },
   welcome: {
     stepOf: "Steg {{current}} av {{total}}",
@@ -1298,7 +1298,7 @@ export const sv = {
       titleRequired: "Ange en titel.",
       timesLabel: "Tider på dygnet",
       timesPlaceholder: "t.ex. 07:00, 12:00, 17:00, 21:00",
-      timesHint: "Komma-separerade. Du kan justera dem senare i Schemat.",
+      timesHint: "Komma-separerade. Du kan justera dem senare i Planeraren.",
       amountLabel: "Volym per matning (ml)",
       amountPlaceholder: "t.ex. 200",
       notesLabel: "Anteckningar",
@@ -2218,7 +2218,7 @@ export const sv = {
       u3Q: "Kan vi byta plan?",
       u3A: "Det är en prenumeration per familj, med månadsbetalning. Ägaren trycker på Hantera på prenumerationssidan för att öppna betalportalen, där ni kan byta betalsätt, se fakturor och säga upp. Grundarfamiljer behåller sitt låsta pris så länge prenumerationen löper.",
       u4Q: "Hur lägger jag in ett läkemedel som ges flera gånger om dagen?",
-      u4A: "Lägg till en tidpunkt per dos på läkemedlet. Varje tidpunkt blir en dos varje dag och visas på Idag och i Schema i tidsordning. För en tidsbegränsad kur slår du på kuralternativet och anger första dosen och totalt antal doser.",
+      u4A: "Lägg till en tidpunkt per dos på läkemedlet. Varje tidpunkt blir en dos varje dag och visas på Idag och i Planeraren i tidsordning. För en tidsbegränsad kur slår du på kuralternativet och anger första dosen och totalt antal doser.",
       u5Q: "Hur fungerar överlämningen mellan pass?",
       u5A: "En överlämning är en skriven rapport mellan pass, med en sammanfattning och korta fält för sömn, humör, anfall, vätska och läkemedel. Utkastet kan förifyllas från passets tidsfönster — givna eller missade läkemedel, mätvärden, besök, syrgas och händelser blir punktlistor, och förifyllningen skriver aldrig över det du själv skrivit. Övriga markerar den som läst; den som skrev kan ändra i två timmar, vilket ber de andra läsa den igen.",
       kicker: "Vanliga frågor",
@@ -2472,7 +2472,7 @@ export const sv = {
       b3: "Tidiga varningar vid ca 60 och 20 minuter kvar",
     },
     schedule: {
-      title: "Schema",
+      title: "Planerare",
       body: "Planera upprepande uppgifter, besök och inhalationer över veckan.",
       b1: "Dagliga, veckovisa eller specifika tider per dag",
       b2: "Ikoner per uppgiftstyp — SpO₂-kontroller, inhalationer, matning",
@@ -3404,7 +3404,7 @@ export const sv = {
       steps: [
         "Fyll i barnets profil: namn, diagnos, allergier, nödkontakter och läkare.",
         "Välj vårdbehoven i barnets profil. De styr vilka mätvärden och moduler som visas i resten av appen.",
-        "Lägg in medicinerna med sina klockslag, så börjar doserna dyka upp på Idag och i Schema.",
+        "Lägg in medicinerna med sina klockslag, så börjar doserna dyka upp på Idag och i Planeraren.",
         "Bjud in resten av vårdteamet från Vårdteam och skapa en vårdgivarprofil för varje person.",
         "Ställ in familjens tidszon, överlämningstider och övriga familjeinställningar i Inställningar.",
         "Slå på aviseringar i Inställningar på varje enhet som ska få påminnelser.",
@@ -3451,11 +3451,11 @@ export const sv = {
         ],
       },
       schedule: {
-        title: "Schema",
+        title: "Planerare",
         blocks: [
           {
             body: [
-              "Schema är er plan dag för dag. Den visar en dag i taget — varje medicindos och besök den dagen, i tidsordning — så att du kan blicka framåt eller bakåt på en enskild dag utan bruset från Idags arbetsvy.",
+              "Planeraren är er plan dag för dag. Den visar en dag i taget — varje medicindos och besök den dagen, i tidsordning — så att du kan blicka framåt eller bakåt på en enskild dag utan bruset från Idags arbetsvy.",
               "Bläddra mellan dagar med föregående, i dag och nästa.",
             ],
           },
@@ -3500,7 +3500,7 @@ export const sv = {
         blocks: [
           {
             body: [
-              "Mediciner är listan över barnets läkemedel och tiderna de ges. Den är källan till de doser som visas på Idag och i Schema.",
+              "Mediciner är listan över barnets läkemedel och tiderna de ges. Den är källan till de doser som visas på Idag och i Planeraren.",
             ],
           },
           {
