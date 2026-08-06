@@ -1,47 +1,37 @@
-# i18n accuracy fixes: Planner no longer creates appointments
+# Mobile layout fixes (≤375px)
 
-## Goal
-Update two stale English strings (and their Swedish counterparts) so they no longer tell users to create appointments from the Planner. The Planner now creates care tasks only; appointments are created on the Appointments page.
+Four low-risk presentation fixes. No behavior or data changes.
 
-## Files changed
-- `src/lib/i18n/en.ts`
-- `src/lib/i18n/sv.ts`
+## 1 & 2 — Header action bar overflow (shared layout)
 
-## Diffs
+`src/components/carenest/DashboardLayout.tsx`
 
-### 1. Guidebook Planner "How to use it" step
+- Title block: keep `min-w-0` + `truncate`, and let it shrink first.
+- Actions group: add `shrink-0` so the emergency link and profile selector can never be pushed off-screen; reduce mobile gaps.
+- Page action buttons passed through the `actions` slot get a wrapper with a shared class so long labels condense on mobile: the layout applies `[&_[data-action-label]]:hidden sm:[&_[data-action-label]]:inline` — but rather than magic selectors, the simpler route is used:
+  - Wrap `{actions}` in `<div className="flex items-center gap-1 md:gap-2 min-w-0">` and mark the long-label page buttons themselves with `hidden sm:inline` spans at the two call sites that overflow (Planner, Medications), leaving the icon visible on mobile — the same pattern the emergency link already uses.
 
-`src/lib/i18n/en.ts` (line ~3465):
+Net effect: on mobile the page action shows as an icon-only pill; emergency + profile always visible. From `sm:` up nothing changes.
 
-````text
-- "Use the plus button to create an appointment for the day you are looking at.",
-+ "Use the plus button to add a care task — like feeding, sleep, or a vitals check — for the day you're looking at. Care tasks appear on Today, where caregivers mark them done, skipped, or postponed. External visits (doctor, therapy, etc.) are added on the Appointments page, not here.",
-````
+## 3 — Duplicate language toggle in page headers
 
-`src/lib/i18n/sv.ts` (line ~3465):
+Remove `<LanguageToggle />` from the `actions` slot (and its now-unused import) in:
 
-````text
-- "Använd plusknappen för att skapa ett besök på den dag du tittar på.",
-+ "Använd plusknappen för att lägga till en vårduppgift — som matning, sömn eller en vitalitetskontroll — på den dag du tittar på. Vårduppgifter visas på Idag, där vårdgivare markerar dem som gjorda, hoppade över eller uppskjutna. Externa besök (läkare, terapi med mera) läggs till på sidan Besök, inte här.",
-````
+- `src/routes/_authenticated/events.tsx`
+- `src/routes/_authenticated/appointments.tsx`
+- `src/routes/_authenticated/shopping.tsx`
 
-### 2. Onboarding medication extra hint
+It remains in the sidebar (`AppSidebar`) for all in-app pages. Marketing/auth/onboarding toggles untouched.
 
-`src/lib/i18n/en.ts` (line ~1207):
+## 4 — Snabblogg option grid overflow
 
-````text
-- medExtraHint: "You can also schedule appointments and inhalations later from the Planner page.",
-+ medExtraHint: "You can also add inhalations and other care tasks later from the Planner, and appointments from the Appointments page.",
-````
+`src/components/carenest/UnifiedLogDialog.tsx`
 
-`src/lib/i18n/sv.ts` (line ~1207):
-
-````text
-- medExtraHint: "Du kan också schemalägga besök och inhalationer senare från sidan Planeraren.",
-+ medExtraHint: "Du kan också lägga till inhalationer och andra vårduppgifter senare i Planeraren, och besök på sidan Besök.",
-````
+- VÄRDEN grid (~line 277): `grid-cols-2` → `grid-cols-1 sm:grid-cols-2`.
+- Add `min-w-0` to each option's label container so long text wraps instead of overflowing.
+- Events grid (~line 303) already wraps text (`break-words`), keep as is.
+- Date/time and duration grids already have `min-w-0`; severity grid is short-label only. No change.
 
 ## Verification
-- `rg` confirms neither `en.ts` nor `sv.ts` still says appointments are created on the Planner.
-- `tsgo --noEmit` passes.
-- i18n key parity check passes (en/sv key counts equal).
+
+Screenshots at 375px (Planner header, Medications header, Events header, Snabblogg modal) and at 1280px to confirm desktop is unchanged, plus `tsgo --noEmit`.
