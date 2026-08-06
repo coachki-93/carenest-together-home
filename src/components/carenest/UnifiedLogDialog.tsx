@@ -287,7 +287,7 @@ export function UnifiedLogDialog({
                       <div className={cn("size-10 rounded-xl flex items-center justify-center shrink-0", p.tone)}>
                         <Icon className="size-5" />
                       </div>
-                      <div className="font-semibold text-sm leading-tight">
+                      <div className="font-semibold text-sm leading-tight min-w-0 break-words">
                         {t(`quickLog.presets.${p.key}`)}
                       </div>
                     </button>
