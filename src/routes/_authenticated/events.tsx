@@ -135,17 +135,16 @@ function EventsPage() {
       title={t("careEvents.pageTitle")}
       subtitle={t("careEvents.pageSubtitle")}
       actions={
-        <>
-          <LanguageToggle />
-          <Button
-            size="sm"
-            onClick={() => setLogOpen(true)}
-            className="rounded-full font-semibold"
-          >
-            <Plus className="size-4 mr-1" />
-            {t("careEvents.logEvent")}
-          </Button>
-        </>
+        <Button
+          size="sm"
+          onClick={() => setLogOpen(true)}
+          className="rounded-full font-semibold shrink-0"
+          aria-label={t("careEvents.logEvent")}
+          title={t("careEvents.logEvent")}
+        >
+          <Plus className="size-4 sm:mr-1" />
+          <span className="hidden sm:inline">{t("careEvents.logEvent")}</span>
+        </Button>
       }
     >
       <div className="max-w-4xl mx-auto">
