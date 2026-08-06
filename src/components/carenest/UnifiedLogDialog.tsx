@@ -274,7 +274,7 @@ export function UnifiedLogDialog({
               <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
                 {t("quickLog.groups.vitals")}
               </Label>
-              <div className="grid grid-cols-2 gap-2.5 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-2">
                 {VITAL_PRESETS.map((p) => {
                   const Icon = p.icon;
                   return (
