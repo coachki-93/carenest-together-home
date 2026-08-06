@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
-import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { ShoppingListCard } from "@/components/carenest/ShoppingListCard";
 import { useMyMembership } from "@/lib/auth/use-profile";
 
@@ -18,7 +17,6 @@ function ShoppingPage() {
     <DashboardLayout
       title={t("shopping.title")}
       subtitle={t("shopping.subtitle")}
-      actions={<LanguageToggle />}
     >
       <div className="space-y-4 max-w-3xl">
         {familyId ? (

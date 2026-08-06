@@ -38,7 +38,7 @@ export function DashboardLayout({ title, subtitle, actions, children }: Dashboar
                   </div>
                 </div>
                 <div className="flex items-center gap-1 md:gap-2 shrink-0">
-                  {actions}
+                  <div className="flex items-center gap-1 md:gap-2 min-w-0">{actions}</div>
                   <Link
                     to="/emergency"
                     aria-label={t("emergency.title")}

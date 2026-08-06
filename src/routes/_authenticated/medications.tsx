@@ -129,8 +129,14 @@ function MedicationsPage() {
       subtitle={child ? t("meds.subtitle", { name: child.name }) : undefined}
       actions={
         child && isOwner ? (
-          <Button onClick={() => setCreating(true)} className="rounded-full">
-            <Plus className="size-4" /> {t("meds.addNew")}
+          <Button
+            onClick={() => setCreating(true)}
+            className="rounded-full shrink-0"
+            aria-label={t("meds.addNew")}
+            title={t("meds.addNew")}
+          >
+            <Plus className="size-4" />
+            <span className="hidden sm:inline">{t("meds.addNew")}</span>
           </Button>
         ) : null
       }

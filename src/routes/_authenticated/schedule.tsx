@@ -338,18 +338,29 @@ function SchedulePage() {
       title={t("schedule.title")}
       subtitle={dayLabel}
       actions={
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-2">
           <Button
             size="sm"
-            className="rounded-full gap-1.5 font-semibold"
+            className="rounded-full gap-1.5 font-semibold shrink-0"
             onClick={openCreateAppt}
             disabled={!familyId}
+            aria-label={t("scheduleEvents.new")}
+            title={t("scheduleEvents.new")}
           >
-            <Plus className="size-4" /> {t("scheduleEvents.new")}
+            <Plus className="size-4" />
+            <span className="hidden sm:inline">{t("scheduleEvents.new")}</span>
           </Button>
-          <Button asChild size="sm" variant="outline" className="rounded-full">
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            className="rounded-full shrink-0"
+            aria-label={t("schedule.addMedication")}
+            title={t("schedule.addMedication")}
+          >
             <Link to="/medications">
-              <Pill className="size-4" /> {t("schedule.addMedication")}
+              <Pill className="size-4" />
+              <span className="hidden sm:inline">{t("schedule.addMedication")}</span>
             </Link>
           </Button>
         </div>
