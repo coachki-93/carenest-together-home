@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
-import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -198,7 +197,6 @@ function AppointmentsPage() {
     <DashboardLayout
       title={t("appointments.title")}
       subtitle={t("appointments.subtitleNoChild")}
-      actions={<LanguageToggle />}
     >
       <div className="max-w-6xl">
         {/* ============ Mobile: agenda-first ============ */}

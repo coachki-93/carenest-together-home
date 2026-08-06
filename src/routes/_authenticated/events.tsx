@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
 import { toast } from "sonner";
-import { LanguageToggle } from "@/components/carenest/LanguageToggle";
 import { ByProfile } from "@/components/carenest/ByProfile";
 import { CareEventDialog } from "@/components/carenest/CareEventDialog";
 import { UnifiedLogDialog } from "@/components/carenest/UnifiedLogDialog";
