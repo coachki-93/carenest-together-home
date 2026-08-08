@@ -92,7 +92,7 @@ export const OUTCOME_DECK_THEME: Record<"sage" | "amber" | "violet" | "ink", Car
   },
 };
 
-type OutcomeDef = {
+export type OutcomeDef = {
   key: string;
   eyebrowKey: string;
   headlineKey: string;
