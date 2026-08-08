@@ -544,7 +544,7 @@ function IdentityChip({
 function ProblemOldCard() {
   const { t } = useTranslation();
   return (
-    <Reveal>
+    <Reveal className="min-w-0">
       <div className="relative h-full rounded-3xl p-6 md:p-7 bg-marketing-surface border border-marketing-line overflow-hidden">
         <div aria-hidden className="mk-grain" />
         <p className="relative text-[10px] font-semibold uppercase tracking-[0.22em] text-marketing-muted mb-3">
@@ -756,7 +756,7 @@ function ProblemNewCard() {
   ];
 
   return (
-    <Reveal>
+    <Reveal className="min-w-0">
       <div
         ref={flashRef}
         className="relative h-full mk-glass mk-glass-border mk-flashlight rounded-3xl p-6 md:p-7"
