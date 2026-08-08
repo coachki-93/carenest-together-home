@@ -474,6 +474,7 @@ export function OutcomeDeck() {
         ) : (
           <FallbackGrid />
         )}
+        </div>
       </div>
     </section>
   );
