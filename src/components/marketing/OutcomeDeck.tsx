@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { Pill, Package, BellOff, BellRing, Check, type LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/marketing/Reveal";
+import { OutcomeSwitcher } from "@/components/marketing/OutcomeSwitcher";
 
 /**
  * Section 5 — "What actually changes at home."
