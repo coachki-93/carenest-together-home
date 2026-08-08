@@ -410,6 +410,13 @@ export function OutcomeDeck() {
           </h2>
         </Reveal>
 
+        {/* Mobile-only switcher — no fan transforms. */}
+        <div className="md:hidden">
+          <OutcomeSwitcher cards={CARDS} />
+        </div>
+
+        {/* Desktop (md+) — unchanged fanned deck / fallback grid. */}
+        <div className="hidden md:block">
         {enabled ? (
           <div
             ref={deckRef}
