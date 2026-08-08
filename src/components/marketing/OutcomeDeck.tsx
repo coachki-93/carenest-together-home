@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { Pill, Package, BellOff, BellRing, Check, type LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/marketing/Reveal";
+import { OutcomeSwitcher } from "@/components/marketing/OutcomeSwitcher";
 
 /**
  * Section 5 — "What actually changes at home."
@@ -92,7 +93,7 @@ export const OUTCOME_DECK_THEME: Record<"sage" | "amber" | "violet" | "ink", Car
   },
 };
 
-type OutcomeDef = {
+export type OutcomeDef = {
   key: string;
   eyebrowKey: string;
   headlineKey: string;
@@ -410,6 +411,13 @@ export function OutcomeDeck() {
           </h2>
         </Reveal>
 
+        {/* Mobile-only switcher — no fan transforms. */}
+        <div className="md:hidden">
+          <OutcomeSwitcher cards={CARDS} />
+        </div>
+
+        {/* Desktop (md+) — unchanged fanned deck / fallback grid. */}
+        <div className="hidden md:block">
         {enabled ? (
           <div
             ref={deckRef}
@@ -467,6 +475,7 @@ export function OutcomeDeck() {
         ) : (
           <FallbackGrid />
         )}
+        </div>
       </div>
     </section>
   );
