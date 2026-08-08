@@ -343,7 +343,7 @@ function MedicationCard({
   return (
     <div
       className={cn(
-        "card-soft p-5",
+        "card-soft p-5 min-w-0",
         (!med.active || status?.kind === "after") && "opacity-60",
       )}
     >
@@ -367,7 +367,7 @@ function MedicationCard({
                 </p>
               )}
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1 shrink-0">
               <Button
                 size="icon"
                 variant="ghost"
