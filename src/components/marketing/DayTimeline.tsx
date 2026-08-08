@@ -153,7 +153,14 @@ export function DayTimeline() {
   );
 
   return (
-    <section className="bg-marketing-surface border-y border-marketing-line">
+    <section className="bg-marketing-surface border-y border-marketing-line overflow-hidden">
+      {/* Mobile-only (<md) swipeable carousel. */}
+      <div className="md:hidden">
+        <DayTimelineMobile cards={cards} header={header} />
+      </div>
+
+      {/* Desktop (md+) — unchanged pinned timeline / stacked fallback. */}
+      <div className="hidden md:block">
       {enabled ? (
         <div
           ref={trackRef}
