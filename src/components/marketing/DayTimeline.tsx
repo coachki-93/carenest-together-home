@@ -237,6 +237,7 @@ export function DayTimeline() {
           </div>
         </div>
       )}
+      </div>
     </section>
   );
 }
