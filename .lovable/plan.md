@@ -1,27 +1,26 @@
-# Mobile overflow fix: Problem section chat cards
+# Fix desktop timeline pinning regression
 
 ## Goal
-Stop the two old/new chat cards in the landing "problem" section from clipping off the right edge on mobile (≤375 px). CSS-only change; no text or i18n edits.
+Restore the desktop scroll-pinned "A day with Tillsa" timeline animation. CSS-only change.
 
 ## Root cause
-The grid at `src/routes/index.tsx:124` renders the two cards as direct grid children:
+`src/components/marketing/DayTimeline.tsx` wraps the entire section in:
 
 ```tsx
-<div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch">
-  <ProblemOldCard />
-  <ProblemNewCard />
-</div>
+<section className="... overflow-hidden">
 ```
 
-Each card is wrapped in `<Reveal>`, which renders a block-level `<div>`. Without `min-w-0`, that grid item refuses to shrink below the intrinsic width of the chat bubbles, so the card overflows the viewport and `overflow-hidden` on the section clips the bubbles.
+The desktop pinned timeline uses `position: sticky; top: 0` on a descendant element. `position: sticky` is clipped by any ancestor with `overflow: hidden | auto | scroll`, so the sticky element no longer pins to the viewport and the scroll-driven card crossfade is dead.
 
 ## Change
-Add `className="min-w-0"` to the `<Reveal>` wrapper inside both `ProblemOldCard` and `ProblemNewCard` so the grid items shrink to the column width. The bubbles already use `max-w-[85%]` and normal `white-space`, so they will wrap naturally once the card width is constrained.
+Remove `overflow-hidden` from the shared `<section>`.
+
+The mobile carousel does not need this ancestor-level overflow control: `MobileCardCarousel.tsx` already wraps its scroll-snap track in its own `overflow-hidden` container, so horizontal page overflow on mobile is still contained.
 
 ## Files touched
-- `src/routes/index.tsx` (2 call-site className additions)
+- `src/components/marketing/DayTimeline.tsx`
 
 ## Verification
 - `tsgo --noEmit` clean.
-- Playwright screenshot at 375 px: both chat cards fit within the viewport, no right-edge clipping, no horizontal page scroll, bubbles wrap naturally.
-- Desktop (≥1024 px): two-column layout unchanged.
+- Desktop (≥1024 px): scroll through the timeline section and confirm the sticky card pins and advances through the four time steps (07:00 → 07:10 → During the day → 15:00).
+- Mobile (375 px): confirm the carousel still works and `document.documentElement.scrollWidth === clientWidth` (no horizontal page overflow).
