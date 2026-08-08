@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Clock, Bell, Pill } from "lucide-react";
+import { DayTimelineMobile } from "@/components/marketing/DayTimelineMobile";
 
 
 /**
