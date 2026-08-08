@@ -154,7 +154,7 @@ export function DayTimeline() {
   );
 
   return (
-    <section className="bg-marketing-surface border-y border-marketing-line overflow-hidden">
+    <section className="bg-marketing-surface border-y border-marketing-line">
       {/* Mobile-only (<md) swipeable carousel. */}
       <div className="md:hidden">
         <DayTimelineMobile cards={cards} header={header} />
