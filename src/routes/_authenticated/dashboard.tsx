@@ -1150,7 +1150,7 @@ function DashboardPage() {
                                   : "bg-card border-border/60 hover:shadow-soft",
                     )}
                   >
-                    <div className="flex items-start gap-2 sm:gap-4 min-w-0 flex-1">
+                    <div className="flex flex-wrap sm:flex-nowrap items-start gap-2 sm:gap-4 min-w-0 flex-1">
                       <div
                         className={cn(
                           "flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-bold shrink-0 pt-1 tabular-nums",
@@ -1176,11 +1176,11 @@ function DashboardPage() {
                         <Icon className="size-4 sm:size-5" />
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 basis-32 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap min-w-0">
                           <span
                             className={cn(
-                              "font-bold [overflow-wrap:anywhere] min-w-0",
+                              "font-bold break-words min-w-0",
                               isCompleted && "line-through text-muted-foreground",
                             )}
                           >
