@@ -446,7 +446,7 @@ export function useHandoverPrefill(
       // Abnormal vitals — clustered by moment. A single clinical event
       // (e.g. a desaturation) drags several vitals at once; collapse
       // readings inside VITAL_CLUSTER_WINDOW_MS into ONE line.
-      const abnormal: Array<{ at: Date; label: string; text: string }> = [];
+      const abnormal: AbnormalReading[] = [];
       for (const v of vitals) {
         const range = VITAL_RANGES[v.vital_type as VitalType];
         if (!range) continue;
@@ -457,33 +457,18 @@ export function useHandoverPrefill(
             labels.vitalTypeLabels?.[v.vital_type] ?? v.vital_type;
           abnormal.push({
             at: new Date(v.logged_at),
-            label: v.vital_type,
+            vitalType: v.vital_type,
             text: `${typeLabel} ${val}${v.unit ?? ""}`,
           });
         }
       }
-      abnormal.sort((a, b) => a.at.getTime() - b.at.getTime());
-      const clusters: Array<typeof abnormal> = [];
-      for (const r of abnormal) {
-        const cur = clusters[clusters.length - 1];
-        if (
-          cur &&
-          r.at.getTime() - cur[0].at.getTime() <= VITAL_CLUSTER_WINDOW_MS
-        ) {
-          cur.push(r);
-        } else {
-          clusters.push([r]);
-        }
-      }
-      for (const cluster of clusters) {
-        const ordered = [...cluster].sort(
-          (a, b) => vitalOrder(a.label) - vitalOrder(b.label),
-        );
+      for (const cluster of clusterAbnormalVitals(abnormal)) {
         const t = fmtTime(cluster[0].at);
         noteLines.push(
-          `• ${t} ${labels.vitalAbnormal}: ${ordered.map((r) => r.text).join(", ")}`,
+          `• ${t} ${labels.vitalAbnormal}: ${cluster.map((r) => r.text).join(", ")}`,
         );
       }
+
 
 
       // Oxygen tank events during the shift.
