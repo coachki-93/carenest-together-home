@@ -326,21 +326,48 @@ export function useHandoverPrefill(
         noteLines.push(`• ${t} ${title} — ${labels.taskNote}: ${note}`);
       }
 
-      // Abnormal vitals
+      // Abnormal vitals — clustered by moment. A single clinical event
+      // (e.g. a desaturation) drags several vitals at once; collapse
+      // readings inside VITAL_CLUSTER_WINDOW_MS into ONE line.
+      const abnormal: Array<{ at: Date; label: string; text: string }> = [];
       for (const v of vitals) {
         const range = VITAL_RANGES[v.vital_type as VitalType];
         if (!range) continue;
         const val = Number(v.value);
         if (!Number.isFinite(val)) continue;
         if (val < range.low || val > range.high) {
-          const t = fmtTime(new Date(v.logged_at));
           const typeLabel =
             labels.vitalTypeLabels?.[v.vital_type] ?? v.vital_type;
-          noteLines.push(
-            `• ${t} ${labels.vitalAbnormal}: ${typeLabel} ${val}${v.unit ?? ""}`,
-          );
+          abnormal.push({
+            at: new Date(v.logged_at),
+            label: v.vital_type,
+            text: `${typeLabel} ${val}${v.unit ?? ""}`,
+          });
         }
       }
+      abnormal.sort((a, b) => a.at.getTime() - b.at.getTime());
+      const clusters: Array<typeof abnormal> = [];
+      for (const r of abnormal) {
+        const cur = clusters[clusters.length - 1];
+        if (
+          cur &&
+          r.at.getTime() - cur[0].at.getTime() <= VITAL_CLUSTER_WINDOW_MS
+        ) {
+          cur.push(r);
+        } else {
+          clusters.push([r]);
+        }
+      }
+      for (const cluster of clusters) {
+        const ordered = [...cluster].sort(
+          (a, b) => vitalOrder(a.label) - vitalOrder(b.label),
+        );
+        const t = fmtTime(cluster[0].at);
+        noteLines.push(
+          `• ${t} ${labels.vitalAbnormal}: ${ordered.map((r) => r.text).join(", ")}`,
+        );
+      }
+
 
       // Oxygen tank events during the shift.
       // Care-needs gate: only emit if the child has the oxygen module.
