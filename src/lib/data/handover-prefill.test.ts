@@ -23,6 +23,7 @@ function event(partial: Partial<CareEvent> & { occurred_at: string }): CareEvent
     child_id: null,
     type: "vomiting",
     occurred_at: partial.occurred_at,
+
     description: "",
     action_taken: null,
     severity: null,
