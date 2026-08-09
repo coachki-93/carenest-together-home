@@ -507,24 +507,57 @@ export function useHandoverPrefill(
         );
       }
 
-      // Care events during the shift — surfaced unconditionally when they occur.
+      // Care events during the shift. Noteworthy events (note, action taken,
+      // or severity ≥ 2) always surface on their own line; routine repeats of
+      // the same type collapse into a single "×N during the shift" count so
+      // four uneventful vomits don't become four lines.
       const careEvents = (careEventsRes.data ?? []) as CareEvent[];
+      const eventLineLabels = {
+        typeLabel: (t: CareEventType) => labels.careEventTypeLabels?.[t] ?? t,
+        severityLabel: (n: number) =>
+          labels.careEventSeverityLabels?.[n] ?? String(n),
+        actionPrefix: labels.careEventActionPrefix ?? "Action",
+        duration: labels.careEventDuration ?? ((s: number) => `${s}s`),
+      };
+      const routineByType = new Map<CareEventType, CareEvent[]>();
       for (const ev of careEvents) {
-        const time = formatTimeIn(ev.occurred_at, tz);
-        const line = _formatCareEventLine(
-          ev,
-          {
-            typeLabel: (t) =>
-              labels.careEventTypeLabels?.[t] ?? t,
-            severityLabel: (n) =>
-              labels.careEventSeverityLabels?.[n] ?? String(n),
-            actionPrefix: labels.careEventActionPrefix ?? "Action",
-            duration: labels.careEventDuration ?? ((s) => `${s}s`),
-          },
-          time,
-        );
-        noteLines.push(line);
+        if (isNoteworthyEvent(ev)) {
+          noteLines.push(
+            _formatCareEventLine(
+              ev,
+              eventLineLabels,
+              formatTimeIn(ev.occurred_at, tz),
+            ),
+          );
+        } else {
+          const list = routineByType.get(ev.type);
+          if (list) list.push(ev);
+          else routineByType.set(ev.type, [ev]);
+        }
       }
+      // Map preserves first-occurrence order (careEvents is time-ascending).
+      for (const [type, list] of routineByType) {
+        if (list.length === 1) {
+          noteLines.push(
+            _formatCareEventLine(
+              list[0],
+              eventLineLabels,
+              formatTimeIn(list[0].occurred_at, tz),
+            ),
+          );
+        } else {
+          const countTemplate =
+            labels.careEventCount ?? "{{type}} ×{{count}} {{during}}";
+          noteLines.push(
+            `• ${countTemplate
+              .replace("{{type}}", eventLineLabels.typeLabel(type))
+              .replace("{{count}}", String(list.length))
+              .replace("{{during}}", labels.duringShift ?? "during the shift")
+              .trim()}`,
+          );
+        }
+      }
+
 
       const medsStr = medLines.length ? medLines.join("\n") : "";
       const notesStr = noteLines.length ? noteLines.join("\n") : "";
