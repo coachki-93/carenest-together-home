@@ -52,6 +52,11 @@ interface Labels {
   careEventSeverityLabels?: Partial<Record<number, string>>;
   careEventActionPrefix?: string;
   careEventDuration?: (seconds: number) => string;
+  /** "{{type}} ×{{count}} {{during}}" — collapsed routine repeats. */
+  careEventCount?: string;
+  /** "during the shift" / "under passet". */
+  duringShift?: string;
+
 }
 
 
