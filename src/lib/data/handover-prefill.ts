@@ -61,7 +61,7 @@ interface Labels {
 
 
 /** Abnormal vitals logged within this window belong to ONE clinical moment. */
-const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
+export const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
 
 /** Stable in-line ordering for clustered vitals. Unknown types sort last. */
 const VITAL_LINE_ORDER = [
@@ -79,15 +79,97 @@ function vitalOrder(type: string): number {
   return i === -1 ? VITAL_LINE_ORDER.length : i;
 }
 
+export interface AbnormalReading {
+  at: Date;
+  vitalType: string;
+  /** Preformatted "SpO₂ 94%" — label + value + unit resolved by the caller. */
+  text: string;
+}
+
+/**
+ * Group abnormal readings into clinical moments. Readings are sorted by time
+ * and joined into a cluster while they fall within `windowMs` of the FIRST
+ * reading of that cluster, so separate episodes hours apart never merge.
+ * Each cluster is returned in the fixed vital order.
+ */
+export function clusterAbnormalVitals(
+  readings: AbnormalReading[],
+  windowMs: number = VITAL_CLUSTER_WINDOW_MS,
+): AbnormalReading[][] {
+  const sorted = [...readings].sort((a, b) => a.at.getTime() - b.at.getTime());
+  const clusters: AbnormalReading[][] = [];
+  for (const r of sorted) {
+    const cur = clusters[clusters.length - 1];
+    if (cur && r.at.getTime() - cur[0].at.getTime() <= windowMs) {
+      cur.push(r);
+    } else {
+      clusters.push([r]);
+    }
+  }
+  return clusters.map((c) =>
+    [...c].sort((a, b) => vitalOrder(a.vitalType) - vitalOrder(b.vitalType)),
+  );
+}
+
 /** A care event is noteworthy (never collapsed into a count) when it carries
  *  a description, an action taken, or a severity of moderate (2) or higher. */
-function isNoteworthyEvent(ev: CareEvent): boolean {
+export function isNoteworthyEvent(
+  ev: Pick<CareEvent, "description" | "action_taken" | "severity">,
+): boolean {
   return (
     !!ev.description?.trim() ||
     !!ev.action_taken?.trim() ||
     (ev.severity ?? 0) >= 2
   );
 }
+
+export interface CareEventSummaryLabels {
+  /** Renders one full event line, including its family-tz timestamp. */
+  formatEvent: (ev: CareEvent) => string;
+  typeLabel: (t: CareEventType) => string;
+  /** "{{type}} ×{{count}} {{during}}" */
+  countTemplate: string;
+  duringShift: string;
+}
+
+/**
+ * Noteworthy events surface individually in chronological order; routine
+ * repeats of the same type collapse into one count line per type. A lone
+ * routine event renders as a normal line — never "×1".
+ * `events` is expected time-ascending (the query orders it).
+ */
+export function summarizeCareEvents(
+  events: CareEvent[],
+  labels: CareEventSummaryLabels,
+): string[] {
+  const lines: string[] = [];
+  const routineByType = new Map<CareEventType, CareEvent[]>();
+  for (const ev of events) {
+    if (isNoteworthyEvent(ev)) {
+      lines.push(labels.formatEvent(ev));
+    } else {
+      const list = routineByType.get(ev.type);
+      if (list) list.push(ev);
+      else routineByType.set(ev.type, [ev]);
+    }
+  }
+  // Map preserves first-occurrence order.
+  for (const [type, list] of routineByType) {
+    if (list.length === 1) {
+      lines.push(labels.formatEvent(list[0]));
+    } else {
+      lines.push(
+        `• ${labels.countTemplate
+          .replace("{{type}}", labels.typeLabel(type))
+          .replace("{{count}}", String(list.length))
+          .replace("{{during}}", labels.duringShift)
+          .trim()}`,
+      );
+    }
+  }
+  return lines;
+}
+
 
 function fmtTime(d: Date) {
   return d.toTimeString().slice(0, 5);
