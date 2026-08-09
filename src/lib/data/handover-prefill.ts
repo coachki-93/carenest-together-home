@@ -463,11 +463,15 @@ export function useHandoverPrefill(
         }
       }
       for (const cluster of clusterAbnormalVitals(abnormal)) {
-        const t = fmtTime(cluster[0].at);
+        // Clusters are ordered by vital, so timestamp from the earliest reading.
+        const t = fmtTime(
+          new Date(Math.min(...cluster.map((r) => r.at.getTime()))),
+        );
         noteLines.push(
           `• ${t} ${labels.vitalAbnormal}: ${cluster.map((r) => r.text).join(", ")}`,
         );
       }
+
 
 
 
