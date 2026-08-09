@@ -55,9 +55,39 @@ interface Labels {
 }
 
 
+/** Abnormal vitals logged within this window belong to ONE clinical moment. */
+const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
+
+/** Stable in-line ordering for clustered vitals. Unknown types sort last. */
+const VITAL_LINE_ORDER = [
+  "spo2",
+  "heart_rate",
+  "breathing",
+  "temperature",
+  "fluids",
+  "seizure",
+  "weight",
+  "other",
+];
+function vitalOrder(type: string): number {
+  const i = VITAL_LINE_ORDER.indexOf(type);
+  return i === -1 ? VITAL_LINE_ORDER.length : i;
+}
+
+/** A care event is noteworthy (never collapsed into a count) when it carries
+ *  a description, an action taken, or a severity of moderate (2) or higher. */
+function isNoteworthyEvent(ev: CareEvent): boolean {
+  return (
+    !!ev.description?.trim() ||
+    !!ev.action_taken?.trim() ||
+    (ev.severity ?? 0) >= 2
+  );
+}
+
 function fmtTime(d: Date) {
   return d.toTimeString().slice(0, 5);
 }
+
 
 function statusLine(
   status: string,
