@@ -819,6 +819,8 @@ export const en = {
       tidySkipped: "Tidy skipped",
       maintenanceDone: "Maintenance done",
       maintenanceOverdue: "Overdue maintenance",
+      careEventCount: "{{type}} ×{{count}} {{during}}",
+      duringShift: "during the shift",
       medAllGiven: "All scheduled meds given ({{given}}/{{total}})",
     },
     reads: {

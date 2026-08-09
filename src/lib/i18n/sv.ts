@@ -819,6 +819,8 @@ export const sv = {
       tidySkipped: "Städning hoppad",
       maintenanceDone: "Underhåll utfört",
       maintenanceOverdue: "Försenat underhåll",
+      careEventCount: "{{type}} ×{{count}} {{during}}",
+      duringShift: "under passet",
       medAllGiven: "Alla schemalagda mediciner givna ({{given}}/{{total}})",
     },
     reads: {

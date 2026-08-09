@@ -52,12 +52,47 @@ interface Labels {
   careEventSeverityLabels?: Partial<Record<number, string>>;
   careEventActionPrefix?: string;
   careEventDuration?: (seconds: number) => string;
+  /** "{{type}} ×{{count}} {{during}}" — collapsed routine repeats. */
+  careEventCount?: string;
+  /** "during the shift" / "under passet". */
+  duringShift?: string;
+
 }
 
+
+/** Abnormal vitals logged within this window belong to ONE clinical moment. */
+const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
+
+/** Stable in-line ordering for clustered vitals. Unknown types sort last. */
+const VITAL_LINE_ORDER = [
+  "spo2",
+  "heart_rate",
+  "breathing",
+  "temperature",
+  "fluids",
+  "seizure",
+  "weight",
+  "other",
+];
+function vitalOrder(type: string): number {
+  const i = VITAL_LINE_ORDER.indexOf(type);
+  return i === -1 ? VITAL_LINE_ORDER.length : i;
+}
+
+/** A care event is noteworthy (never collapsed into a count) when it carries
+ *  a description, an action taken, or a severity of moderate (2) or higher. */
+function isNoteworthyEvent(ev: CareEvent): boolean {
+  return (
+    !!ev.description?.trim() ||
+    !!ev.action_taken?.trim() ||
+    (ev.severity ?? 0) >= 2
+  );
+}
 
 function fmtTime(d: Date) {
   return d.toTimeString().slice(0, 5);
 }
+
 
 function statusLine(
   status: string,
@@ -326,21 +361,48 @@ export function useHandoverPrefill(
         noteLines.push(`• ${t} ${title} — ${labels.taskNote}: ${note}`);
       }
 
-      // Abnormal vitals
+      // Abnormal vitals — clustered by moment. A single clinical event
+      // (e.g. a desaturation) drags several vitals at once; collapse
+      // readings inside VITAL_CLUSTER_WINDOW_MS into ONE line.
+      const abnormal: Array<{ at: Date; label: string; text: string }> = [];
       for (const v of vitals) {
         const range = VITAL_RANGES[v.vital_type as VitalType];
         if (!range) continue;
         const val = Number(v.value);
         if (!Number.isFinite(val)) continue;
         if (val < range.low || val > range.high) {
-          const t = fmtTime(new Date(v.logged_at));
           const typeLabel =
             labels.vitalTypeLabels?.[v.vital_type] ?? v.vital_type;
-          noteLines.push(
-            `• ${t} ${labels.vitalAbnormal}: ${typeLabel} ${val}${v.unit ?? ""}`,
-          );
+          abnormal.push({
+            at: new Date(v.logged_at),
+            label: v.vital_type,
+            text: `${typeLabel} ${val}${v.unit ?? ""}`,
+          });
         }
       }
+      abnormal.sort((a, b) => a.at.getTime() - b.at.getTime());
+      const clusters: Array<typeof abnormal> = [];
+      for (const r of abnormal) {
+        const cur = clusters[clusters.length - 1];
+        if (
+          cur &&
+          r.at.getTime() - cur[0].at.getTime() <= VITAL_CLUSTER_WINDOW_MS
+        ) {
+          cur.push(r);
+        } else {
+          clusters.push([r]);
+        }
+      }
+      for (const cluster of clusters) {
+        const ordered = [...cluster].sort(
+          (a, b) => vitalOrder(a.label) - vitalOrder(b.label),
+        );
+        const t = fmtTime(cluster[0].at);
+        noteLines.push(
+          `• ${t} ${labels.vitalAbnormal}: ${ordered.map((r) => r.text).join(", ")}`,
+        );
+      }
+
 
       // Oxygen tank events during the shift.
       // Care-needs gate: only emit if the child has the oxygen module.
@@ -450,24 +512,57 @@ export function useHandoverPrefill(
         );
       }
 
-      // Care events during the shift — surfaced unconditionally when they occur.
+      // Care events during the shift. Noteworthy events (note, action taken,
+      // or severity ≥ 2) always surface on their own line; routine repeats of
+      // the same type collapse into a single "×N during the shift" count so
+      // four uneventful vomits don't become four lines.
       const careEvents = (careEventsRes.data ?? []) as CareEvent[];
+      const eventLineLabels = {
+        typeLabel: (t: CareEventType) => labels.careEventTypeLabels?.[t] ?? t,
+        severityLabel: (n: number) =>
+          labels.careEventSeverityLabels?.[n] ?? String(n),
+        actionPrefix: labels.careEventActionPrefix ?? "Action",
+        duration: labels.careEventDuration ?? ((s: number) => `${s}s`),
+      };
+      const routineByType = new Map<CareEventType, CareEvent[]>();
       for (const ev of careEvents) {
-        const time = formatTimeIn(ev.occurred_at, tz);
-        const line = _formatCareEventLine(
-          ev,
-          {
-            typeLabel: (t) =>
-              labels.careEventTypeLabels?.[t] ?? t,
-            severityLabel: (n) =>
-              labels.careEventSeverityLabels?.[n] ?? String(n),
-            actionPrefix: labels.careEventActionPrefix ?? "Action",
-            duration: labels.careEventDuration ?? ((s) => `${s}s`),
-          },
-          time,
-        );
-        noteLines.push(line);
+        if (isNoteworthyEvent(ev)) {
+          noteLines.push(
+            _formatCareEventLine(
+              ev,
+              eventLineLabels,
+              formatTimeIn(ev.occurred_at, tz),
+            ),
+          );
+        } else {
+          const list = routineByType.get(ev.type);
+          if (list) list.push(ev);
+          else routineByType.set(ev.type, [ev]);
+        }
       }
+      // Map preserves first-occurrence order (careEvents is time-ascending).
+      for (const [type, list] of routineByType) {
+        if (list.length === 1) {
+          noteLines.push(
+            _formatCareEventLine(
+              list[0],
+              eventLineLabels,
+              formatTimeIn(list[0].occurred_at, tz),
+            ),
+          );
+        } else {
+          const countTemplate =
+            labels.careEventCount ?? "{{type}} ×{{count}} {{during}}";
+          noteLines.push(
+            `• ${countTemplate
+              .replace("{{type}}", eventLineLabels.typeLabel(type))
+              .replace("{{count}}", String(list.length))
+              .replace("{{during}}", labels.duringShift ?? "during the shift")
+              .trim()}`,
+          );
+        }
+      }
+
 
       const medsStr = medLines.length ? medLines.join("\n") : "";
       const notesStr = noteLines.length ? noteLines.join("\n") : "";

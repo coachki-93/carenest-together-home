@@ -184,6 +184,8 @@ function HandoverPage() {
         3: t("careEvents.severity.severe"),
       },
       careEventActionPrefix: t("careEvents.actionLabel"),
+      careEventCount: t("handoverPage.prefill.careEventCount"),
+      duringShift: t("handoverPage.prefill.duringShift"),
       careEventDuration: (s: number) => {
         if (s < 60) return t("careEvents.duration.seconds", { s });
         const m = Math.floor(s / 60);
