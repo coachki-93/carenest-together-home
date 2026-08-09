@@ -61,7 +61,7 @@ interface Labels {
 
 
 /** Abnormal vitals logged within this window belong to ONE clinical moment. */
-const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
+export const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
 
 /** Stable in-line ordering for clustered vitals. Unknown types sort last. */
 const VITAL_LINE_ORDER = [
@@ -79,15 +79,97 @@ function vitalOrder(type: string): number {
   return i === -1 ? VITAL_LINE_ORDER.length : i;
 }
 
+export interface AbnormalReading {
+  at: Date;
+  vitalType: string;
+  /** Preformatted "SpO₂ 94%" — label + value + unit resolved by the caller. */
+  text: string;
+}
+
+/**
+ * Group abnormal readings into clinical moments. Readings are sorted by time
+ * and joined into a cluster while they fall within `windowMs` of the FIRST
+ * reading of that cluster, so separate episodes hours apart never merge.
+ * Each cluster is returned in the fixed vital order.
+ */
+export function clusterAbnormalVitals(
+  readings: AbnormalReading[],
+  windowMs: number = VITAL_CLUSTER_WINDOW_MS,
+): AbnormalReading[][] {
+  const sorted = [...readings].sort((a, b) => a.at.getTime() - b.at.getTime());
+  const clusters: AbnormalReading[][] = [];
+  for (const r of sorted) {
+    const cur = clusters[clusters.length - 1];
+    if (cur && r.at.getTime() - cur[0].at.getTime() <= windowMs) {
+      cur.push(r);
+    } else {
+      clusters.push([r]);
+    }
+  }
+  return clusters.map((c) =>
+    [...c].sort((a, b) => vitalOrder(a.vitalType) - vitalOrder(b.vitalType)),
+  );
+}
+
 /** A care event is noteworthy (never collapsed into a count) when it carries
  *  a description, an action taken, or a severity of moderate (2) or higher. */
-function isNoteworthyEvent(ev: CareEvent): boolean {
+export function isNoteworthyEvent(
+  ev: Pick<CareEvent, "description" | "action_taken" | "severity">,
+): boolean {
   return (
     !!ev.description?.trim() ||
     !!ev.action_taken?.trim() ||
     (ev.severity ?? 0) >= 2
   );
 }
+
+export interface CareEventSummaryLabels {
+  /** Renders one full event line, including its family-tz timestamp. */
+  formatEvent: (ev: CareEvent) => string;
+  typeLabel: (t: CareEventType) => string;
+  /** "{{type}} ×{{count}} {{during}}" */
+  countTemplate: string;
+  duringShift: string;
+}
+
+/**
+ * Noteworthy events surface individually in chronological order; routine
+ * repeats of the same type collapse into one count line per type. A lone
+ * routine event renders as a normal line — never "×1".
+ * `events` is expected time-ascending (the query orders it).
+ */
+export function summarizeCareEvents(
+  events: CareEvent[],
+  labels: CareEventSummaryLabels,
+): string[] {
+  const lines: string[] = [];
+  const routineByType = new Map<CareEventType, CareEvent[]>();
+  for (const ev of events) {
+    if (isNoteworthyEvent(ev)) {
+      lines.push(labels.formatEvent(ev));
+    } else {
+      const list = routineByType.get(ev.type);
+      if (list) list.push(ev);
+      else routineByType.set(ev.type, [ev]);
+    }
+  }
+  // Map preserves first-occurrence order.
+  for (const [type, list] of routineByType) {
+    if (list.length === 1) {
+      lines.push(labels.formatEvent(list[0]));
+    } else {
+      lines.push(
+        `• ${labels.countTemplate
+          .replace("{{type}}", labels.typeLabel(type))
+          .replace("{{count}}", String(list.length))
+          .replace("{{during}}", labels.duringShift)
+          .trim()}`,
+      );
+    }
+  }
+  return lines;
+}
+
 
 function fmtTime(d: Date) {
   return d.toTimeString().slice(0, 5);
@@ -364,7 +446,7 @@ export function useHandoverPrefill(
       // Abnormal vitals — clustered by moment. A single clinical event
       // (e.g. a desaturation) drags several vitals at once; collapse
       // readings inside VITAL_CLUSTER_WINDOW_MS into ONE line.
-      const abnormal: Array<{ at: Date; label: string; text: string }> = [];
+      const abnormal: AbnormalReading[] = [];
       for (const v of vitals) {
         const range = VITAL_RANGES[v.vital_type as VitalType];
         if (!range) continue;
@@ -375,33 +457,22 @@ export function useHandoverPrefill(
             labels.vitalTypeLabels?.[v.vital_type] ?? v.vital_type;
           abnormal.push({
             at: new Date(v.logged_at),
-            label: v.vital_type,
+            vitalType: v.vital_type,
             text: `${typeLabel} ${val}${v.unit ?? ""}`,
           });
         }
       }
-      abnormal.sort((a, b) => a.at.getTime() - b.at.getTime());
-      const clusters: Array<typeof abnormal> = [];
-      for (const r of abnormal) {
-        const cur = clusters[clusters.length - 1];
-        if (
-          cur &&
-          r.at.getTime() - cur[0].at.getTime() <= VITAL_CLUSTER_WINDOW_MS
-        ) {
-          cur.push(r);
-        } else {
-          clusters.push([r]);
-        }
-      }
-      for (const cluster of clusters) {
-        const ordered = [...cluster].sort(
-          (a, b) => vitalOrder(a.label) - vitalOrder(b.label),
+      for (const cluster of clusterAbnormalVitals(abnormal)) {
+        // Clusters are ordered by vital, so timestamp from the earliest reading.
+        const t = fmtTime(
+          new Date(Math.min(...cluster.map((r) => r.at.getTime()))),
         );
-        const t = fmtTime(cluster[0].at);
         noteLines.push(
-          `• ${t} ${labels.vitalAbnormal}: ${ordered.map((r) => r.text).join(", ")}`,
+          `• ${t} ${labels.vitalAbnormal}: ${cluster.map((r) => r.text).join(", ")}`,
         );
       }
+
+
 
 
       // Oxygen tank events during the shift.
@@ -524,44 +595,21 @@ export function useHandoverPrefill(
         actionPrefix: labels.careEventActionPrefix ?? "Action",
         duration: labels.careEventDuration ?? ((s: number) => `${s}s`),
       };
-      const routineByType = new Map<CareEventType, CareEvent[]>();
-      for (const ev of careEvents) {
-        if (isNoteworthyEvent(ev)) {
-          noteLines.push(
+      noteLines.push(
+        ...summarizeCareEvents(careEvents, {
+          formatEvent: (ev) =>
             _formatCareEventLine(
               ev,
               eventLineLabels,
               formatTimeIn(ev.occurred_at, tz),
             ),
-          );
-        } else {
-          const list = routineByType.get(ev.type);
-          if (list) list.push(ev);
-          else routineByType.set(ev.type, [ev]);
-        }
-      }
-      // Map preserves first-occurrence order (careEvents is time-ascending).
-      for (const [type, list] of routineByType) {
-        if (list.length === 1) {
-          noteLines.push(
-            _formatCareEventLine(
-              list[0],
-              eventLineLabels,
-              formatTimeIn(list[0].occurred_at, tz),
-            ),
-          );
-        } else {
-          const countTemplate =
-            labels.careEventCount ?? "{{type}} ×{{count}} {{during}}";
-          noteLines.push(
-            `• ${countTemplate
-              .replace("{{type}}", eventLineLabels.typeLabel(type))
-              .replace("{{count}}", String(list.length))
-              .replace("{{during}}", labels.duringShift ?? "during the shift")
-              .trim()}`,
-          );
-        }
-      }
+          typeLabel: eventLineLabels.typeLabel,
+          countTemplate:
+            labels.careEventCount ?? "{{type}} ×{{count}} {{during}}",
+          duringShift: labels.duringShift ?? "during the shift",
+        }),
+      );
+
 
 
       const medsStr = medLines.length ? medLines.join("\n") : "";
