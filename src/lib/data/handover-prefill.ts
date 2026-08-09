@@ -595,44 +595,21 @@ export function useHandoverPrefill(
         actionPrefix: labels.careEventActionPrefix ?? "Action",
         duration: labels.careEventDuration ?? ((s: number) => `${s}s`),
       };
-      const routineByType = new Map<CareEventType, CareEvent[]>();
-      for (const ev of careEvents) {
-        if (isNoteworthyEvent(ev)) {
-          noteLines.push(
+      noteLines.push(
+        ...summarizeCareEvents(careEvents, {
+          formatEvent: (ev) =>
             _formatCareEventLine(
               ev,
               eventLineLabels,
               formatTimeIn(ev.occurred_at, tz),
             ),
-          );
-        } else {
-          const list = routineByType.get(ev.type);
-          if (list) list.push(ev);
-          else routineByType.set(ev.type, [ev]);
-        }
-      }
-      // Map preserves first-occurrence order (careEvents is time-ascending).
-      for (const [type, list] of routineByType) {
-        if (list.length === 1) {
-          noteLines.push(
-            _formatCareEventLine(
-              list[0],
-              eventLineLabels,
-              formatTimeIn(list[0].occurred_at, tz),
-            ),
-          );
-        } else {
-          const countTemplate =
-            labels.careEventCount ?? "{{type}} ×{{count}} {{during}}";
-          noteLines.push(
-            `• ${countTemplate
-              .replace("{{type}}", eventLineLabels.typeLabel(type))
-              .replace("{{count}}", String(list.length))
-              .replace("{{during}}", labels.duringShift ?? "during the shift")
-              .trim()}`,
-          );
-        }
-      }
+          typeLabel: eventLineLabels.typeLabel,
+          countTemplate:
+            labels.careEventCount ?? "{{type}} ×{{count}} {{during}}",
+          duringShift: labels.duringShift ?? "during the shift",
+        }),
+      );
+
 
 
       const medsStr = medLines.length ? medLines.join("\n") : "";
