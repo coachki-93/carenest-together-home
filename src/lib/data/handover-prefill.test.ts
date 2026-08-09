@@ -100,8 +100,8 @@ describe("clusterAbnormalVitals", () => {
   });
 
   it("measures the window from the cluster's first reading", () => {
-    // Chained readings 2 min apart span 6 min total: the 4th falls outside the
-    // window measured from the first, so it opens a new cluster.
+    // Chained readings 2 min apart: the 3rd is 4 min after the FIRST, so it
+    // opens a new cluster instead of chaining indefinitely.
     const clusters = clusterAbnormalVitals(
       [
         reading("2026-08-09T02:00:00Z", "spo2", "a"),
@@ -112,9 +112,10 @@ describe("clusterAbnormalVitals", () => {
       VITAL_CLUSTER_WINDOW_MS,
     );
     expect(clusters).toHaveLength(2);
-    expect(clusters[0]).toHaveLength(3);
-    expect(clusters[1]).toHaveLength(1);
+    expect(clusters[0]).toHaveLength(2);
+    expect(clusters[1]).toHaveLength(2);
   });
+
 });
 
 describe("isNoteworthyEvent (safety carve-out)", () => {
