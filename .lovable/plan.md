@@ -1,53 +1,52 @@
-# Summarise handover prefill noise
+# Extract handover summarization logic + tests
 
-Read-time formatting only, all in `src/lib/data/handover-prefill.ts` plus two new label keys in `en.ts` / `sv.ts`. No schema changes.
+Refactor for testability only — no output changes.
 
-Severity scale confirmed as 1–3 (mild / moderate / severe), so "surface individually" = severity 2 or 3; severity 1 or none can collapse.
+## Files
 
-## 1. Cluster abnormal vitals by moment
+- `src/lib/data/handover-prefill.ts` — extract inline logic into exported pure functions; the hook calls them.
+- `src/lib/data/handover-prefill.test.ts` — new vitest file, following the `care-events.test.ts` pattern.
 
-New const `VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000` (3 minutes).
+## Extracted API (all pure, no Supabase/i18n/React deps)
 
-- Collect all abnormal readings first (instead of pushing a line each).
-- Sort by `logged_at`.
-- Walk the list; start a new cluster when a reading is more than the window after the *first* reading of the current cluster.
-- Within a cluster, order readings by a fixed vital order (spo2, heart_rate, breathing, temperature, then the rest alphabetically) so lines read the same every shift.
-- Emit one line per cluster, timestamped from the cluster's first reading:
+```ts
+export const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
 
-```text
-• 02:46 Värde utanför normalområdet: SpO₂ 94%, puls 128, andning 64
+export interface AbnormalReading { at: Date; vitalType: string; text: string }
+
+/** Sorts by time, groups readings within windowMs of the cluster's first
+ *  reading, orders each cluster by the fixed vital order. */
+export function clusterAbnormalVitals(
+  readings: AbnormalReading[],
+  windowMs = VITAL_CLUSTER_WINDOW_MS,
+): AbnormalReading[][];
+
+/** Safety-critical predicate: description OR action_taken OR severity >= 2. */
+export function isNoteworthyEvent(ev: NoteworthyInput): boolean;
+
+/** Noteworthy events individually (chronological) + routine repeats collapsed
+ *  to one count line per type; a lone routine event renders as a normal line. */
+export function summarizeCareEvents(
+  events: CareEvent[],
+  labels: {
+    formatEvent: (ev: CareEvent) => string;  // hook passes _formatCareEventLine + tz
+    typeLabel: (t: CareEventType) => string;
+    countTemplate: string;                   // "{{type}} ×{{count}} {{during}}"
+    duringShift: string;
+  },
+): string[];
 ```
 
-A single abnormal reading naturally renders as a one-vital line. Separate episodes hours apart stay separate lines.
+The hook builds the abnormal-reading list from `vitals` (unchanged range check, unchanged label/unit text), calls `clusterAbnormalVitals`, and renders the same `• {time} {vitalAbnormal}: a, b, c` line. For care events it passes a `formatEvent` closure wrapping `_formatCareEventLine` + `formatTimeIn(tz)`, so timezone handling stays exactly where it is today.
 
-## 2. Summarise repeated care events
+## Test coverage
 
-Per event type within the shift:
+Vitals clustering: several readings inside the window collapse to one cluster; a reading beyond the window starts a new cluster; a lone reading forms its own cluster; two episodes of the same vital hours apart stay separate; in-cluster ordering is the fixed vital order regardless of insertion order.
 
-- Noteworthy = non-empty `description`, OR non-empty `action_taken`, OR `severity >= 2`. Always rendered individually via the existing `_formatCareEventLine` (time, severity, duration, description, action).
-- The remaining routine events of that type: if 2 or more, one count line; if exactly 1, render it normally (never "×1").
+Care-event collapse: 4 routine same-type events produce one count of 4; a single event renders as a normal line with no "×1"; two different types produce two separate counts, never merged.
 
-Count line format:
-
-```text
-• Kräkning ×3 under passet
-```
-
-Ordering: noteworthy lines keep chronological order (query is already ordered ascending); count lines are appended after them, ordered by first occurrence of the type.
-
-## New i18n keys
-
-Under `handoverPage.prefill`:
-
-- `careEventCount` — en: `"{{type}} ×{{count}} {{during}}"`, sv: `"{{type}} ×{{count}} {{during}}"`
-- `duringShift` — en: `"during the shift"`, sv: `"under passet"`
-
-Plumbed through the existing `Labels` interface as optional `careEventCount` / `duringShift` fields, wired in `src/routes/_authenticated/handover.tsx` alongside the other prefill labels.
-
-## Preserved
-
-Exception-based philosophy (only abnormal / noteworthy shown, just grouped), family-timezone handling (`formatTimeIn` for care events, `fmtTime` for vitals as today), calm-shift positive meds summary, and every other note source.
+Safety carve-out: description-only, action_taken-only, and severity 2 and 3 each return `true` from `isNoteworthyEvent`; severity 1 / null / whitespace-only strings return `false`. Integration: 1 noteworthy + 3 routine vomits → the noteworthy line surfaces individually, the count line says 3, and the test explicitly asserts the noteworthy event's description does not appear inside any count line and the count never equals 4.
 
 ## Verification
 
-`tsgo --noEmit`, en/sv key parity, and a pure-logic simulation covering: multi-vital desaturation → one line; 4 routine vomits → `×4 under passet`; 1 flagged vomit + 3 routine → separate line + `×3`; single event of a type → normal line.
+`vitest run` on the new file, `tsgo --noEmit`, and a before/after comparison of the summarization output for the same inputs to confirm the refactor is behavior-identical.
