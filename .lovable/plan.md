@@ -1,52 +1,59 @@
-# Extract handover summarization logic + tests
+# Fix: handover mislabels oxygen flow changes as tank swaps
 
-Refactor for testability only — no output changes.
+## Finding first: is `useReplaceTank` a flow change or a real swap?
 
-## Files
+**It is a real tank swap.** Evidence from `src/routes/_authenticated/oxygen.tsx`:
 
-- `src/lib/data/handover-prefill.ts` — extract inline logic into exported pure functions; the hook calls them.
-- `src/lib/data/handover-prefill.test.ts` — new vitest file, following the `care-events.test.ts` pattern.
+- `ReplaceTankDialog` is opened by the button labelled `oxygen.replaceTank` ("Byt tub" / "Replace tank"), next to a separate `oxygen.changeFlow` button.
+- Its dialog title/body are `oxygen.replaceTitle` / `oxygen.replaceBody` — "Byt tub" / "Markera den här tuben som tom och starta en ny." (not `changeFlowTitle`, as suspected in the report).
+- Behaviour matches a swap: it closes the current row and starts a fresh tank at 100% from `now`, with no carry-over of remaining volume. `useChangeFlow` is the one that back-dates `started_at` to carry the remaining percentage.
+- It exposes a flow field only so the caregiver can confirm/adjust the regulator setting on the new tank; it defaults to the current flow.
 
-## Extracted API (all pure, no Supabase/i18n/React deps)
+So: `useReplaceTank` → `'tank_swap'`. No misleading naming to comment on — the name is correct.
 
-```ts
-export const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
+## Part 1 — Migration
 
-export interface AbnormalReading { at: Date; vitalType: string; text: string }
+```sql
+ALTER TABLE public.oxygen_tanks
+  ADD COLUMN change_reason TEXT;
 
-/** Sorts by time, groups readings within windowMs of the cluster's first
- *  reading, orders each cluster by the fixed vital order. */
-export function clusterAbnormalVitals(
-  readings: AbnormalReading[],
-  windowMs = VITAL_CLUSTER_WINDOW_MS,
-): AbnormalReading[][];
-
-/** Safety-critical predicate: description OR action_taken OR severity >= 2. */
-export function isNoteworthyEvent(ev: NoteworthyInput): boolean;
-
-/** Noteworthy events individually (chronological) + routine repeats collapsed
- *  to one count line per type; a lone routine event renders as a normal line. */
-export function summarizeCareEvents(
-  events: CareEvent[],
-  labels: {
-    formatEvent: (ev: CareEvent) => string;  // hook passes _formatCareEventLine + tz
-    typeLabel: (t: CareEventType) => string;
-    countTemplate: string;                   // "{{type}} ×{{count}} {{during}}"
-    duringShift: string;
-  },
-): string[];
+ALTER TABLE public.oxygen_tanks
+  ADD CONSTRAINT oxygen_tanks_change_reason_check
+  CHECK (change_reason IS NULL OR change_reason IN ('start','flow_change','tank_swap'));
 ```
 
-The hook builds the abnormal-reading list from `vitals` (unchanged range check, unchanged label/unit text), calls `clusterAbnormalVitals`, and renders the same `• {time} {vitalAbnormal}: a, b, c` line. For care events it passes a `formatEvent` closure wrapping `_formatCareEventLine` + `formatTimeIn(tz)`, so timezone handling stays exactly where it is today.
+Nullable, no default, no RLS changes (existing policies are row-level and cover new columns).
 
-## Test coverage
+## Part 1b — Stamp at source (`src/lib/data/oxygen.ts`)
 
-Vitals clustering: several readings inside the window collapse to one cluster; a reading beyond the window starts a new cluster; a lone reading forms its own cluster; two episodes of the same vital hours apart stay separate; in-cluster ordering is the fixed vital order regardless of insertion order.
+| Mutation | insert stamp |
+| --- | --- |
+| `useStartTank` | `change_reason: 'start'` |
+| `useReplaceTank` | `change_reason: 'tank_swap'` |
+| `useChangeFlow` | `change_reason: 'flow_change'` |
 
-Care-event collapse: 4 routine same-type events produce one count of 4; a single event renders as a normal line with no "×1"; two different types produce two separate counts, never merged.
+## Part 2 — Handover labelling (`src/lib/data/handover-prefill.ts`)
 
-Safety carve-out: description-only, action_taken-only, and severity 2 and 3 each return `true` from `isNoteworthyEvent`; severity 1 / null / whitespace-only strings return `false`. Integration: 1 noteworthy + 3 routine vomits → the noteworthy line surfaces individually, the count line says 3, and the test explicitly asserts the noteworthy event's description does not appear inside any count line and the count never equals 4.
+Rewrite the oxygen block to key off the **new row's** `change_reason` (the row whose `started_at` falls in the shift):
+
+- `start` → `• {time} {oxygenStarted} — {tank} @ {flow}` (unchanged)
+- `tank_swap` → `• {time} {oxygenReplaced} — {tank}` (individual; real swaps only)
+- `flow_change` → collected:
+  - exactly 1: `• {time} {oxygenFlowChanged} {flow}` — "Syrgasflöde ändrat till 0,05 l/min" (no "×1")
+  - 2 or more: one line `• {oxygenFlowChangedMany}` — "Syrgasflöde: nu 0,10 l/min (ändrat 4× under passet, senast 14:20)"
+- `null` (legacy) → current behaviour preserved: started line, plus the `replaced_at` line for rows closed in-window.
+
+Legacy `replaced_at` lines are suppressed when a stamped row starts within 60s of that `replaced_at` (the successor row already describes what happened), so the transition period doesn't double-report.
+
+Extracted as a pure `summarizeOxygenEvents(...)` helper so it can be unit-tested next to the existing handover tests.
+
+## i18n (en + sv, parity)
+
+- `oxygenFlowChanged`: "Oxygen flow changed to" / "Syrgasflöde ändrat till"
+- `oxygenFlowChangedMany`: "Oxygen flow: now {{flow}} (changed {{count}}× during the shift, last at {{time}})" / "Syrgasflöde: nu {{flow}} (ändrat {{count}}× under passet, senast {{time}})"
 
 ## Verification
 
-`vitest run` on the new file, `tsgo --noEmit`, and a before/after comparison of the summarization output for the same inputs to confirm the refactor is behavior-identical.
+- Migration applies clean; `change_reason` present and constrained.
+- Unit tests: 4 flow changes → one summary line; 1 flow change → plain line, no "×1"; real swap → own line; legacy null rows → old behaviour, no crash.
+- en/sv key parity; `tsgo --noEmit` clean; full vitest run.
