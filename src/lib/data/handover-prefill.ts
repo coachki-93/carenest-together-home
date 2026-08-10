@@ -595,25 +595,17 @@ export function useHandoverPrefill(
       // emit it, because it actually happened (data mismatch, existing
       // family, etc. must not silently swallow live oxygen activity).
       if (oxygenAllowed || oxyTanks.length > 0) {
-        for (const tank of oxyTanks) {
-        const tankLabel =
-          TANKS[tank.tank_type as TankType]?.label ?? tank.tank_type;
-        const flowStr = formatFlow(Number(tank.flow_lpm));
-        const startedAt = new Date(tank.started_at);
-        if (startedAt >= shiftStart && startedAt < shiftEnd) {
-          noteLines.push(
-            `• ${fmtTime(startedAt)} ${labels.oxygenStarted} — ${tankLabel} @ ${flowStr}`,
-          );
-        }
-        if (tank.replaced_at) {
-          const replacedAt = new Date(tank.replaced_at);
-          if (replacedAt >= shiftStart && replacedAt < shiftEnd) {
-            noteLines.push(
-              `• ${fmtTime(replacedAt)} ${labels.oxygenReplaced} — ${tankLabel}`,
-            );
-          }
-        }
-        }
+        noteLines.push(
+          ...summarizeOxygenEvents(oxyTanks, shiftStart, shiftEnd, {
+            fmtTime,
+            tankLabel: (tt) => TANKS[tt as TankType]?.label ?? tt,
+            flowLabel: (f) => formatFlow(f),
+            oxygenStarted: labels.oxygenStarted,
+            oxygenReplaced: labels.oxygenReplaced,
+            oxygenFlowChanged: labels.oxygenFlowChanged,
+            oxygenFlowChangedMany: labels.oxygenFlowChangedMany,
+          }),
+        );
       }
 
       // Hospital flag — currently at hospital and that started before shiftEnd
