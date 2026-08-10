@@ -244,3 +244,123 @@ describe("summarizeCareEvents", () => {
     expect(lines.some((l) => l.includes("×"))).toBe(false);
   });
 });
+
+describe("summarizeOxygenEvents", () => {
+  const start = new Date("2026-08-10T06:00:00Z");
+  const end = new Date("2026-08-10T14:00:00Z");
+  const labels = {
+    fmtTime: (d: Date) => d.toISOString().slice(11, 16),
+    tankLabel: (t: string) => t,
+    flowLabel: (f: number) => `${f} l/min`,
+    oxygenStarted: "Ny syrgastub påbörjad",
+    oxygenReplaced: "Syrgastub utbytt",
+    oxygenFlowChanged: "Syrgasflöde ändrat till",
+    oxygenFlowChangedMany:
+      "Syrgasflöde: nu {{flow}} (ändrat {{count}}× under passet, senast {{time}})",
+  };
+  const row = (
+    iso: string,
+    reason: string | null,
+    flow = 0.05,
+    replaced: string | null = null,
+  ) => ({
+    started_at: iso,
+    replaced_at: replaced,
+    tank_type: "liv_mini_2l",
+    flow_lpm: flow,
+    change_reason: reason,
+  });
+
+  it("collapses 4 flow changes into one summary line", () => {
+    const lines = summarizeOxygenEvents(
+      [
+        row("2026-08-10T07:00:00Z", "flow_change", 0.05),
+        row("2026-08-10T08:00:00Z", "flow_change", 0.1),
+        row("2026-08-10T09:00:00Z", "flow_change", 0.25),
+        row("2026-08-10T10:00:00Z", "flow_change", 0.5),
+      ],
+      start,
+      end,
+      labels,
+    );
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toBe(
+      "• Syrgasflöde: nu 0.5 l/min (ändrat 4× under passet, senast 10:00)",
+    );
+    expect(lines[0]).not.toContain("utbytt");
+  });
+
+  it("renders a single flow change plainly, never ×1", () => {
+    const lines = summarizeOxygenEvents(
+      [row("2026-08-10T07:30:00Z", "flow_change", 0.1)],
+      start,
+      end,
+      labels,
+    );
+    expect(lines).toEqual(["• 07:30 Syrgasflöde ändrat till 0.1 l/min"]);
+    expect(lines[0]).not.toContain("×");
+  });
+
+  it("shows a real tank swap on its own line", () => {
+    const lines = summarizeOxygenEvents(
+      [row("2026-08-10T09:15:00Z", "tank_swap")],
+      start,
+      end,
+      labels,
+    );
+    expect(lines).toEqual(["• 09:15 Syrgastub utbytt — liv_mini_2l"]);
+  });
+
+  it("keeps start lines and orders events chronologically", () => {
+    const lines = summarizeOxygenEvents(
+      [
+        row("2026-08-10T11:00:00Z", "tank_swap"),
+        row("2026-08-10T06:30:00Z", "start"),
+      ],
+      start,
+      end,
+      labels,
+    );
+    expect(lines[0]).toContain("06:30 Ny syrgastub påbörjad");
+    expect(lines[1]).toContain("11:00 Syrgastub utbytt");
+  });
+
+  it("falls back to legacy behaviour for unstamped rows", () => {
+    const lines = summarizeOxygenEvents(
+      [row("2026-08-10T07:00:00Z", null, 0.05, "2026-08-10T09:00:00Z")],
+      start,
+      end,
+      labels,
+    );
+    expect(lines).toEqual([
+      "• 07:00 Ny syrgastub påbörjad — liv_mini_2l @ 0.05 l/min",
+      "• 09:00 Syrgastub utbytt — liv_mini_2l",
+    ]);
+  });
+
+  it("does not double-report a legacy close described by a stamped successor", () => {
+    const lines = summarizeOxygenEvents(
+      [
+        row("2026-08-10T07:00:00Z", null, 0.05, "2026-08-10T09:00:00Z"),
+        row("2026-08-10T09:00:00Z", "flow_change", 0.1),
+      ],
+      start,
+      end,
+      labels,
+    );
+    expect(lines).toEqual([
+      "• 07:00 Ny syrgastub påbörjad — liv_mini_2l @ 0.05 l/min",
+      "• 09:00 Syrgasflöde ändrat till 0.1 l/min",
+    ]);
+  });
+
+  it("ignores events outside the shift window", () => {
+    const lines = summarizeOxygenEvents(
+      [row("2026-08-10T05:00:00Z", "flow_change"), row("2026-08-10T15:00:00Z", "tank_swap")],
+      start,
+      end,
+      labels,
+    );
+    expect(lines).toEqual([]);
+  });
+});
