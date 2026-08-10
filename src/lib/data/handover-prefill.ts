@@ -40,6 +40,8 @@ interface Labels {
   empty: string;
   oxygenStarted: string;
   oxygenReplaced: string;
+  oxygenFlowChanged: string;
+  oxygenFlowChangedMany: string;
   hospital: string;
   carePlaceIssue: string;
   taskNote: string;
