@@ -74,6 +74,7 @@ export function useStartTank() {
           tank_type: input.tank_type,
           flow_lpm: input.flow_lpm,
           started_at: input.started_at ?? new Date().toISOString(),
+          change_reason: "start",
           notes: input.notes ?? null,
           created_by: input.created_by ?? null,
         })
@@ -104,6 +105,7 @@ export function useReplaceTank() {
           tank_type: input.current.tank_type,
           flow_lpm: input.flow_lpm,
           started_at: now,
+          change_reason: "tank_swap",
           notes: input.notes ?? null,
           created_by: input.created_by ?? null,
         })
@@ -150,6 +152,7 @@ export function useChangeFlow() {
           tank_type: input.current.tank_type,
           flow_lpm: input.new_flow_lpm,
           started_at: backdatedStart.toISOString(),
+          change_reason: "flow_change",
           notes: `Flow changed from ${input.current.flow_lpm} to ${input.new_flow_lpm} l/min (carried ${Math.round(remainingMin)} min remaining)`,
           created_by: input.created_by ?? null,
         })

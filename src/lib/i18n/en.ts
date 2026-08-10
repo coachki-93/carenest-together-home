@@ -813,6 +813,8 @@ export const en = {
       vitalAbnormal: "Out-of-range reading",
       oxygenStarted: "New oxygen tank started",
       oxygenReplaced: "Oxygen tank replaced",
+      oxygenFlowChanged: "Oxygen flow changed to",
+      oxygenFlowChangedMany: "Oxygen flow: now {{flow}} (changed {{count}}× during the shift, last at {{time}})",
       hospital: "Family was at hospital during this shift (oxygen paused).",
       carePlaceIssue: "Care-place check flagged",
       taskNote: "Note",
