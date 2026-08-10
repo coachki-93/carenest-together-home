@@ -152,6 +152,8 @@ function HandoverPage() {
       empty: t("handoverPage.prefill.empty"),
       oxygenStarted: t("handoverPage.prefill.oxygenStarted"),
       oxygenReplaced: t("handoverPage.prefill.oxygenReplaced"),
+      oxygenFlowChanged: t("handoverPage.prefill.oxygenFlowChanged"),
+      oxygenFlowChangedMany: t("handoverPage.prefill.oxygenFlowChangedMany"),
       hospital: t("handoverPage.prefill.hospital"),
       carePlaceIssue: t("handoverPage.prefill.carePlaceIssue"),
       taskNote: t("handoverPage.prefill.taskNote"),

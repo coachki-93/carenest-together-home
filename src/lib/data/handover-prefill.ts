@@ -431,6 +431,7 @@ export function useHandoverPrefill(
         replaced_at: string | null;
         tank_type: string;
         flow_lpm: number;
+        change_reason: string | null;
       }>;
       const cpAnswers = (cpAnswersRes.data ?? []) as Array<{
         item_label_snapshot: string;

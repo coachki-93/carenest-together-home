@@ -813,6 +813,8 @@ export const sv = {
       vitalAbnormal: "Värde utanför normalområdet",
       oxygenStarted: "Ny syrgastub påbörjad",
       oxygenReplaced: "Syrgastub utbytt",
+      oxygenFlowChanged: "Syrgasflöde ändrat till",
+      oxygenFlowChangedMany: "Syrgasflöde: nu {{flow}} (ändrat {{count}}× under passet, senast {{time}})",
       hospital: "Familjen var på sjukhus under passet (syrgas pausad).",
       carePlaceIssue: "Vårdplats-kontroll flaggad",
       taskNote: "Anteckning",
