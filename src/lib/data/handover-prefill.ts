@@ -170,6 +170,118 @@ export function summarizeCareEvents(
   return lines;
 }
 
+/** A row of `oxygen_tanks` as far as the handover summary is concerned. */
+export interface OxygenRow {
+  started_at: string;
+  replaced_at: string | null;
+  tank_type: string;
+  flow_lpm: number;
+  /** 'start' | 'flow_change' | 'tank_swap' — null on rows written before the marker existed. */
+  change_reason?: string | null;
+}
+
+export interface OxygenSummaryLabels {
+  fmtTime: (d: Date) => string;
+  tankLabel: (tankType: string) => string;
+  flowLabel: (flow: number) => string;
+  oxygenStarted: string;
+  oxygenReplaced: string;
+  /** "Oxygen flow changed to" — prefixes the flow value. */
+  oxygenFlowChanged: string;
+  /** "Oxygen flow: now {{flow}} (changed {{count}}× during the shift, last at {{time}})" */
+  oxygenFlowChangedMany: string;
+}
+
+/** A legacy close (`replaced_at`) is considered already described by a stamped
+ *  successor row that starts at practically the same moment. */
+const OXY_SUCCESSOR_TOLERANCE_MS = 60 * 1000;
+
+/**
+ * Turn oxygen tank rows into handover lines, keyed off the marker written at
+ * the mutation source:
+ *  - 'start'       → individual "oxygen started" line
+ *  - 'tank_swap'   → individual "tank replaced" line (real physical swaps only)
+ *  - 'flow_change' → collapsed: one summary line when it happened 2+ times
+ *  - null (legacy) → best-effort previous behaviour, never a crash
+ */
+export function summarizeOxygenEvents(
+  tanks: OxygenRow[],
+  shiftStart: Date,
+  shiftEnd: Date,
+  labels: OxygenSummaryLabels,
+): string[] {
+  const inWindow = (d: Date) =>
+    !Number.isNaN(d.getTime()) && d >= shiftStart && d < shiftEnd;
+  const entries: Array<{ at: Date; text: string }> = [];
+  const flowChanges: Array<{ at: Date; flow: number }> = [];
+
+  for (const tank of tanks) {
+    const startedAt = new Date(tank.started_at);
+    const tankLabel = labels.tankLabel(tank.tank_type);
+    const flowStr = labels.flowLabel(Number(tank.flow_lpm));
+    const reason = tank.change_reason ?? null;
+
+    if (inWindow(startedAt)) {
+      if (reason === "flow_change") {
+        flowChanges.push({ at: startedAt, flow: Number(tank.flow_lpm) });
+      } else if (reason === "tank_swap") {
+        entries.push({
+          at: startedAt,
+          text: `• ${labels.fmtTime(startedAt)} ${labels.oxygenReplaced} — ${tankLabel}`,
+        });
+      } else {
+        // 'start' and legacy null rows.
+        entries.push({
+          at: startedAt,
+          text: `• ${labels.fmtTime(startedAt)} ${labels.oxygenStarted} — ${tankLabel} @ ${flowStr}`,
+        });
+      }
+    }
+
+    // Legacy rows only: a closed row used to be the sole signal of a swap.
+    // Stamped rows describe themselves, so we don't double-report them.
+    if (reason === null && tank.replaced_at) {
+      const replacedAt = new Date(tank.replaced_at);
+      if (!inWindow(replacedAt)) continue;
+      const describedBySuccessor = tanks.some(
+        (t) =>
+          (t.change_reason ?? null) !== null &&
+          Math.abs(new Date(t.started_at).getTime() - replacedAt.getTime()) <=
+            OXY_SUCCESSOR_TOLERANCE_MS,
+      );
+      if (describedBySuccessor) continue;
+      entries.push({
+        at: replacedAt,
+        text: `• ${labels.fmtTime(replacedAt)} ${labels.oxygenReplaced} — ${tankLabel}`,
+      });
+    }
+  }
+
+  if (flowChanges.length === 1) {
+    const only = flowChanges[0];
+    entries.push({
+      at: only.at,
+      text: `• ${labels.fmtTime(only.at)} ${labels.oxygenFlowChanged} ${labels.flowLabel(only.flow)}`,
+    });
+  } else if (flowChanges.length > 1) {
+    const sorted = [...flowChanges].sort(
+      (a, b) => a.at.getTime() - b.at.getTime(),
+    );
+    const last = sorted[sorted.length - 1];
+    entries.push({
+      at: last.at,
+      text: `• ${labels.oxygenFlowChangedMany
+        .replace("{{flow}}", labels.flowLabel(last.flow))
+        .replace("{{count}}", String(sorted.length))
+        .replace("{{time}}", labels.fmtTime(last.at))}`,
+    });
+  }
+
+  return entries
+    .sort((a, b) => a.at.getTime() - b.at.getTime())
+    .map((e) => e.text);
+}
+
 
 function fmtTime(d: Date) {
   return d.toTimeString().slice(0, 5);
