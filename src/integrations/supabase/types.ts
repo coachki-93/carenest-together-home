@@ -2007,6 +2007,7 @@ export type Database = {
       }
       oxygen_tanks: {
         Row: {
+          change_reason: string | null
           created_at: string
           created_by: string | null
           critical_alert_sent_at: string | null
@@ -2023,6 +2024,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          change_reason?: string | null
           created_at?: string
           created_by?: string | null
           critical_alert_sent_at?: string | null
@@ -2039,6 +2041,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          change_reason?: string | null
           created_at?: string
           created_by?: string | null
           critical_alert_sent_at?: string | null
