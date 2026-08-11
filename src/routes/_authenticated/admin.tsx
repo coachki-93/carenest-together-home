@@ -35,15 +35,20 @@ import {
 } from "@/lib/data/admin.functions";
 import { AdminCoupons } from "@/components/carenest/AdminCoupons";
 import { AdminBugReports } from "@/components/carenest/AdminBugReports";
+import { AdminAnalytics } from "@/components/carenest/AdminAnalytics";
+import { adminGetFamilySubscription } from "@/lib/data/analytics-admin.functions";
 import { toast } from "@/lib/notify";
 
-type AdminTab = "accounts" | "families" | "coupons" | "bugs";
+type AdminTab = "accounts" | "families" | "coupons" | "bugs" | "analytics";
 type AdminSearch = { tab?: AdminTab };
 
 export const Route = createFileRoute("/_authenticated/admin")({
   validateSearch: (s: Record<string, unknown>): AdminSearch => {
     const tab: AdminTab =
-      s.tab === "families" || s.tab === "coupons" || s.tab === "bugs"
+      s.tab === "families" ||
+      s.tab === "coupons" ||
+      s.tab === "bugs" ||
+      s.tab === "analytics"
         ? s.tab
         : "accounts";
     return { tab };
@@ -85,7 +90,9 @@ function AdminPage() {
         ? "admin.coupons.title"
         : tab === "bugs"
           ? "admin.bugs.title"
-          : "admin.accounts.title";
+          : tab === "analytics"
+            ? "admin.analytics.title"
+            : "admin.accounts.title";
 
   return (
     <AdminLayout title={t(titleKey)} subtitle={t("admin.subtitle")}>
@@ -95,6 +102,8 @@ function AdminPage() {
         <AdminCoupons />
       ) : tab === "bugs" ? (
         <AdminBugReports />
+      ) : tab === "analytics" ? (
+        <AdminAnalytics />
       ) : (
         <AccountsSection />
       )}
@@ -405,6 +414,14 @@ function AccountDetailDialog({
               </dd>
             </dl>
 
+            {detailQ.data.memberships.map((m) => (
+              <FamilySubscriptionBlock
+                key={m.family_id}
+                familyId={m.family_id}
+                familyName={m.family_name}
+              />
+            ))}
+
             {issued ? (
               issued.kind === "recovery_link" ? (
                 <div className="rounded-2xl border-2 border-primary/40 bg-primary-soft/40 p-4 space-y-2">
@@ -559,5 +576,78 @@ function AccountDetailDialog({
         </Dialog>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Per-family subscription (support lookup)
+// ---------------------------------------------------------------------------
+
+function FamilySubscriptionBlock({
+  familyId,
+  familyName,
+}: {
+  familyId: string;
+  familyName: string;
+}) {
+  const { t } = useTranslation();
+  const get = useServerFn(adminGetFamilySubscription);
+  const q = useQuery({
+    queryKey: ["admin", "family-subscription", familyId],
+    queryFn: () => get({ data: { familyId } }),
+  });
+
+  return (
+    <div className="rounded-2xl border p-4 space-y-2">
+      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        {t("admin.analytics.familySubTitle", { name: familyName })}
+      </p>
+      {q.isLoading ? (
+        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+      ) : q.isError ? (
+        <p className="text-sm text-red-700">{(q.error as Error).message}</p>
+      ) : !q.data ? (
+        <p className="text-sm text-muted-foreground">
+          {t("admin.analytics.familySubNone")}
+        </p>
+      ) : (
+        <dl className="grid grid-cols-3 gap-y-1 text-sm">
+          <dt className="text-muted-foreground">
+            {t("admin.analytics.subStatus")}
+          </dt>
+          <dd className="col-span-2 font-medium">{q.data.status ?? "—"}</dd>
+          <dt className="text-muted-foreground">
+            {t("admin.analytics.subPlan")}
+          </dt>
+          <dd className="col-span-2">{q.data.plan ?? "—"}</dd>
+          <dt className="text-muted-foreground">
+            {t("admin.analytics.subCustomerId")}
+          </dt>
+          <dd className="col-span-2 font-mono break-all text-xs">
+            {q.data.stripeCustomerId ?? "—"}
+          </dd>
+          <dt className="text-muted-foreground">
+            {t("admin.analytics.subSubscriptionId")}
+          </dt>
+          <dd className="col-span-2 font-mono break-all text-xs">
+            {q.data.stripeSubscriptionId ?? "—"}
+          </dd>
+          <dt className="text-muted-foreground">
+            {t("admin.analytics.subPeriodEnd")}
+          </dt>
+          <dd className="col-span-2">
+            {q.data.currentPeriodEnd
+              ? new Date(q.data.currentPeriodEnd).toLocaleDateString()
+              : "—"}
+          </dd>
+          <dt className="text-muted-foreground">
+            {t("admin.analytics.subCancelScheduled")}
+          </dt>
+          <dd className="col-span-2">
+            {q.data.cancelAtPeriodEnd ? t("common.yes") : t("common.no")}
+          </dd>
+        </dl>
+      )}
+    </div>
   );
 }
