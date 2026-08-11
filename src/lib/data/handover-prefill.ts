@@ -36,10 +36,10 @@ interface Labels {
   medAllGiven: string; // "... ({{given}}/{{total}})"
   apptMissed: string;
   apptCancelled: string;
-  vitalAbnormal: string;
   empty: string;
   oxygenStarted: string;
   oxygenReplaced: string;
+  oxygenLegacyChange: string;
   oxygenFlowChanged: string;
   oxygenFlowChangedMany: string;
   hospital: string;
@@ -63,7 +63,7 @@ interface Labels {
 
 
 /** Abnormal vitals logged within this window belong to ONE clinical moment. */
-export const VITAL_CLUSTER_WINDOW_MS = 3 * 60 * 1000;
+export const VITAL_CLUSTER_WINDOW_MS = 10 * 60 * 1000;
 
 /** Stable in-line ordering for clustered vitals. Unknown types sort last. */
 const VITAL_LINE_ORDER = [
@@ -188,6 +188,8 @@ export interface OxygenSummaryLabels {
   flowLabel: (flow: number) => string;
   oxygenStarted: string;
   oxygenReplaced: string;
+  /** Neutral label for legacy rows with no change_reason marker. */
+  oxygenLegacyChange: string;
   /** "Oxygen flow changed to" — prefixes the flow value. */
   oxygenFlowChanged: string;
   /** "Oxygen flow: now {{flow}} (changed {{count}}× during the shift, last at {{time}})" */
@@ -254,7 +256,7 @@ export function summarizeOxygenEvents(
       if (describedBySuccessor) continue;
       entries.push({
         at: replacedAt,
-        text: `• ${labels.fmtTime(replacedAt)} ${labels.oxygenReplaced} — ${tankLabel}`,
+        text: `• ${labels.fmtTime(replacedAt)} ${labels.oxygenLegacyChange} — ${tankLabel}`,
       });
     }
   }
@@ -583,7 +585,7 @@ export function useHandoverPrefill(
           new Date(Math.min(...cluster.map((r) => r.at.getTime()))),
         );
         noteLines.push(
-          `• ${t} ${labels.vitalAbnormal}: ${cluster.map((r) => r.text).join(", ")}`,
+          `• ${t} — ${cluster.map((r) => r.text).join(", ")}`,
         );
       }
 
@@ -603,6 +605,7 @@ export function useHandoverPrefill(
             flowLabel: (f) => formatFlow(f),
             oxygenStarted: labels.oxygenStarted,
             oxygenReplaced: labels.oxygenReplaced,
+            oxygenLegacyChange: labels.oxygenLegacyChange,
             oxygenFlowChanged: labels.oxygenFlowChanged,
             oxygenFlowChangedMany: labels.oxygenFlowChangedMany,
           }),
