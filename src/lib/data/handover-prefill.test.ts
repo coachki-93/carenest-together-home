@@ -74,10 +74,19 @@ describe("clusterAbnormalVitals", () => {
     ]);
   });
 
-  it("starts a new cluster for a reading beyond the window", () => {
+  it("merges readings ~8 minutes apart into one cluster", () => {
     const clusters = clusterAbnormalVitals([
       reading("2026-08-09T02:46:00Z", "spo2", "SpO2 94%"),
-      reading("2026-08-09T02:50:00Z", "heart_rate", "pulse 128"),
+      reading("2026-08-09T02:54:00Z", "heart_rate", "pulse 128"),
+    ]);
+    expect(clusters).toHaveLength(1);
+    expect(clusters[0]).toHaveLength(2);
+  });
+
+  it("starts a new cluster for a reading beyond the window (15 min apart)", () => {
+    const clusters = clusterAbnormalVitals([
+      reading("2026-08-09T02:46:00Z", "spo2", "SpO2 94%"),
+      reading("2026-08-09T03:01:00Z", "heart_rate", "pulse 128"),
     ]);
     expect(clusters).toHaveLength(2);
   });
@@ -101,14 +110,14 @@ describe("clusterAbnormalVitals", () => {
   });
 
   it("measures the window from the cluster's first reading", () => {
-    // Chained readings 2 min apart: the 3rd is 4 min after the FIRST, so it
+    // Chained readings 6 min apart: the 3rd is 12 min after the FIRST, so it
     // opens a new cluster instead of chaining indefinitely.
     const clusters = clusterAbnormalVitals(
       [
         reading("2026-08-09T02:00:00Z", "spo2", "a"),
-        reading("2026-08-09T02:02:00Z", "heart_rate", "b"),
-        reading("2026-08-09T02:04:00Z", "breathing", "c"),
-        reading("2026-08-09T02:06:00Z", "temperature", "d"),
+        reading("2026-08-09T02:06:00Z", "heart_rate", "b"),
+        reading("2026-08-09T02:12:00Z", "breathing", "c"),
+        reading("2026-08-09T02:18:00Z", "temperature", "d"),
       ],
       VITAL_CLUSTER_WINDOW_MS,
     );
@@ -255,6 +264,7 @@ describe("summarizeOxygenEvents", () => {
     flowLabel: (f: number) => `${f} l/min`,
     oxygenStarted: "Ny syrgastub påbörjad",
     oxygenReplaced: "Syrgastub utbytt",
+    oxygenLegacyChange: "Syrgas: ändring",
     oxygenFlowChanged: "Syrgasflöde ändrat till",
     oxygenFlowChangedMany:
       "Syrgasflöde: nu {{flow}} (ändrat {{count}}× under passet, senast {{time}})",
@@ -335,7 +345,7 @@ describe("summarizeOxygenEvents", () => {
     );
     expect(lines).toEqual([
       "• 07:00 Ny syrgastub påbörjad — liv_mini_2l @ 0.05 l/min",
-      "• 09:00 Syrgastub utbytt — liv_mini_2l",
+      "• 09:00 Syrgas: ändring — liv_mini_2l",
     ]);
   });
 
