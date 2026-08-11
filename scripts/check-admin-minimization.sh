@@ -14,6 +14,7 @@ FILES=(
   "src/lib/data/admin.functions.ts"
   "src/lib/data/billing-admin.functions.ts"
   "src/lib/data/bug-admin.functions.ts"
+  "src/lib/data/analytics-admin.functions.ts"
 )
 
 # bug_reports is user-submitted support text (never health data) and lives in

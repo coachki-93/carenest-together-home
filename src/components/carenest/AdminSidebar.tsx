@@ -7,6 +7,7 @@ import {
   ShieldAlert,
   Ticket,
   Bug,
+  BarChart3,
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,10 +37,11 @@ export function AdminSidebar() {
   const search = useRouterState({ select: (s) => s.location.search }) as {
     tab?: string;
   };
-  const activeTab: "accounts" | "families" | "coupons" | "bugs" =
+  const activeTab: "accounts" | "families" | "coupons" | "bugs" | "analytics" =
     search.tab === "families" ||
     search.tab === "coupons" ||
-    search.tab === "bugs"
+    search.tab === "bugs" ||
+    search.tab === "analytics"
       ? search.tab
       : "accounts";
   const membership = useMyMembership();
@@ -70,6 +72,12 @@ export function AdminSidebar() {
       title: t("admin.nav.bugs"),
       icon: Bug,
       tab: "bugs" as const,
+    },
+    {
+      key: "analytics",
+      title: t("admin.nav.analytics"),
+      icon: BarChart3,
+      tab: "analytics" as const,
     },
   ];
 
