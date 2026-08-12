@@ -77,6 +77,7 @@ FORBIDDEN=(
   tasks
   events
   push_subscriptions
+  appointment_notifications
   scaffolds
   bug_reports
 )
@@ -92,6 +93,13 @@ for FILE in "${FILES[@]}"; do
     if [[ "$name" == "bug_reports" && "$FILE" == "$BUG_TABLE_OWNER" ]]; then
       continue
     fi
+    if [[ "$FILE" == "$DIAG_OWNER" ]]; then
+      skip=0
+      for allowed in "${DIAG_ALLOWED[@]}"; do
+        [[ "$name" == "$allowed" ]] && skip=1
+      done
+      [[ $skip -eq 1 ]] && continue
+    fi
     # Match .from("name"), .from('name'), or bare "name" / 'name' string.
     if echo "$CODE_ONLY" | grep -Eq "\.from\(\s*['\"]${name}['\"]|['\"]${name}['\"]"; then
       echo "FORBIDDEN: $FILE references health/operational table '${name}'" >&2
@@ -104,15 +112,28 @@ for FILE in "${FILES[@]}"; do
     fail=1
   fi
 
-  if echo "$CODE_ONLY" | grep -Eq "\.rpc\("; then
-    # is_platform_admin is called through supabase.rpc from the caller's
-    # RLS-scoped client. That's the only allowed rpc call. Verify.
-    if ! grep -q 'rpc("is_platform_admin"' "$FILE"; then
-      echo "FORBIDDEN: $FILE uses .rpc() beyond the is_platform_admin gate" >&2
+  # Only the allow-listed rpc names may be called. is_platform_admin is the
+  # gate; family_last_active / family_notification_attempts are read-only
+  # SECURITY DEFINER helpers that return timestamps + delivery metadata only.
+  while read -r rpcname; do
+    [[ -z "$rpcname" ]] && continue
+    ok=0
+    for allowed in "${ALLOWED_RPCS[@]}"; do
+      [[ "$rpcname" == "$allowed" ]] && ok=1
+    done
+    if [[ $ok -eq 0 ]]; then
+      echo "FORBIDDEN: $FILE calls .rpc(\"${rpcname}\") which is not allow-listed" >&2
       fail=1
     fi
+  done < <(echo "$CODE_ONLY" | grep -Eo "\.rpc\(\s*['\"][A-Za-z0-9_]+['\"]" | grep -Eo "['\"][A-Za-z0-9_]+['\"]" | tr -d "\"'")
+
+  # A dynamic / non-literal rpc call can't be audited — reject it.
+  if echo "$CODE_ONLY" | grep -Eq "\.rpc\(\s*[^'\"]" ; then
+    echo "FORBIDDEN: $FILE uses .rpc() with a non-literal name" >&2
+    fail=1
   fi
 done
+
 
 if [[ $fail -ne 0 ]]; then
   echo "" >&2
