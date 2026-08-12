@@ -2627,6 +2627,15 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      family_last_active: { Args: { _family_id: string }; Returns: string }
+      family_notification_attempts: {
+        Args: { _family_id: string; _limit?: number }
+        Returns: {
+          notified_at: string
+          occurrence_at: string
+          pass: string
+        }[]
+      }
       get_app_secret: { Args: { _key: string }; Returns: string }
       is_family_member: {
         Args: { _family_id: string; _user_id: string }
