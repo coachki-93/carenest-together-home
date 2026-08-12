@@ -36,7 +36,10 @@ import {
 import { AdminCoupons } from "@/components/carenest/AdminCoupons";
 import { AdminBugReports } from "@/components/carenest/AdminBugReports";
 import { AdminAnalytics } from "@/components/carenest/AdminAnalytics";
-import { adminGetFamilySubscription } from "@/lib/data/analytics-admin.functions";
+import {
+  adminGetFamilySubscription,
+  adminGetFamilyDiagnostics,
+} from "@/lib/data/analytics-admin.functions";
 import { toast } from "@/lib/notify";
 
 type AdminTab = "accounts" | "families" | "coupons" | "bugs" | "analytics";
