@@ -1,53 +1,54 @@
-# L3 Admin Analytics tab (v1: numbers + lists)
+# Admin support diagnostics (read-only)
 
-Read-only subscription/revenue aggregates for the platform owner. No new tables, no charts.
+Notification-subscription health, recent send-attempts, and last-active for a looked-up family. No schema changes, no writes.
 
 ## Files
 
 | File | Change |
 | --- | --- |
-| `src/lib/data/analytics-admin.functions.ts` | NEW — `adminGetSubscriptionAnalytics` + `adminGetFamilySubscription` |
-| `src/components/carenest/AdminAnalytics.tsx` | NEW — stat cards + short lists |
-| `src/routes/_authenticated/admin.tsx` | Add `analytics` to `AdminTab` union + render; show subscription block in account detail |
-| `src/components/carenest/AdminSidebar.tsx` | Add "Analytics" nav item (BarChart3 icon) + activeTab union |
-| `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts` | `admin.analytics.*` + `admin.nav.analytics` |
-| `scripts/check-admin-minimization.sh` | Add the new file to `FILES` so it's guarded too |
+| `src/lib/data/analytics-admin.functions.ts` | NEW fn `adminGetFamilyDiagnostics({ familyId })` |
+| `src/routes/_authenticated/admin.tsx` | Diagnostics block inside the existing `AccountDetailDialog` (per membership, enabled only while open) |
+| `src/lib/i18n/en.ts`, `src/lib/i18n/sv.ts` | `admin.analytics.diag.*` labels + honesty note |
+| `scripts/check-admin-minimization.sh` | Narrow, documented exception so the diagnostics fn may read timestamp-only columns |
 
 ## 1. Server function
 
-New module (kept out of `admin.functions.ts` to preserve the minimization contract, mirroring bug-admin / billing-admin). Same pattern: `createServerFn` + `requireSupabaseAuth`, `assertCallerIsPlatformAdmin` against the caller's RLS client BEFORE `supabaseAdmin`, explicit columns only, one `admin_audit_log` write per call.
+Same contract as the rest of the module: `createServerFn` + `requireSupabaseAuth` → `assertCallerIsPlatformAdmin` on the caller's RLS client → `supabaseAdmin` → explicit columns → one `admin_audit_log` row with `target_family_id`. Strictly read-only.
 
-`adminGetSubscriptionAnalytics()` reads `family_subscriptions` (`family_id, status, plan, trial_ends_at, current_period_end, cancel_at_period_end, created_at, stripe_customer_id, stripe_subscription_id`) plus `families` (`id, name, founding_member`) and aggregates in JS:
+Returns:
 
-- counts by status: active / trialing / canceled / past_due / none
-- among active: founding vs standard (from `families.founding_member`)
-- `mrrSek = activeFounding * 199 + activeStandard * 299`; `arrSek = mrrSek * 12`
-- signups last 30d (count of `created_at >= now-30d`)
-- trials ending next 7d: count + list `{ familyId, familyName, trialEndsAt }`
-- scheduled cancels (`cancel_at_period_end = true`): count + list `{ familyId, familyName, currentPeriodEnd }`
+- `members[]` — from `family_members(user_id)` + `profiles(id, full_name)` joined with `push_subscriptions(user_id, user_agent, created_at, last_seen_at)`: `{ userId, name, hasPush, devices: [{ userAgent, createdAt, lastSeenAt }] }`
+- `recentAttempts[]` — last 20 `appointment_notifications(appointment_id, occurrence_at, pass, notified_at)` for the family's appointment ids (ids fetched with `appointments.select("id").eq("family_id", …)`), sorted `notified_at` desc
+- `lastActiveAt` — max of: latest `push_subscriptions.last_seen_at`, latest `vitals.logged_at`, latest `care_events.occurred_at`, latest `handovers.created_at`, each fetched as a single `order(...).limit(1)` row selecting only that one timestamp column
 
-Lists capped at 50 and sorted by date. Strictly read-only.
+No health content is read — only `id`/timestamp columns used to compute one "last active" datetime.
 
-`adminGetFamilySubscription({ familyId })` — support lookup: status, plan, `stripe_customer_id`, `stripe_subscription_id`, `current_period_end`, `trial_ends_at`, `cancel_at_period_end`. Also audit-logged with `target_family_id`.
+## 2. Minimization guard
 
-## 2. Analytics tab
+`check-admin-minimization.sh` currently forbids `push_subscriptions`, `vitals`, `care_events`, `handovers`, `appointments`, `maintenance_logs`-style names in every guarded file. The diagnostics fn must name four of them, so the script gets a per-file exception list (mirroring the existing `BUG_TABLE_OWNER` pattern):
 
-`AdminAnalytics.tsx`, styled like the other sections (`card-soft`, `useServerFn` + `useQuery`):
+```
+DIAG_OWNER="src/lib/data/analytics-admin.functions.ts"
+DIAG_ALLOWED=(push_subscriptions vitals care_events handovers appointments)
+```
 
-- Row of stat cards: MRR, ARR, active, trialing, past due, canceled, founding/standard split, signups (30d)
-- Two small tables: trials ending within 7 days; scheduled cancellations with period end
-- Loading spinner / error text conventions copied from `FamiliesSection`
+skipped only for that file, with a comment stating the contract: these tables may be referenced **only** for existence/timestamp columns, never for content columns. `admin.functions.ts` stays fully locked — no drift there. Everything else (no `select("*")`, rpc gate) still applies to the diagnostics file.
 
-Route gate is unchanged — the whole `/admin` page already bails unless `useIsAdmin()` is true, and the server fn re-checks.
+## 3. UI
 
-## 3. Per-family subscription in account lookup
+Inside `AccountDetailDialog`, next to the existing subscription block, a `Diagnostics` section per family membership:
 
-Reuse the existing `AccountDetailDialog`: for each membership the account has, render a compact subscription block fed by `adminGetFamilySubscription` (query enabled only while the dialog is open). No new search UI.
+- **Last active** — relative time
+- **Push subscriptions** — one row per member: name, registered / not registered badge, device string (truncated user agent), last seen relative
+- **Recent notification attempts** — compact list of `pass` + occurrence/notified time, max 20, scrollable
+- **Honesty note** (muted, always visible): "Shows subscription state and what was sent. Web push has no delivery receipt — this cannot confirm a notification reached the device." / sv: "Visar prenumerationsstatus och vad som skickats. Webbpush saknar leveranskvitto — detta kan inte bekräfta att en notis nådde enheten."
+
+Query uses `useServerFn` + `useQuery` with `enabled: open`.
 
 ## 4. i18n
 
-`admin.analytics.*` in en + sv, exact parity, natural Swedish (Analys, Aktiva, Provperioder, Uppsägningar…). Currency shown as `kr`.
+`admin.analytics.diag.*` in en + sv, exact parity, natural Swedish.
 
 ## Verify
 
-`bash scripts/check-admin-minimization.sh` green, en/sv parity, `tsgo --noEmit`, live query cross-check of counts/MRR against the DB.
+`bash scripts/check-admin-minimization.sh` green, en/sv parity, `tsgo --noEmit`, live query cross-check of the diagnostics payload against the DB, and an audit-log row with the right `target_family_id`.
