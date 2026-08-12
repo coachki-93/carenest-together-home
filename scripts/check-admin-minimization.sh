@@ -21,6 +21,19 @@ FILES=(
 # its own module. Only bug-admin.functions.ts may name it.
 BUG_TABLE_OWNER="src/lib/data/bug-admin.functions.ts"
 
+# Support diagnostics read notification DELIVERY / DEVICE metadata only — never
+# health content. Only analytics-admin.functions.ts may name these two, and the
+# allow-list is deliberately narrow: vitals / care_events / handovers /
+# appointments stay forbidden in EVERY guarded file (last-active and recent
+# send-attempts come from SECURITY DEFINER SQL functions that return only
+# timestamps and the pass label).
+DIAG_OWNER="src/lib/data/analytics-admin.functions.ts"
+DIAG_ALLOWED=(push_subscriptions appointment_notifications)
+
+# rpc() allow-list. Anything else is a violation.
+ALLOWED_RPCS=(is_platform_admin family_last_active family_notification_attempts)
+
+
 for FILE in "${FILES[@]}"; do
   if [[ ! -f "$FILE" ]]; then
     echo "check-admin-minimization: $FILE not found" >&2
