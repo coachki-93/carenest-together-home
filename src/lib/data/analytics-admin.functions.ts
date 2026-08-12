@@ -261,3 +261,141 @@ export const adminGetFamilySubscription = createServerFn({ method: "POST" })
       };
     },
   );
+
+// ---------------------------------------------------------------------------
+// Support diagnostics (read-only)
+//
+// Notification-delivery + device metadata only. Health content NEVER appears
+// here: "last active" and "recent send attempts" are computed inside the
+// SECURITY DEFINER functions family_last_active / family_notification_attempts,
+// which return only timestamps and the pass label.
+// ---------------------------------------------------------------------------
+
+export interface AdminPushDevice {
+  userAgent: string | null;
+  createdAt: string;
+  lastSeenAt: string;
+}
+
+export interface AdminDiagMember {
+  userId: string;
+  name: string;
+  hasPush: boolean;
+  devices: AdminPushDevice[];
+}
+
+export interface AdminNotificationAttempt {
+  occurrenceAt: string;
+  pass: string;
+  notifiedAt: string;
+}
+
+export interface AdminFamilyDiagnostics {
+  familyId: string;
+  lastActiveAt: string | null;
+  members: AdminDiagMember[];
+  recentAttempts: AdminNotificationAttempt[];
+}
+
+const DiagSchema = z.object({ familyId: z.string().uuid() });
+
+export const adminGetFamilyDiagnostics = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => DiagSchema.parse(input))
+  .handler(async ({ data, context }): Promise<AdminFamilyDiagnostics> => {
+    const { supabase, userId } = context;
+    await assertCallerIsPlatformAdmin(supabase, userId);
+
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+
+    const { data: members, error: memErr } = await supabaseAdmin
+      .from("family_members")
+      .select("user_id")
+      .eq("family_id", data.familyId);
+    if (memErr) throw new Error(memErr.message);
+
+    const userIds = (members ?? []).map((m) => m.user_id as string);
+
+    const { data: profiles, error: profErr } = userIds.length
+      ? await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", userIds)
+      : { data: [], error: null };
+    if (profErr) throw new Error(profErr.message);
+
+    const { data: subs, error: subErr } = await supabaseAdmin
+      .from("push_subscriptions")
+      .select("user_id, user_agent, created_at, last_seen_at")
+      .eq("family_id", data.familyId);
+    if (subErr) throw new Error(subErr.message);
+
+    const nameById = new Map(
+      (profiles ?? []).map((p) => [
+        p.id as string,
+        (p.full_name as string) ?? "",
+      ]),
+    );
+
+    const devicesByUser = new Map<string, AdminPushDevice[]>();
+    for (const s of subs ?? []) {
+      const uid = s.user_id as string;
+      const list = devicesByUser.get(uid) ?? [];
+      list.push({
+        userAgent: (s.user_agent as string | null) ?? null,
+        createdAt: s.created_at as string,
+        lastSeenAt: s.last_seen_at as string,
+      });
+      devicesByUser.set(uid, list);
+    }
+
+    const memberRows: AdminDiagMember[] = userIds.map((uid) => {
+      const devices = (devicesByUser.get(uid) ?? []).sort((a, b) =>
+        b.lastSeenAt.localeCompare(a.lastSeenAt),
+      );
+      return {
+        userId: uid,
+        name: nameById.get(uid) ?? "",
+        hasPush: devices.length > 0,
+        devices,
+      };
+    });
+
+    const { data: lastActive, error: laErr } = await supabaseAdmin.rpc(
+      "family_last_active",
+      { _family_id: data.familyId },
+    );
+    if (laErr) throw new Error(laErr.message);
+
+    const { data: attempts, error: atErr } = await supabaseAdmin.rpc(
+      "family_notification_attempts",
+      { _family_id: data.familyId, _limit: 20 },
+    );
+    if (atErr) throw new Error(atErr.message);
+
+    const recentAttempts: AdminNotificationAttempt[] = (attempts ?? []).map(
+      (a) => ({
+        occurrenceAt: a.occurrence_at as string,
+        pass: (a.pass as string) ?? "",
+        notifiedAt: a.notified_at as string,
+      }),
+    );
+
+    await logAdminAction(userId, "diagnostics.family.view", {
+      target_family_id: data.familyId,
+      detail: {
+        members: memberRows.length,
+        with_push: memberRows.filter((m) => m.hasPush).length,
+        attempts: recentAttempts.length,
+      },
+    });
+
+    return {
+      familyId: data.familyId,
+      lastActiveAt: (lastActive as string | null) ?? null,
+      members: memberRows,
+      recentAttempts,
+    };
+  });

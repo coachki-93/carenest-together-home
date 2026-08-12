@@ -36,7 +36,10 @@ import {
 import { AdminCoupons } from "@/components/carenest/AdminCoupons";
 import { AdminBugReports } from "@/components/carenest/AdminBugReports";
 import { AdminAnalytics } from "@/components/carenest/AdminAnalytics";
-import { adminGetFamilySubscription } from "@/lib/data/analytics-admin.functions";
+import {
+  adminGetFamilySubscription,
+  adminGetFamilyDiagnostics,
+} from "@/lib/data/analytics-admin.functions";
 import { toast } from "@/lib/notify";
 
 type AdminTab = "accounts" | "families" | "coupons" | "bugs" | "analytics";
@@ -422,6 +425,11 @@ function AccountDetailDialog({
               />
             ))}
 
+            {detailQ.data.memberships.map((m) => (
+              <FamilyDiagnosticsBlock key={m.family_id} familyId={m.family_id} />
+            ))}
+
+
             {issued ? (
               issued.kind === "recovery_link" ? (
                 <div className="rounded-2xl border-2 border-primary/40 bg-primary-soft/40 p-4 space-y-2">
@@ -648,6 +656,122 @@ function FamilySubscriptionBlock({
           </dd>
         </dl>
       )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Per-family support diagnostics (read-only)
+// ---------------------------------------------------------------------------
+
+function relTime(iso: string | null | undefined, never: string): string {
+  if (!iso) return never;
+  const ms = Date.now() - new Date(iso).getTime();
+  const min = Math.round(ms / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 48) return `${h} h`;
+  return `${Math.round(h / 24)} d`;
+}
+
+function FamilyDiagnosticsBlock({ familyId }: { familyId: string }) {
+  const { t } = useTranslation();
+  const get = useServerFn(adminGetFamilyDiagnostics);
+  const q = useQuery({
+    queryKey: ["admin", "family-diagnostics", familyId],
+    queryFn: () => get({ data: { familyId } }),
+  });
+
+  return (
+    <div className="rounded-2xl border p-4 space-y-3">
+      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        {t("admin.analytics.diag.title")}
+      </p>
+      {q.isLoading ? (
+        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+      ) : q.isError ? (
+        <p className="text-sm text-red-700">{(q.error as Error).message}</p>
+      ) : q.data ? (
+        <div className="space-y-3 text-sm">
+          <p>
+            <span className="text-muted-foreground">
+              {t("admin.analytics.diag.lastActive")}:{" "}
+            </span>
+            <span className="font-medium">
+              {q.data.lastActiveAt
+                ? `${relTime(q.data.lastActiveAt, "")} (${new Date(q.data.lastActiveAt).toLocaleString()})`
+                : t("admin.analytics.diag.never")}
+            </span>
+          </p>
+
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-muted-foreground">
+              {t("admin.analytics.diag.pushTitle")}
+            </p>
+            {q.data.members.length === 0 ? (
+              <p className="text-muted-foreground">
+                {t("admin.analytics.diag.noMembers")}
+              </p>
+            ) : (
+              <ul className="space-y-1">
+                {q.data.members.map((m) => (
+                  <li key={m.userId} className="flex flex-wrap gap-x-2">
+                    <span className="font-medium">
+                      {m.name || m.userId.slice(0, 8)}
+                    </span>
+                    {m.hasPush ? (
+                      <span className="text-emerald-700">
+                        {t("admin.analytics.diag.registered")}
+                      </span>
+                    ) : (
+                      <span className="text-amber-700">
+                        {t("admin.analytics.diag.notRegistered")}
+                      </span>
+                    )}
+                    {m.devices.map((d, i) => (
+                      <span
+                        key={i}
+                        className="text-xs text-muted-foreground break-all"
+                      >
+                        {(d.userAgent ?? "—").slice(0, 48)} ·{" "}
+                        {t("admin.analytics.diag.lastSeen")}{" "}
+                        {relTime(d.lastSeenAt, "—")}
+                      </span>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-muted-foreground">
+              {t("admin.analytics.diag.attemptsTitle")}
+            </p>
+            {q.data.recentAttempts.length === 0 ? (
+              <p className="text-muted-foreground">
+                {t("admin.analytics.diag.noAttempts")}
+              </p>
+            ) : (
+              <ul className="max-h-48 overflow-y-auto space-y-0.5 text-xs">
+                {q.data.recentAttempts.map((a, i) => (
+                  <li key={i} className="flex justify-between gap-2">
+                    <span className="font-mono">{a.pass}</span>
+                    <span className="text-muted-foreground">
+                      {new Date(a.notifiedAt).toLocaleString()}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            {t("admin.analytics.diag.note")}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
