@@ -425,6 +425,11 @@ function AccountDetailDialog({
               />
             ))}
 
+            {detailQ.data.memberships.map((m) => (
+              <FamilyDiagnosticsBlock key={m.family_id} familyId={m.family_id} />
+            ))}
+
+
             {issued ? (
               issued.kind === "recovery_link" ? (
                 <div className="rounded-2xl border-2 border-primary/40 bg-primary-soft/40 p-4 space-y-2">
