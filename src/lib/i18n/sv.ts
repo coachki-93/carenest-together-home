@@ -1148,6 +1148,14 @@ export const sv = {
       required: "Beskriv problemet",
     },
   },
+  oxygenCheck: {
+    title: "Påminnelse om att kontrollera syrgastuben",
+    subtitle: "En återkommande påminnelse om att titta på den fysiska tuben och bekräfta flödet — oberoende av nedräkningen.",
+    label: "Påminn om att kontrollera syrgastuben var",
+    hours_one: "{{count}} timme",
+    hours_other: "{{count}} timmar",
+    saved: "Sparat",
+  },
   usesEquipment: {
     title: "Spåra utrustningsunderhåll",
     subtitle: "Visa underhållssektionen för maskiner som behöver skötsel.",
@@ -1630,6 +1638,11 @@ export const sv = {
     saveError: "Kunde inte spara.",
     flowFromTo: "Flöde {{from}} → {{to}} l/min",
     duration: "Räcker {{duration}} vid full tub",
+    confirmTank: "Bekräfta tub",
+    confirmed: "Tuben bekräftad",
+    lastConfirmed: "Senast bekräftad {{time}}",
+    neverConfirmed: "Inte bekräftad sedan tuben startades.",
+    basedOnFlow: "Baserat på {{flow}}",
   },
   instructions: {
     title: "Instruktioner",

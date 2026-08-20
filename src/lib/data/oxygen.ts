@@ -165,6 +165,27 @@ export function useChangeFlow() {
   });
 }
 
+/**
+ * Confirm the active tank: stamp `last_checked_at = now()`.
+ * Resets the periodic "confirm the tank" reminder clock (the sweep uses
+ * GREATEST(started_at, last_checked_at, updated_at) as last interaction).
+ */
+export function useConfirmTank() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true }, // safe: caller try/catches mutateAsync
+    mutationFn: async (input: { tankId: string }) => {
+      const { error } = await supabase
+        .from("oxygen_tanks")
+        .update({ last_checked_at: new Date().toISOString() })
+        .eq("id", input.tankId)
+        .is("replaced_at", null);
+      if (error) throw error;
+    },
+    onSuccess: () => invalidate(qc),
+  });
+}
+
 export function useDeleteOxygenTank() {
   const qc = useQueryClient();
   return useMutation({

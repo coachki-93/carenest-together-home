@@ -180,7 +180,7 @@ export function useFamily(familyId: string | undefined | null) {
       const { data, error } = await supabase
         .from("families")
         .select(
-          "id, name, owner_id, at_hospital_since, hospital_paused, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language, owner_notify_level, uses_equipment",
+          "id, name, owner_id, at_hospital_since, hospital_paused, handover_reminder_minutes, handover_reminder_duration_minutes, timezone, notification_language, owner_notify_level, uses_equipment, oxygen_check_interval_minutes",
         )
         .eq("id", familyId!)
         .single();
@@ -209,6 +209,25 @@ export function useUpdateHandoverReminderMinutes() {
           handover_reminder_minutes: leadMinutes,
           handover_reminder_duration_minutes: durationMinutes,
         })
+        .eq("id", familyId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["family", vars.familyId] });
+    },
+  });
+}
+
+/** Cadence of the periodic "confirm the oxygen tank" reminder (minutes, >= 30). */
+export function useUpdateOxygenCheckInterval() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true }, // safe: caller try/catches mutateAsync
+    mutationFn: async ({ familyId, minutes }: { familyId: string; minutes: number }) => {
+      const safe = Math.max(30, Math.round(minutes));
+      const { error } = await supabase
+        .from("families")
+        .update({ oxygen_check_interval_minutes: safe })
         .eq("id", familyId);
       if (error) throw error;
     },

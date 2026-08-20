@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Wind, Plus, RefreshCw, Sliders, Loader2, Hospital } from "lucide-react";
+import { Wind, Plus, RefreshCw, Sliders, Loader2, Hospital, CheckCircle2 } from "lucide-react";
 import { toast } from "@/lib/notify";
 import { format } from "date-fns";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
@@ -31,6 +31,7 @@ import {
   useStartTank,
   useReplaceTank,
   useChangeFlow,
+  useConfirmTank,
   type OxygenTank,
 } from "@/lib/data/oxygen";
 import {
@@ -160,6 +161,16 @@ function CurrentTankCard({
   const { t } = useTranslation();
   const info = computeRemaining(tank);
   const tankLabel = TANKS[tank.tank_type as TankType]?.label ?? tank.tank_type;
+  const confirm = useConfirmTank();
+
+  async function confirmTank() {
+    try {
+      await confirm.mutateAsync({ tankId: tank.id });
+      toast.success(t("oxygen.confirmed"));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("oxygen.saveError"));
+    }
+  }
 
   return (
     <div className="card-soft p-8 space-y-6">
@@ -198,6 +209,9 @@ function CurrentTankCard({
             <p className="text-sm text-muted-foreground mt-2">
               {t("oxygen.percentLeft", { percent: Math.round(info.percentRemaining) })}
             </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t("oxygen.basedOnFlow", { flow: formatFlow(Number(tank.flow_lpm)) })}
+            </p>
           </div>
 
           <Progress value={info.percentRemaining} className="h-3 rounded-full" />
@@ -214,6 +228,15 @@ function CurrentTankCard({
 
 
       <div className="flex flex-wrap gap-3 pt-2">
+        <Button
+          variant="outline"
+          onClick={confirmTank}
+          disabled={confirm.isPending}
+          className="rounded-full"
+        >
+          {confirm.isPending ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}{" "}
+          {t("oxygen.confirmTank")}
+        </Button>
         <Button variant="outline" onClick={onChangeFlow} className="rounded-full">
           <Sliders className="size-4" /> {t("oxygen.changeFlow")}
         </Button>
@@ -221,6 +244,11 @@ function CurrentTankCard({
           <RefreshCw className="size-4" /> {t("oxygen.replaceTank")}
         </Button>
       </div>
+      <p className="text-xs text-muted-foreground">
+        {tank.last_checked_at
+          ? t("oxygen.lastConfirmed", { time: format(new Date(tank.last_checked_at), "MMM d, HH:mm") })
+          : t("oxygen.neverConfirmed")}
+      </p>
     </div>
   );
 }

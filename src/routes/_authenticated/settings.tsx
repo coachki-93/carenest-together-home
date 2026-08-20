@@ -12,6 +12,7 @@ import { TidySettings } from "@/components/carenest/TidySettings";
 import { HandoverReminderSettings } from "@/components/carenest/HandoverReminderSettings";
 import { OwnerNotifyLevelSettings } from "@/components/carenest/OwnerNotifyLevelSettings";
 import { UsesEquipmentSettings } from "@/components/carenest/UsesEquipmentSettings";
+import { OxygenCheckSettings } from "@/components/carenest/OxygenCheckSettings";
 import { ScaffoldsResetSettings } from "@/components/carenest/ScaffoldsResetSettings";
 import { HospitalToggle } from "@/components/carenest/HospitalToggle";
 import { TeamAccountCard } from "@/components/carenest/TeamAccountCard";
@@ -452,6 +453,7 @@ function SettingsPage() {
               <TidySettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
               <HandoverReminderSettings familyId={familyId} userId={user?.id} isOwner={isOwner} />
               <OwnerNotifyLevelSettings familyId={familyId} isOwner={isOwner} />
+              <OxygenCheckSettings familyId={familyId} isOwner={isOwner} />
               <UsesEquipmentSettings familyId={familyId} isOwner={isOwner} />
               <ScaffoldsResetSettings familyId={familyId} />
               {familyId && <TeamAccountCard familyId={familyId} isOwner={isOwner} />}
