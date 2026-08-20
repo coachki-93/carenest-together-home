@@ -1073,6 +1073,7 @@ export type Database = {
           notification_language: string
           owner_id: string
           owner_notify_level: string
+          oxygen_check_interval_minutes: number
           oxygen_critical_minutes: number
           oxygen_warn_minutes: number
           timezone: string
@@ -1091,6 +1092,7 @@ export type Database = {
           notification_language?: string
           owner_id: string
           owner_notify_level?: string
+          oxygen_check_interval_minutes?: number
           oxygen_critical_minutes?: number
           oxygen_warn_minutes?: number
           timezone?: string
@@ -1109,6 +1111,7 @@ export type Database = {
           notification_language?: string
           owner_id?: string
           owner_notify_level?: string
+          oxygen_check_interval_minutes?: number
           oxygen_critical_minutes?: number
           oxygen_warn_minutes?: number
           timezone?: string
@@ -2008,12 +2011,14 @@ export type Database = {
       oxygen_tanks: {
         Row: {
           change_reason: string | null
+          check_reminder_sent_at: string | null
           created_at: string
           created_by: string | null
           critical_alert_sent_at: string | null
           family_id: string
           flow_lpm: number
           id: string
+          last_checked_at: string | null
           low_alert_sent_at: string | null
           notes: string | null
           paused_at: string | null
@@ -2025,12 +2030,14 @@ export type Database = {
         }
         Insert: {
           change_reason?: string | null
+          check_reminder_sent_at?: string | null
           created_at?: string
           created_by?: string | null
           critical_alert_sent_at?: string | null
           family_id: string
           flow_lpm: number
           id?: string
+          last_checked_at?: string | null
           low_alert_sent_at?: string | null
           notes?: string | null
           paused_at?: string | null
@@ -2042,12 +2049,14 @@ export type Database = {
         }
         Update: {
           change_reason?: string | null
+          check_reminder_sent_at?: string | null
           created_at?: string
           created_by?: string | null
           critical_alert_sent_at?: string | null
           family_id?: string
           flow_lpm?: number
           id?: string
+          last_checked_at?: string | null
           low_alert_sent_at?: string | null
           notes?: string | null
           paused_at?: string | null
