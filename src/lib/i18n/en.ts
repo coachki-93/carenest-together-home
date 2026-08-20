@@ -1148,6 +1148,14 @@ export const en = {
       required: "Please describe the problem",
     },
   },
+  oxygenCheck: {
+    title: "Oxygen tank check reminder",
+    subtitle: "A recurring nudge to look at the physical tank and confirm the flow — independent of the countdown.",
+    label: "Remind to check the oxygen tank every",
+    hours_one: "{{count}} hour",
+    hours_other: "{{count}} hours",
+    saved: "Saved",
+  },
   usesEquipment: {
     title: "Track equipment maintenance",
     subtitle: "Show the Maintenance section for machines that need upkeep.",
@@ -1630,6 +1638,11 @@ export const en = {
     saveError: "Couldn't save.",
     flowFromTo: "Flow {{from}} → {{to}} l/min",
     duration: "Lasts {{duration}} at full",
+    confirmTank: "Confirm tank",
+    confirmed: "Tank confirmed",
+    lastConfirmed: "Last confirmed {{time}}",
+    neverConfirmed: "Not confirmed since this tank was started.",
+    basedOnFlow: "Based on {{flow}}",
   },
   instructions: {
     title: "Instructions",
