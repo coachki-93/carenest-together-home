@@ -1,51 +1,67 @@
-# Stage 2 — periodic "confirm the tank" reminder in the oxygen sweep
+# Stage 3 — Confirm tank, assumed-flow line, interval setting
 
-Adds an independent check-reminder pass to the existing 15-minute oxygen sweep. No UI, no confirm action, no change to low/critical behaviour.
+## 1. `useConfirmTank` mutation (`src/lib/data/oxygen.ts`)
 
-## 1. New pure decision module — `src/lib/oxygen/check-reminder.ts`
-
-Extractable, fully testable, no Supabase or push dependency.
+Mirrors the existing mutation pattern (`suppressGlobalError` meta + `invalidate(qc)` on success). Unlike Replace/ChangeFlow it does **not** close/open rows — it only stamps the active tank:
 
 ```ts
-export const DEFAULT_OXYGEN_CHECK_INTERVAL_MINUTES = 180;
-
-export type CheckReminderInput = {
-  startedAt: string | null;
-  lastCheckedAt: string | null;
-  updatedAt: string | null;
-  checkReminderSentAt: string | null;
-  intervalMinutes: number | null | undefined;
-  now: Date;
-};
-
-// GREATEST(started_at, last_checked_at, updated_at); nulls ignored.
-// If all three are unparsable/null -> lastInteraction = null -> FIRE (fail-safe).
-export function lastInteractionAt(i): Date | null
-export function shouldSendCheckReminder(i: CheckReminderInput): boolean
+export function useConfirmTank() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true },
+    mutationFn: async (input: { tankId: string }) => {
+      const { error } = await supabase
+        .from("oxygen_tanks")
+        .update({ last_checked_at: new Date().toISOString() })
+        .eq("id", input.tankId)
+        .is("replaced_at", null);
+      if (error) throw error;
+    },
+    onSuccess: () => invalidate(qc),
+  });
+}
 ```
 
-Rules (fail-safe: ambiguity fires):
-- interval = finite, >= 30 value of `intervalMinutes`, otherwise 180.
-- no valid lastInteraction → fire.
-- elapsed since lastInteraction < interval → do not fire.
-- otherwise fire when: `checkReminderSentAt` null OR unparsable, OR `checkReminderSentAt < lastInteraction`, OR `now - checkReminderSentAt >= interval`.
+RLS: the existing family-member UPDATE policy on `oxygen_tanks` covers this (no column restrictions) — no migration.
 
-## 2. Sweep changes — `src/routes/api/public/hooks/oxygen-low-sweep.ts`
+Reminder reset: Stage 2's sweep computes `lastInteraction = max(started_at, last_checked_at, updated_at)` and compares against the family interval; stamping `last_checked_at = now()` therefore pushes the next reminder a full interval out. The sweep's dedup stamp `check_reminder_sent_at` is older than the new `last_checked_at`, so the "already reminded this interval" branch does not suppress future reminders incorrectly.
 
-- Select `updated_at, last_checked_at, check_reminder_sent_at` on `oxygen_tanks`; select `oxygen_check_interval_minutes` on `families` and store it in `famSettings` as `checkInterval`.
-- Wrap the whole per-tank body in `try { … } catch { /* continue */ }` so one bad row can't abort the loop.
-- Restructure the body into two independent passes:
-  - **Pass A (unchanged logic):** `computeRemaining` → low/critical push + stamp. `if (!info) continue;` becomes a local skip of pass A only (`if (info) { … }`), and it is wrapped in its own try/catch so a throw there cannot skip pass B.
-  - **Pass B (new, timestamp-only):** `shouldSendCheckReminder(...)` → push to the `"oxygen"` recipient category via the existing `createRecipientResolver`, then `update({ check_reminder_sent_at: nowIso })` on the tank. Stale endpoints go into the same `stale` array; `pushes` counted the same way.
-- Copy added next to `OX_COPY`:
-  - sv title `🫁 Kontrollera syrgastuben`, body `Bekräfta nivå och flöde. Appen räknar med {flow} l/min — stämmer det?`
-  - en title `🫁 Check the oxygen tank`, body `Confirm the level and flow. The app assumes {flow} l/min — is that still correct?`
-  - `tag: oxygen-check-${tank.id}`, `url: "/oxygen"`, family `notification_language`.
-- Response becomes `{ ok: true, pushes, checkPushes }` for observability.
+## 2. Oxygen page (`src/routes/_authenticated/oxygen.tsx`)
 
-## 3. Test — `src/lib/oxygen/check-reminder.test.ts`
+**Assumed-flow line** — under the remaining-time / percent block in `CurrentTankCard`, a calm muted line:
 
-Covers: untouched > interval fires once; second sweep 15 min later does not re-fire; interaction after a reminder resets and re-fires only after a new interval; missing/invalid interval defaults to 180; interval below 30 clamps to 180; all-null timestamps fire; unparsable `check_reminder_sent_at` fires.
+```tsx
+<p className="text-xs text-muted-foreground mt-1">
+  {t("oxygen.basedOnFlow", { flow: formatFlow(Number(tank.flow_lpm)) })}
+</p>
+```
+
+("Based on 0.05 l/min" / "Baserat på 0,05 l/min"). No colour, no icon — informational. The existing "Change flow rate" button already sits directly below in the action row, so it reads as the fix-it action.
+
+**Confirm button** — first in the action row, before Change flow / Replace:
+
+```tsx
+<Button variant="outline" onClick={confirm} disabled={confirmTank.isPending} className="rounded-full">
+  <CheckCircle2 className="size-4" /> {t("oxygen.confirmTank")}
+</Button>
+```
+
+Handler calls `mutateAsync({ tankId: tank.id })` inside try/catch → `toast.success(t("oxygen.confirmed"))` or `toast.error`. A muted caption under the row shows when it was last confirmed (`oxygen.lastConfirmed` / `oxygen.neverConfirmed`) so the anti-fatigue state is visible.
+
+## 3. Interval setting
+
+There is currently **no UI** for `oxygen_warn_minutes` / `oxygen_critical_minutes` — they're DB-only. So this goes into the owner-only **Settings → Family settings** block (`src/routes/_authenticated/settings.tsx`), as a new card `OxygenCheckSettings.tsx` placed next to `HandoverReminderSettings`, following the `UsesEquipmentSettings` shape.
+
+- Control: a `Select` of hours — 1, 2, 3 (default), 4, 6, 8, 12 h → stored as minutes (60…720). All options are ≥ 30, so the DB CHECK can't be violated; a defensive `Math.max(30, …)` clamp on write.
+- New hook `useUpdateOxygenCheckInterval` in `src/lib/data/family.ts`, and `oxygen_check_interval_minutes` added to the `useFamily` select list.
+- Card only renders when the family uses oxygen tracking is not gated today, so it renders for owners like the other cards.
+
+## 4. i18n (`en.ts` + `sv.ts`, exact parity)
+
+`oxygen.confirmTank`, `oxygen.confirmed`, `oxygen.lastConfirmed`, `oxygen.neverConfirmed`, `oxygen.basedOnFlow`, plus an `oxygenCheck.*` block (title, subtitle, label, hours option label, saved).
+
+Swedish: "Bekräfta tub", "Tuben bekräftad", "Baserat på {{flow}}", "Påminn om att kontrollera syrgastuben var …".
 
 ## Verification
-`tsgo --noEmit`, full vitest run, and a manual trace confirming the check pass is reached when `computeRemaining` returns null or throws.
+
+`tsgo --noEmit`, vitest, en/sv key-parity script, a live DB check that Confirm writes `last_checked_at`, and a re-run of the Stage-2 reminder decision against the stamped tank to show it no longer fires.
