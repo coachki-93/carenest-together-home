@@ -1,41 +1,51 @@
-# Plan: Stage 1 — Oxygen periodic confirmation migration
+# Stage 2 — periodic "confirm the tank" reminder in the oxygen sweep
 
-Add the three database columns that a future periodic "confirm the tank" reminder will use. No application code, sweep logic, or UI in this stage.
+Adds an independent check-reminder pass to the existing 15-minute oxygen sweep. No UI, no confirm action, no change to low/critical behaviour.
 
-## Migration
+## 1. New pure decision module — `src/lib/oxygen/check-reminder.ts`
 
-**Tables touched:** `families`, `oxygen_tanks`
+Extractable, fully testable, no Supabase or push dependency.
 
-**Columns:**
-- `families.oxygen_check_interval_minutes` — integer, NOT NULL, default 180, with CHECK >= 30. This is the per-family cadence for the safety reminder.
-- `oxygen_tanks.last_checked_at` — timestamptz, nullable. When a caregiver last confirmed the tank/flow/level.
-- `oxygen_tanks.check_reminder_sent_at` — timestamptz, nullable. Dedup stamp so the reminder fires once per interval, not once per sweep.
+```ts
+export const DEFAULT_OXYGEN_CHECK_INTERVAL_MINUTES = 180;
 
-## SQL (before application)
+export type CheckReminderInput = {
+  startedAt: string | null;
+  lastCheckedAt: string | null;
+  updatedAt: string | null;
+  checkReminderSentAt: string | null;
+  intervalMinutes: number | null | undefined;
+  now: Date;
+};
 
-```sql
--- Per-family cadence for the periodic "confirm the tank" reminder.
-ALTER TABLE public.families
-  ADD COLUMN oxygen_check_interval_minutes integer NOT NULL DEFAULT 180
-  CONSTRAINT oxygen_check_interval_minutes_check CHECK (oxygen_check_interval_minutes >= 30);
-
--- When a caregiver last confirmed the active tank.
-ALTER TABLE public.oxygen_tanks
-  ADD COLUMN last_checked_at timestamp with time zone;
-
--- Dedup stamp for the last reminder sent (once per interval).
-ALTER TABLE public.oxygen_tanks
-  ADD COLUMN check_reminder_sent_at timestamp with time zone;
+// GREATEST(started_at, last_checked_at, updated_at); nulls ignored.
+// If all three are unparsable/null -> lastInteraction = null -> FIRE (fail-safe).
+export function lastInteractionAt(i): Date | null
+export function shouldSendCheckReminder(i: CheckReminderInput): boolean
 ```
 
-## RLS confirmation
+Rules (fail-safe: ambiguity fires):
+- interval = finite, >= 30 value of `intervalMinutes`, otherwise 180.
+- no valid lastInteraction → fire.
+- elapsed since lastInteraction < interval → do not fire.
+- otherwise fire when: `checkReminderSentAt` null OR unparsable, OR `checkReminderSentAt < lastInteraction`, OR `now - checkReminderSentAt >= interval`.
 
-No RLS or policy changes are required. `families` and `oxygen_tanks` already have policies that operate on the whole row (family membership / ownership). New columns are covered automatically by existing SELECT/INSERT/UPDATE policies.
+## 2. Sweep changes — `src/routes/api/public/hooks/oxygen-low-sweep.ts`
 
-## Verification checklist
+- Select `updated_at, last_checked_at, check_reminder_sent_at` on `oxygen_tanks`; select `oxygen_check_interval_minutes` on `families` and store it in `famSettings` as `checkInterval`.
+- Wrap the whole per-tank body in `try { … } catch { /* continue */ }` so one bad row can't abort the loop.
+- Restructure the body into two independent passes:
+  - **Pass A (unchanged logic):** `computeRemaining` → low/critical push + stamp. `if (!info) continue;` becomes a local skip of pass A only (`if (info) { … }`), and it is wrapped in its own try/catch so a throw there cannot skip pass B.
+  - **Pass B (new, timestamp-only):** `shouldSendCheckReminder(...)` → push to the `"oxygen"` recipient category via the existing `createRecipientResolver`, then `update({ check_reminder_sent_at: nowIso })` on the tank. Stale endpoints go into the same `stale` array; `pushes` counted the same way.
+- Copy added next to `OX_COPY`:
+  - sv title `🫁 Kontrollera syrgastuben`, body `Bekräfta nivå och flöde. Appen räknar med {flow} l/min — stämmer det?`
+  - en title `🫁 Check the oxygen tank`, body `Confirm the level and flow. The app assumes {flow} l/min — is that still correct?`
+  - `tag: oxygen-check-${tank.id}`, `url: "/oxygen"`, family `notification_language`.
+- Response becomes `{ ok: true, pushes, checkPushes }` for observability.
 
-- [ ] Migration applies cleanly.
-- [ ] The three columns exist with the correct types, default, and CHECK.
-- [ ] Existing rows remain valid (no backfill required).
-- [ ] RLS policies on both tables remain intact.
-- [ ] `tsgo --noEmit` passes (no TypeScript source changes are expected, but the generated types should refresh automatically via the integration).
+## 3. Test — `src/lib/oxygen/check-reminder.test.ts`
+
+Covers: untouched > interval fires once; second sweep 15 min later does not re-fire; interaction after a reminder resets and re-fires only after a new interval; missing/invalid interval defaults to 180; interval below 30 clamps to 180; all-null timestamps fire; unparsable `check_reminder_sent_at` fires.
+
+## Verification
+`tsgo --noEmit`, full vitest run, and a manual trace confirming the check pass is reached when `computeRemaining` returns null or throws.
