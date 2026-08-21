@@ -16,7 +16,7 @@ export const MIN_OXYGEN_CHECK_INTERVAL_MINUTES = 30;
 export type CheckReminderInput = {
   startedAt: string | null | undefined;
   lastCheckedAt: string | null | undefined;
-  updatedAt: string | null | undefined;
+  
   checkReminderSentAt: string | null | undefined;
   intervalMinutes: number | null | undefined;
   now: Date;
