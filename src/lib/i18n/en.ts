@@ -1643,6 +1643,8 @@ export const en = {
     lastConfirmed: "Last confirmed {{time}}",
     neverConfirmed: "Not confirmed since this tank was started.",
     basedOnFlow: "Based on {{flow}}",
+    checkBannerTitle: "Check the oxygen tank",
+    checkBannerBody: "Confirm the tank is connected and the flow is right.",
   },
   instructions: {
     title: "Instructions",

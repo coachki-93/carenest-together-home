@@ -95,6 +95,7 @@ import { UnifiedLogDialog } from "@/components/carenest/UnifiedLogDialog";
 import { WelcomeTour } from "@/components/carenest/WelcomeTour";
 import { buildWelcomePages } from "@/lib/onboarding/welcome-scenario";
 import { CarePlaceCheckBanner } from "@/components/carenest/CarePlaceCheckBanner";
+import { OxygenCheckBanner } from "@/components/carenest/OxygenCheckBanner";
 import { EndOfShiftTidyBanner } from "@/components/carenest/EndOfShiftTidyBanner";
 import { MaintenanceDueCard } from "@/components/carenest/MaintenanceDueCard";
 import { ScaffoldSuggestionCard } from "@/components/carenest/ScaffoldSuggestionCard";
@@ -982,6 +983,7 @@ function DashboardPage() {
             </div>
           )}
           <CarePlaceCheckBanner familyId={familyId} userId={user?.id} />
+          <OxygenCheckBanner familyId={familyId} />
           <EndOfShiftTidyBanner familyId={familyId} userId={user?.id} />
           <AppointmentsTodayBanner familyId={familyId} />
           <AppointmentsReminderBanner familyId={familyId} />

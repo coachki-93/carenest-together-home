@@ -1643,6 +1643,8 @@ export const sv = {
     lastConfirmed: "Senast bekräftad {{time}}",
     neverConfirmed: "Inte bekräftad sedan tuben startades.",
     basedOnFlow: "Baserat på {{flow}}",
+    checkBannerTitle: "Kontrollera syrgastuben",
+    checkBannerBody: "Bekräfta att tuben är kopplad och att flödet stämmer.",
   },
   instructions: {
     title: "Instruktioner",
