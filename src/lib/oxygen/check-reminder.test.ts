@@ -12,7 +12,6 @@ const minsAgo = (m: number) => new Date(NOW.getTime() - m * 60_000).toISOString(
 const base = {
   startedAt: minsAgo(500),
   lastCheckedAt: null,
-  updatedAt: null,
   checkReminderSentAt: null,
   intervalMinutes: 180,
   now: NOW,
