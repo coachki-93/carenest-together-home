@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_OXYGEN_CHECK_INTERVAL_MINUTES,
+  isOxygenCheckOverdue,
   lastInteractionAt,
   resolveCheckIntervalMinutes,
   shouldSendCheckReminder,
