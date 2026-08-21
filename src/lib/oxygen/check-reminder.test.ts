@@ -12,27 +12,23 @@ const minsAgo = (m: number) => new Date(NOW.getTime() - m * 60_000).toISOString(
 const base = {
   startedAt: minsAgo(500),
   lastCheckedAt: null,
-  updatedAt: null,
   checkReminderSentAt: null,
   intervalMinutes: 180,
   now: NOW,
 };
 
 describe("lastInteractionAt", () => {
-  it("takes the most recent of started/checked/updated", () => {
+  it("takes the most recent of started/checked", () => {
     expect(
       lastInteractionAt({
         startedAt: minsAgo(500),
         lastCheckedAt: minsAgo(20),
-        updatedAt: minsAgo(300),
       })?.toISOString(),
     ).toBe(minsAgo(20));
   });
 
   it("is null when nothing is parsable", () => {
-    expect(
-      lastInteractionAt({ startedAt: "nope", lastCheckedAt: null, updatedAt: undefined }),
-    ).toBeNull();
+    expect(lastInteractionAt({ startedAt: "nope", lastCheckedAt: null })).toBeNull();
   });
 });
 
@@ -99,10 +95,45 @@ describe("shouldSendCheckReminder", () => {
       shouldSendCheckReminder({
         ...base,
         startedAt: null,
-        updatedAt: null,
         lastCheckedAt: null,
       }),
     ).toBe(true);
+  });
+
+  // REGRESSION: the sweep's own stamp bumps oxygen_tanks.updated_at via the
+  // set_updated_at trigger. If updated_at counted as an interaction, the
+  // reminder silenced itself forever after the first send.
+  it("re-fires for a reminded-but-unconfirmed tank (self-silencing regression)", () => {
+    expect(
+      shouldSendCheckReminder({
+        ...base,
+        startedAt: minsAgo(600),
+        lastCheckedAt: null, // never confirmed by a human
+        checkReminderSentAt: minsAgo(181), // system write bumped updated_at too
+      }),
+    ).toBe(true);
+    expect(
+      shouldSendCheckReminder({
+        ...base,
+        startedAt: minsAgo(600),
+        lastCheckedAt: null,
+        checkReminderSentAt: minsAgo(179),
+      }),
+    ).toBe(false);
+  });
+
+  it("keeps nagging across three consecutive intervals", () => {
+    const startedAt = minsAgo(600);
+    for (const sent of [181, 362, 543]) {
+      expect(
+        shouldSendCheckReminder({
+          ...base,
+          startedAt,
+          lastCheckedAt: null,
+          checkReminderSentAt: minsAgo(sent),
+        }),
+      ).toBe(true);
+    }
   });
 
   it("fires when the dedup stamp is unparsable (fail-safe)", () => {

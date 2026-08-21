@@ -16,7 +16,7 @@ export const MIN_OXYGEN_CHECK_INTERVAL_MINUTES = 30;
 export type CheckReminderInput = {
   startedAt: string | null | undefined;
   lastCheckedAt: string | null | undefined;
-  updatedAt: string | null | undefined;
+  
   checkReminderSentAt: string | null | undefined;
   intervalMinutes: number | null | undefined;
   now: Date;
@@ -28,15 +28,21 @@ function parse(value: string | null | undefined): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-/** GREATEST(started_at, last_checked_at, updated_at); nulls ignored. */
+/**
+ * GREATEST(started_at, last_checked_at); nulls ignored.
+ *
+ * NEVER include `updated_at`: the `set_updated_at` trigger bumps it on every
+ * write, including the sweep's own `check_reminder_sent_at` stamp, which made
+ * the reminder reset its own clock and fire only once. Genuine human actions
+ * are fully covered — start/change-flow/replace INSERT a row with a fresh
+ * `started_at`, confirm stamps `last_checked_at`.
+ */
 export function lastInteractionAt(
-  input: Pick<CheckReminderInput, "startedAt" | "lastCheckedAt" | "updatedAt">,
+  input: Pick<CheckReminderInput, "startedAt" | "lastCheckedAt">,
 ): Date | null {
-  const candidates = [
-    parse(input.startedAt),
-    parse(input.lastCheckedAt),
-    parse(input.updatedAt),
-  ].filter((d): d is Date => d !== null);
+  const candidates = [parse(input.startedAt), parse(input.lastCheckedAt)].filter(
+    (d): d is Date => d !== null,
+  );
   if (!candidates.length) return null;
   return new Date(Math.max(...candidates.map((d) => d.getTime())));
 }
