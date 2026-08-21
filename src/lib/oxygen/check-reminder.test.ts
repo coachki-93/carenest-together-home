@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_OXYGEN_CHECK_INTERVAL_MINUTES,
+  isOxygenCheckOverdue,
   lastInteractionAt,
   resolveCheckIntervalMinutes,
   shouldSendCheckReminder,
@@ -149,5 +150,48 @@ describe("shouldSendCheckReminder", () => {
     expect(
       shouldSendCheckReminder({ ...base, startedAt: minsAgo(170), intervalMinutes: null }),
     ).toBe(false);
+  });
+});
+
+describe("isOxygenCheckOverdue (banner, no send-dedup)", () => {
+  const b = {
+    startedAt: minsAgo(500),
+    lastCheckedAt: null as string | null,
+    intervalMinutes: 180,
+    now: NOW,
+  };
+
+  it("is not overdue before the interval", () => {
+    expect(isOxygenCheckOverdue({ ...b, startedAt: minsAgo(60) })).toBe(false);
+  });
+
+  it("is overdue after the interval", () => {
+    expect(isOxygenCheckOverdue(b)).toBe(true);
+  });
+
+  // REGRESSION: the banner previously reused shouldSendCheckReminder, so the
+  // push's own dedup stamp hid the banner right when it should appear.
+  it("stays overdue even though the push already fired", () => {
+    expect(
+      isOxygenCheckOverdue({
+        ...b,
+        // check_reminder_sent_at = now is deliberately NOT an input here
+      }),
+    ).toBe(true);
+    expect(
+      shouldSendCheckReminder({
+        ...b,
+        checkReminderSentAt: NOW.toISOString(),
+      }),
+    ).toBe(false); // push is deduped...
+    expect(isOxygenCheckOverdue(b)).toBe(true); // ...banner is not
+  });
+
+  it("is not overdue right after a confirm", () => {
+    expect(isOxygenCheckOverdue({ ...b, lastCheckedAt: minsAgo(0) })).toBe(false);
+  });
+
+  it("is overdue when no interaction is recorded (fail-safe)", () => {
+    expect(isOxygenCheckOverdue({ ...b, startedAt: null, lastCheckedAt: null })).toBe(true);
   });
 });

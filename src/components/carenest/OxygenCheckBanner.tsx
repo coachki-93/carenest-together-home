@@ -7,7 +7,7 @@ import { toast } from "@/lib/notify";
 import { isPaused } from "@/lib/hospital/paused";
 import { useFamily } from "@/lib/data/family";
 import { useActiveOxygenTank, useConfirmTank } from "@/lib/data/oxygen";
-import { shouldSendCheckReminder } from "@/lib/oxygen/check-reminder";
+import { isOxygenCheckOverdue } from "@/lib/oxygen/check-reminder";
 import { formatFlow } from "@/lib/oxygen/tanks";
 
 interface Props {
@@ -37,10 +37,11 @@ export function OxygenCheckBanner({ familyId }: Props) {
   if (tank.paused_at) return null;
   if (isPaused(family ?? null, "oxygen")) return null;
 
-  const due = shouldSendCheckReminder({
+  // Persistent overdue state — intentionally NOT the push's deduped predicate,
+  // so the banner still shows after the push has fired.
+  const due = isOxygenCheckOverdue({
     startedAt: tank.started_at,
     lastCheckedAt: tank.last_checked_at,
-    checkReminderSentAt: tank.check_reminder_sent_at,
     intervalMinutes: family?.oxygen_check_interval_minutes,
     now,
   });

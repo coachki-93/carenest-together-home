@@ -61,6 +61,25 @@ export function resolveCheckIntervalMinutes(
   return intervalMinutes;
 }
 
+export type CheckOverdueInput = Pick<
+  CheckReminderInput,
+  "startedAt" | "lastCheckedAt" | "intervalMinutes" | "now"
+>;
+
+/**
+ * In-app "a check is overdue" state for the Today banner.
+ *
+ * Same lastInteraction + interval math as the push, but deliberately WITHOUT
+ * the send-dedup (`check_reminder_sent_at`): the banner is persistent until a
+ * caregiver confirms the tank, and must never be silenced by the push firing.
+ */
+export function isOxygenCheckOverdue(input: CheckOverdueInput): boolean {
+  const intervalMs = resolveCheckIntervalMinutes(input.intervalMinutes) * 60_000;
+  const last = lastInteractionAt(input);
+  if (!last) return true; // fail-safe
+  return input.now.getTime() - last.getTime() >= intervalMs;
+}
+
 export function shouldSendCheckReminder(input: CheckReminderInput): boolean {
   const intervalMs = resolveCheckIntervalMinutes(input.intervalMinutes) * 60_000;
   const now = input.now.getTime();
