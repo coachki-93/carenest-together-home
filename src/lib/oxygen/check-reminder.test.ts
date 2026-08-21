@@ -18,20 +18,17 @@ const base = {
 };
 
 describe("lastInteractionAt", () => {
-  it("takes the most recent of started/checked/updated", () => {
+  it("takes the most recent of started/checked", () => {
     expect(
       lastInteractionAt({
         startedAt: minsAgo(500),
         lastCheckedAt: minsAgo(20),
-        updatedAt: minsAgo(300),
       })?.toISOString(),
     ).toBe(minsAgo(20));
   });
 
   it("is null when nothing is parsable", () => {
-    expect(
-      lastInteractionAt({ startedAt: "nope", lastCheckedAt: null, updatedAt: undefined }),
-    ).toBeNull();
+    expect(lastInteractionAt({ startedAt: "nope", lastCheckedAt: null })).toBeNull();
   });
 });
 
