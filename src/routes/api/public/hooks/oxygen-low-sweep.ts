@@ -188,7 +188,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
               shouldSendCheckReminder({
                 startedAt: tank.started_at,
                 lastCheckedAt: tank.last_checked_at,
-                updatedAt: tank.updated_at,
+                
                 checkReminderSentAt: tank.check_reminder_sent_at,
                 intervalMinutes: checkInterval,
                 now: new Date(nowIso),
