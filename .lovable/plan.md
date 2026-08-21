@@ -1,51 +1,52 @@
-# "Check the oxygen tank" banner on Today
+# Fix: Today "check the oxygen tank" banner never appears
 
-Surface the Stage-2/3 oxygen check reminder in-app, using the exact same decision function as the push, so the banner and the notification can never disagree.
+The banner reuses the push's send-dedup, so once the push stamps `check_reminder_sent_at` the banner hides. Give the banner its own persistent overdue predicate.
 
-## New file: `src/components/carenest/OxygenCheckBanner.tsx`
+## `src/lib/oxygen/check-reminder.ts` (add, nothing removed)
 
-Self-contained, takes `familyId`, returns `null` when not applicable.
-
-Data it reads (all existing hooks):
-- `useActiveOxygenTank(familyId)` — active tank (`replaced_at IS NULL`)
-- `useFamily(familyId)` — for `hospital_paused` and `oxygen_check_interval_minutes`
-- `useConfirmTank()` — Stage-3 mutation that stamps `last_checked_at`
-
-Show condition (no duplicated logic):
 ```ts
-if (!familyId || !tank) return null;
-if (tank.paused_at) return null;
-if (isPaused(family, "oxygen")) return null;
-const due = shouldSendCheckReminder({
-  startedAt: tank.started_at,
-  lastCheckedAt: tank.last_checked_at,
-  checkReminderSentAt: tank.check_reminder_sent_at,
-  intervalMinutes: family?.oxygen_check_interval_minutes,
-  now,                    // ticking every 60s so it appears without a reload
-});
-if (!due) return null;
+export type CheckOverdueInput = Pick<
+  CheckReminderInput,
+  "startedAt" | "lastCheckedAt" | "intervalMinutes" | "now"
+>;
+
+/**
+ * In-app "a check is overdue" state. Same lastInteraction + interval math as
+ * the push, but deliberately WITHOUT the send-dedup: the banner is persistent
+ * until a caregiver confirms, and must not be silenced by the push firing.
+ */
+export function isOxygenCheckOverdue(input: CheckOverdueInput): boolean {
+  const intervalMs = resolveCheckIntervalMinutes(input.intervalMinutes) * 60_000;
+  const last = lastInteractionAt(input);
+  if (!last) return true; // fail-safe
+  return input.now.getTime() - last.getTime() >= intervalMs;
+}
 ```
-`shouldSendCheckReminder` is imported from `src/lib/oxygen/check-reminder.ts` — the same function the sweep calls.
 
-Presentation: soft amber card (`border-amber-300 bg-amber-50`), lungs icon, matching the existing banner shell.
-- Title: `oxygen.checkBannerTitle`
-- Sub-line: `oxygen.basedOnFlow` with `formatFlow(tank.flow_lpm)` (reused key)
-- Card body is a click target that navigates to `/oxygen`
-- `Confirm` button (stops propagation) → `useConfirmTank({ tankId })` → `toast.success(t("oxygen.confirmed"))` (the Stage-3 toast). The stamp flips the show-condition false and resets the push clock, since both read `last_checked_at`.
+`shouldSendCheckReminder` is untouched — the push keeps its dedup.
 
-## Edit: `src/routes/_authenticated/dashboard.tsx`
+## `src/components/carenest/OxygenCheckBanner.tsx`
 
-Import and render `<OxygenCheckBanner familyId={familyId} />` in the banner stack next to `CarePlaceCheckBanner` / `AppointmentsReminderBanner`.
+```diff
+-import { shouldSendCheckReminder } from "@/lib/oxygen/check-reminder";
++import { isOxygenCheckOverdue } from "@/lib/oxygen/check-reminder";
+...
+-  const due = shouldSendCheckReminder({
++  const due = isOxygenCheckOverdue({
+     startedAt: tank.started_at,
+     lastCheckedAt: tank.last_checked_at,
+-    checkReminderSentAt: tank.check_reminder_sent_at,
+     intervalMinutes: family?.oxygen_check_interval_minutes,
+     now,
+   });
+```
 
-## i18n (`en.ts` + `sv.ts`, oxygen block)
+Everything else in the banner is unchanged: pause / hospital / no-tank guards, confirm action, styling, 60s tick.
 
-| key | en | sv |
-| --- | --- | --- |
-| `oxygen.checkBannerTitle` | Check the oxygen tank | Kontrollera syrgastuben |
-| `oxygen.checkBannerBody` | Confirm the tank is connected and the flow is right. | Bekräfta att tuben är kopplad och att flödet stämmer. |
+## Tests (`src/lib/oxygen/check-reminder.test.ts`)
 
-`oxygen.confirmTank` / `oxygen.confirmed` / `oxygen.basedOnFlow` already exist and are reused.
+New `describe("isOxygenCheckOverdue")`: not overdue before the interval; overdue after it; **still overdue with a fresh `check_reminder_sent_at`** (the regression); not overdue right after a confirm; null interaction → true.
 
-## Verification
+## Verify
 
-`tsgo --noEmit`, full vitest, en/sv key parity, and a live trace of the due/not-due/paused/no-tank cases plus a confirm write that clears the banner.
+`tsgo --noEmit`, full vitest, and a live trace: banner shows for a due tank whose push already fired, persists, disappears on confirm, stays hidden when paused / hospital-paused / no tank.
