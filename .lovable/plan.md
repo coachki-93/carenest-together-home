@@ -1,53 +1,51 @@
-# Fix: "confirm the tank" reminder self-silences
+# "Check the oxygen tank" banner on Today
 
-## Root cause (confirmed)
+Surface the Stage-2/3 oxygen check reminder in-app, using the exact same decision function as the push, so the banner and the notification can never disagree.
 
-`lastInteractionAt` includes `updated_at`. The sweep's own write of
-`check_reminder_sent_at` fires the `set_updated_at` trigger, so `updated_at`
-becomes "now" right after every reminder. The next sweep then sees
-`now - lastInteraction < interval` and never fires again.
+## New file: `src/components/carenest/OxygenCheckBanner.tsx`
 
-## 1. `src/lib/oxygen/check-reminder.ts`
+Self-contained, takes `familyId`, returns `null` when not applicable.
 
-- `CheckReminderInput`: drop `updatedAt`.
-- `lastInteractionAt`: `GREATEST(started_at, last_checked_at)` only.
+Data it reads (all existing hooks):
+- `useActiveOxygenTank(familyId)` — active tank (`replaced_at IS NULL`)
+- `useFamily(familyId)` — for `hospital_paused` and `oxygen_check_interval_minutes`
+- `useConfirmTank()` — Stage-3 mutation that stamps `last_checked_at`
 
-```diff
- export type CheckReminderInput = {
-   startedAt: string | null | undefined;
-   lastCheckedAt: string | null | undefined;
--  updatedAt: string | null | undefined;
-   checkReminderSentAt: string | null | undefined;
-   ...
- export function lastInteractionAt(
--  input: Pick<CheckReminderInput, "startedAt" | "lastCheckedAt" | "updatedAt">,
-+  input: Pick<CheckReminderInput, "startedAt" | "lastCheckedAt">,
- ): Date | null {
--  const candidates = [parse(startedAt), parse(lastCheckedAt), parse(updatedAt)]
-+  const candidates = [parse(startedAt), parse(lastCheckedAt)]
+Show condition (no duplicated logic):
+```ts
+if (!familyId || !tank) return null;
+if (tank.paused_at) return null;
+if (isPaused(family, "oxygen")) return null;
+const due = shouldSendCheckReminder({
+  startedAt: tank.started_at,
+  lastCheckedAt: tank.last_checked_at,
+  checkReminderSentAt: tank.check_reminder_sent_at,
+  intervalMinutes: family?.oxygen_check_interval_minutes,
+  now,                    // ticking every 60s so it appears without a reload
+});
+if (!due) return null;
 ```
+`shouldSendCheckReminder` is imported from `src/lib/oxygen/check-reminder.ts` — the same function the sweep calls.
 
-Comment added explaining why `updated_at` must never be used (system writes).
+Presentation: soft amber card (`border-amber-300 bg-amber-50`), lungs icon, matching the existing banner shell.
+- Title: `oxygen.checkBannerTitle`
+- Sub-line: `oxygen.basedOnFlow` with `formatFlow(tank.flow_lpm)` (reused key)
+- Card body is a click target that navigates to `/oxygen`
+- `Confirm` button (stops propagation) → `useConfirmTank({ tankId })` → `toast.success(t("oxygen.confirmed"))` (the Stage-3 toast). The stamp flips the show-condition false and resets the push clock, since both read `last_checked_at`.
 
-No signal lost: start/change-flow/replace each INSERT a row with a fresh
-`started_at`; confirm stamps `last_checked_at`. Fail-safe behaviour unchanged —
-no usable timestamp still fires.
+## Edit: `src/routes/_authenticated/dashboard.tsx`
 
-## 2. `src/routes/api/public/hooks/oxygen-low-sweep.ts`
+Import and render `<OxygenCheckBanner familyId={familyId} />` in the banner stack next to `CarePlaceCheckBanner` / `AppointmentsReminderBanner`.
 
-Stop passing `updatedAt` in the `shouldSendCheckReminder` call (~line 191);
-drop `updated_at` from the select list only if unused elsewhere (it is used by
-`computeRemaining`'s row type, so the select stays).
+## i18n (`en.ts` + `sv.ts`, oxygen block)
 
-## 3. Tests `src/lib/oxygen/check-reminder.test.ts`
+| key | en | sv |
+| --- | --- | --- |
+| `oxygen.checkBannerTitle` | Check the oxygen tank | Kontrollera syrgastuben |
+| `oxygen.checkBannerBody` | Confirm the tank is connected and the flow is right. | Bekräfta att tuben är kopplad och att flödet stämmer. |
 
-- Remove `updatedAt` from the fixture and the two cases that assert on it.
-- **New regression test**: reminded-but-unconfirmed tank —
-  `check_reminder_sent_at = 181 min ago`, `updated_at` bumped to the same
-  moment (now irrelevant), `last_checked_at = null`, `started_at` old →
-  must return `true`. Plus the paired case at 179 min → `false`, and a
-  "three consecutive intervals keep nagging" loop.
+`oxygen.confirmTank` / `oxygen.confirmed` / `oxygen.basedOnFlow` already exist and are reused.
 
 ## Verification
 
-`tsgo --noEmit`, full vitest incl. the new regression test.
+`tsgo --noEmit`, full vitest, en/sv key parity, and a live trace of the due/not-due/paused/no-tank cases plus a confirm write that clears the banner.
