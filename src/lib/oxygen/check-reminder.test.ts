@@ -195,3 +195,25 @@ describe("isOxygenCheckOverdue (banner, no send-dedup)", () => {
     expect(isOxygenCheckOverdue({ ...b, startedAt: null, lastCheckedAt: null })).toBe(true);
   });
 });
+
+describe("high-flow interval cap", () => {
+  it("effective interval", async () => {
+    const { effectiveCheckIntervalMinutes } = await import("./check-reminder");
+    expect(effectiveCheckIntervalMinutes(180, 130)).toBe(65);
+    expect(effectiveCheckIntervalMinutes(180, 4860)).toBe(180);
+    expect(effectiveCheckIntervalMinutes(180, null)).toBe(180);
+    expect(effectiveCheckIntervalMinutes(180, 40)).toBe(30); // floor
+  });
+  it("3.0 fires after ~65 min, 0.08 stays at 180, null total uses family", () => {
+    const at = (started: number, total: number | null) => ({
+      ...base, startedAt: minsAgo(started), tankTotalMinutes: total,
+    });
+    expect(shouldSendCheckReminder(at(64, 130))).toBe(false);
+    expect(shouldSendCheckReminder(at(66, 130))).toBe(true);
+    expect(isOxygenCheckOverdue(at(66, 130))).toBe(true);
+    expect(shouldSendCheckReminder(at(170, 4860))).toBe(false);
+    expect(shouldSendCheckReminder(at(181, 4860))).toBe(true);
+    expect(shouldSendCheckReminder(at(170, null))).toBe(false);
+    expect(isOxygenCheckOverdue(at(181, null))).toBe(true);
+  });
+});
