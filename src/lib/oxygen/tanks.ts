@@ -8,7 +8,8 @@ export interface FlowDuration {
   minutes: number;
 }
 
-// LIV Mini 2 L med lågflödesväljare
+// LIV Mini 2 L CONOXIA. Linde Homecare pocket table SE 2020-02:
+// low-flow selector + standard regulator; durations are for a full tank, rounded down.
 const LIV_MINI_2L: FlowDuration[] = [
   { flow: 0.01, minutes: 27 * 1440 },           // 27 d
   { flow: 0.02, minutes: 13 * 1440 + 12 * 60 }, // 13 d 12 h
@@ -23,11 +24,15 @@ const LIV_MINI_2L: FlowDuration[] = [
   { flow: 0.12, minutes: 2 * 1440 + 7 * 60 },  // 2 d 7 h
   { flow: 0.20, minutes: 33 * 60 },             // 33 h
   { flow: 0.30, minutes: 22 * 60 },             // 22 h
+  { flow: 0.5, minutes: 13 * 60 + 20 },         // 13 h 20 min
+  { flow: 0.75, minutes: 8 * 60 + 45 },         // 8 h 45 min
+  { flow: 1.0, minutes: 6 * 60 + 40 },          // 6 h 40 min
+  { flow: 3.0, minutes: 2 * 60 + 10 },          // 2 h 10 min
 ];
 
 export const TANKS: Record<TankType, { label: string; flows: FlowDuration[] }> = {
   liv_mini_2l: {
-    label: "LIV Mini 2 L (lågflödesväljare)",
+    label: "LIV Mini 2 L CONOXIA",
     flows: LIV_MINI_2L,
   },
 };
@@ -94,11 +99,14 @@ export function computeRemaining(tank: OxygenTankRow, now: Date = new Date()): R
   // forward in real time as the clock ticks.
   const emptyAt = new Date(startedMs + (total + totalPausedMin) * 60000);
   const pct = total > 0 ? Math.max(0, Math.min(100, (remaining / total) * 100)) : 0;
+  // Short tanks scale thresholds; every tank > 720 min keeps 720/120.
+  const lowAt = total <= 720 ? total / 2 : 720;
+  const critAt = total <= 720 ? total / 4 : 120;
   let status: RemainingInfo["status"] = "ok";
   if (isPaused) status = "paused";
   else if (remaining <= 0) status = "empty";
-  else if (remaining < 120) status = "critical";
-  else if (remaining < 720) status = "low";
+  else if (remaining < critAt) status = "critical";
+  else if (remaining < lowAt) status = "low";
   return {
     totalMinutes: total,
     elapsedMinutes: elapsed,

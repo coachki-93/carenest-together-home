@@ -8,7 +8,7 @@ import { isPaused } from "@/lib/hospital/paused";
 import { useFamily } from "@/lib/data/family";
 import { useActiveOxygenTank, useConfirmTank } from "@/lib/data/oxygen";
 import { isOxygenCheckOverdue } from "@/lib/oxygen/check-reminder";
-import { formatFlow } from "@/lib/oxygen/tanks";
+import { durationMinutes, formatFlow, type TankType } from "@/lib/oxygen/tanks";
 
 interface Props {
   familyId: string | undefined | null;
@@ -43,6 +43,7 @@ export function OxygenCheckBanner({ familyId }: Props) {
     startedAt: tank.started_at,
     lastCheckedAt: tank.last_checked_at,
     intervalMinutes: family?.oxygen_check_interval_minutes,
+    tankTotalMinutes: durationMinutes(tank.tank_type as TankType, Number(tank.flow_lpm)),
     now,
   });
   if (!due) return null;
