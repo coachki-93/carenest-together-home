@@ -2791,7 +2791,7 @@ export const sv = {
         l2: "• 14:00 Inhalation · 2 puffar — senarelagd → 15:00",
         l3: "Alla schemalagda mediciner givna (3/5)",
         n1: "• 09:12 Värde utanför normalområdet: SpO₂ 91%",
-        n2: "• 11:40 Ny syrgastub påbörjad — LIV Mini 2 L (lågflödesväljare) @ 0,10 l/min",
+        n2: "• 11:40 Ny syrgastub påbörjad — LIV Mini 2 L CONOXIA @ 0,10 l/min",
         n3: "• 13:20 Vårdplats-kontroll flaggad: sug varm",
         footer: "Läst av Kim · 15:03",
       },

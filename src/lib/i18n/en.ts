@@ -2792,7 +2792,7 @@ export const en = {
         l2: "• 14:00 Inhalation · 2 puffs — postponed → 15:00",
         l3: "All scheduled meds given (3/5)",
         n1: "• 09:12 Out-of-range reading: SpO₂ 91%",
-        n2: "• 11:40 New oxygen tank started — LIV Mini 2 L (lågflödesväljare) @ 0,10 l/min",
+        n2: "• 11:40 New oxygen tank started — LIV Mini 2 L CONOXIA @ 0,10 l/min",
         n3: "• 13:20 Care-place check flagged: suction unit warm",
         footer: "Read by Kim · 15:03",
       },

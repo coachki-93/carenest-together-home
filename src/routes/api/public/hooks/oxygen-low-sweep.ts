@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { computeRemaining, type OxygenTankRow } from "@/lib/oxygen/tanks";
+import { computeRemaining, durationMinutes, type OxygenTankRow, type TankType } from "@/lib/oxygen/tanks";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver } from "@/lib/push/recipients";
@@ -188,7 +188,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
               shouldSendCheckReminder({
                 startedAt: tank.started_at,
                 lastCheckedAt: tank.last_checked_at,
-                
+                tankTotalMinutes: durationMinutes(tank.tank_type as TankType, Number(tank.flow_lpm)),
                 checkReminderSentAt: tank.check_reminder_sent_at,
                 intervalMinutes: checkInterval,
                 now: new Date(nowIso),

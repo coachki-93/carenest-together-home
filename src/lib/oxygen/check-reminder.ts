@@ -16,7 +16,8 @@ export const MIN_OXYGEN_CHECK_INTERVAL_MINUTES = 30;
 export type CheckReminderInput = {
   startedAt: string | null | undefined;
   lastCheckedAt: string | null | undefined;
-  
+  /** Full-tank duration at the logged flow; caps the interval at total/2. */
+  tankTotalMinutes?: number | null;
   checkReminderSentAt: string | null | undefined;
   intervalMinutes: number | null | undefined;
   now: Date;
@@ -61,9 +62,28 @@ export function resolveCheckIntervalMinutes(
   return intervalMinutes;
 }
 
+/**
+ * max(MIN, min(familyInterval, total / 2)) when the tank total is known;
+ * otherwise the resolved family interval unchanged (fail-safe, never skip).
+ */
+export function effectiveCheckIntervalMinutes(
+  intervalMinutes: number | null | undefined,
+  tankTotalMinutes: number | null | undefined,
+): number {
+  const resolved = resolveCheckIntervalMinutes(intervalMinutes);
+  if (
+    typeof tankTotalMinutes !== "number" ||
+    !Number.isFinite(tankTotalMinutes) ||
+    tankTotalMinutes <= 0
+  ) {
+    return resolved;
+  }
+  return Math.max(MIN_OXYGEN_CHECK_INTERVAL_MINUTES, Math.min(resolved, tankTotalMinutes / 2));
+}
+
 export type CheckOverdueInput = Pick<
   CheckReminderInput,
-  "startedAt" | "lastCheckedAt" | "intervalMinutes" | "now"
+  "startedAt" | "lastCheckedAt" | "intervalMinutes" | "tankTotalMinutes" | "now"
 >;
 
 /**
@@ -74,14 +94,14 @@ export type CheckOverdueInput = Pick<
  * caregiver confirms the tank, and must never be silenced by the push firing.
  */
 export function isOxygenCheckOverdue(input: CheckOverdueInput): boolean {
-  const intervalMs = resolveCheckIntervalMinutes(input.intervalMinutes) * 60_000;
+  const intervalMs = effectiveCheckIntervalMinutes(input.intervalMinutes, input.tankTotalMinutes) * 60_000;
   const last = lastInteractionAt(input);
   if (!last) return true; // fail-safe
   return input.now.getTime() - last.getTime() >= intervalMs;
 }
 
 export function shouldSendCheckReminder(input: CheckReminderInput): boolean {
-  const intervalMs = resolveCheckIntervalMinutes(input.intervalMinutes) * 60_000;
+  const intervalMs = effectiveCheckIntervalMinutes(input.intervalMinutes, input.tankTotalMinutes) * 60_000;
   const now = input.now.getTime();
 
   const lastInteraction = lastInteractionAt(input);
