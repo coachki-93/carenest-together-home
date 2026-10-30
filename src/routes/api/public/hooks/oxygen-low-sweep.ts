@@ -4,7 +4,7 @@ import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver } from "@/lib/push/recipients";
 import { isPaused } from "@/lib/hospital/paused";
-import { shouldSendCheckReminder } from "@/lib/oxygen/check-reminder";
+import { shouldNagManualPause, shouldSendCheckReminder } from "@/lib/oxygen/check-reminder";
 import { formatTimeIn } from "@/lib/time/family-tz";
 
 /**
@@ -149,7 +149,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
               // Hospital-paused tanks — and families that paused the oxygen
               // category at hospital — stay fully silent, as before.
               if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
-              if (tank.pause_reason !== "manual") continue;
+              if (!shouldNagManualPause({ pausedAt: tank.paused_at, pauseReason: tank.pause_reason })) continue;
 
               // Manually paused at home: no depletion alarms (Pass A) and no
               // normal check reminder (Pass B) — the countdown is frozen.

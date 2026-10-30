@@ -4,6 +4,7 @@ import {
   isOxygenCheckOverdue,
   lastInteractionAt,
   resolveCheckIntervalMinutes,
+  shouldNagManualPause,
   shouldSendCheckReminder,
 } from "./check-reminder";
 
