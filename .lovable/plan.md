@@ -1,79 +1,83 @@
-# Checklists inside tasks
+# Guided routine setup from care needs
 
-## 1. Migration (shown for approval, not applied yet)
+## Blocker: the catalog file is missing
+`claude/routine-catalog-draft.md` is not in the project, and no file named like it exists. Only the Trakeostomi rows and Lägesändring are spelled out in your message. Please upload or paste the catalog. Until then I can build the engine and the trach + Lägesändring templates. Every other row waits on the catalog.
 
-```sql
-ALTER TABLE public.appointments
-  ADD COLUMN checklist jsonb NOT NULL DEFAULT '[]'::jsonb;
+## Answers
+- **Who sees the page: owner only.** child.tsx sets `canEdit = role === "owner"`, and the database only lets the owner update a child. Caregivers get a "only the owner can set up routines" message. Creating tasks is open to any member, but saving progress on the care needs (the duplicate guard) isn't.
+- **Existing task offers** (feed_task for g_tube/nj_tube, neb_task for inhalations, glucose_task for diabetes): the new page replaces them. I'll remove them from the dashboard card so each routine has one way to be created. Their catalog equivalents become templates. Tasks already created from the old offers aren't tracked, so the new page can't detect them (see conflict 3).
+- **neb_task flag:** it creates `kind = "medication"` tasks in the planner, outside the Medications module, so they skip dose logging and stock. I'm leaving it as is; when it's retired, its catalog row should be `medication_link` or a plain task.
+- **Default `reminder_minutes`:** null (off) for every new template. Turning reminders on stays a per-task choice in the planner.
 
-ALTER TABLE public.appointments
-  ADD CONSTRAINT appointments_checklist_shape
-  CHECK (jsonb_typeof(checklist) = 'array' AND jsonb_array_length(checklist) <= 20);
+## Conflicts to decide
+1. **Push flood is not controlled by reminders.** Every task occurrence gets a START push, plus a MISSED push if it isn't done within `missed_after_minutes` (default 15). `reminder_minutes = null` only turns off the early reminder. Lägesändring at 9 times a day means about 9 start pushes a day, and up to 9 missed pushes, including at 00:00 and 04:00. There's no per-task off switch today. Options:
+   a. Accept it, and give multi-time templates a long missed window (e.g. 90 min) so only real misses are pushed. No database change.
+   b. **Add `appointments.notify_start boolean NOT NULL DEFAULT true`** and have the sweep skip START when false. Templates with more than 3 times a day set it false. One small additive column; existing tasks keep today's behaviour.
+   I recommend **b**, and it's the only migration I'd propose. `template_key` isn't needed, because ids are stored in care-needs settings.
+2. **"Mark the need done" would also hide its instruction offers.** The scaffold status today is one value per capability, and it also drives the instruction offers on the dashboard card. Marking it done after routines are saved would silently drop "save trach-care instructions". Proposal: keep `status` for the card's instruction offers as now, and add separate fields for routines, backwards-compatible:
+   `scaffolds[cap] = { status?, until?, routines?: { status: "done" | "dismissed", created: { [templateKey]: appointmentId } } }`
+   Old entries with only `status` read exactly as before. The reminder card uses `routines` (no status → show "Set up routines for X →"), and the instruction offers keep using `status`.
+3. **Duplicates with old offer tasks:** tasks made through the old feed/neb/glucose offers have no record. A family that already used them will see the feeding suggestion again, but it starts unticked whenever the child already has a planner task of the same kind. That last part is a heuristic; tell me if you'd rather skip it.
+4. **"Show setup suggestions again"** (clearAllScaffolds) would wipe the `created` record and allow duplicates. Proposal: it clears `status` and `routines.status` only, and keeps `routines.created`.
 
-ALTER TABLE public.appointment_completions
-  ADD COLUMN checklist_result jsonb NULL;
+## Flow
+- **New page `/routines?child=<id>&needs=a,b`** (only the given needs, or all of the child's needs with templates if omitted). It's titled "Föreslagna rutiner" / "Suggested routines" and starts with the note "Förslag – följ alltid ert vårdteams ordination." / "Suggestions – always follow your care team's plan."
+- **Onboarding:** the final step goes to `/routines?child=…` instead of the dashboard. If the child has no needs with templates, it goes straight to the dashboard (with the tour), as today.
+- **Child page:** after saving, newly added needs that have templates and no `routines.status` open `/routines?child=…&needs=<new>`.
+- **Grouped by need,** each suggestion row has:
+  - a checkbox
+  - the title (editable)
+  - repeat: freq select + interval
+  - times of day
+  - a ChecklistEditor
+  - `medication_link` rows show "Set up in Medications →" and never create anything.
+- **Validation:** a ticked task without a time is marked inline ("Lägg till minst en tid") and blocks saving.
+- **"Lägg till valda"** creates one appointment per ticked row. Already-created rows show "Tillagd" (disabled). Then it writes `routines.created` and `routines.status`, and goes to Today. A need with nothing ticked and nothing created becomes `dismissed`; otherwise `done`.
+- **Skip button:** marks every shown need `dismissed` and goes to Today.
 
-COMMENT ON COLUMN public.appointments.checklist IS
-  'Array of {id,label}. Read from the series master only (recurrence_parent_id IS NULL); override rows keep the default [] and are ignored.';
-COMMENT ON COLUMN public.appointment_completions.checklist_result IS
-  'Snapshot array of {id,label,done} at completion time.';
+## Template model (`src/lib/care-needs/routine-templates.ts`)
+```ts
+type RoutineTemplate = {
+  key: string;            // "trach_care"
+  capability: string;     // "tracheostomy"
+  target: "task" | "medication_link";
+  kind: AppointmentKind;
+  titleKey: string;       // routines.templates.trach_care.title
+  stepKeys: string[];     // routines.templates.trach_care.steps.clean_stoma …
+  freq: "hourly" | "daily" | "weekly" | "monthly";
+  interval: number;
+  timesOfDay: string[];   // ☐ rows: []
+  defaultSelected: boolean;
+  requiresTimes: boolean;
+};
 ```
+Pure mapper `templateToAppointment(t, edits, { familyId, childId, userId, tz, today, t })` returns the insert payload:
+- The anchor `starts_at` is `zonedWallClockToDate(today, firstTime, tz)`.
+- `recurrence_times_of_day` holds the times, and `recurrence_interval` the interval.
+- Checklist ids come from `crypto.randomUUID()`, with labels in the creating user's language.
+- `reminder_minutes: null`, `late_after_minutes: 0`, `missed_after_minutes: 15` (or the conflict 1 values).
 
-Existing rows get `[]`, so the CHECK passes. The CHECK is immutable, so it's fine as a constraint. I'm not adding label-length or item-shape checks in the database; the dialog enforces 20 steps and 120 characters. I can add a validation trigger if you'd like that on the server too.
+Templates known now:
+- **Trakeostomi:**
+  - "Trakomläggning": daily 08:00, ticked. Steps: Rengör stoma, Byt trakkompress, Byt trakband, Byt fuktfilter (HME).
+  - "Kontroll av akutväska": ticked. The time comes from the catalog.
+  - "Kanylbyte": not ticked, no times.
+- **Lägesändring:** daily at 08, 10, 12, 14, 16, 18, 20, 00, 04. Which capability it belongs to (sleep_positioning?) comes from the catalog.
 
-### Override check: works, with one flag
-- `instanceFromMaster` spreads `...master` and then overrides only title, notes, location, kind, all_day, amount_ml and the times. If I leave `checklist` off that list, every occurrence (including overridden ones) shows the master's checklist. That's the behaviour you asked for.
-- Override rows are written by `useUpdateAppointmentInstance` / `useDeleteAppointmentInstance` with a `patch` that won't include `checklist`. They get the column default `[]`, which is never read.
-- **Flag:** when you edit one occurrence ("this one only"), the dialog must hide or disable the Checklist section, or show it read-only with "Edit the series to change steps". Otherwise an edit there would silently do nothing. My plan is read-only plus that hint.
-- Completions key on `appointment_id` = master id (and occurrence_at), so the snapshot attaches correctly for overridden occurrences too.
+## i18n
+New `routines.*` block with exact en/sv parity. Natural Swedish titles and steps.
 
-### RLS: no changes needed
-Current policies (checked live):
-- `appointments` UPDATE/INSERT: any family member (INSERT also requires `created_by = auth.uid()`). These are row-level, so they cover the new column.
-- `appointment_completions` INSERT/UPDATE: family member plus `caregiver_profile_in_family(caregiver_profile_id, family_id)`. These also cover `checklist_result`.
-I won't touch either.
+## Tests
+- `routine-templates.test.ts`: the mapper uses Stockholm 08:00 in winter and summer, and a non-Stockholm timezone. It also covers times, interval and freq, new unique checklist ids, the "no time → invalid" rule and `medication_link → null`.
+- `scaffold-status.test.ts`: old entries still parse, `routines` merges, and created records survive a reset.
 
-## 2. Planner: create/edit dialog (schedule.tsx)
-- A new "Checklist / Checklista" section: a list of rows with a text input (maxLength 120), up/down buttons to reorder, and a remove button. "Add step / Lägg till steg" is disabled at 20, with a counter "n/20 steg". Ids come from `crypto.randomUUID()`. Blank labels are trimmed and dropped on save.
-- `checklist` goes through `useCreateAppointment` / `useUpdateAppointment` (series scope) like the other fields.
-- **Permission (answer):** it is **not owner-only.** Edit and delete controls show when `created_by === user.id || role === "owner"`, so a caregiver can edit tasks they created. At the database level, any family member can update any task. The checklist follows the same rule as the rest of the task. If you want checklists owner-only, that is a separate decision. It would also make sense to tighten the update policy then, since the UI gate alone is cosmetic.
-
-## 3. Today (dashboard.tsx)
-- For a task with `checklist.length > 0`, the expanded row lists the steps as checkbox rows. Ticks live in local state, keyed by occurrence.
-- Tapping Klar with unticked steps opens an AlertDialog: "X av Y steg är inte avbockade. Markera som klar ändå?" with Cancel / "Markera klar".
-- The save uses the existing `useLogAppointmentCompletion` path (same `guardActingProfile` + `caregiver_profile_id`) and adds `checklist_result: steps.map(s => ({id, label, done}))`. I'll add the field to the mutation's input type.
-- Ticks are lost if you leave the page before Klar. That is the expected trade-off for local state.
-
-### On "ongoing" for live ticks (opinion, not built)
-I'd recommend it as a follow-up. Upserting `status: "ongoing"` with a partial `checklist_result` on each tick would let ticks survive a reload and show other caregivers progress mid-task. The `ongoing` status and `ongoing_started_*` fields already exist. Caveats:
-- Only tasks with `allow_ongoing` use it today, and the ongoing UI and timers would light up for checklist tasks.
-- Every tick becomes a network write.
-- The late/missed notifier would need to keep treating ongoing as "in progress".
-For v1, local state is simpler and safer.
-
-## 4. Handover (src/lib/data/handover-prefill.ts)
-In the existing completions loop: for status `done` with `checklist_result` containing any `done: false`, add the note line
-`{task} klar – ej avbockat: {label1, label2}` (en: `{task} done – not ticked: {labels}`) using a new i18n key. Add a test to `handover-prefill.test.ts`, plus a pure helper test for "unticked labels".
-
-## 5. i18n (en + sv, exact parity)
-Keys under `scheduleEvents.checklist*` and `dashboard.checklist*`:
-- Checklist / Checklista
-- Add step / Lägg till steg
-- Step {{n}} / Steg {{n}}
-- {{n}}/20 steps / {{n}}/20 steg
-- Edit the series to change steps / Redigera hela serien för att ändra steg
-- Confirm title and body: "{{x}} of {{y}} steps aren't ticked. Mark as done anyway?" / "{{x}} av {{y}} steg är inte avbockade. Markera som klar ändå?"
-- Confirm button
-- Handover line
-
-## 6. Verification
-Apply the migration, then:
-- Check the columns and constraint exist.
-- Live trace: create a task with 3 steps → Today → tick 2 → Klar → confirmation → saved snapshot read back → handover shows the line.
-- Edit the checklist afterwards and confirm the history is unchanged.
-- An override occurrence still shows the master's steps.
+## Verification
+- New test account: onboarding with Trakeostomi + Gastrostomi → suggestions → accept → tasks show on Today with checklists.
+- Add Diabetes later on the child page → only diabetes suggestions show.
+- Open the page again → "Tillagd" and no duplicates.
 - Full vitest, tsgo, en/sv parity.
 
-## Not in this step / possible conflicts for next step
-- Routine setup and care-need suggestions aren't included. A suggestion that creates tasks can just write `checklist` on the master. No conflict, but suggested steps need stable ids if a template later updates them.
-- If you later split a series ("this and following"), today's split only covers "this" or "series", so there's nothing to copy for now.
+## Needed from you
+1. The routine catalog.
+2. Option a or b for conflict 1.
+3. Approval of the split routines status (conflict 2) and the reset behaviour (conflict 4).
