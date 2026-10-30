@@ -98,7 +98,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     if (hasProtectedSubscription(existing)) {
       if (missingCustomer) {
         console.error("[billing] missing customer: recovery refused", {
-          familyId: fam.id, mode: "subscription", liveMode: !process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_"),
+          familyId: fam.id, mode: "checkout",
         });
         throw new Error("customer_not_found");
       }
