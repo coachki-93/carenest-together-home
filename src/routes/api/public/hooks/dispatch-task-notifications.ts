@@ -4,6 +4,7 @@ import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver, type NotifyCategory } from "@/lib/push/recipients";
 import { isPaused } from "@/lib/hospital/paused";
+import { fetchAllPages, fetchInChunks } from "@/lib/push/batching";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
 // anon `apikey` header. Runs four passes per call, all deduped per-occurrence
@@ -121,9 +122,10 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         let dispatched = 0;
 
         // Preload per-family timezone + language + hospital-pause once.
-        const { data: allFams } = await supabaseAdmin
+        const { data: allFams, error: famErr } = await supabaseAdmin
           .from("families")
           .select("id, timezone, notification_language, at_hospital_since, hospital_paused");
+        if (famErr) console.error("task-sweep: families query failed", famErr.message);
         const famInfo = new Map<
           string,
           { tz: string; lang: Lang; tasksPaused: boolean }
@@ -206,32 +208,45 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           recurrence_parent_id: string | null;
           recurrence_override_at: string | null;
           recurrence_cancelled: boolean | null;
+          notify_start: boolean | null;
         };
 
         const slmSelect =
-          "id, family_id, title, kind, starts_at, all_day, late_after_minutes, missed_after_minutes, recurrence_freq, recurrence_interval, recurrence_byweekday, recurrence_times_of_day, recurrence_parent_id, recurrence_override_at, recurrence_cancelled";
+          "id, family_id, title, kind, starts_at, all_day, late_after_minutes, missed_after_minutes, recurrence_freq, recurrence_interval, recurrence_byweekday, recurrence_times_of_day, recurrence_parent_id, recurrence_override_at, recurrence_cancelled, notify_start";
 
         // Non-recurring, non-override rows whose single occurrence lands in
         // the window.
-        const { data: slmPlainRows } = await supabaseAdmin
-          .from("appointments")
-          .select(slmSelect)
-          .is("recurrence_freq", null)
-          .is("recurrence_parent_id", null)
-          .eq("all_day", false)
-          .gte("starts_at", windowStartIso)
-          .lte("starts_at", nowIso)
-          .limit(1000);
+        const plainRes = await fetchAllPages<SLMRow>((from, to) =>
+          supabaseAdmin
+            .from("appointments")
+            .select(slmSelect)
+            .is("recurrence_freq", null)
+            .is("recurrence_parent_id", null)
+            .eq("all_day", false)
+            .gte("starts_at", windowStartIso)
+            .lte("starts_at", nowIso)
+            .order("id")
+            .range(from, to) as never,
+        );
+        if (plainRes.error)
+          console.error("task-sweep slm: plain rows query failed", plainRes.error.message);
+        const slmPlainRows = plainRes.rows;
 
-        // All recurring masters (infinite series — no time filter).
-        const { data: slmMasterRows } = await supabaseAdmin
-          .from("appointments")
-          .select(slmSelect)
-          .not("recurrence_freq", "is", null)
-          .eq("all_day", false)
-          .limit(1000);
-
-        const slmMasters = (slmMasterRows ?? []) as SLMRow[];
+        // All recurring masters (infinite series — no time filter). Paged so
+        // no master is ever dropped by the 1000-row API cap.
+        const masterRes = await fetchAllPages<SLMRow>((from, to) =>
+          supabaseAdmin
+            .from("appointments")
+            .select(slmSelect)
+            .not("recurrence_freq", "is", null)
+            .is("recurrence_parent_id", null)
+            .eq("all_day", false)
+            .order("id")
+            .range(from, to) as never,
+        );
+        if (masterRes.error)
+          console.error("task-sweep slm: masters query failed", masterRes.error.message);
+        const slmMasters = masterRes.rows;
 
         // Overrides for those masters within the window. Non-cancelled
         // overrides *replace* the master's occurrence at that timestamp
@@ -241,17 +256,22 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           recurrence_override_at: string;
         };
         let slmOverrides: SLMOverride[] = [];
+        let slmFailedMasters = new Set<string>();
         if (slmMasters.length > 0) {
-          const { data: ov } = await supabaseAdmin
-            .from("appointments")
-            .select(slmSelect)
-            .in(
-              "recurrence_parent_id",
-              slmMasters.map((m) => m.id),
-            )
-            .gte("recurrence_override_at", windowStartIso)
-            .lte("recurrence_override_at", nowIso);
-          slmOverrides = ((ov ?? []) as unknown as SLMRow[]).filter(
+          const ovRes = await fetchInChunks<SLMRow>(
+            slmMasters.map((m) => m.id),
+            (ids) =>
+              supabaseAdmin
+                .from("appointments")
+                .select(slmSelect)
+                .in("recurrence_parent_id", ids)
+                .gte("recurrence_override_at", windowStartIso)
+                .lte("recurrence_override_at", nowIso) as never,
+          );
+          for (const e of ovRes.errors)
+            console.error("task-sweep slm: overrides chunk failed; skipping its masters", e);
+          slmFailedMasters = ovRes.failedIds;
+          slmOverrides = (ovRes.rows as unknown as SLMRow[]).filter(
             (r): r is SLMOverride =>
               !!r.recurrence_parent_id && !!r.recurrence_override_at,
           );
@@ -273,6 +293,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           kind: string | null;
           late_after_minutes: number;
           missed_after_minutes: number;
+          notify_start: boolean;
         };
 
         const slmCandidates: SLMCandidate[] = [];
@@ -287,10 +308,13 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             kind: p.kind,
             late_after_minutes: p.late_after_minutes ?? 0,
             missed_after_minutes: p.missed_after_minutes ?? 15,
+            notify_start: p.notify_start !== false,
           });
         }
 
         for (const m of slmMasters) {
+          // Without override info we could push cancelled occurrences — skip.
+          if (slmFailedMasters.has(m.id)) continue;
           const occs = expandOccurrences(m, windowStart, now);
           for (const occ of occs) {
             const iso = occ.toISOString();
@@ -310,6 +334,8 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
               late_after_minutes: src.late_after_minutes ?? m.late_after_minutes ?? 0,
               missed_after_minutes:
                 src.missed_after_minutes ?? m.missed_after_minutes ?? 15,
+              // Always from the master; overrides don't carry their own.
+              notify_start: m.notify_start !== false,
             });
           }
         }
@@ -330,12 +356,15 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
               pass,
             } as never)
             .select("appointment_id");
+          if (error && error.code !== "23505")
+            console.error(`task-sweep ${pass}: dedupe insert failed`, error.message);
           return !error;
         };
 
         // -------- PASS 1: start (within START_GRACE_MINUTES) --------
         for (const c of slmCandidates) {
           if (infoFor(c.family_id).tasksPaused) continue;
+          if (!c.notify_start) continue;
           const diffMin = (now.getTime() - c.occurrence_ms) / 60_000;
           if (diffMin < 0 || diffMin > START_GRACE_MINUTES) continue;
           if (!(await tryClaim(c.master_id, c.occurrence_at, "start"))) continue;
@@ -409,51 +438,64 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         };
 
         // Non-recurring: starts_at in [now, now+2d]
-        const { data: plainRows } = await supabaseAdmin
-          .from("appointments")
-          .select(
-            "id, family_id, title, starts_at, reminder_minutes, recurrence_freq, recurrence_interval, recurrence_byweekday, recurrence_times_of_day, ends_at, all_day",
-          )
-          .not("reminder_minutes", "is", null)
-          .is("recurrence_freq", null)
-          .is("recurrence_parent_id", null)
-          .eq("all_day", false)
-          .gte("starts_at", nowIso)
-          .lte("starts_at", lookAheadIso)
-          .limit(500);
+        const reminderSelect =
+          "id, family_id, title, starts_at, reminder_minutes, recurrence_freq, recurrence_interval, recurrence_byweekday, recurrence_times_of_day, ends_at, all_day";
+        const remPlainRes = await fetchAllPages<ReminderRow>((from, to) =>
+          supabaseAdmin
+            .from("appointments")
+            .select(reminderSelect)
+            .not("reminder_minutes", "is", null)
+            .is("recurrence_freq", null)
+            .is("recurrence_parent_id", null)
+            .eq("all_day", false)
+            .gte("starts_at", nowIso)
+            .lte("starts_at", lookAheadIso)
+            .order("id")
+            .range(from, to) as never,
+        );
+        if (remPlainRes.error)
+          console.error("task-sweep reminder: plain rows query failed", remPlainRes.error.message);
+        const plainRows = remPlainRes.rows;
 
         // Recurring masters with reminders
-        const { data: masterRows } = await supabaseAdmin
-          .from("appointments")
-          .select(
-            "id, family_id, title, starts_at, reminder_minutes, recurrence_freq, recurrence_interval, recurrence_byweekday, recurrence_times_of_day, ends_at, all_day",
-          )
-          .not("reminder_minutes", "is", null)
-          .not("recurrence_freq", "is", null)
-          .eq("all_day", false)
-          .limit(500);
+        const remMasterRes = await fetchAllPages<ReminderRow>((from, to) =>
+          supabaseAdmin
+            .from("appointments")
+            .select(reminderSelect)
+            .not("reminder_minutes", "is", null)
+            .not("recurrence_freq", "is", null)
+            .is("recurrence_parent_id", null)
+            .eq("all_day", false)
+            .order("id")
+            .range(from, to) as never,
+        );
+        if (remMasterRes.error)
+          console.error("task-sweep reminder: masters query failed", remMasterRes.error.message);
 
         // Load overrides for these masters within window (for cancel detection)
-        const masters = (masterRows ?? []) as ReminderRow[];
+        const masters = remMasterRes.rows;
         type Override = {
           recurrence_parent_id: string;
           recurrence_override_at: string;
           recurrence_cancelled: boolean;
         };
         let overrides: Override[] = [];
+        let remFailedMasters = new Set<string>();
         if (masters.length > 0) {
-          const { data: ov } = await supabaseAdmin
-            .from("appointments")
-            .select(
-              "recurrence_parent_id, recurrence_override_at, recurrence_cancelled",
-            )
-            .in(
-              "recurrence_parent_id",
-              masters.map((m) => m.id),
-            )
-            .gte("recurrence_override_at", nowIso)
-            .lte("recurrence_override_at", lookAheadIso);
-          overrides = (ov ?? []) as Override[];
+          const ovRes = await fetchInChunks<Override>(
+            masters.map((m) => m.id),
+            (ids) =>
+              supabaseAdmin
+                .from("appointments")
+                .select("recurrence_parent_id, recurrence_override_at, recurrence_cancelled")
+                .in("recurrence_parent_id", ids)
+                .gte("recurrence_override_at", nowIso)
+                .lte("recurrence_override_at", lookAheadIso) as never,
+          );
+          for (const e of ovRes.errors)
+            console.error("task-sweep reminder: overrides chunk failed; skipping its masters", e);
+          remFailedMasters = ovRes.failedIds;
+          overrides = ovRes.rows;
         }
         const overrideKey = new Set<string>();
         for (const o of overrides) {
@@ -488,6 +530,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         for (const m of masters) {
           if (!m.reminder_minutes || !m.recurrence_freq) continue;
+          if (remFailedMasters.has(m.id)) continue;
           const occs = expandOccurrences(m, now, lookAheadEnd);
           for (const occ of occs) {
             const iso = occ.toISOString();
@@ -520,7 +563,11 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
               pass: "reminder",
             } as never)
             .select("appointment_id");
-          if (ins.error) continue; // conflict (already sent) → skip silently
+          if (ins.error) {
+            if (ins.error.code !== "23505")
+              console.error("task-sweep reminder: dedupe insert failed", ins.error.message);
+            continue; // conflict (already sent) → skip silently
+          }
 
           const { tz, lang } = infoFor(c.family_id);
           const time = formatTimeIn(c.occurrence_at, tz);
@@ -706,11 +753,17 @@ async function hasCompletion(
   appointmentId: string,
   occurrenceAt: string,
 ): Promise<boolean> {
-  const { data } = await client
+  const { data, error } = await client
     .from("appointment_completions")
     .select("id")
     .eq("appointment_id", appointmentId)
     .eq("occurrence_at", occurrenceAt)
     .limit(1);
+  if (error) {
+    // Unknown state: report "completed" so this run doesn't push; the
+    // dedupe row isn't claimed, so the next run retries.
+    console.error("task-sweep: completion lookup failed", error.message);
+    return true;
+  }
   return Array.isArray(data) && data.length > 0;
 }
