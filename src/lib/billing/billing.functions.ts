@@ -91,7 +91,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         const customer = await stripe.customers.retrieve(existing.stripe_customer_id);
         missingCustomer = customer.deleted === true;
       } catch (error) {
-        if (!isMissingCustomer(error)) throw new Error("billing_failed");
+        if (!isMissingCustomer(error, true)) throw new Error("billing_failed");
         missingCustomer = true;
       }
     }
@@ -114,16 +114,16 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         metadata: { family_id: fam.id, owner_user_id: userId },
       });
       customerId = customer.id;
-      const { error: upErr } = await supabaseAdmin
-        .from("family_subscriptions")
-        .update({ stripe_customer_id: customerId, ...(missingCustomer ? { stripe_subscription_id: null, status: "canceled" as const } : {}) })
-        .eq("family_id", fam.id);
-      if (upErr) throw new Error(`Failed to persist customer id: ${upErr.message}`);
       if (missingCustomer) {
         console.error("[billing] customer self-heal", {
           familyId: fam.id, oldCustomerId: existing?.stripe_customer_id, newCustomerId: customerId,
         });
       }
+      const { error: upErr } = await supabaseAdmin
+        .from("family_subscriptions")
+        .update({ stripe_customer_id: customerId, ...(missingCustomer ? { stripe_subscription_id: null, status: "canceled" as const } : {}) })
+        .eq("family_id", fam.id);
+      if (upErr) throw new Error(`Failed to persist customer id: ${upErr.message}`);
     }
 
     const priceId = resolvePriceId(fam.founding_member);

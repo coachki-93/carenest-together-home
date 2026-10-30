@@ -43,6 +43,8 @@ describe("billing recovery and shared derived state", () => {
   });
   it("only handles missing customer errors, not missing prices or network failures", () => {
     expect(isMissingCustomer({ code: "resource_missing", param: "customer" })).toBe(true);
+    expect(isMissingCustomer({ code: "resource_missing", param: "id" }, true)).toBe(true);
+    expect(isMissingCustomer({ code: "resource_missing", param: "id" })).toBe(false);
     expect(isMissingCustomer({ code: "resource_missing", param: "price" })).toBe(false);
     expect(isMissingCustomer(new Error("network"))).toBe(false);
   });

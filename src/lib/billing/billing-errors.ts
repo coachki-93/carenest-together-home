@@ -1,8 +1,8 @@
-export function isMissingCustomer(error: unknown): boolean {
+export function isMissingCustomer(error: unknown, retrievingCustomer = false): boolean {
   if (!error || typeof error !== "object") return false;
   const e = error as { code?: string; param?: string };
   return e.code === "resource_missing" &&
-    (e.param === "customer" || e.param === "customer_id");
+    (e.param === "customer" || e.param === "customer_id" || (retrievingCustomer && e.param === "id"));
 }
 
 export function billingErrorKey(error: Error): string {

@@ -5,7 +5,14 @@ import { BillingCard } from "@/components/carenest/BillingCard";
 import { useMyMembership } from "@/lib/auth/use-profile";
 
 export const Route = createFileRoute("/_authenticated/billing")({
-  head: () => ({ meta: [{ title: "Subscription — Tillsa" }] }),
+  head: () => ({ meta: [
+    { title: "Subscription — Tillsa" },
+    { name: "description", content: "Manage your family's Tillsa subscription and billing." },
+    { property: "og:title", content: "Subscription — Tillsa" },
+    { property: "og:description", content: "Manage your family's Tillsa subscription and billing." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: BillingPage,
 });
 
