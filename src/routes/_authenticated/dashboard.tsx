@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
 import {
   Pill,
   Activity,
@@ -65,7 +66,7 @@ import {
   type AppointmentCompletion,
 } from "@/lib/data/appointment-completions";
 import { useFamilyMembers, useInvites, useFamily } from "@/lib/data/family";
-import { Hospital } from "lucide-react";
+import { Hospital, Pause } from "lucide-react";
 import {
   useCaregiverProfiles,
   useSuggestedCaregiverProfile,
@@ -1723,13 +1724,23 @@ function OxygenBar({
   );
 
   const isPaused = remainingInfo?.paused ?? false;
+  const isManualPaused = isPaused && activeOxygen?.pause_reason === "manual";
+  const isHospitalPaused = isPaused && !isManualPaused;
 
   return (
-    <section className={cn("card-soft p-4", isPaused && "border border-red-200 bg-red-50 text-red-900")}>
-      {isPaused && (
+    <section className={cn("card-soft p-4", isHospitalPaused && "border border-red-200 bg-red-50 text-red-900")}>
+      {isHospitalPaused && (
         <div className="flex items-center gap-3 mb-3">
           <Hospital className="size-5 shrink-0" />
           <p className="text-sm font-medium">{t("oxygen.pausedHospital")}</p>
+        </div>
+      )}
+      {isManualPaused && activeOxygen?.paused_at && (
+        <div className="flex items-center gap-3 mb-3">
+          <Pause className="size-5 shrink-0 text-muted-foreground" />
+          <p className="text-sm font-medium">
+            {t("oxygen.pausedSince", { time: format(new Date(activeOxygen.paused_at), "HH:mm") })}
+          </p>
         </div>
       )}
       {isLoading ? (
