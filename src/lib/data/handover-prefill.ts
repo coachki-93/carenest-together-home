@@ -624,6 +624,19 @@ export function useHandoverPrefill(
         );
       }
 
+      // Live state: a manually paused tank is called out even when the pause
+      // started before the shift window — the next caregiver must know the
+      // countdown and alarms are off.
+      const activeOxy = activeOxyRes.data as {
+        paused_at: string | null;
+        pause_reason: string | null;
+      } | null;
+      if (activeOxy?.paused_at && activeOxy.pause_reason === "manual") {
+        noteLines.push(
+          `• ${labels.oxygenPausedSince.replace("{{time}}", formatTimeIn(activeOxy.paused_at, tz))}`,
+        );
+      }
+
       // Hospital flag — currently at hospital and that started before shiftEnd
       if (atHospitalSince && atHospitalSince < shiftEnd) {
         noteLines.unshift(`• ${labels.hospital}`);
