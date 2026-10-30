@@ -35,4 +35,7 @@
 - [x] Migration: policies, can_manage_appointment(id, family, user), immutables trigger
 - [x] Client canManage mirrors series rule (Planner + visits calendar gate)
 - [x] API verification as caregiver + owner
-- [ ] Flagged: 'this occurrence only' edit/cancel fails (upsert can't use the partial unique index) — needs your go-ahead
+- [x] Override upsert index fix (42P10)
+- [ ] Sweep: moved overrides push at new starts_at (passes 1–3 + reminder), tests
+- [ ] Today late/missed uses moved time (confirm)
+- [ ] In-app occurrence verification + live 5-min push check
