@@ -74,6 +74,12 @@ import {
 } from "@/lib/data/caregiver-profiles";
 import { useActiveCaregiverProfile } from "@/lib/data/active-profile";
 import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
+import {
+  buildChecklistResult,
+  parseChecklist,
+  parseChecklistResult,
+} from "@/lib/schedule/checklist";
+import { ChecklistReadOnly } from "@/components/carenest/ChecklistEditor";
 import { useShifts, expandShifts, type ShiftOccurrence } from "@/lib/data/shifts";
 import {
   useHandoverDueItem,
@@ -444,6 +450,9 @@ function DashboardPage() {
     action: TaskAction;
   } | null>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
+  // Checklist ticks are local until "Klar"; keyed by task id.
+  const [checklistTicks, setChecklistTicks] = useState<Record<string, string[]>>({});
+  const [openChecklists, setOpenChecklists] = useState<Record<string, boolean>>({});
   const [showPastTasks, setShowPastTasks] = useState(false);
   const dismissKey = user?.id ? `carenest.resume.dismissed.${user.id}` : null;
   const [resumeDismissed, setResumeDismissed] = useState<boolean>(() => {
@@ -733,7 +742,22 @@ function DashboardPage() {
           reason: result.reason,
           postponed_to: result.postponedTo ? result.postponedTo.toISOString() : null,
           notes: result.notes,
+          // Snapshot only on done; skipped/postponed store no checklist data.
+          checklist_result:
+            action === "done" && parseChecklist((a as { checklist?: unknown }).checklist).length > 0
+              ? buildChecklistResult(
+                  parseChecklist((a as { checklist?: unknown }).checklist),
+                  new Set(checklistTicks[task.id] ?? []),
+                )
+              : null,
         });
+        if (action === "done") {
+          setChecklistTicks((prev) => {
+            const next = { ...prev };
+            delete next[task.id];
+            return next;
+          });
+        }
         // Also log a vital when the appt kind maps to one and the caregiver entered a value
         if (action === "done" && child && result.vitalValue != null) {
           const vt = apptKindToVitalType(a.kind as AppointmentKind);
@@ -1221,6 +1245,69 @@ function DashboardPage() {
                             {task.detail}
                           </div>
                         )}
+                        {task.source.kind === "appt" && (() => {
+                          const appt = task.source.appt;
+                          const steps = parseChecklist((appt as { checklist?: unknown }).checklist);
+                          const snapshot = isCompleted
+                            ? parseChecklistResult(
+                                (task.source.completion as { checklist_result?: unknown } | null)
+                                  ?.checklist_result,
+                              )
+                            : null;
+                          if (isCompleted ? !snapshot || snapshot.length === 0 : steps.length === 0)
+                            return null;
+                          const ticked = new Set(checklistTicks[task.id] ?? []);
+                          const shown = !!openChecklists[task.id];
+                          const doneN = isCompleted
+                            ? snapshot!.filter((s) => s.done).length
+                            : steps.filter((s) => ticked.has(s.id)).length;
+                          const totalN = isCompleted ? snapshot!.length : steps.length;
+                          return (
+                            <div className="mt-1.5">
+                              <button
+                                type="button"
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                                aria-expanded={shown}
+                                onClick={() =>
+                                  setOpenChecklists((p) => ({ ...p, [task.id]: !p[task.id] }))
+                                }
+                              >
+                                <ListChecks className="size-3.5" />
+                                {t("dashboard.checklistToggle", { done: doneN, total: totalN })}
+                              </button>
+                              {shown && (
+                                <div className="mt-1.5 rounded-xl bg-muted/40 p-2">
+                                  {isCompleted ? (
+                                    <ChecklistReadOnly steps={snapshot!} />
+                                  ) : (
+                                    <ul className="space-y-1">
+                                      {steps.map((s) => (
+                                        <li key={s.id}>
+                                          <label className="flex items-start gap-2 text-sm cursor-pointer">
+                                            <Checkbox
+                                              checked={ticked.has(s.id)}
+                                              disabled={isSkipped}
+                                              onCheckedChange={(c) =>
+                                                setChecklistTicks((prev) => {
+                                                  const cur = new Set(prev[task.id] ?? []);
+                                                  if (c === true) cur.add(s.id);
+                                                  else cur.delete(s.id);
+                                                  return { ...prev, [task.id]: [...cur] };
+                                                })
+                                              }
+                                              className="mt-0.5"
+                                            />
+                                            <span>{s.label}</span>
+                                          </label>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                         {(isCompleted || isSkipped || isPostponed || isOngoing) && (
                           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                             <ByProfile
@@ -1654,6 +1741,18 @@ function DashboardPage() {
         profiles={caregiverProfilesForActions}
         defaultProfileId={suggestedCaregiverId ?? activeCaregiverId ?? null}
         onConfirm={handleTaskAction}
+        checklistWarning={(() => {
+          if (pendingAction?.task.source.kind !== "appt") return null;
+          const steps = parseChecklist(
+            (pendingAction.task.source.appt as { checklist?: unknown }).checklist,
+          );
+          if (steps.length === 0) return null;
+          const ticked = new Set(checklistTicks[pendingAction.task.id] ?? []);
+          return {
+            unticked: steps.filter((s) => !ticked.has(s.id)).length,
+            total: steps.length,
+          };
+        })()}
         submitting={logDose.isPending || logAppt.isPending || logVital.isPending}
         vitalSpec={
           pendingAction?.task.source.kind === "appt"

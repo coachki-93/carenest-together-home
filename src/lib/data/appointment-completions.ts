@@ -52,6 +52,8 @@ export function useLogAppointmentCompletion() {
       ongoing_started_by?: string | null;
       timer_started_at?: string | null;
       timer_started_by?: string | null;
+      /** Snapshot of checklist ticks; only set for "done", null otherwise. */
+      checklist_result?: { id: string; label: string; done: boolean }[] | null;
     }) => {
       const payload = {
         ...input,
