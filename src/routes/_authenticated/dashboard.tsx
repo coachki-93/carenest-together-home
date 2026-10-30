@@ -106,6 +106,7 @@ import { OxygenCheckBanner } from "@/components/carenest/OxygenCheckBanner";
 import { EndOfShiftTidyBanner } from "@/components/carenest/EndOfShiftTidyBanner";
 import { MaintenanceDueCard } from "@/components/carenest/MaintenanceDueCard";
 import { ScaffoldSuggestionCard } from "@/components/carenest/ScaffoldSuggestionCard";
+import { RoutinesReminderCard } from "@/components/carenest/RoutinesReminderCard";
 import { useTodayMissedChecks } from "@/lib/data/missed-checks";
 import { useLowStockSummary } from "@/lib/data/inventory";
 import { Boxes } from "lucide-react";
@@ -1059,6 +1060,13 @@ function DashboardPage() {
           )}
 
           {family?.uses_equipment !== false && <MaintenanceDueCard familyId={familyId} />}
+
+          {child?.id && membership?.role === "owner" && (
+            <RoutinesReminderCard
+              childName={child.name ?? ""}
+              careNeedsRaw={(child as { care_needs?: unknown }).care_needs}
+            />
+          )}
 
           {familyId && child?.id && user?.id && (
             <ScaffoldSuggestionCard

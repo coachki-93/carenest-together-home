@@ -15,6 +15,13 @@
       "when": 1793394665252,
       "tag": "0001_task_checklists",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793395980595,
+      "tag": "0002_appointments_notify_start",
+      "breakpoints": true
     }
   ]
 }

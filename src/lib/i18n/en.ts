@@ -1001,6 +1001,255 @@ export const en = {
   actor: {
     selectProfilePrompt: "Pick which caregiver profile you're acting as before continuing.",
   },
+  routines: {
+    title: "Suggested routines",
+    subtitle: "Pick the routines that fit {{name}}. You can change everything in the planner later.",
+    note: "Suggestions – always follow your care team's plan.",
+    addSelected: "Add selected",
+    skip: "Skip",
+    added: "Added",
+    needTime: "Add at least one time",
+    times: "Times",
+    addTime: "Add time",
+    repeat: "Repeat",
+    every: "Every",
+    freq_hourly: "hour",
+    freq_daily: "day",
+    freq_weekly: "week",
+    freq_monthly: "month",
+    weeklyHint: "on Sundays",
+    monthlyHint: "on the 1st",
+    medLink: "Set up under Medications",
+    medLinkCta: "Open Medications",
+    ownerOnly: "Only the family owner can set up routines.",
+    none: "There are no suggestions for the selected needs.",
+    saved_one: "{{count}} routine added",
+    saved_other: "{{count}} routines added",
+    fixErrors: "Add a time to the marked routines.",
+    reminderTitle: "Set up routines for {{name}}",
+    reminderBody: "Suggestions based on: {{needs}}",
+    reminderCta: "See suggestions",
+    quietHint: "Many times a day – no notification when it starts, only if it's missed.",
+    titleLabel: "Title",
+    templates: {
+      trach_care: {
+        title: "Trach care",
+        steps: {
+          s1: "Clean the stoma",
+          s2: "Change the trach dressing",
+          s3: "Change the trach ties",
+          s4: "Change the HME filter",
+        },
+      },
+      trach_emergency_check: {
+        title: "Emergency bag check",
+        steps: {
+          s1: "Spare tube, same size",
+          s2: "Spare tube, one size smaller",
+          s3: "Suction charged, catheters ready",
+          s4: "Resuscitation bag, correct size",
+          s5: "Scissors, lubricant and saline",
+        },
+      },
+      trach_tube_change: {
+        title: "Trach tube change",
+      },
+      suction_clean: {
+        title: "Clean suction equipment",
+        steps: {
+          s1: "Empty and wash the suction canister",
+          s2: "Leave a little water in the bottom",
+          s3: "Charge the suction unit",
+        },
+      },
+      suction_tubing: {
+        title: "Change suction tubing",
+      },
+      vent_daily: {
+        title: "Daily ventilator check",
+        steps: {
+          s1: "Wipe tubing, ventilator and humidifier",
+          s2: "Empty and rinse the humidifier chamber",
+          s3: "Check settings against the prescription",
+          s4: "Check the battery is charged",
+        },
+      },
+      vent_weekly: {
+        title: "Weekly ventilator care",
+        steps: {
+          s1: "Clean or replace the circuit",
+          s2: "Wash the humidifier chamber",
+          s3: "Wash the inlet filter",
+          s4: "Clean the outlet filter",
+        },
+      },
+      vent_inlet_filter: {
+        title: "Replace inlet filter",
+      },
+      cpap_daily: {
+        title: "Daily mask care",
+        steps: {
+          s1: "Wipe the mask and headgear",
+          s2: "Empty the humidifier chamber and let it dry",
+        },
+      },
+      cpap_weekly: {
+        title: "Weekly CPAP cleaning",
+        steps: {
+          s1: "Wash the mask taken apart",
+          s2: "Wash the tubing",
+          s3: "Wash the humidifier chamber",
+        },
+      },
+      cpap_filter: {
+        title: "Replace fine filter",
+      },
+      inhalation_meds: {
+        title: "Inhaled medicines",
+      },
+      cough_assist: {
+        title: "Cough assist",
+      },
+      feed_task: {
+        title: "Tube feeding",
+        steps: {
+          s1: "Flush before",
+          s2: "Flush after",
+        },
+      },
+      gtube_site: {
+        title: "Gastrostomy site care",
+        steps: {
+          s1: "Clean around the button",
+          s2: "Pat dry",
+          s3: "Check the skin (redness, leaking, granulation)",
+        },
+      },
+      gtube_balloon: {
+        title: "Balloon button check",
+        steps: {
+          s1: "Check the balloon volume",
+          s2: "Rotate the button one full turn (360°)",
+        },
+      },
+      gtube_extension: {
+        title: "Change extension set",
+      },
+      gtube_button_change: {
+        title: "Button change",
+      },
+      feed_task_nj: {
+        title: "Tube feeding",
+        steps: {
+          s1: "Check the length marking",
+          s2: "Flush after",
+        },
+      },
+      tpn_dressing: {
+        title: "CVC dressing change",
+      },
+      rescue_med_check: {
+        title: "Rescue medicine check",
+        steps: {
+          s1: "Correct dose",
+          s2: "Expiry date",
+          s3: "In the bag",
+          s4: "At preschool/school",
+        },
+      },
+      antiepileptics: {
+        title: "Seizure medicines",
+      },
+      pain_meds: {
+        title: "Pain relief",
+      },
+      glucose_task: {
+        title: "Blood glucose check",
+      },
+      infusion_set: {
+        title: "Change infusion set",
+        steps: {
+          s1: "New site",
+          s2: "Check the old site",
+        },
+      },
+      cgm_sensor: {
+        title: "Change CGM sensor",
+      },
+      hydrocortisone: {
+        title: "Hydrocortisone",
+      },
+      adrenal_kit: {
+        title: "Emergency kit check",
+        steps: {
+          s1: "Tablet expiry date",
+          s2: "Injection expiry date",
+          s3: "Glucose gel expiry date",
+          s4: "Kit in the bag",
+          s5: "Kit at preschool/school",
+          s6: "Kit at home",
+        },
+      },
+      thyroid_meds: {
+        title: "Thyroid medicines",
+      },
+      orthotic_skin: {
+        title: "Skin check after orthoses",
+        steps: {
+          s1: "Check feet and legs",
+          s2: "Red marks gone within 20–30 minutes",
+        },
+      },
+      orthotic_wear: {
+        title: "Orthoses on/off",
+      },
+      standing: {
+        title: "Standing practice",
+      },
+      physio: {
+        title: "Exercise programme",
+      },
+      wheelchair_check: {
+        title: "Wheelchair check",
+        steps: {
+          s1: "Tyres",
+          s2: "Brakes",
+          s3: "Belts",
+          s4: "Charging (powered chair)",
+        },
+      },
+      catheterisation: {
+        title: "Catheterisation",
+        steps: {
+          s1: "Wash your hands",
+          s2: "New catheter",
+        },
+      },
+      stoma_bag_change: {
+        title: "Stoma bag change",
+        steps: {
+          s1: "Check the stoma (moist and red)",
+          s2: "Check the skin around the stoma",
+        },
+      },
+      toilet_routine: {
+        title: "Toilet routine",
+      },
+      toothbrushing: {
+        title: "Toothbrushing",
+      },
+      skin_check: {
+        title: "Skin check",
+        steps: {
+          s1: "Check bony areas",
+          s2: "Check the skin under orthoses and equipment",
+        },
+      },
+      repositioning: {
+        title: "Repositioning",
+      },
+    },
+  },
   scheduleEvents: {
     checklist: {
       title: "Checklist",
@@ -1031,6 +1280,9 @@ export const en = {
     endAfterStart: "End time must be after start time.",
     allDay: "All day",
     fields: {
+      notifyStart: "Notify when it starts",
+      notifyStartHelp: "Sends a notification when the task is due. Turn off for tasks with many times a day.",
+      notifyStartSeriesHelp: "Applies to the whole series. Choose “Whole series” when saving.",
       title: "Title",
       kind: "Type",
       date: "Date",

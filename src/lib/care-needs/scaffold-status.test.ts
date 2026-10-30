@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   clearAllScaffolds,
+  mergeRoutinesState,
   mergeScaffoldStatus,
   readScaffoldsMap,
   shouldShowScaffold,
@@ -97,5 +98,32 @@ describe("clearAllScaffolds", () => {
     expect(after.capabilities).toEqual(["g_tube"]);
     expect(settings.onboardingHint).toBe("seen");
     expect(settings.scaffolds).toBeUndefined();
+  });
+});
+
+describe("routines state", () => {
+  it("old entries without routines read as before", () => {
+    const m = readScaffoldsMap({ settings: { scaffolds: { g_tube: { status: "done" } } } });
+    expect(m.g_tube.status).toBe("done");
+    expect(m.g_tube.routines).toBeUndefined();
+  });
+  it("merging routines keeps the instruction status and accumulates created", () => {
+    const raw = { capabilities: ["tracheostomy"], settings: { scaffolds: { tracheostomy: { status: "snoozed", until: "x" } } } };
+    const a = mergeRoutinesState(raw, { tracheostomy: { status: "done", created: { trach_care: "id1" } } });
+    const b = mergeRoutinesState(a, { tracheostomy: { status: "done", created: { trach_tube_change: "id2" } } });
+    const e = readScaffoldsMap(b).tracheostomy;
+    expect(e.status).toBe("snoozed");
+    expect(e.routines).toEqual({ status: "done", created: { trach_care: "id1", trach_tube_change: "id2" } });
+  });
+  it("instruction status update keeps routines", () => {
+    const a = mergeRoutinesState({}, { g_tube: { status: "dismissed" } });
+    const b = mergeScaffoldStatus(a, "g_tube", "done");
+    expect(readScaffoldsMap(b).g_tube.routines?.status).toBe("dismissed");
+  });
+  it("reset clears statuses but keeps created ids", () => {
+    const a = mergeRoutinesState({}, { g_tube: { status: "done", created: { gtube_site: "id9" } }, diabetes: { status: "dismissed" } });
+    const m = readScaffoldsMap(clearAllScaffolds(a));
+    expect(m.g_tube).toEqual({ routines: { status: undefined, created: { gtube_site: "id9" } } });
+    expect(m.diabetes).toBeUndefined();
   });
 });

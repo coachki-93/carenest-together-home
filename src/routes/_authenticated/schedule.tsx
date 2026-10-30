@@ -142,6 +142,7 @@ type SavePayload = {
   allow_ongoing: boolean;
   timer_minutes: number | null;
   checklist: ChecklistStep[];
+  notify_start: boolean;
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
@@ -594,6 +595,7 @@ function SchedulePage() {
                     allow_ongoing: values.allow_ongoing,
                     timer_minutes: values.timer_minutes,
                     checklist: values.checklist,
+                    notify_start: values.notify_start,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
@@ -978,6 +980,7 @@ function AppointmentDialog({
   const [missedAfter, setMissedAfter] = useState<string>("15");
   const [allowOngoing, setAllowOngoing] = useState<boolean>(false);
   const [checklist, setChecklist] = useState<ChecklistStep[]>([]);
+  const [notifyStart, setNotifyStart] = useState<boolean>(true);
   const [initialChecklist, setInitialChecklist] = useState<ChecklistStep[]>([]);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
@@ -1023,6 +1026,7 @@ function AppointmentDialog({
       const loadedChecklist = parseChecklist((editing as { checklist?: unknown }).checklist);
       setChecklist(loadedChecklist);
       setInitialChecklist(loadedChecklist);
+      setNotifyStart((editing as { notify_start?: boolean }).notify_start !== false);
     } else {
       setTitle("");
       setKind("task");
@@ -1043,6 +1047,7 @@ function AppointmentDialog({
       setAllowOngoing(false);
       setChecklist([]);
       setInitialChecklist([]);
+      setNotifyStart(true);
     }
   }, [open, editing, defaultDay]);
 
@@ -1123,6 +1128,7 @@ function AppointmentDialog({
       allow_ongoing: allowOngoing,
       timer_minutes: null,
       checklist: cleanChecklist(checklist),
+      notify_start: notifyStart,
     };
   }
 
@@ -1480,6 +1486,23 @@ function AppointmentDialog({
               </div>
               <p className="text-xs text-muted-foreground">
                 {t("scheduleEvents.fields.allowOngoingHelp")}
+              </p>
+            </div>
+
+            {/* Notify when it starts (saved on the series) */}
+            <div className="rounded-2xl border border-border/60 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="notify-start"
+                  checked={notifyStart}
+                  onCheckedChange={(c) => setNotifyStart(c === true)}
+                />
+                <Label htmlFor="notify-start" className="font-semibold cursor-pointer">
+                  {t("scheduleEvents.fields.notifyStart")}
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t(isInstance ? "scheduleEvents.fields.notifyStartSeriesHelp" : "scheduleEvents.fields.notifyStartHelp")}
               </p>
             </div>
 

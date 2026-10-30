@@ -1001,6 +1001,255 @@ export const sv = {
   actor: {
     selectProfilePrompt: "Välj vilken vårdgivarprofil du agerar som innan du fortsätter.",
   },
+  routines: {
+    title: "Föreslagna rutiner",
+    subtitle: "Välj de rutiner som passar {{name}}. Du kan ändra allt i planeringen senare.",
+    note: "Förslag – följ alltid ert vårdteams ordination.",
+    addSelected: "Lägg till valda",
+    skip: "Hoppa över",
+    added: "Tillagd",
+    needTime: "Lägg till minst en tid",
+    times: "Tider",
+    addTime: "Lägg till tid",
+    repeat: "Upprepa",
+    every: "Var",
+    freq_hourly: "timme",
+    freq_daily: "dag",
+    freq_weekly: "vecka",
+    freq_monthly: "månad",
+    weeklyHint: "på söndagar",
+    monthlyHint: "den 1:a",
+    medLink: "Läggs upp under Läkemedel",
+    medLinkCta: "Öppna Läkemedel",
+    ownerOnly: "Bara familjens ägare kan lägga upp rutiner.",
+    none: "Det finns inga förslag för de valda behoven.",
+    saved_one: "{{count}} rutin tillagd",
+    saved_other: "{{count}} rutiner tillagda",
+    fixErrors: "Lägg till tid på de markerade rutinerna.",
+    reminderTitle: "Lägg upp rutiner för {{name}}",
+    reminderBody: "Förslag baserade på: {{needs}}",
+    reminderCta: "Visa förslag",
+    quietHint: "Många tider per dag – ingen avisering när den börjar, bara om den missas.",
+    titleLabel: "Titel",
+    templates: {
+      trach_care: {
+        title: "Trakomläggning",
+        steps: {
+          s1: "Rengör stoma",
+          s2: "Byt trakkompress",
+          s3: "Byt trakband",
+          s4: "Byt fuktfilter (HME)",
+        },
+      },
+      trach_emergency_check: {
+        title: "Kontroll av akutväska",
+        steps: {
+          s1: "Reservkanyl i samma storlek",
+          s2: "Reservkanyl en storlek mindre",
+          s3: "Sug laddad och sugkatetrar redo",
+          s4: "Andningsblåsa i rätt storlek",
+          s5: "Sax, glidmedel och koksalt",
+        },
+      },
+      trach_tube_change: {
+        title: "Kanylbyte",
+      },
+      suction_clean: {
+        title: "Rengör sugutrustning",
+        steps: {
+          s1: "Töm och diska sugbehållaren",
+          s2: "Lämna lite vatten i botten",
+          s3: "Ladda sugen",
+        },
+      },
+      suction_tubing: {
+        title: "Byt sugslang",
+      },
+      vent_daily: {
+        title: "Daglig ventilatorkontroll",
+        steps: {
+          s1: "Torka av slangar, ventilator och fuktare",
+          s2: "Töm och skölj fuktarkammaren",
+          s3: "Kontrollera inställningar mot ordination",
+          s4: "Kontrollera att batteriet är laddat",
+        },
+      },
+      vent_weekly: {
+        title: "Veckovård av ventilator",
+        steps: {
+          s1: "Rengör eller byt kretsen",
+          s2: "Diska fuktarkammaren",
+          s3: "Tvätta inloppsfiltret",
+          s4: "Rengör utloppsfiltret",
+        },
+      },
+      vent_inlet_filter: {
+        title: "Byt inloppsfilter",
+      },
+      cpap_daily: {
+        title: "Daglig maskvård",
+        steps: {
+          s1: "Torka av mask och huvudband",
+          s2: "Töm fuktkammaren och låt torka",
+        },
+      },
+      cpap_weekly: {
+        title: "Veckorengöring CPAP",
+        steps: {
+          s1: "Diska masken isärtagen",
+          s2: "Diska slangen",
+          s3: "Diska fuktkammaren",
+        },
+      },
+      cpap_filter: {
+        title: "Byt finfilter",
+      },
+      inhalation_meds: {
+        title: "Inhalationsläkemedel",
+      },
+      cough_assist: {
+        title: "Hostmaskin",
+      },
+      feed_task: {
+        title: "Sondmatning",
+        steps: {
+          s1: "Spola före",
+          s2: "Spola efter",
+        },
+      },
+      gtube_site: {
+        title: "Gastrostomivård",
+        steps: {
+          s1: "Rengör runt knappen",
+          s2: "Torka torrt",
+          s3: "Kontrollera huden (rodnad, läckage, granulation)",
+        },
+      },
+      gtube_balloon: {
+        title: "Kontroll av ballongknapp",
+        steps: {
+          s1: "Kontrollera ballongvolymen",
+          s2: "Vrid knappen ett varv (360°)",
+        },
+      },
+      gtube_extension: {
+        title: "Byt förlängningsslang",
+      },
+      gtube_button_change: {
+        title: "Knappbyte",
+      },
+      feed_task_nj: {
+        title: "Sondmatning",
+        steps: {
+          s1: "Kontrollera längdmarkeringen",
+          s2: "Spola efter",
+        },
+      },
+      tpn_dressing: {
+        title: "Byte av CVK-förband",
+      },
+      rescue_med_check: {
+        title: "Kontroll av akutmedicin",
+        steps: {
+          s1: "Rätt dos",
+          s2: "Utgångsdatum",
+          s3: "Finns i väskan",
+          s4: "Finns på förskolan/skolan",
+        },
+      },
+      antiepileptics: {
+        title: "Epilepsiläkemedel",
+      },
+      pain_meds: {
+        title: "Smärtlindring",
+      },
+      glucose_task: {
+        title: "Blodsockerkontroll",
+      },
+      infusion_set: {
+        title: "Byt infusionsset",
+        steps: {
+          s1: "Nytt ställe",
+          s2: "Kontrollera det gamla stället",
+        },
+      },
+      cgm_sensor: {
+        title: "Byt CGM-sensor",
+      },
+      hydrocortisone: {
+        title: "Hydrokortison",
+      },
+      adrenal_kit: {
+        title: "Kontroll av akutkit",
+        steps: {
+          s1: "Utgångsdatum tabletter",
+          s2: "Utgångsdatum injektion",
+          s3: "Utgångsdatum druvsockergel",
+          s4: "Kit i väskan",
+          s5: "Kit på förskolan/skolan",
+          s6: "Kit hemma",
+        },
+      },
+      thyroid_meds: {
+        title: "Sköldkörtelläkemedel",
+      },
+      orthotic_skin: {
+        title: "Hudkontroll efter ortos",
+        steps: {
+          s1: "Kontrollera fot och ben",
+          s2: "Röda märken borta inom 20–30 minuter",
+        },
+      },
+      orthotic_wear: {
+        title: "Ortos på/av",
+      },
+      standing: {
+        title: "Ståträning",
+      },
+      physio: {
+        title: "Träningsprogram",
+      },
+      wheelchair_check: {
+        title: "Rullstolskontroll",
+        steps: {
+          s1: "Däck",
+          s2: "Bromsar",
+          s3: "Bälten",
+          s4: "Laddning (elrullstol)",
+        },
+      },
+      catheterisation: {
+        title: "Kateterisering",
+        steps: {
+          s1: "Tvätta händerna",
+          s2: "Ny kateter",
+        },
+      },
+      stoma_bag_change: {
+        title: "Byte av stomipåse",
+        steps: {
+          s1: "Kontrollera stomat (fuktigt och rött)",
+          s2: "Kontrollera huden runt stomat",
+        },
+      },
+      toilet_routine: {
+        title: "Toalettrutin",
+      },
+      toothbrushing: {
+        title: "Tandborstning",
+      },
+      skin_check: {
+        title: "Hudkontroll",
+        steps: {
+          s1: "Kontrollera benutskott",
+          s2: "Kontrollera huden under ortoser och utrustning",
+        },
+      },
+      repositioning: {
+        title: "Lägesändring",
+      },
+    },
+  },
   scheduleEvents: {
     checklist: {
       title: "Checklista",
@@ -1031,6 +1280,9 @@ export const sv = {
     endAfterStart: "Sluttiden måste vara efter starttiden.",
     allDay: "Hela dagen",
     fields: {
+      notifyStart: "Avisera när den börjar",
+      notifyStartHelp: "Skickar en avisering när uppgiften ska göras. Stäng av för uppgifter med många tider per dag.",
+      notifyStartSeriesHelp: "Gäller hela serien. Välj ”Hela serien” när du sparar.",
       title: "Titel",
       kind: "Typ",
       date: "Datum",
