@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { computeRemaining, durationMinutes, type OxygenTankRow } from "./tanks";
+import {
+  computeRemaining,
+  durationMinutes,
+  flowOptions,
+  type OxygenTankRow,
+  type TankType,
+} from "./tanks";
 
 const OLD: [number, number][] = [
   [0.01, 38880], [0.02, 19440], [0.03, 12960], [0.04, 9900], [0.05, 7920],
@@ -25,6 +31,13 @@ describe("durationMinutes", () => {
   });
   it("old 13 rows unchanged", () => {
     for (const [f, m] of OLD) expect(durationMinutes("liv_mini_2l", f)).toBe(m);
+  });
+
+  // FAIL-SAFE: a DB row whose tank_type is not in TANKS must not throw.
+  // durationMinutes feeds the sweep's check-reminder pass and the Today banner.
+  it("unknown tank type returns null / [] instead of throwing", () => {
+    expect(durationMinutes("unknown" as TankType, 0.1)).toBeNull();
+    expect(flowOptions("unknown" as TankType)).toEqual([]);
   });
 });
 

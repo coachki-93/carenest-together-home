@@ -38,11 +38,11 @@ export const TANKS: Record<TankType, { label: string; flows: FlowDuration[] }> =
 };
 
 export function flowOptions(type: TankType): number[] {
-  return TANKS[type].flows.map((f) => f.flow);
+  return TANKS[type]?.flows.map((f) => f.flow) ?? [];
 }
 
 export function durationMinutes(type: TankType, flow: number): number | null {
-  const row = TANKS[type].flows.find((f) => Math.abs(f.flow - flow) < 1e-9);
+  const row = TANKS[type]?.flows.find((f) => Math.abs(f.flow - flow) < 1e-9);
   return row ? row.minutes : null;
 }
 
