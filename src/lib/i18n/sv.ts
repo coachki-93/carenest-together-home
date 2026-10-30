@@ -1274,7 +1274,7 @@ export const sv = {
     deleted: "Event borttaget",
     emptyTitle: "Inget schemalagt",
     emptyBody: "Lägg till en medicin eller boka in en händelse för att fylla dagen.",
-    confirmDeleteTitle: "Ta bort detta event?",
+    confirmDeleteTitle: "Ta bort uppgiften?",
     confirmDeleteBody: "\"{{title}}\" tas bort från schemat för hela vårdteamet.",
     titleRequired: "Ge eventet en kort titel.",
     endAfterStart: "Sluttiden måste vara efter starttiden.",

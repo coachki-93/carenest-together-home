@@ -1274,7 +1274,7 @@ export const en = {
     deleted: "Event removed",
     emptyTitle: "Nothing scheduled",
     emptyBody: "Add a medication or schedule an appointment to fill this day.",
-    confirmDeleteTitle: "Remove this event?",
+    confirmDeleteTitle: "Delete this task?",
     confirmDeleteBody: "\"{{title}}\" will be removed from the schedule for the whole care team.",
     titleRequired: "Give the event a short title.",
     endAfterStart: "End time must be after start time.",
