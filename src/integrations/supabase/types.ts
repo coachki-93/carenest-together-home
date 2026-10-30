@@ -183,6 +183,7 @@ export type Database = {
           location: string | null
           missed_after_minutes: number
           notes: string | null
+          notify_start: boolean
           recurrence_byweekday: number[] | null
           recurrence_cancelled: boolean
           recurrence_freq: string | null
@@ -213,6 +214,7 @@ export type Database = {
           location?: string | null
           missed_after_minutes?: number
           notes?: string | null
+          notify_start?: boolean
           recurrence_byweekday?: number[] | null
           recurrence_cancelled?: boolean
           recurrence_freq?: string | null
@@ -243,6 +245,7 @@ export type Database = {
           location?: string | null
           missed_after_minutes?: number
           notes?: string | null
+          notify_start?: boolean
           recurrence_byweekday?: number[] | null
           recurrence_cancelled?: boolean
           recurrence_freq?: string | null
