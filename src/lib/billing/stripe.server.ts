@@ -1,6 +1,7 @@
 // Server-only Stripe helpers. NEVER import from a *.functions.ts file at
 // module scope — always dynamically import inside the handler.
 import Stripe from "stripe";
+import { checkoutPlan } from "./subscription-state";
 
 /**
  * Build a Stripe client configured for the Cloudflare Worker runtime.
@@ -24,7 +25,7 @@ export function getStripeClient(): Stripe {
 export function resolvePriceId(founding: boolean): string {
   const founding_price = process.env.STRIPE_PRICE_FOUNDING;
   const standard_price = process.env.STRIPE_PRICE_STANDARD;
-  const chosen = founding ? founding_price : standard_price;
+  const chosen = checkoutPlan(founding) === "founding" ? founding_price : standard_price;
   if (!chosen) {
     throw new Error(
       `Missing Stripe price secret: ${founding ? "STRIPE_PRICE_FOUNDING" : "STRIPE_PRICE_STANDARD"}`,

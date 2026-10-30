@@ -83,6 +83,28 @@ export function hasProtectedSubscription(row: SubscriptionRow): boolean {
   return state.isActive && (!state.isTrial || !!row?.stripe_subscription_id);
 }
 
+/** A saved customer alone is not a subscription (e.g. abandoned checkout). */
+export function hasLiveSubscription(state: SubscriptionState | undefined): boolean {
+  return !!state?.row?.stripe_subscription_id && state.isActive;
+}
+
+export function checkoutPlan(foundingMember: boolean): "founding" | "standard" {
+  return foundingMember ? "founding" : "standard";
+}
+
+export function billingPresentation(state: SubscriptionState | undefined, foundingMember: boolean) {
+  const hasSubscription = hasLiveSubscription(state);
+  const plan = hasSubscription && state?.row?.plan
+    ? state.row.plan
+    : checkoutPlan(foundingMember);
+  return {
+    primaryAction: hasSubscription ? "manage" as const : "subscribe" as const,
+    showHistory: !hasSubscription && !!state?.row?.stripe_customer_id,
+    plan,
+    priceKr: plan === "founding" ? 199 : 299,
+  };
+}
+
 export function billingStatus(state: SubscriptionState) {
   if (!state.row?.status) return "none";
   if (!state.isActive) return state.endsAt ? "expired" : "inactive";

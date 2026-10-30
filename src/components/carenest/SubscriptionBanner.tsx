@@ -5,6 +5,7 @@ import { AlertTriangle, Clock, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMyMembership } from "@/lib/auth/use-profile";
 import { useFamilySubscription } from "@/lib/billing/use-subscription";
+import { hasLiveSubscription } from "@/lib/billing/subscription-state";
 
 /**
  * Renders a slim banner above the dashboard when the family's subscription
@@ -87,9 +88,9 @@ export function SubscriptionBanner() {
           className="rounded-full bg-white"
           onClick={() => navigate({ to: "/billing" })}
         >
-          {view.cta === "resubscribe"
+          {view.cta === "resubscribe" && hasLiveSubscription(sub.data)
             ? t("billing.banner.resubscribe")
-            : sub.data?.row?.stripe_customer_id
+            : hasLiveSubscription(sub.data)
               ? t("billing.banner.manage")
               : t("billing.banner.subscribe")}
         </Button>
