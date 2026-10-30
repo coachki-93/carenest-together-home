@@ -171,6 +171,17 @@ export function TaskActionDialog({
           <DialogTitle>{heading}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
+        {act === "done" && checklistWarning && checklistWarning.unticked > 0 && (
+          <div
+            role="alert"
+            className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-sm font-medium"
+          >
+            {t("taskAction.checklistUnticked", {
+              x: checklistWarning.unticked,
+              y: checklistWarning.total,
+            })}
+          </div>
+        )}
 
         <div className="space-y-4">
           {showVital && vitalSpec && (
