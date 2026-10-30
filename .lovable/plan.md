@@ -1,39 +1,138 @@
-# Higher LIV Mini 2 L flows + short-tank safety adjustments
+# Two small fixes: oxygen fail-safe + PWA theme colour
 
-## 1. Duration table (`src/lib/oxygen/tanks.ts`)
-Header comment becomes:
+## Scope
+
+Exactly four files. No package/dependency changes. No CSS token changes.
+
+---
+
+## 1. Oxygen fail-safe — `src/lib/oxygen/tanks.ts`
+
+`TANKS` is typed `Record<TankType, ...>` with one key (`liv_mini_2l`), but the
+type is a lie at runtime: every call site passes
+`tank.tank_type as TankType` from a plain `string` DB column. Any row with a
+tank type outside that key makes `TANKS[type]` `undefined`, and
+`TANKS[type].flows` throws.
+
+Blast radius today:
+
+- `durationMinutes` is called in the sweep's check-reminder pass
+  (`oxygen-low-sweep.ts:191`) and in `OxygenCheckBanner.tsx:46`. In the sweep,
+  the throw lands inside the per-tank `try` and skips that tank's safety
+  reminder; on the Today page it breaks the render.
+- `flowOptions` is called in `oxygen.tsx:302` with the constant
+  `DEFAULT_TANK`, so it is safe today — hardened anyway for symmetry.
+
+### Diff
+
+```diff
+ export function flowOptions(type: TankType): number[] {
+-  return TANKS[type].flows.map((f) => f.flow);
++  return TANKS[type]?.flows.map((f) => f.flow) ?? [];
+ }
+
+ export function durationMinutes(type: TankType, flow: number): number | null {
+-  const row = TANKS[type].flows.find((f) => Math.abs(f.flow - flow) < 1e-9);
++  const row = TANKS[type]?.flows.find((f) => Math.abs(f.flow - flow) < 1e-9);
+   return row ? row.minutes : null;
+ }
 ```
-// LIV Mini 2 L CONOXIA. Linde Homecare pocket table SE 2020-02:
-// low-flow selector + standard regulator; durations are for a full tank, rounded down.
+
+Both are already null-returning for an unknown *flow*; optional chaining makes
+an unknown *type* behave identically. `computeRemaining` already returns `null`
+when `durationMinutes` returns `null`, so no other call site needs touching.
+
+### Tests — `src/lib/oxygen/tanks.test.ts`
+
+Add `flowOptions` and `type TankType` to the import, then two cases:
+
+```diff
+-import { computeRemaining, durationMinutes, type OxygenTankRow } from "./tanks";
++import {
++  computeRemaining,
++  durationMinutes,
++  flowOptions,
++  type OxygenTankRow,
++  type TankType,
++} from "./tanks";
 ```
-13 existing rows byte-identical. Append after 0.30:
-```ts
-  { flow: 0.5, minutes: 13 * 60 + 20 },  // 13 h 20 min
-  { flow: 0.75, minutes: 8 * 60 + 45 },  // 8 h 45 min
-  { flow: 1.0, minutes: 6 * 60 + 40 },   // 6 h 40 min
-  { flow: 3.0, minutes: 2 * 60 + 10 },   // 2 h 10 min
+
+```diff
+   it("old 13 rows unchanged", () => {
+     for (const [f, m] of OLD) expect(durationMinutes("liv_mini_2l", f)).toBe(m);
+   });
++
++  // FAIL-SAFE: a DB row whose tank_type is not in TANKS must not throw.
++  // durationMinutes feeds the sweep's check-reminder pass and the Today banner.
++  it("unknown tank type returns null / [] instead of throwing", () => {
++    expect(durationMinutes("unknown" as TankType, 0.1)).toBeNull();
++    expect(flowOptions("unknown" as TankType)).toEqual([]);
++  });
+ });
 ```
 
-## 2. Label
-`label: "LIV Mini 2 L CONOXIA"` (id `liv_mini_2l` unchanged, no migration).
-`en.ts:2795` / `sv.ts:2794` example strings: `LIV Mini 2 L (lågflödesväljare)` -> `LIV Mini 2 L CONOXIA`.
+All 17 existing durations and every status assertion stay untouched and must
+still pass.
 
-## 3. Status thresholds (`computeRemaining`)
-```ts
-const lowAt = total <= 720 ? total / 2 : 720;
-const critAt = total <= 120 ? total / 4 : 120;
-else if (remaining < critAt) status = "critical";
-else if (remaining < lowAt) status = "low";
+### Note on the requested `check-reminder.test.ts` case
+
+`expect(effectiveCheckIntervalMinutes(180, null)).toBe(180)` **already exists**
+in that file (inside `describe("high-flow interval cap")`). I am not adding a
+duplicate — flagging instead of doing, per your instruction. Say the word if you
+want it moved into its own named `describe("effectiveCheckIntervalMinutes")`
+block.
+
+---
+
+## 2. PWA theme colour `#6C63FF` → `#6426DB`
+
+Exactly two places, as specified:
+
+### `public/manifest.webmanifest`
+
+```diff
+   "background_color": "#ffffff",
+-  "theme_color": "#6C63FF",
++  "theme_color": "#6426DB",
 ```
-All old flows have total >= 1320 min, so they keep 720/120 exactly. New: 0.5 (800) unchanged; 0.75 (525) low <262.5; 1.0 (400) low <200; 3.0 (130) low <65, crit <120 (130 > 120 so critAt stays 120).
 
-## 4. Check-interval cap (`check-reminder.ts`)
-New exported helper `effectiveCheckIntervalMinutes(intervalMinutes, tankTotalMinutes)` = `min(resolveCheckIntervalMinutes(interval), total/2)` when total is a finite number > 0, else the resolved family interval. Optional `tankTotalMinutes` added to both `shouldSendCheckReminder` and `isOxygenCheckOverdue` inputs. Sweep and `OxygenCheckBanner` pass `durationMinutes(tank_type, flow_lpm)`.
+### `src/routes/__root.tsx`
 
-## 5. Tests
-New `tanks.test.ts` (durations old + new, status parity for old flows, 3.0 ok/low/critical boundaries) and cap cases in `check-reminder.test.ts`.
+```diff
+       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+-      { name: "theme-color", content: "#6C63FF" },
++      { name: "theme-color", content: "#6426DB" },
+```
 
-## Flags (please decide)
-- **Your item 3 math for 3.0 l/min:** total 130 > 120, so `critAt` stays 120, not 32.5. That means a *fresh* 3.0 tank already shows "critical" (130 left, crit < 120 after 10 min; and "low" threshold 65 sits below crit). Your expected test ("ok fresh, low <65, critical <32.5") only holds with `critAt = total <= 720 ? total / 4 : 120` (same gate as lowAt). I'll use that unless you object — it still leaves every old flow at exactly 720/120.
-- **Push alarms at 3.0:** family defaults warn 60 / crit 20 min are unchanged per your instruction, so the critical push comes at ~20 min left of a 130-min tank. Fine if intended; just noting.
-- The cap is not floored at the 30-min minimum; smallest table total is 130 -> 65, so it can't currently go below 30.
+`--primary` and every other CSS token stay as they are; `background_color`
+stays `#ffffff`.
+
+---
+
+## Flagged, not changed
+
+Other `#6C63FF` literals exist in the repo and are **out of scope** for this
+pass — listed so you can decide separately:
+
+- `src/styles.css:89` — a comment (`/* #6C63FF-ish */`) next to `--primary`.
+- `src/lib/email-templates/*.tsx` (5 files) — button background colours in
+  signup / recovery / magic-link / invite / email-change emails.
+- `src/routes/_authenticated/dashboard.tsx:2033` and
+  `src/components/carenest/ProfileSelector.tsx:39` — avatar colour fallbacks.
+- `src/routes/index.tsx:251` — a hardcoded demo chip colour.
+
+---
+
+## Verification
+
+1. `bunx vitest run` — full suite, including the new tanks cases.
+2. `tsgo --noEmit` — clean.
+3. Confirm the two theme-colour edits landed and nothing else in
+   `manifest.webmanifest` / `__root.tsx` changed.
+
+## Files changed (expected)
+
+- `src/lib/oxygen/tanks.ts`
+- `src/lib/oxygen/tanks.test.ts`
+- `public/manifest.webmanifest`
+- `src/routes/__root.tsx`
