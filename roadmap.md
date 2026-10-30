@@ -30,3 +30,8 @@
 - [x] Late push only when late_after_minutes > 0 and notify_start
 - [x] Page families in task + oxygen sweeps
 - [x] Tests + read-only completion count
+
+## Task write access (owner or creator) — awaiting approval
+- [ ] Migration: policies, can_manage_appointment(id, family, user), immutables trigger
+- [ ] Client canManage mirrors series rule (Planner + visits calendar gate)
+- [ ] API verification as caregiver + owner
