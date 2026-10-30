@@ -57,6 +57,7 @@ import { useFamily } from "@/lib/data/family";
 import {
   useAppointments,
   useCreateAppointment,
+  canManageAppointment,
   useDeleteAppointment,
   useDeleteAppointmentInstance,
   useUpdateAppointment,
@@ -409,6 +410,13 @@ function AppointmentsPage() {
         tz={tz}
         onClose={() => setPreviewing(null)}
         onEdit={openEditFromPreview}
+        canManage={
+          !!previewing &&
+          canManageAppointment(previewing, {
+            userId: user?.id,
+            isOwner: membership?.role === "owner",
+          })
+        }
       />
     </DashboardLayout>
   );
@@ -514,11 +522,13 @@ function PreviewDialog({
   tz,
   onClose,
   onEdit,
+  canManage,
 }: {
   appt: ExpandedAppointment | null;
   tz: string;
   onClose: () => void;
   onEdit: () => void;
+  canManage: boolean;
 }) {
   const { t, i18n } = useTranslation();
   if (!appt) {
@@ -619,14 +629,16 @@ function PreviewDialog({
           )}
         </div>
 
-        <DialogFooter className="px-6 pb-6 pt-2">
-          <Button
-            className="rounded-full font-bold w-full sm:w-auto"
-            onClick={onEdit}
-          >
-            {t("common.edit")}
-          </Button>
-        </DialogFooter>
+        {canManage && (
+          <DialogFooter className="px-6 pb-6 pt-2">
+            <Button
+              className="rounded-full font-bold w-full sm:w-auto"
+              onClick={onEdit}
+            >
+              {t("common.edit")}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

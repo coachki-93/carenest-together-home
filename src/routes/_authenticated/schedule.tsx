@@ -105,6 +105,7 @@ import {
   useDeleteAppointment,
   useUpdateAppointmentInstance,
   useDeleteAppointmentInstance,
+  canManageAppointment,
   type ExpandedAppointment,
   type AppointmentKind,
   type RecurrenceFreq,
@@ -494,7 +495,10 @@ function SchedulePage() {
               appt={item.appt}
               onEdit={() => openEditAppt(item.appt)}
               onDelete={() => setConfirmDeleteAppt(item.appt)}
-              canManage={item.appt.created_by === user?.id || membership?.role === "owner"}
+              canManage={canManageAppointment(item.appt, {
+                userId: user?.id,
+                isOwner: membership?.role === "owner",
+              })}
             />
           );
         };

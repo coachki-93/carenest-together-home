@@ -22,6 +22,13 @@
       "when": 1793395980595,
       "tag": "0002_appointments_notify_start",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793399186287,
+      "tag": "0003_appointments_owner_or_creator_writes",
+      "breakpoints": true
     }
   ]
 }
