@@ -104,6 +104,7 @@ import {
   useUpdateAppointment,
   useDeleteAppointment,
   useUpdateAppointmentInstance,
+  OCCURRENCE_DAY_LOCKED,
   useDeleteAppointmentInstance,
   canManageAppointment,
   type ExpandedAppointment,
@@ -620,7 +621,7 @@ function SchedulePage() {
             setApptOpen(false);
             setEditing(null);
           } catch (e) {
-            toast.error((e as Error).message);
+            toast.error((e as Error).message === OCCURRENCE_DAY_LOCKED ? t("scheduleEvents.occurrenceDayLocked") : (e as Error).message);
           }
         }}
         saving={

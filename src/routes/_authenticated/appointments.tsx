@@ -869,6 +869,7 @@ function EventDialog({
           created_by: userId,
           master_id: editing.master_id!,
           occurrence_start: editing.occurrence_start,
+          tz,
           patch: {
             title: b.common.title,
             notes: b.common.notes,
