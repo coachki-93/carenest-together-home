@@ -127,13 +127,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         let dispatched = 0;
 
         // Preload per-family timezone + language + hospital-pause once.
-        const { rows: allFams, error: famErr } = await fetchAllPages<{
-          id: string;
-          timezone: string | null;
-          notification_language: string | null;
-          at_hospital_since: string | null;
-          hospital_paused: unknown;
-        }>((from, to) =>
+        const { rows: allFams, error: famErr } = await fetchAllPages((from, to) =>
           supabaseAdmin
             .from("families")
             .select("id, timezone, notification_language, at_hospital_since, hospital_paused")
