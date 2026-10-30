@@ -63,6 +63,7 @@ export function TaskActionDialog({
   submitting,
   vitalSpec,
   notesSpec,
+  checklistWarning,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -75,6 +76,8 @@ export function TaskActionDialog({
   submitting?: boolean;
   vitalSpec?: VitalSpec | null;
   notesSpec?: NotesSpec | null;
+  /** Only shown for "done" when some checklist steps are unticked. */
+  checklistWarning?: { unticked: number; total: number } | null;
 }) {
   const { t } = useTranslation();
   const [profileId, setProfileId] = useState<string | null>(defaultProfileId);
