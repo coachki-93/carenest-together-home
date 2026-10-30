@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { wallClockIn } from "@/lib/time/family-tz";
 import { DEFAULT_FAMILY_TZ, shiftDateStr, startOfDayIn } from "@/lib/schedule/recurrence";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -362,16 +363,6 @@ function buildNotesSpec(
   return null;
 }
 
-function startOfDay(d: Date) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-function endOfDay(d: Date) {
-  const x = startOfDay(d);
-  x.setDate(x.getDate() + 1);
-  return x;
-}
 
 function DashboardPage() {
   const { t, i18n } = useTranslation();
