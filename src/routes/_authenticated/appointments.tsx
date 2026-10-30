@@ -864,7 +864,7 @@ function EventDialog({
 
     if (pendingScope === "save") {
       if (scope === "this") {
-        if (!isSameFamilyDay(b.common.starts_at, editing.occurrence_start, tz)) {
+        if (!isSameFamilyDay(b.starts_at, editing.occurrence_start, tz)) {
           toast.error(t("scheduleEvents.occurrenceDayLocked"));
           return;
         }
