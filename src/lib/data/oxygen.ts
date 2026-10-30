@@ -221,7 +221,6 @@ export function useResumeTank() {
       const { error } = await supabase.rpc("set_oxygen_tank_paused", {
         _tank_id: input.tankId,
         _paused: false,
-        _caregiver_profile_id: null,
       });
       if (error) throw error;
     },
