@@ -1,129 +1,50 @@
-# Guided routine setup from care needs
+# Fix: recurring tasks expand in different timezones on app vs. server
 
-Catalog: received in the decisions message (40 rows).
+## What's wrong
+The app turns a repeating task into occurrences in the **browser's** timezone; the push sweep does it in **UTC**. A "08:00" task shows at 08:00 Stockholm but is pushed at 08:00Z, and completions saved at the app's time aren't found by the sweep → false "missed" pushes. Since 25 Oct, tasks without times-of-day are also an hour off on the server.
 
-## Answers
-- **Who sees the page: owner only.** child.tsx sets `canEdit = role === "owner"`, and the database only lets the owner update a child. Caregivers get a "only the owner can set up routines" message. Creating tasks is open to any member, but saving progress on the care needs (the duplicate guard) isn't.
-- **Existing task offers** (feed_task for g_tube/nj_tube, neb_task for inhalations, glucose_task for diabetes): the new page replaces them. I'll remove them from the dashboard card so each routine has one way to be created. Their catalog equivalents become templates. Tasks already created from the old offers aren't tracked, so the new page can't detect them (see conflict 3).
-- **neb_task flag:** it creates `kind = "medication"` tasks in the planner, outside the Medications module, so they skip dose logging and stock. I'm leaving it as is; when it's retired, its catalog row should be `medication_link` or a plain task.
-- **Default `reminder_minutes`:** null (off) for every new template. Turning reminders on stays a per-task choice in the planner.
+## Fix
+1. **One shared expander** — new `src/lib/schedule/recurrence.ts`:
+   `expandRecurrence(master, rangeStart, rangeEnd, tz): Date[]`
+   - Pure, no browser/server APIs beyond `Intl`.
+   - Walks **wall-clock days in `tz`** (date strings `YYYY-MM-DD`, weekday computed from the date itself, not from a `Date` in local/UTC).
+   - Times: `recurrence_times_of_day`, else the master's start wall-clock time **in `tz`** (via `wallClockIn`).
+   - Each (day, time) → `zonedWallClockToDate(day, time, tz)`.
+   - Daily interval aligned to the master's start day in `tz`; weekly by weekday in `tz`; monthly on the master's day-of-month in `tz` (skip months without that day — same as today).
+   - Hourly stays absolute (start + n·interval hours) — identical on both sides already; across DST it keeps exact spacing (e.g. every 2 h stays 2 h apart, local clock labels shift by an hour). Flagging: say if you'd rather hourly snap to local wall-clock.
+   - DST: a non-existent local time (02:30 on the last Sunday of March) resolves via `zonedWallClockToDate`'s existing behaviour (shifts forward); an ambiguous time (02:30 last Sunday of October) yields **one** occurrence (the first), never two.
+   - Same safety caps as today.
+2. **App** — `src/lib/data/appointments.ts`: delete `expandMaster`/`expandDayWithTimes`/`parseHHMM`; `useAppointments(familyId, start, end, tz)` calls `expandRecurrence` with the **family's** `families.timezone` (from the existing family-tz hook used by Planner/Medications), not the browser's. Query key gains `tz`. Callers updated: dashboard (Today), schedule (Planner), appointments, AppointmentsTodayBanner, AppointmentsReminderBanner.
+3. **Server** — `dispatch-task-notifications.ts`: delete its `expandOccurrences`/`parseHHMM` copy; both pass 1–3 and the reminder pass call `expandRecurrence(m, …, infoFor(m.family_id).tz)`.
+4. **Late push (pass 2)** — only when `late_after_minutes > 0` **and** `notify_start !== false`. (Today 0 fires at the same moment as start, and routines with start pushes off still get a late push.) Missed push (pass 3) unchanged.
+5. **Families query** — paged with the existing `fetchAllPages` (order by id, 1000/page), same as masters; on error log and continue with default tz `Europe/Stockholm` as today.
 
-## Conflicts to decide
-1. **Push flood is not controlled by reminders.** Every task occurrence gets a START push, plus a MISSED push if it isn't done within `missed_after_minutes` (default 15). `reminder_minutes = null` only turns off the early reminder. Lägesändring at 9 times a day means about 9 start pushes a day, and up to 9 missed pushes, including at 00:00 and 04:00. There's no per-task off switch today. Options:
-   a. Accept it, and give multi-time templates a long missed window (e.g. 90 min) so only real misses are pushed. No database change.
-   b. **Add `appointments.notify_start boolean NOT NULL DEFAULT true`** and have the sweep skip START when false. Templates with more than 3 times a day set it false. One small additive column; existing tasks keep today's behaviour.
-   I recommend **b**, and it's the only migration I'd propose. `template_key` isn't needed, because ids are stored in care-needs settings.
-2. **"Mark the need done" would also hide its instruction offers.** The scaffold status today is one value per capability, and it also drives the instruction offers on the dashboard card. Marking it done after routines are saved would silently drop "save trach-care instructions". Proposal: keep `status` for the card's instruction offers as now, and add separate fields for routines, backwards-compatible:
-   `scaffolds[cap] = { status?, until?, routines?: { status: "done" | "dismissed", created: { [templateKey]: appointmentId } } }`
-   Old entries with only `status` read exactly as before. The reminder card uses `routines` (no status → show "Set up routines for X →"), and the instruction offers keep using `status`.
-3. **Duplicates with old offer tasks:** tasks made through the old feed/neb/glucose offers have no record. A family that already used them will see the feeding suggestion again, but it starts unticked whenever the child already has a planner task of the same kind. That last part is a heuristic; tell me if you'd rather skip it.
-4. **"Show setup suggestions again"** (clearAllScaffolds) would wipe the `created` record and allow duplicates. Proposal: it clears `status` and `routines.status` only, and keeps `routines.created`.
+## Tests (`src/lib/schedule/recurrence.test.ts`)
+- Stockholm daily 08:00 in January → 07:00Z; in July → 06:00Z.
+- Daily 08:00 across last Sunday of March (2027-03-28) and October (2026-10-25): 08:00 local each day, UTC jumps by 1 h; plus a 02:30 task on both DST days (one occurrence each).
+- Weekly Sunday 00:30 Stockholm → Saturday 23:30Z (winter) / 22:30Z (summer), weekday correct.
+- Monthly on the 1st 09:00 → correct UTC each month, incl. a DST-crossing month.
+- Non-Stockholm tz (America/New_York) daily 08:00 → 13:00Z / 12:00Z.
+- No times-of-day: uses master start wall-clock in tz (regression for the DST hour drift).
+- **Parity**: the client path (`useAppointments`' instance builder, exported pure helper) and the server sweep candidate builder produce the same `occurrence_at` ISO strings for the same master + tz.
+- Late pass predicate (extracted pure helper): 0 → no late push; notify_start=false → no late push; 10 + notify_start → pushes after 10 min.
 
-## Flow
-- **New page `/routines?child=<id>&needs=a,b`** (only the given needs, or all of the child's needs with templates if omitted). It's titled "Föreslagna rutiner" / "Suggested routines" and starts with the note "Förslag – följ alltid ert vårdteams ordination." / "Suggestions – always follow your care team's plan."
-- **Onboarding:** the final step goes to `/routines?child=…` instead of the dashboard. If the child has no needs with templates, it goes straight to the dashboard (with the tour), as today.
-- **Child page:** after saving, newly added needs that have templates and no `routines.status` open `/routines?child=…&needs=<new>`.
-- **Grouped by need,** each suggestion row has:
-  - a checkbox
-  - the title (editable)
-  - repeat: freq select + interval
-  - times of day
-  - a ChecklistEditor
-  - `medication_link` rows show "Set up in Medications →" and never create anything.
-- **Validation:** a ticked task without a time is marked inline ("Lägg till minst en tid") and blocks saving.
-- **"Lägg till valda"** creates one appointment per ticked row. Already-created rows show "Tillagd" (disabled). Then it writes `routines.created` and `routines.status`, and goes to Today. A need with nothing ticked and nothing created becomes `dismissed`; otherwise `done`.
-- **Skip button:** marks every shown need `dismissed` and goes to Today.
+## Existing data (read-only, no migration)
+- 9 recurring masters; **1** has `recurrence_times_of_day`.
+- 266 completions since 25 Oct; on recurring masters almost all are **hourly** tasks (unaffected — hourly is identical on both sides). First pass shows the one daily completion (19:00) lines up.
+- After building, I'll run the new expander read-only over every completion since 25 Oct and report the exact number whose `occurrence_at` it wouldn't produce. I won't change any data without asking.
 
-## Template model (`src/lib/care-needs/routine-templates.ts`)
-```ts
-type RoutineTemplate = {
-  key: string;            // "trach_care"
-  capability: string;     // "tracheostomy"
-  target: "task" | "medication_link";
-  kind: AppointmentKind;
-  titleKey: string;       // routines.templates.trach_care.title
-  stepKeys: string[];     // routines.templates.trach_care.steps.clean_stoma …
-  freq: "hourly" | "daily" | "weekly" | "monthly";
-  interval: number;
-  timesOfDay: string[];   // ☐ rows: []
-  defaultSelected: boolean;
-  requiresTimes: boolean;
-};
-```
-Pure mapper `templateToAppointment(t, edits, { familyId, childId, userId, tz, today, t })` returns the insert payload:
-- The anchor `starts_at` is `zonedWallClockToDate(today, firstTime, tz)`.
-- `recurrence_times_of_day` holds the times, and `recurrence_interval` the interval.
-- Checklist ids come from `crypto.randomUUID()`, with labels in the creating user's language.
-- `reminder_minutes: null`, `late_after_minutes: 0`, `missed_after_minutes: 15` (or the conflict 1 values).
+## Conflicts / flags
+- **Today**: Today's task list, banners and completion `occurrence_at` all come from `useAppointments` → they move to family tz together, so completions keep matching what's shown. Users whose browser tz ≠ family tz will see task times shift to family time (intended).
+- **Handover**: reads completions/rows directly, doesn't expand recurrences — no conflict. Old completions keep their stored `occurrence_at`.
+- **Oxygen sweep**: doesn't use appointments — no conflict. Its families query is unpaged too; I'll **leave it** (out of scope) unless you want it paged in the same step.
+- **Overrides**: matched by `master@occurrence ISO`. Existing overrides were created from the app's (browser-tz) occurrence; for the Stockholm-only families today they still match. Overrides on the one times-of-day master will match the app as before.
+- **Pending dedupe rows** in `appointment_notifications` keyed on old UTC occurrences won't block new correct ones (different key) — at most one extra correct push per occurrence on deploy day.
 
-Templates known now:
-- **Trakeostomi:**
-  - "Trakomläggning": daily 08:00, ticked. Steps: Rengör stoma, Byt trakkompress, Byt trakband, Byt fuktfilter (HME).
-  - "Kontroll av akutväska": ticked. The time comes from the catalog.
-  - "Kanylbyte": not ticked, no times.
-- **Lägesändring:** daily at 08, 10, 12, 14, 16, 18, 20, 00, 04. Which capability it belongs to (sleep_positioning?) comes from the catalog.
-
-## i18n
-New `routines.*` block with exact en/sv parity. Natural Swedish titles and steps.
-
-## Tests
-- `routine-templates.test.ts`: the mapper uses Stockholm 08:00 in winter and summer, and a non-Stockholm timezone. It also covers times, interval and freq, new unique checklist ids, the "no time → invalid" rule and `medication_link → null`.
-- `scaffold-status.test.ts`: old entries still parse, `routines` merges, and created records survive a reset.
-
-## Verification
-- New test account: onboarding with Trakeostomi + Gastrostomi → suggestions → accept → tasks show on Today with checklists.
-- Add Diabetes later on the child page → only diabetes suggestions show.
-- Open the page again → "Tillagd" and no duplicates.
-- Full vitest, tsgo, en/sv parity.
-
-## Decisions received
-- Conflicts: 1 → b; 2 approved; 3 approved, only for feed_task and glucose_task; 4 approved.
-- Inhalations become a medication link. Templates can belong to several needs (`capabilities: string[]`), shown once under the first matching need.
-- Weekly with no day given = Sunday; monthly = day 1.
-- Tasks with more than 3 times a day get `notify_start = false` and a 60-minute missed window. Lägesändring is the only one in the catalog.
-
-## Migration (for review, not applied)
-```sql
-ALTER TABLE public.appointments
-  ADD COLUMN notify_start boolean NOT NULL DEFAULT true;
-
-COMMENT ON COLUMN public.appointments.notify_start IS
-  'When false, the task sweep skips the START push. Read from the series master; late/missed/reminder pushes are unaffected.';
-```
-Existing rows default to true, so today's behaviour is unchanged. RLS and grants don't change.
-
-## Sweep diff (dispatch-task-notifications.ts)
-```diff
- type SLMRow = {
-   ...
-   recurrence_cancelled: boolean | null;
-+  notify_start: boolean | null;
- };
- const slmSelect =
--  "id, family_id, ..., recurrence_cancelled";
-+  "id, family_id, ..., recurrence_cancelled, notify_start";
-
- type SLMCandidate = {
-   ...
-   missed_after_minutes: number;
-+  notify_start: boolean;
- };
- // plain rows
-+  notify_start: p.notify_start !== false,
- // recurring: always from the master, overrides never carry their own
-+  notify_start: m.notify_start !== false,
-
- // -------- PASS 1: start --------
- for (const c of slmCandidates) {
-   if (infoFor(c.family_id).tasksPaused) continue;
-+  if (!c.notify_start) continue;
-   const diffMin = ...
-```
-`!== false` fails safe: a null or missing value still sends the push. The late, missed and reminder passes don't change.
-
-### Flag: the setting is hidden in the planner
-Without a control, an owner can't turn START pushes back on for Lägesändring. Proposal: a checkbox in the task dialog, "Notify when it starts" / "Avisera när den börjar" (default on). It is saved on the series, like the checklist. Say no and I'll leave it out.
-
-## Needed from you
-1. Approve the migration and sweep diff.
-2. Yes or no on the "Notify when it starts" checkbox in the planner.
+## Affected files
+- new `src/lib/schedule/recurrence.ts`, `src/lib/schedule/recurrence.test.ts`
+- `src/lib/data/appointments.ts`
+- `src/routes/api/public/hooks/dispatch-task-notifications.ts` (+ small pure late-pass helper, tested)
+- callers of `useAppointments`: `src/routes/_authenticated/dashboard.tsx`, `schedule.tsx`, `appointments.tsx`, `src/components/carenest/AppointmentsTodayBanner.tsx`, `AppointmentsReminderBanner.tsx`
+- `AGENTS.md` (rule: recurrence expansion only via the shared tz-aware expander)
+- No i18n, no migration, no package changes.
