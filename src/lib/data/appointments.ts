@@ -401,23 +401,35 @@ type InstanceOverrideInput = {
   };
 };
 
+export const OCCURRENCE_DAY_LOCKED = "occurrence_day_locked";
+
 /** Edit just one occurrence of a recurring series (upserts an override row). */
 export function useUpdateAppointmentInstance() {
   const qc = useQueryClient();
   return useMutation({
     meta: { suppressGlobalError: true }, // safe: all callers try/catch mutateAsync or set per-call onError (audited 2026-07-19)
     mutationFn: async (input: InstanceOverrideInput) => {
+      // Date is locked for single-occurrence edits: only the time may change,
+      // within the same day in the family timezone.
+      if (
+        input.patch.starts_at &&
+        !isSameFamilyDay(input.patch.starts_at, input.occurrence_start, input.tz)
+      ) {
+        throw new Error(OCCURRENCE_DAY_LOCKED);
+      }
+      const { tz: _tz, ...row } = input;
+      void _tz;
       const { error } = await supabase
         .from("appointments")
         .upsert(
           {
-            family_id: input.family_id,
-            child_id: input.child_id,
-            created_by: input.created_by,
-            recurrence_parent_id: input.master_id,
-            recurrence_override_at: input.occurrence_start,
+            family_id: row.family_id,
+            child_id: row.child_id,
+            created_by: row.created_by,
+            recurrence_parent_id: row.master_id,
+            recurrence_override_at: row.occurrence_start,
             recurrence_cancelled: false,
-            ...input.patch,
+            ...row.patch,
           } as never,
           { onConflict: "recurrence_parent_id,recurrence_override_at" },
         );

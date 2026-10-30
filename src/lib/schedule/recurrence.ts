@@ -142,5 +142,5 @@ export function shouldSendLatePush(
  * as the original occurrence slot.
  */
 export function isSameFamilyDay(aIso: string, bIso: string, tz: string): boolean {
-  return wallClockIn(new Date(aIso), tz).dateStr === wallClockIn(new Date(bIso), tz).dateStr;
+  return wallClockIn(new Date(aIso), tz).todayStr === wallClockIn(new Date(bIso), tz).todayStr;
 }
