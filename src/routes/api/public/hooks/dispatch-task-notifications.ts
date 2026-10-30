@@ -8,8 +8,17 @@ import { fetchAllPages, fetchInChunks } from "@/lib/push/batching";
 import {
   DEFAULT_FAMILY_TZ,
   expandRecurrence,
-  shouldSendLatePush,
 } from "@/lib/schedule/recurrence";
+import {
+  MOVE_LOOKAHEAD_MS,
+  expandMasterForSweep,
+  isLateDue,
+  isMissedDue,
+  isReminderDue,
+  isStartDue,
+  type OverrideLike,
+  type SweepOccurrence,
+} from "@/lib/schedule/sweep-occurrences";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
 // anon `apikey` header. Runs four passes per call, all deduped per-occurrence
@@ -274,8 +283,10 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
                 .from("appointments")
                 .select(slmSelect)
                 .in("recurrence_parent_id", ids)
-                .gte("recurrence_override_at", windowStartIso)
-                .lte("recurrence_override_at", nowIso) as never,
+                // Original slots up to MOVE_LOOKAHEAD either side, so moved
+                // occurrences whose new time is in the window are found.
+                .gte("recurrence_override_at", new Date(windowStart.getTime() - MOVE_LOOKAHEAD_MS).toISOString())
+                .lte("recurrence_override_at", new Date(now.getTime() + MOVE_LOOKAHEAD_MS).toISOString()) as never,
           );
           for (const e of ovRes.errors)
             console.error("task-sweep slm: overrides chunk failed; skipping its masters", e);
@@ -285,25 +296,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
               !!r.recurrence_parent_id && !!r.recurrence_override_at,
           );
         }
-        const slmCancelled = new Set<string>();
-        const slmOverrideByKey = new Map<string, SLMOverride>();
-        for (const o of slmOverrides) {
-          const key = `${o.recurrence_parent_id}@${new Date(o.recurrence_override_at).toISOString()}`;
-          if (o.recurrence_cancelled) slmCancelled.add(key);
-          else slmOverrideByKey.set(key, o);
-        }
-
-        type SLMCandidate = {
-          master_id: string;
-          occurrence_at: string; // ISO
-          occurrence_ms: number;
-          family_id: string;
-          title: string | null;
-          kind: string | null;
-          late_after_minutes: number;
-          missed_after_minutes: number;
-          notify_start: boolean;
-        };
+        type SLMCandidate = SweepOccurrence;
 
         const slmCandidates: SLMCandidate[] = [];
 
@@ -318,36 +311,25 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             late_after_minutes: p.late_after_minutes ?? 0,
             missed_after_minutes: p.missed_after_minutes ?? 15,
             notify_start: p.notify_start !== false,
+            reminder_minutes: null,
           });
         }
 
         for (const m of slmMasters) {
           // Without override info we could push cancelled occurrences — skip.
           if (slmFailedMasters.has(m.id)) continue;
-          const occs = expandRecurrence(m, windowStart, now, infoFor(m.family_id).tz);
-          for (const occ of occs) {
-            const iso = occ.toISOString();
-            const key = `${m.id}@${iso}`;
-            if (slmCancelled.has(key)) continue;
-            const ov = slmOverrideByKey.get(key);
-            const src = ov ?? m;
-            slmCandidates.push({
-              master_id: m.id,
-              occurrence_at: ov ? ov.recurrence_override_at : iso,
-              occurrence_ms: new Date(
-                ov ? ov.recurrence_override_at : iso,
-              ).getTime(),
-              family_id: m.family_id,
-              title: src.title,
-              kind: src.kind,
-              late_after_minutes: src.late_after_minutes ?? m.late_after_minutes ?? 0,
-              missed_after_minutes:
-                src.missed_after_minutes ?? m.missed_after_minutes ?? 15,
-              // Always from the master; overrides don't carry their own.
-              notify_start: m.notify_start !== false,
-            });
-          }
+          slmCandidates.push(
+            ...expandMasterForSweep(
+              m,
+              slmOverrides as OverrideLike[],
+              windowStart.getTime(),
+              now.getTime(),
+              infoFor(m.family_id).tz,
+            ),
+          );
         }
+        // Display the actual (possibly moved) time; key stays occurrence_at.
+        const shownAt = (c: SweepOccurrence) => new Date(c.occurrence_ms).toISOString();
 
         // Try to insert the dedupe row first; only fanout on success. On PK
         // conflict PostgREST returns an error and we skip silently (same
@@ -373,15 +355,13 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         // -------- PASS 1: start (within START_GRACE_MINUTES) --------
         for (const c of slmCandidates) {
           if (infoFor(c.family_id).tasksPaused) continue;
-          if (!c.notify_start) continue;
-          const diffMin = (now.getTime() - c.occurrence_ms) / 60_000;
-          if (diffMin < 0 || diffMin > START_GRACE_MINUTES) continue;
+          if (!isStartDue(c, now.getTime(), START_GRACE_MINUTES)) continue;
           if (!(await tryClaim(c.master_id, c.occurrence_at, "start"))) continue;
 
           const { tz, lang } = infoFor(c.family_id);
           await fanout(c.family_id, "start", {
             title: c.title || "Tillsa",
-            body: `${humanKind(c.kind, lang)} • ${formatTimeIn(c.occurrence_at, tz)}`,
+            body: `${humanKind(c.kind, lang)} • ${formatTimeIn(shownAt(c), tz)}`,
             tag: `appt-${c.master_id}-start-${c.occurrence_at}`,
             url: "/dashboard",
           });
@@ -390,8 +370,10 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         // -------- PASS 2: late --------
         for (const c of slmCandidates) {
           if (infoFor(c.family_id).tasksPaused) continue;
-          if (!shouldSendLatePush(c, now.getTime())) continue;
-          if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+          if (!isLateDue(c, now.getTime(), false)) continue;
+          if (
+            !isLateDue(c, now.getTime(), await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+          )
             continue;
           if (!(await tryClaim(c.master_id, c.occurrence_at, "late"))) continue;
 
@@ -399,7 +381,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           const title = c.title || "Tillsa";
           await fanout(c.family_id, "late", {
             title: COPY[lang].lateTitle(title),
-            body: COPY[lang].lateBody(formatTimeIn(c.occurrence_at, tz)),
+            body: COPY[lang].lateBody(formatTimeIn(shownAt(c), tz)),
             tag: `appt-${c.master_id}-late-${c.occurrence_at}`,
             url: "/dashboard",
           });
@@ -408,9 +390,10 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         // -------- PASS 3: missed --------
         for (const c of slmCandidates) {
           if (infoFor(c.family_id).tasksPaused) continue;
-          const dueMs = c.occurrence_ms + c.missed_after_minutes * 60_000;
-          if (now.getTime() < dueMs) continue;
-          if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+          if (!isMissedDue(c, now.getTime(), false)) continue;
+          if (
+            !isMissedDue(c, now.getTime(), await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+          )
             continue;
           if (!(await tryClaim(c.master_id, c.occurrence_at, "missed"))) continue;
 
@@ -418,7 +401,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           const title = c.title || "Tillsa";
           await fanout(c.family_id, "missed", {
             title: COPY[lang].missedTitle(title),
-            body: COPY[lang].missedBody(formatTimeIn(c.occurrence_at, tz)),
+            body: COPY[lang].missedBody(formatTimeIn(shownAt(c), tz)),
             tag: `appt-${c.master_id}-missed-${c.occurrence_at}`,
             url: "/dashboard",
           });
@@ -482,11 +465,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
 
         // Load overrides for these masters within window (for cancel detection)
         const masters = remMasterRes.rows;
-        type Override = {
-          recurrence_parent_id: string;
-          recurrence_override_at: string;
-          recurrence_cancelled: boolean;
-        };
+        type Override = OverrideLike;
         let overrides: Override[] = [];
         let remFailedMasters = new Set<string>();
         if (masters.length > 0) {
@@ -495,71 +474,48 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
             (ids) =>
               supabaseAdmin
                 .from("appointments")
-                .select("recurrence_parent_id, recurrence_override_at, recurrence_cancelled")
+                .select("recurrence_parent_id, recurrence_override_at, recurrence_cancelled, starts_at, title, kind")
                 .in("recurrence_parent_id", ids)
-                .gte("recurrence_override_at", nowIso)
-                .lte("recurrence_override_at", lookAheadIso) as never,
+                .gte("recurrence_override_at", new Date(now.getTime() - MOVE_LOOKAHEAD_MS).toISOString())
+                .lte("recurrence_override_at", new Date(lookAheadEnd.getTime() + MOVE_LOOKAHEAD_MS).toISOString()) as never,
           );
           for (const e of ovRes.errors)
             console.error("task-sweep reminder: overrides chunk failed; skipping its masters", e);
           remFailedMasters = ovRes.failedIds;
           overrides = ovRes.rows;
         }
-        const overrideKey = new Set<string>();
-        for (const o of overrides) {
-          if (o.recurrence_cancelled) {
-            overrideKey.add(
-              `${o.recurrence_parent_id}@${new Date(o.recurrence_override_at).toISOString()}`,
-            );
-          }
-        }
-
-        type Candidate = {
-          master_id: string;
-          occurrence_at: string;
-          family_id: string;
-          title: string | null;
-          reminder_minutes: number;
-          starts_at_ms: number;
-        };
-        const candidates: Candidate[] = [];
+        const candidates: SweepOccurrence[] = [];
 
         for (const p of (plainRows ?? []) as ReminderRow[]) {
           if (!p.reminder_minutes) continue;
           candidates.push({
             master_id: p.id,
             occurrence_at: p.starts_at,
+            occurrence_ms: new Date(p.starts_at).getTime(),
             family_id: p.family_id,
             title: p.title,
+            kind: null,
+            late_after_minutes: 0,
+            missed_after_minutes: 15,
+            notify_start: true,
             reminder_minutes: p.reminder_minutes,
-            starts_at_ms: new Date(p.starts_at).getTime(),
           });
         }
 
         for (const m of masters) {
           if (!m.reminder_minutes || !m.recurrence_freq) continue;
           if (remFailedMasters.has(m.id)) continue;
-          const occs = expandRecurrence(m, now, lookAheadEnd, infoFor(m.family_id).tz);
-          for (const occ of occs) {
-            const iso = occ.toISOString();
-            if (overrideKey.has(`${m.id}@${iso}`)) continue;
-            candidates.push({
-              master_id: m.id,
-              occurrence_at: iso,
-              family_id: m.family_id,
-              title: m.title,
-              reminder_minutes: m.reminder_minutes,
-              starts_at_ms: occ.getTime(),
-            });
-          }
+          candidates.push(
+            ...expandMasterForSweep(m, overrides, now.getTime(), lookAheadEnd.getTime(), infoFor(m.family_id).tz),
+          );
         }
 
         for (const c of candidates) {
           if (infoFor(c.family_id).tasksPaused) continue;
-          const remindAtMs = c.starts_at_ms - c.reminder_minutes * 60_000;
-          if (now.getTime() < remindAtMs) continue;
-          if (now.getTime() >= c.starts_at_ms) continue;
-          if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+          if (!isReminderDue(c, now.getTime(), false)) continue;
+          if (
+            !isReminderDue(c, now.getTime(), await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
+          )
             continue;
 
           // Per-occurrence dedupe via insert-if-absent.
@@ -578,9 +534,9 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           }
 
           const { tz, lang } = infoFor(c.family_id);
-          const time = formatTimeIn(c.occurrence_at, tz);
+          const time = formatTimeIn(new Date(c.occurrence_ms).toISOString(), tz);
           const nowDay = wallClockIn(now, tz).todayStr;
-          const occDay = wallClockIn(new Date(c.occurrence_at), tz).todayStr;
+          const occDay = wallClockIn(new Date(c.occurrence_ms), tz).todayStr;
           const when = occDay === nowDay
             ? (lang === "sv" ? "idag" : "today")
             : (lang === "sv" ? "imorgon" : "tomorrow");
