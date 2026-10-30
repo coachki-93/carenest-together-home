@@ -1,7 +1,6 @@
 # Guided routine setup from care needs
 
-## Blocker: the catalog file is missing
-`claude/routine-catalog-draft.md` is not in the project, and no file named like it exists. Only the Trakeostomi rows and Lägesändring are spelled out in your message. Please upload or paste the catalog. Until then I can build the engine and the trach + Lägesändring templates. Every other row waits on the catalog.
+Catalog: received in the decisions message (40 rows).
 
 ## Answers
 - **Who sees the page: owner only.** child.tsx sets `canEdit = role === "owner"`, and the database only lets the owner update a child. Caregivers get a "only the owner can set up routines" message. Creating tasks is open to any member, but saving progress on the care needs (the duplicate guard) isn't.
@@ -77,7 +76,54 @@ New `routines.*` block with exact en/sv parity. Natural Swedish titles and steps
 - Open the page again → "Tillagd" and no duplicates.
 - Full vitest, tsgo, en/sv parity.
 
+## Decisions received
+- Conflicts: 1 → b; 2 approved; 3 approved, only for feed_task and glucose_task; 4 approved.
+- Inhalations become a medication link. Templates can belong to several needs (`capabilities: string[]`), shown once under the first matching need.
+- Weekly with no day given = Sunday; monthly = day 1.
+- Tasks with more than 3 times a day get `notify_start = false` and a 60-minute missed window. Lägesändring is the only one in the catalog.
+
+## Migration (for review, not applied)
+```sql
+ALTER TABLE public.appointments
+  ADD COLUMN notify_start boolean NOT NULL DEFAULT true;
+
+COMMENT ON COLUMN public.appointments.notify_start IS
+  'When false, the task sweep skips the START push. Read from the series master; late/missed/reminder pushes are unaffected.';
+```
+Existing rows default to true, so today's behaviour is unchanged. RLS and grants don't change.
+
+## Sweep diff (dispatch-task-notifications.ts)
+```diff
+ type SLMRow = {
+   ...
+   recurrence_cancelled: boolean | null;
++  notify_start: boolean | null;
+ };
+ const slmSelect =
+-  "id, family_id, ..., recurrence_cancelled";
++  "id, family_id, ..., recurrence_cancelled, notify_start";
+
+ type SLMCandidate = {
+   ...
+   missed_after_minutes: number;
++  notify_start: boolean;
+ };
+ // plain rows
++  notify_start: p.notify_start !== false,
+ // recurring: always from the master, overrides never carry their own
++  notify_start: m.notify_start !== false,
+
+ // -------- PASS 1: start --------
+ for (const c of slmCandidates) {
+   if (infoFor(c.family_id).tasksPaused) continue;
++  if (!c.notify_start) continue;
+   const diffMin = ...
+```
+`!== false` fails safe: a null or missing value still sends the push. The late, missed and reminder passes don't change.
+
+### Flag: the setting is hidden in the planner
+Without a control, an owner can't turn START pushes back on for Lägesändring. Proposal: a checkbox in the task dialog, "Notify when it starts" / "Avisera när den börjar" (default on). It is saved on the series, like the checklist. Say no and I'll leave it out.
+
 ## Needed from you
-1. The routine catalog.
-2. Option a or b for conflict 1.
-3. Approval of the split routines status (conflict 2) and the reset behaviour (conflict 4).
+1. Approve the migration and sweep diff.
+2. Yes or no on the "Notify when it starts" checkbox in the planner.

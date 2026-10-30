@@ -13,3 +13,11 @@
 ## Next
 - Routine setup + care-need task suggestions (uses checklist)
 - Tighten appointments update policy (separate)
+
+## Guided routine setup (plan approved in principle; migration awaiting review)
+- [ ] Migration notify_start + sweep skip START
+- [ ] routine-templates.ts (catalog, capabilities[])
+- [ ] /routines page, onboarding + child.tsx entry
+- [ ] Split routines status in scaffolds; reset keeps created
+- [ ] Dashboard card: routines reminder; remove feed/neb/glucose task offers
+- [ ] i18n, tests, live verification
