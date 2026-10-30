@@ -36,6 +36,7 @@
 - [x] Client canManage mirrors series rule (Planner + visits calendar gate)
 - [x] API verification as caregiver + owner
 - [x] Override upsert index fix (42P10)
-- [ ] Sweep: moved overrides push at new starts_at (passes 1–3 + reminder), tests
-- [ ] Today late/missed uses moved time (confirm)
-- [ ] In-app occurrence verification + live 5-min push check
+- [x] Sweep: moved overrides push at new starts_at (passes 1–4), tests
+- [x] Today late/missed uses moved time (confirmed)
+- [x] In-app occurrence verification
+- [ ] Live 5-min moved-push check — needs publish (cron runs the published code)
