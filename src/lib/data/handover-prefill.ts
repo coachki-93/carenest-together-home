@@ -1,3 +1,4 @@
+import { untickedLabels } from "@/lib/schedule/checklist";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -47,6 +48,8 @@ interface Labels {
   hospital: string;
   carePlaceIssue: string;
   taskNote: string;
+  /** "{{task}} done – not ticked: {{labels}}" */
+  checklistUnticked: string;
   tidySkipped: string;
   maintenanceDone: string;
   maintenanceOverdue: string;
@@ -117,6 +120,23 @@ export function clusterAbnormalVitals(
 
 /** A care event is noteworthy (never collapsed into a count) when it carries
  *  a description, an action taken, or a severity of moderate (2) or higher. */
+/**
+ * Handover line for a completion whose checklist had unticked steps.
+ * Only "done" completions with a snapshot qualify; a NULL snapshot means
+ * "no checklist data" and never produces a line.
+ */
+export function formatChecklistUntickedLine(
+  status: string,
+  title: string,
+  checklistResult: unknown,
+  template: string,
+): string | null {
+  if (status !== "done") return null;
+  const missing = untickedLabels(checklistResult);
+  if (missing.length === 0) return null;
+  return template.replace("{{task}}", title).replace("{{labels}}", missing.join(", "));
+}
+
 export function isNoteworthyEvent(
   ev: Pick<CareEvent, "description" | "action_taken" | "severity">,
 ): boolean {
@@ -560,6 +580,18 @@ export function useHandoverPrefill(
         } else if (!c && start < new Date()) {
           noteLines.push(`• ${time} ${a.title} — ${labels.apptMissed}`);
         }
+      }
+
+      // Done tasks with unticked checklist steps. NULL snapshot = no data.
+      for (const c of completions) {
+        const appt = apptById.get(c.appointment_id);
+        const line = formatChecklistUntickedLine(
+          c.status,
+          appt?.title ?? labels.taskNote,
+          (c as { checklist_result?: unknown }).checklist_result,
+          labels.checklistUnticked,
+        );
+        if (line) noteLines.push(`• ${fmtTime(new Date(c.occurrence_at))} ${line}`);
       }
 
       // Free-text notes captured while marking tasks done during this shift
