@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Wind, Plus, RefreshCw, Sliders, Loader2, Hospital, CheckCircle2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Wind, Plus, RefreshCw, Sliders, Loader2, Hospital, CheckCircle2, Pause, Play } from "lucide-react";
 import { toast } from "@/lib/notify";
 import { format } from "date-fns";
 import { DashboardLayout } from "@/components/carenest/DashboardLayout";
@@ -25,6 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMyMembership, useSession } from "@/lib/auth/use-profile";
+import { supabase } from "@/integrations/supabase/client";
+import { guardActingProfile, useCurrentActor } from "@/lib/data/current-actor";
 import {
   useActiveOxygenTank,
   useOxygenHistory,
@@ -32,6 +35,8 @@ import {
   useReplaceTank,
   useChangeFlow,
   useConfirmTank,
+  usePauseTank,
+  useResumeTank,
   type OxygenTank,
 } from "@/lib/data/oxygen";
 import {
