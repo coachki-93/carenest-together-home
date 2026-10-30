@@ -79,7 +79,8 @@ describe("computeRemaining with pause fields", () => {
     const info = computeRemaining(row, NOW)!;
     expect(info.paused).toBe(true);
     expect(info.status).toBe("paused");
-    // 100 min elapsed before the pause; the 30 paused minutes don't count.
-    expect(info.remainingMinutes).toBeCloseTo(3840 - 100, 5);
+    // Started 100 min ago, paused 30 min ago: 70 min of burn, the 30
+    // paused minutes don't count.
+    expect(info.remainingMinutes).toBeCloseTo(3840 - 70, 5);
   });
 });
