@@ -5,6 +5,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { hasProtectedSubscription } from "./subscription-state";
+import { isMissingCustomer } from "./billing-errors";
 
 /**
  * Read the caller's family subscription row. Any family member can call
@@ -65,17 +67,12 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     }
 
     // ---- 2. Look up existing subscription row (also RLS-scoped) --------
-    const { data: existing } = await supabase
+    const { data: existing, error: subErr } = await supabase
       .from("family_subscriptions")
-      .select("stripe_customer_id, status")
+      .select("stripe_customer_id, stripe_subscription_id, status, plan, trial_ends_at, current_period_end, cancel_at_period_end")
       .eq("family_id", data.familyId)
       .maybeSingle();
-
-    // Trialing families may convert early to a paid subscription.
-    // Block only truly-active paid subscriptions to avoid double-charging.
-    if (existing?.status === "active") {
-      throw new Error("This family already has an active subscription");
-    }
+    if (subErr) throw new Error("billing_failed");
 
     // ---- 3. Escalate — Stripe + admin writes -------------------------
     const { getStripeClient, resolvePriceId } = await import(
@@ -86,18 +83,45 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     );
     const stripe = getStripeClient();
 
+    // Validate the stored customer before checkout. Missing protected accounts
+    // must refuse recovery, not silently create a second paid subscription.
+    let missingCustomer = false;
+    if (existing?.stripe_customer_id) {
+      try {
+        const customer = await stripe.customers.retrieve(existing.stripe_customer_id);
+        missingCustomer = customer.deleted === true;
+      } catch (error) {
+        if (!isMissingCustomer(error, true)) throw new Error("billing_failed");
+        missingCustomer = true;
+      }
+    }
+    if (hasProtectedSubscription(existing)) {
+      if (missingCustomer) {
+        console.error("[billing] missing customer: recovery refused", {
+          familyId: fam.id, mode: "checkout",
+        });
+        throw new Error("customer_not_found");
+      }
+      throw new Error("subscription_exists");
+    }
+
     // Reuse a stored customer or create a fresh one. Store immediately so
     // future portal sessions and webhook lookups find it.
-    let customerId = existing?.stripe_customer_id ?? null;
+    let customerId = missingCustomer ? null : existing?.stripe_customer_id ?? null;
     if (!customerId) {
       const customer = await stripe.customers.create({
         name: fam.name,
         metadata: { family_id: fam.id, owner_user_id: userId },
       });
       customerId = customer.id;
+      if (missingCustomer) {
+        console.error("[billing] customer self-heal", {
+          familyId: fam.id, oldCustomerId: existing?.stripe_customer_id, newCustomerId: customerId,
+        });
+      }
       const { error: upErr } = await supabaseAdmin
         .from("family_subscriptions")
-        .update({ stripe_customer_id: customerId })
+        .update({ stripe_customer_id: customerId, ...(missingCustomer ? { stripe_subscription_id: null, status: "canceled" as const } : {}) })
         .eq("family_id", fam.id);
       if (upErr) throw new Error(`Failed to persist customer id: ${upErr.message}`);
     }
@@ -159,23 +183,30 @@ export const createPortalSession = createServerFn({ method: "POST" })
     }
 
     // ---- 2. Fetch the stored customer id (RLS-scoped) ----------------
-    const { data: sub } = await supabase
+    const { data: sub, error: subErr } = await supabase
       .from("family_subscriptions")
       .select("stripe_customer_id")
       .eq("family_id", data.familyId)
       .maybeSingle();
+    if (subErr) throw new Error("billing_failed");
     if (!sub?.stripe_customer_id) {
-      throw new Error(
-        "This family doesn't have a payment account yet — start a subscription first.",
-      );
+      throw new Error("customer_not_found");
     }
 
     // ---- 3. Escalate — Stripe only, no DB writes needed --------------
     const { getStripeClient } = await import("@/lib/billing/stripe.server");
     const stripe = getStripeClient();
-    const portal = await stripe.billingPortal.sessions.create({
-      customer: sub.stripe_customer_id,
-      return_url: data.returnUrl,
-    });
-    return { url: portal.url };
+    try {
+      const portal = await stripe.billingPortal.sessions.create({
+        customer: sub.stripe_customer_id,
+        return_url: data.returnUrl,
+      });
+      return { url: portal.url };
+    } catch (error) {
+      if (isMissingCustomer(error)) {
+        console.error("[billing] portal customer missing", { familyId: fam.id, mode: "portal" });
+        throw new Error("customer_not_found");
+      }
+      throw new Error("billing_failed");
+    }
   });

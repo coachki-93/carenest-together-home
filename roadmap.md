@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Open
-- [ ] Stripe test-mode IDs bug (uploaded brief): find test-only family_subscriptions rows, show data fix before applying, harden createPortalSession against resource_missing, never show raw Stripe errors, fix BillingCard status line to use derived state. Plan first.
+- [ ] Stripe end-to-end subscription activation/webhook: blocked because Stripe rejects existing lifetime 100% coupon; no subscription submitted. Row correction, live customer creation, portal, forced translated error, shared derived-state guard, tests verified.
 - [ ] Marketing: 100-paying-families plan presented (plan.md saved 2026-10-30); awaiting user's choice of first action (recommendation card: discoverability fix).
 
 ## Done

@@ -3515,6 +3515,11 @@ export const en = {
     },
   },
   billing: {
+    errors: {
+      customerNotFound: "This payment account no longer exists — please subscribe again. If your subscription is still active, contact support.",
+      subscriptionExists: "This family already has an active subscription. Contact support if you cannot manage it.",
+      generic: "Billing could not be opened. Please try again or contact support.",
+    },
     banner: {
       trial_one: "Free trial — 1 day left. Add a subscription to keep writing after that.",
       trial_other: "Free trial — {{count}} days left. Add a subscription to keep writing after that.",
@@ -3544,6 +3549,7 @@ export const en = {
       statusPastDue: "Payment failed. Grace period ends {{date}}.",
       statusCanceled: "Canceled. Subscribe to restore writing.",
       statusInactive: "Not active. Subscribe to enable writing.",
+      statusExpired: "Expired on {{date}}. Subscribe to restore writing.",
       statusNone: "No subscription yet.",
       dataPreserved: "If your subscription lapses, the app becomes read-only. Your data is never deleted.",
     },
