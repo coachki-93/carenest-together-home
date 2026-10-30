@@ -299,27 +299,62 @@ function CurrentTankCard({
 
 
       <div className="flex flex-wrap gap-3 pt-2">
-        <Button
-          variant="outline"
-          onClick={confirmTank}
-          disabled={confirm.isPending}
-          className="rounded-full"
-        >
-          {confirm.isPending ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}{" "}
-          {t("oxygen.confirmTank")}
-        </Button>
-        <Button variant="outline" onClick={onChangeFlow} className="rounded-full">
-          <Sliders className="size-4" /> {t("oxygen.changeFlow")}
-        </Button>
-        <Button onClick={onReplace} className="rounded-full">
-          <RefreshCw className="size-4" /> {t("oxygen.replaceTank")}
-        </Button>
+        {isManualPaused ? (
+          <>
+            <Button onClick={resumeTank} disabled={resume.isPending} className="rounded-full">
+              {resume.isPending ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}{" "}
+              {t("oxygen.resumeTank")}
+            </Button>
+            <Button variant="outline" onClick={onReplace} className="rounded-full">
+              <RefreshCw className="size-4" /> {t("oxygen.replaceTank")}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              variant="outline"
+              onClick={confirmTank}
+              disabled={confirm.isPending}
+              className="rounded-full"
+            >
+              {confirm.isPending ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}{" "}
+              {t("oxygen.confirmTank")}
+            </Button>
+            <Button variant="outline" onClick={onChangeFlow} className="rounded-full">
+              <Sliders className="size-4" /> {t("oxygen.changeFlow")}
+            </Button>
+            <Button variant="outline" onClick={() => setPauseOpen(true)} className="rounded-full">
+              <Pause className="size-4" /> {t("oxygen.pauseTank")}
+            </Button>
+            <Button onClick={onReplace} className="rounded-full">
+              <RefreshCw className="size-4" /> {t("oxygen.replaceTank")}
+            </Button>
+          </>
+        )}
       </div>
       <p className="text-xs text-muted-foreground">
         {tank.last_checked_at
           ? t("oxygen.lastConfirmed", { time: format(new Date(tank.last_checked_at), "MMM d, HH:mm") })
           : t("oxygen.neverConfirmed")}
       </p>
+
+      <Dialog open={pauseOpen} onOpenChange={setPauseOpen}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{t("oxygen.pauseTitle")}</DialogTitle>
+            <DialogDescription>{t("oxygen.pauseBody")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPauseOpen(false)} className="rounded-full">
+              {t("oxygen.cancel")}
+            </Button>
+            <Button onClick={pauseTank} disabled={pause.isPending} className="rounded-full">
+              {pause.isPending && <Loader2 className="size-4 animate-spin" />}
+              {t("oxygen.pauseTank")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
