@@ -1,6 +1,6 @@
-# Tighten task write access (owner or task creator)
+# Tighten task write access (owner or task creator) — revised
 
-## 1. Live policies on public.appointments (read just now)
+## 1. Live policies on public.appointments
 
 | policyname | cmd | qual | with_check |
 |---|---|---|---|
@@ -9,27 +9,28 @@
 | Appointments: members update | UPDATE | private.is_family_member(family_id, auth.uid()) | private.is_family_member(family_id, auth.uid()) |
 | Appointments: members delete | DELETE | private.is_family_member(family_id, auth.uid()) | — |
 
-Helpers in `private`: `is_family_member`, `is_family_owner` (both `(_family_id, _user_id)`). SELECT stays untouched.
+SELECT stays untouched. `appointment_completions` not touched.
 
-## 2. Migration (to apply after approval)
+## 2. Revised migration
 
 ```sql
--- Helper: can this user manage the given series master? Owner, or creator who is still a member.
-CREATE OR REPLACE FUNCTION private.can_manage_appointment(_appointment_id uuid, _user_id uuid)
+-- Can this user manage the series master _appointment_id, which must belong to _family_id?
+CREATE OR REPLACE FUNCTION private.can_manage_appointment(_appointment_id uuid, _family_id uuid, _user_id uuid)
 RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, private
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.appointments a
     WHERE a.id = _appointment_id
+      AND a.family_id = _family_id
       AND (
         private.is_family_owner(a.family_id, _user_id)
         OR (a.created_by = _user_id AND private.is_family_member(a.family_id, _user_id))
       )
   );
 $$;
-REVOKE ALL ON FUNCTION private.can_manage_appointment(uuid, uuid) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION private.can_manage_appointment(uuid, uuid) TO authenticated;
+REVOKE ALL ON FUNCTION private.can_manage_appointment(uuid, uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION private.can_manage_appointment(uuid, uuid, uuid) TO authenticated, service_role;
 
 DROP POLICY IF EXISTS "Appointments: members insert" ON public.appointments;
 DROP POLICY IF EXISTS "Appointments: members update" ON public.appointments;
@@ -42,38 +43,48 @@ WITH CHECK (
   AND created_by = auth.uid()
   AND (
     recurrence_parent_id IS NULL
-    OR private.can_manage_appointment(recurrence_parent_id, auth.uid())
+    OR private.can_manage_appointment(recurrence_parent_id, family_id, auth.uid())
   )
 );
 
-CREATE POLICY "Appointments: owner or creator update"
+CREATE POLICY "Appointments: owner, creator or series manager update"
 ON public.appointments FOR UPDATE TO authenticated
 USING (
   private.is_family_owner(family_id, auth.uid())
-  OR (created_by = auth.uid() AND private.is_family_member(family_id, auth.uid()))
+  OR (recurrence_parent_id IS NULL AND created_by = auth.uid()
+      AND private.is_family_member(family_id, auth.uid()))
+  OR (recurrence_parent_id IS NOT NULL
+      AND private.can_manage_appointment(recurrence_parent_id, family_id, auth.uid()))
 )
 WITH CHECK (
   private.is_family_owner(family_id, auth.uid())
-  OR (created_by = auth.uid() AND private.is_family_member(family_id, auth.uid()))
+  OR (recurrence_parent_id IS NULL AND created_by = auth.uid()
+      AND private.is_family_member(family_id, auth.uid()))
+  OR (recurrence_parent_id IS NOT NULL
+      AND private.can_manage_appointment(recurrence_parent_id, family_id, auth.uid()))
 );
 
-CREATE POLICY "Appointments: owner or creator delete"
+CREATE POLICY "Appointments: owner, creator or series manager delete"
 ON public.appointments FOR DELETE TO authenticated
 USING (
   private.is_family_owner(family_id, auth.uid())
-  OR (created_by = auth.uid() AND private.is_family_member(family_id, auth.uid()))
+  OR (recurrence_parent_id IS NULL AND created_by = auth.uid()
+      AND private.is_family_member(family_id, auth.uid()))
+  OR (recurrence_parent_id IS NOT NULL
+      AND private.can_manage_appointment(recurrence_parent_id, family_id, auth.uid()))
 );
 
--- Block moving a task to another family or re-assigning its creator.
 CREATE OR REPLACE FUNCTION private.guard_appointment_immutables()
 RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
 BEGIN
   IF NEW.family_id IS DISTINCT FROM OLD.family_id THEN
     RAISE EXCEPTION 'family_id cannot be changed';
   END IF;
-  IF NEW.created_by IS DISTINCT FROM OLD.created_by THEN
-    RAISE EXCEPTION 'created_by cannot be changed';
+  IF NEW.recurrence_parent_id IS DISTINCT FROM OLD.recurrence_parent_id THEN
+    RAISE EXCEPTION 'recurrence_parent_id cannot be changed';
   END IF;
+  -- Keep the original creator silently (override upserts resend created_by).
+  NEW.created_by := OLD.created_by;
   RETURN NEW;
 END $$;
 
@@ -82,31 +93,23 @@ BEFORE UPDATE ON public.appointments
 FOR EACH ROW EXECUTE FUNCTION private.guard_appointment_immutables();
 ```
 
-`appointment_completions` is not touched.
+Note: the BEFORE trigger runs before the UPDATE WITH CHECK, so a non-owner can't keep access by rewriting `created_by` — it's reset first.
 
-## 3. Client audit — every write to tasks
+## 3. Client changes
 
-| Flow | Where | Write | Caregiver after change |
-|---|---|---|---|
-| Create new task | Planner, old visits calendar, routine setup, suggestion card | INSERT, no parent | Works (unchanged) |
-| Edit / delete whole series | Planner (gated: creator or owner) | UPDATE / DELETE | Works for own; owner's hidden in UI anyway |
-| Edit / cancel one occurrence | Planner (gated) | upsert override row | Works for own series |
-| Edit / delete on the old visits calendar (`/appointments`) | no creator/owner gate in UI | UPDATE / DELETE / override upsert | **Will now fail with an error toast on the owner's visits** — UI shows Edit/Delete to everyone (flag) |
-| Postpone / skip / done / ongoing / timer from Today | `appointment_completions` only | not tasks | Works (unchanged) |
-| Routine setup `/routines` | owner-only page | INSERT new tasks | Not affected (caregivers can't open it) |
-| Scaffold suggestion card | INSERT new tasks | Works |
+- **No client update changes `recurrence_parent_id`.** Confirmed: it's only written in the two override upserts, where it is also the conflict key, so the update branch writes the same value. Whole-series updates never include it.
+- **Shared `canManageAppointment(appt, { userId, isOwner, seriesCreatedBy })`** in `src/lib/data/appointments.ts`: owner → yes; series/one-off → `created_by === userId`; override/occurrence → series master's `created_by === userId`. Expanded occurrences already carry `master_id`, so the check uses the master's creator.
+- **Planner**: replace the inline `created_by === user?.id || owner` with the helper.
+- **Visits calendar (`/appointments`)**: same gate; hide Edit, Delete and "cancel this occurrence" when the user can't manage it (preview stays readable).
+- Unit tests for the helper (owner, own one-off, other's one-off, occurrence of own series with owner-made override, occurrence of owner's series).
 
-### Flags (not worked around)
+## 4. Caregiver flows still working
 
-1. **Old visits calendar has no permission gate** — caregivers see Edit/Delete on the owner's visits; those will now be refused by the database. Needs the same `canManage` gate as Planner (separate task).
-2. **Re-editing an existing override hits the new trigger.** Override saves are upserts that always send `created_by = current user`. If an override row already exists and was made by someone else (e.g. caregiver moved one occurrence of their own series, owner then edits that same occurrence again), the upsert becomes an UPDATE that changes `created_by` → trigger raises, **even for the owner**. Same applies to cancelling an already-moved occurrence. Fix options for later: stop sending `created_by` in the conflict update, or let the trigger allow it on override rows. Not changed here per your instruction.
-3. **Override rows follow their own creator, not the series creator.** UPDATE/DELETE checks the override row's `created_by`, so a caregiver who owns a series cannot re-edit an override the owner created on it (owner always can). Matches the rule as written; flagging in case you want "series creator" here too.
+Create tasks (Planner, visits, suggestion card); done/skip/postpone/ongoing/timer from Today (completions only); routine setup is owner-only. Nothing a caregiver legitimately uses today breaks once the visits calendar is gated.
 
-## 4. Verification (after apply)
+## 5. Verification (API, as caregiver test account and owner)
 
-Signed in via the API as a caregiver test account and as the owner:
-- Caregiver: update owner's task → denied; delete owner's task → denied; insert cancel-override on owner's series → denied; change `family_id`/`created_by` on own task → denied by trigger.
-- Caregiver: create and edit own task, cancel an occurrence of own series → allowed.
-- Caregiver: mark owner's task done (completion row) → allowed.
-- Owner: update, delete, override any family task → allowed.
-- Re-read `pg_policies` to confirm the new set; test rows cleaned up afterwards; full vitest + tsgo.
+Caregiver — denied: update/delete owner's task; insert cancel-override on owner's series; re-point own task's `recurrence_parent_id` at owner's series; override pointing at a series in another family; change `family_id`.
+Caregiver — allowed: create/edit own task; cancel an occurrence of own series; re-edit an owner-made override on own series; mark owner's task done.
+Owner — allowed: everything, including re-editing an occurrence a caregiver moved, with `created_by` unchanged afterwards.
+Then re-read `pg_policies`, clean up test rows, full vitest + tsgo.
