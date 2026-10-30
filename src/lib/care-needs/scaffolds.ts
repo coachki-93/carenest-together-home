@@ -26,13 +26,16 @@ export interface ScaffoldDefinition {
   offers: ScaffoldOffer[];
 }
 
-/** Slice 1 — Feeding. Slice 2 — Respiratory. */
+/**
+ * Slice 1 — Feeding. Slice 2 — Respiratory.
+ * Task offers (feed/neb/glucose) moved to guided routine setup
+ * (routine-templates.ts); only instruction offers remain here.
+ */
 export const SCAFFOLD_DEFINITIONS: ScaffoldDefinition[] = [
   {
     capability: "g_tube",
     i18nKey: "g_tube",
     offers: [
-      { key: "feed_task", engine: "task", templateKey: "feed_task" },
       { key: "site_instruction", engine: "instruction", templateKey: "g_tube_site" },
     ],
   },
@@ -40,7 +43,6 @@ export const SCAFFOLD_DEFINITIONS: ScaffoldDefinition[] = [
     capability: "nj_tube",
     i18nKey: "nj_tube",
     offers: [
-      { key: "feed_task", engine: "task", templateKey: "feed_task" },
       { key: "site_instruction", engine: "instruction", templateKey: "nj_tube_site" },
     ],
   },
@@ -89,13 +91,6 @@ export const SCAFFOLD_DEFINITIONS: ScaffoldDefinition[] = [
     ],
   },
   {
-    capability: "inhalations",
-    i18nKey: "inhalations",
-    offers: [
-      { key: "neb_task", engine: "task", templateKey: "neb_task" },
-    ],
-  },
-  {
     capability: "cough_assist",
     i18nKey: "cough_assist",
     offers: [
@@ -107,7 +102,6 @@ export const SCAFFOLD_DEFINITIONS: ScaffoldDefinition[] = [
     capability: "diabetes",
     i18nKey: "diabetes",
     offers: [
-      { key: "glucose_task", engine: "task", templateKey: "glucose_task" },
       { key: "diabetes_instruction", engine: "instruction", templateKey: "diabetes_mgmt" },
     ],
   },
