@@ -29,6 +29,13 @@
       "when": 1793399186287,
       "tag": "0003_appointments_owner_or_creator_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793400282304,
+      "tag": "0004_appointments_override_key_nonpartial",
+      "breakpoints": true
     }
   ]
 }
