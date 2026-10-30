@@ -57,6 +57,7 @@ import { useFamily } from "@/lib/data/family";
 import {
   useAppointments,
   useCreateAppointment,
+  canManageAppointment,
   useDeleteAppointment,
   useDeleteAppointmentInstance,
   useUpdateAppointment,
