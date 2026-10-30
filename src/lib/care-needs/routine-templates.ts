@@ -189,8 +189,8 @@ function addDaysStr(dateStr: string, n: number): string {
 
 /**
  * Pick the anchor (series start) so no occurrence is back-dated:
- * - daily/weekly/hourly: today at the first time still ahead, else tomorrow
- *   at the first time.
+ * - daily/weekly/hourly: today at the first time still ahead (earlier times
+ *   today are skipped), else tomorrow at the first time.
  * - monthly: the 1st of the month at the first time (this month only if
  *   today is the 1st and a time is still ahead).
  * All wall-clock math in the family timezone.
@@ -210,10 +210,7 @@ export function anchorFor(
     const next = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
     return zonedWallClockToDate(next, first, tz);
   }
-  if (ahead) return zonedWallClockToDate(today, ahead === first ? first : first, tz).getTime() >
-    now.getTime()
-    ? zonedWallClockToDate(today, first, tz)
-    : zonedWallClockToDate(today, ahead, tz);
+  if (ahead) return zonedWallClockToDate(today, ahead, tz);
   return zonedWallClockToDate(addDaysStr(today, 1), first, tz);
 }
 
