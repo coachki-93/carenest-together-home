@@ -3540,6 +3540,8 @@ export const sv = {
       foundingLocked: "Grundarpris — låst för alltid, startat före 31 dec 2026.",
       monthlyOnly: "Faktureras månadsvis. Säg upp när som helst; er data bevaras.",
       historyHint: "Se fakturor och betalningshistorik i betalningsportalen.",
+      historyLink: "Fakturor och betalningshistorik",
+      monthlyPrice: "{{price}} kr / mån",
       subscribe: "Starta abonnemang",
       managePortal: "Hantera abonnemang",
       statusTrial_one: "Provperiod — 1 dag kvar (slutar {{date}}).",

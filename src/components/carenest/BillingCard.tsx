@@ -9,17 +9,15 @@ import {
   createPortalSession,
 } from "@/lib/billing/billing.functions";
 import { useFamilySubscription } from "@/lib/billing/use-subscription";
+import { useMyMembership } from "@/lib/auth/use-profile";
 import { toast } from "@/lib/notify";
 import { billingErrorKey } from "@/lib/billing/billing-errors";
-import { billingStatus } from "@/lib/billing/subscription-state";
+import { billingPresentation, billingStatus } from "@/lib/billing/subscription-state";
 
 interface Props {
   familyId: string;
   isOwner: boolean;
 }
-
-const PRICE_FOUNDING_LABEL = "199 kr / mån";
-const PRICE_STANDARD_LABEL = "299 kr / mån";
 
 /**
  * Owner-only billing card. Non-owners see nothing.
@@ -31,6 +29,7 @@ const PRICE_STANDARD_LABEL = "299 kr / mån";
 export function BillingCard({ familyId, isOwner }: Props) {
   const { t, i18n } = useTranslation();
   const sub = useFamilySubscription(familyId);
+  const membership = useMyMembership();
   const checkoutFn = useServerFn(createCheckoutSession);
   const portalFn = useServerFn(createPortalSession);
   const [redirecting, setRedirecting] = useState(false);
@@ -76,16 +75,11 @@ export function BillingCard({ familyId, isOwner }: Props) {
   if (!isOwner) return null;
 
   const s = sub.data;
-  // Portal requires an existing Stripe customer. `isActive` is true during
-  // trials (by design, for access-gating), but a trial family has no customer
-  // yet — gating on it sent them to a Portal call that always failed.
   const hasCustomer = !!s?.row?.stripe_customer_id && !customerMissing;
-  // A paid plan only exists once Stripe has a subscription. Trial families
-  // have plan: null, which previously fell through to "founding".
-  const hasSubscription = !!s?.row?.stripe_subscription_id;
-  const onTrial = !!s?.isTrial && !hasSubscription;
-  const founding = hasSubscription && s?.row?.plan !== "standard";
-  const priceLabel = founding ? PRICE_FOUNDING_LABEL : PRICE_STANDARD_LABEL;
+  const family = membership.data?.family_id === familyId ? membership.data.families : null;
+  const presentation = billingPresentation(s, family?.founding_member === true);
+  const founding = presentation.plan === "founding";
+  const hasSubscription = presentation.primaryAction === "manage";
   const dateFmt = new Intl.DateTimeFormat(
     i18n.language?.startsWith("sv") ? "sv-SE" : "en-GB",
     { day: "numeric", month: "long", year: "numeric" },
@@ -116,20 +110,18 @@ export function BillingCard({ familyId, isOwner }: Props) {
             state={s}
             dateFmt={dateFmt}
             foundingRateLine={
-              founding && !onTrial ? t("billing.card.foundingLocked") : null
+              founding && hasSubscription ? t("billing.card.foundingLocked") : null
             }
           />
 
           <div className="rounded-xl border border-border/70 bg-muted/40 px-4 py-3 text-sm">
             <div className="flex items-baseline justify-between gap-4">
               <span className="font-semibold">
-                {onTrial
-                  ? t("billing.card.freeTrialPlan")
-                  : founding
+                {founding
                     ? t("billing.card.foundingPlan")
                     : t("billing.card.standardPlan")}
               </span>
-              {!onTrial && <span className="tabular-nums">{priceLabel}</span>}
+              <span className="tabular-nums">{t("billing.card.monthlyPrice", { price: presentation.priceKr })}</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {t("billing.card.monthlyOnly")}
@@ -137,7 +129,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
           </div>
 
           <div className="flex flex-wrap gap-2 pt-1">
-            {hasCustomer ? (
+            {hasSubscription ? (
               <Button
                 onClick={() => openPortal.mutate()}
                 disabled={openPortal.isPending || redirecting}
@@ -160,10 +152,20 @@ export function BillingCard({ familyId, isOwner }: Props) {
                 {t("billing.card.subscribe")}
               </Button>
             )}
+            {presentation.showHistory && hasCustomer && (
+              <Button
+                variant="link"
+                onClick={() => openPortal.mutate()}
+                disabled={openPortal.isPending || redirecting}
+              >
+                {openPortal.isPending && <Loader2 className="size-4 animate-spin" />}
+                {t("billing.card.historyLink")}
+              </Button>
+            )}
           </div>
           {customerMissing && <p className="text-sm text-muted-foreground">{t("billing.errors.customerNotFound")}</p>}
 
-          {hasCustomer && (
+          {hasSubscription && hasCustomer && (
             <p className="text-xs text-muted-foreground">
               {t("billing.card.historyHint")}
             </p>

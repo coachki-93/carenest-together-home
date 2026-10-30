@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { billingStatus, deriveState, hasProtectedSubscription, type SubscriptionRow } from "./subscription-state";
+import { billingPresentation, billingStatus, checkoutPlan, deriveState, hasLiveSubscription, hasProtectedSubscription, type SubscriptionRow } from "./subscription-state";
+import { resolvePriceId } from "./stripe.server";
 import { billingErrorKey, isMissingCustomer } from "./billing-errors";
 
 const row = (overrides: Partial<NonNullable<SubscriptionRow>> = {}): NonNullable<SubscriptionRow> => ({
@@ -11,6 +12,38 @@ const row = (overrides: Partial<NonNullable<SubscriptionRow>> = {}): NonNullable
 describe("billing recovery and shared derived state", () => {
   beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-10-30T23:42:00Z")); });
   afterEach(() => vi.useRealTimers());
+  it.each([
+    ["abandoned checkout", { status: "none", stripe_subscription_id: null }, "subscribe", true],
+    ["cancelled", { status: "canceled" }, "subscribe", true],
+    ["trialing without customer", { status: "trialing", trial_ends_at: "2026-11-10T00:00:00Z", stripe_subscription_id: null, stripe_customer_id: null }, "subscribe", false],
+    ["active", {}, "manage", false],
+    ["cancel-scheduled", { cancel_at_period_end: true }, "manage", false],
+    ["trialing with subscription", { status: "trialing", trial_ends_at: "2026-11-10T00:00:00Z" }, "manage", false],
+  ] as const)("chooses the correct action for %s", (_, overrides, action, history) => {
+    const state = deriveState(row(overrides));
+    expect(billingPresentation(state, true).primaryAction).toBe(action);
+    expect(billingPresentation(state, true).showHistory).toBe(history);
+    expect(hasLiveSubscription(state)).toBe(action === "manage");
+  });
+  it.each([
+    [true, false, "standard", 199, "founding"],
+    [false, false, "founding", 299, "standard"],
+    [false, true, "founding", 199, "founding"],
+    [true, true, "standard", 299, "standard"],
+  ] as const)("card and checkout agree on price (founding=%s, subscription=%s)", (founding, subscribed, plan, price, expectedPlan) => {
+    vi.stubEnv("STRIPE_PRICE_FOUNDING", "price_199");
+    vi.stubEnv("STRIPE_PRICE_STANDARD", "price_299");
+    try {
+      const state = deriveState(row({ plan, stripe_subscription_id: subscribed ? "sub_existing" : null }));
+      const card = billingPresentation(state, founding);
+      expect(card.plan).toBe(expectedPlan);
+      expect(card.priceKr).toBe(price);
+      // Existing subscriptions retain their Stripe plan; new checkout uses eligibility.
+      const checkoutFounding = subscribed ? plan === "founding" : founding;
+      expect(checkoutPlan(checkoutFounding)).toBe(expectedPlan);
+      expect(resolvePriceId(checkoutFounding)).toBe(`price_${card.priceKr}`);
+    } finally { vi.unstubAllEnvs(); }
+  });
   it("protects an active subscription against customer replacement", () => {
     expect(hasProtectedSubscription(row())).toBe(true);
     expect(billingStatus(deriveState(row()))).toBe("active");

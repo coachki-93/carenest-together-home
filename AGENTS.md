@@ -1,6 +1,6 @@
 # Project rules
 
-- Billing display and checkout recovery share the pure subscription-state module; missing customers with protected subscription access must fail closed, and every customer replacement is logged. Why: recovery must not create duplicate paid subscriptions or contradict access state.
+- Billing display and checkout recovery share the pure subscription-state module; card/banner actions require derived live subscription access plus a subscription ID, and pre-subscription plan selection shares checkout eligibility logic. Missing customers with protected subscription access must fail closed, and every customer replacement is logged. Why: recovery must not create duplicate paid subscriptions or contradict access and pricing state.
 
 - Task checklists live on the series master (`appointments.checklist`); completions store a snapshot in `checklist_result`, and NULL means "no checklist data", never "unticked". Why: history must survive later edits to the checklist, and overrides don't carry their own copy.
 - Guided routine suggestions come from `src/lib/care-needs/routine-templates.ts`. What was created is tracked in `children.care_needs.settings.scaffolds[cap].routines`, separate from the instruction-offer `status`. Why: re-opening the page or resetting suggestions must never duplicate tasks.

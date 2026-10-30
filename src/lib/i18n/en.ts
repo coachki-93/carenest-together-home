@@ -3540,6 +3540,8 @@ export const en = {
       foundingLocked: "Founding rate — locked for life, started before 31 Dec 2026.",
       monthlyOnly: "Billed monthly. Cancel any time; your data is preserved.",
       historyHint: "View invoices and payment history in the billing portal.",
+      historyLink: "Invoices and payment history",
+      monthlyPrice: "{{price}} kr / month",
       subscribe: "Start subscription",
       managePortal: "Manage billing",
       statusTrial_one: "Free trial — 1 day left (ends {{date}}).",
