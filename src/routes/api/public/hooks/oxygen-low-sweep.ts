@@ -136,16 +136,56 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
 
         for (const tank of tanks ?? []) {
           try {
-            if (tank.paused_at) continue;
-            if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
-
-            const { warn, crit, checkInterval, lang } = famSettings.get(tank.family_id) ?? {
+            const { warn, crit, checkInterval, lang, tz } = famSettings.get(tank.family_id) ?? {
               warn: 60,
               crit: 20,
               checkInterval: null,
               lang: "sv" as const,
+              tz: "Europe/Stockholm",
             };
             const copy = OX_COPY[lang];
+
+            if (tank.paused_at) {
+              // Hospital-paused tanks — and families that paused the oxygen
+              // category at hospital — stay fully silent, as before.
+              if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
+              if (tank.pause_reason !== "manual") continue;
+
+              // Manually paused at home: no depletion alarms (Pass A) and no
+              // normal check reminder (Pass B) — the countdown is frozen.
+              // Instead, nag periodically so a forgotten pause is never
+              // silently permanent. The clock runs from paused_at.
+              if (
+                shouldSendCheckReminder({
+                  startedAt: tank.paused_at,
+                  lastCheckedAt: tank.last_checked_at,
+                  tankTotalMinutes: null,
+                  checkReminderSentAt: tank.check_reminder_sent_at,
+                  intervalMinutes: checkInterval,
+                  now: new Date(nowIso),
+                })
+              ) {
+                if (vapidPrivate) {
+                  checkPushes += await sendToFamily(
+                    tank.family_id,
+                    "oxygen",
+                    JSON.stringify({
+                      title: copy.pausedTitle,
+                      body: copy.pausedBody(formatTimeIn(tank.paused_at, tz)),
+                      tag: `oxygen-paused-${tank.id}`,
+                      url: "/oxygen",
+                    }),
+                  );
+                }
+                await supabaseAdmin
+                  .from("oxygen_tanks")
+                  .update({ check_reminder_sent_at: nowIso })
+                  .eq("id", tank.id);
+              }
+              continue;
+            }
+
+            if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
 
             // ---- Pass A: depletion-estimate driven low / critical alarms.
             // Isolated so a null or throwing estimate cannot skip Pass B.
