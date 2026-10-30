@@ -16,6 +16,8 @@
 
 ## Guided routine setup (plan approved in principle; migration awaiting review)
 - [ ] Migration notify_start + sweep skip START
+- [ ] Planner "Notify when it starts" checkbox
+- [ ] Sweep reliability: page masters, chunk overrides (100), error checks, tests
 - [ ] routine-templates.ts (catalog, capabilities[])
 - [ ] /routines page, onboarding + child.tsx entry
 - [ ] Split routines status in scaffolds; reset keeps created
