@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   VITAL_CLUSTER_WINDOW_MS,
   clusterAbnormalVitals,
+  formatChecklistUntickedLine,
   isNoteworthyEvent,
   summarizeCareEvents,
   summarizeOxygenEvents,
@@ -373,5 +374,30 @@ describe("summarizeOxygenEvents", () => {
       labels,
     );
     expect(lines).toEqual([]);
+  });
+});
+
+describe("formatChecklistUntickedLine", () => {
+  const tpl = "{{task}} klar – ej avbockat: {{labels}}";
+  const snap = [
+    { id: "a", label: "Byt förband", done: true },
+    { id: "b", label: "Kontrollera hud", done: false },
+    { id: "c", label: "Spola sond", done: false },
+  ];
+  it("lists unticked steps for a done task", () => {
+    expect(formatChecklistUntickedLine("done", "Kvällsrutin", snap, tpl)).toBe(
+      "Kvällsrutin klar – ej avbockat: Kontrollera hud, Spola sond",
+    );
+  });
+  it("NULL snapshot (old completion) gives no line", () => {
+    expect(formatChecklistUntickedLine("done", "Kvällsrutin", null, tpl)).toBeNull();
+  });
+  it("all ticked gives no line", () => {
+    expect(
+      formatChecklistUntickedLine("done", "X", snap.map((s) => ({ ...s, done: true })), tpl),
+    ).toBeNull();
+  });
+  it("skipped task gives no line even with a snapshot", () => {
+    expect(formatChecklistUntickedLine("skipped", "X", snap, tpl)).toBeNull();
   });
 });
