@@ -5,6 +5,7 @@ import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver } from "@/lib/push/recipients";
 import { isPaused } from "@/lib/hospital/paused";
 import { shouldSendCheckReminder } from "@/lib/oxygen/check-reminder";
+import { formatTimeIn } from "@/lib/time/family-tz";
 
 /**
  * Scans every active oxygen tank and pushes one notification when remaining
@@ -34,18 +35,18 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
         const { data: tanks } = await supabaseAdmin
           .from("oxygen_tanks")
           .select(
-            "id, family_id, tank_type, flow_lpm, started_at, replaced_at, notes, paused_at, paused_seconds, low_alert_sent_at, critical_alert_sent_at, updated_at, last_checked_at, check_reminder_sent_at",
+            "id, family_id, tank_type, flow_lpm, started_at, replaced_at, notes, paused_at, pause_reason, paused_seconds, low_alert_sent_at, critical_alert_sent_at, updated_at, last_checked_at, check_reminder_sent_at",
           )
           .is("replaced_at", null);
 
         const { data: families } = await supabaseAdmin
           .from("families")
           .select(
-            "id, oxygen_warn_minutes, oxygen_critical_minutes, oxygen_check_interval_minutes, at_hospital_since, hospital_paused, notification_language",
+            "id, oxygen_warn_minutes, oxygen_critical_minutes, oxygen_check_interval_minutes, at_hospital_since, hospital_paused, notification_language, timezone",
           );
         const famSettings = new Map<
           string,
-          { warn: number; crit: number; checkInterval: number | null; lang: "sv" | "en" }
+          { warn: number; crit: number; checkInterval: number | null; lang: "sv" | "en"; tz: string }
         >(
           (families ?? []).map((f) => [
             f.id,
@@ -54,6 +55,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
               crit: f.oxygen_critical_minutes ?? 20,
               checkInterval: f.oxygen_check_interval_minutes ?? null,
               lang: (f.notification_language === "en" ? "en" : "sv") as "sv" | "en",
+              tz: f.timezone ?? "Europe/Stockholm",
             },
           ]),
         );
