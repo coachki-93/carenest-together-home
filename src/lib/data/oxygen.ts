@@ -186,6 +186,48 @@ export function useConfirmTank() {
   });
 }
 
+/**
+ * Manually pause the active tank at home (separate from hospital mode).
+ * Freezes the countdown and silences all oxygen alarms until resumed.
+ * Goes through the SECURITY DEFINER RPC so membership, active-tank and
+ * caregiver-profile checks are enforced server-side.
+ */
+export function usePauseTank() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true }, // safe: callers try/catch mutateAsync
+    mutationFn: async (input: { tankId: string; caregiverProfileId?: string | null }) => {
+      const { error } = await supabase.rpc("set_oxygen_tank_paused", {
+        _tank_id: input.tankId,
+        _paused: true,
+        _caregiver_profile_id: input.caregiverProfileId ?? undefined,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => invalidate(qc),
+  });
+}
+
+/**
+ * Resume a manually paused tank. The RPC accumulates paused_seconds, clears
+ * the pause markers and stamps last_checked_at (resuming counts as checking
+ * the tank). Refused server-side for hospital-paused tanks.
+ */
+export function useResumeTank() {
+  const qc = useQueryClient();
+  return useMutation({
+    meta: { suppressGlobalError: true }, // safe: callers try/catch mutateAsync
+    mutationFn: async (input: { tankId: string }) => {
+      const { error } = await supabase.rpc("set_oxygen_tank_paused", {
+        _tank_id: input.tankId,
+        _paused: false,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => invalidate(qc),
+  });
+}
+
 export function useDeleteOxygenTank() {
   const qc = useQueryClient();
   return useMutation({

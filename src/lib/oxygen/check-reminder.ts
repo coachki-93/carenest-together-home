@@ -100,6 +100,18 @@ export function isOxygenCheckOverdue(input: CheckOverdueInput): boolean {
   return input.now.getTime() - last.getTime() >= intervalMs;
 }
 
+/**
+ * Sweep gate for paused tanks: only a manual at-home pause gets the
+ * "still paused?" reminder. Hospital-paused (or legacy unmarked) tanks
+ * stay silent — hospital mode has its own UI and copy.
+ */
+export function shouldNagManualPause(tank: {
+  pausedAt: string | null | undefined;
+  pauseReason: string | null | undefined;
+}): boolean {
+  return !!parse(tank.pausedAt) && tank.pauseReason === "manual";
+}
+
 export function shouldSendCheckReminder(input: CheckReminderInput): boolean {
   const intervalMs = effectiveCheckIntervalMinutes(input.intervalMinutes, input.tankTotalMinutes) * 60_000;
   const now = input.now.getTime();

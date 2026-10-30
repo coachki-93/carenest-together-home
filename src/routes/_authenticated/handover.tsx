@@ -154,6 +154,7 @@ function HandoverPage() {
       oxygenLegacyChange: t("handoverPage.prefill.oxygenLegacyChange"),
       oxygenFlowChanged: t("handoverPage.prefill.oxygenFlowChanged"),
       oxygenFlowChangedMany: t("handoverPage.prefill.oxygenFlowChangedMany"),
+      oxygenPausedSince: t("handoverPage.prefill.oxygenPausedSince"),
       hospital: t("handoverPage.prefill.hospital"),
       carePlaceIssue: t("handoverPage.prefill.carePlaceIssue"),
       taskNote: t("handoverPage.prefill.taskNote"),

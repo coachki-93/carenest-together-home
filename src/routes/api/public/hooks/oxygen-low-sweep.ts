@@ -4,7 +4,8 @@ import { authorizeCronRequest } from "@/lib/push/cron-auth";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver } from "@/lib/push/recipients";
 import { isPaused } from "@/lib/hospital/paused";
-import { shouldSendCheckReminder } from "@/lib/oxygen/check-reminder";
+import { shouldNagManualPause, shouldSendCheckReminder } from "@/lib/oxygen/check-reminder";
+import { formatTimeIn } from "@/lib/time/family-tz";
 
 /**
  * Scans every active oxygen tank and pushes one notification when remaining
@@ -34,18 +35,18 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
         const { data: tanks } = await supabaseAdmin
           .from("oxygen_tanks")
           .select(
-            "id, family_id, tank_type, flow_lpm, started_at, replaced_at, notes, paused_at, paused_seconds, low_alert_sent_at, critical_alert_sent_at, updated_at, last_checked_at, check_reminder_sent_at",
+            "id, family_id, tank_type, flow_lpm, started_at, replaced_at, notes, paused_at, pause_reason, paused_seconds, low_alert_sent_at, critical_alert_sent_at, updated_at, last_checked_at, check_reminder_sent_at",
           )
           .is("replaced_at", null);
 
         const { data: families } = await supabaseAdmin
           .from("families")
           .select(
-            "id, oxygen_warn_minutes, oxygen_critical_minutes, oxygen_check_interval_minutes, at_hospital_since, hospital_paused, notification_language",
+            "id, oxygen_warn_minutes, oxygen_critical_minutes, oxygen_check_interval_minutes, at_hospital_since, hospital_paused, notification_language, timezone",
           );
         const famSettings = new Map<
           string,
-          { warn: number; crit: number; checkInterval: number | null; lang: "sv" | "en" }
+          { warn: number; crit: number; checkInterval: number | null; lang: "sv" | "en"; tz: string }
         >(
           (families ?? []).map((f) => [
             f.id,
@@ -54,6 +55,7 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
               crit: f.oxygen_critical_minutes ?? 20,
               checkInterval: f.oxygen_check_interval_minutes ?? null,
               lang: (f.notification_language === "en" ? "en" : "sv") as "sv" | "en",
+              tz: f.timezone ?? "Europe/Stockholm",
             },
           ]),
         );
@@ -80,6 +82,9 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
             checkTitle: "🫁 Kontrollera syrgastuben",
             checkBody: (flow: string) =>
               `Bekräfta nivå och flöde. Appen räknar med ${flow} l/min — stämmer det?`,
+            pausedTitle: "⏸️ Syrgasen är pausad",
+            pausedBody: (time: string) =>
+              `Pausad sedan ${time}. Fortfarande avstängd? Tryck Återuppta i appen när ni kopplar på igen.`,
           },
           en: {
             criticalTitle: "🟥 Oxygen tank nearly empty",
@@ -91,6 +96,9 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
             checkTitle: "🫁 Check the oxygen tank",
             checkBody: (flow: string) =>
               `Confirm the level and flow. The app assumes ${flow} l/min — is that still correct?`,
+            pausedTitle: "⏸️ Oxygen is paused",
+            pausedBody: (time: string) =>
+              `Paused since ${time}. Still off? Tap Resume in the app when you reconnect.`,
           },
         } as const;
 
@@ -128,16 +136,56 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
 
         for (const tank of tanks ?? []) {
           try {
-            if (tank.paused_at) continue;
-            if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
-
-            const { warn, crit, checkInterval, lang } = famSettings.get(tank.family_id) ?? {
+            const { warn, crit, checkInterval, lang, tz } = famSettings.get(tank.family_id) ?? {
               warn: 60,
               crit: 20,
               checkInterval: null,
               lang: "sv" as const,
+              tz: "Europe/Stockholm",
             };
             const copy = OX_COPY[lang];
+
+            if (tank.paused_at) {
+              // Hospital-paused tanks — and families that paused the oxygen
+              // category at hospital — stay fully silent, as before.
+              if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
+              if (!shouldNagManualPause({ pausedAt: tank.paused_at, pauseReason: tank.pause_reason })) continue;
+
+              // Manually paused at home: no depletion alarms (Pass A) and no
+              // normal check reminder (Pass B) — the countdown is frozen.
+              // Instead, nag periodically so a forgotten pause is never
+              // silently permanent. The clock runs from paused_at.
+              if (
+                shouldSendCheckReminder({
+                  startedAt: tank.paused_at,
+                  lastCheckedAt: tank.last_checked_at,
+                  tankTotalMinutes: null,
+                  checkReminderSentAt: tank.check_reminder_sent_at,
+                  intervalMinutes: checkInterval,
+                  now: new Date(nowIso),
+                })
+              ) {
+                if (vapidPrivate) {
+                  checkPushes += await sendToFamily(
+                    tank.family_id,
+                    "oxygen",
+                    JSON.stringify({
+                      title: copy.pausedTitle,
+                      body: copy.pausedBody(formatTimeIn(tank.paused_at, tz)),
+                      tag: `oxygen-paused-${tank.id}`,
+                      url: "/oxygen",
+                    }),
+                  );
+                }
+                await supabaseAdmin
+                  .from("oxygen_tanks")
+                  .update({ check_reminder_sent_at: nowIso })
+                  .eq("id", tank.id);
+              }
+              continue;
+            }
+
+            if (oxygenPausedFamilyIds.has(tank.family_id)) continue;
 
             // ---- Pass A: depletion-estimate driven low / critical alarms.
             // Isolated so a null or throwing estimate cannot skip Pass B.

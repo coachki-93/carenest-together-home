@@ -62,3 +62,25 @@ describe("computeRemaining status", () => {
     expect(s(0)).toBe("empty");
   });
 });
+
+describe("computeRemaining with pause fields", () => {
+  it("running tank: null pause fields change nothing", () => {
+    const info = computeRemaining(tank(0.1, 100), NOW)!;
+    expect(info.paused).toBe(false);
+    expect(info.status).toBe("ok");
+    expect(info.remainingMinutes).toBeCloseTo(3840 - 100, 5);
+  });
+
+  it("paused tank freezes the countdown", () => {
+    const row = {
+      ...tank(0.1, 100),
+      paused_at: new Date(NOW.getTime() - 30 * 60_000).toISOString(),
+    };
+    const info = computeRemaining(row, NOW)!;
+    expect(info.paused).toBe(true);
+    expect(info.status).toBe("paused");
+    // Started 100 min ago, paused 30 min ago: 70 min of burn, the 30
+    // paused minutes don't count.
+    expect(info.remainingMinutes).toBeCloseTo(3840 - 70, 5);
+  });
+});

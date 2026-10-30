@@ -42,6 +42,8 @@ interface Labels {
   oxygenLegacyChange: string;
   oxygenFlowChanged: string;
   oxygenFlowChangedMany: string;
+  /** "Oxygen paused since {{time}}" — live state of a manually paused tank. */
+  oxygenPausedSince: string;
   hospital: string;
   carePlaceIssue: string;
   taskNote: string;
@@ -340,7 +342,7 @@ export function useHandoverPrefill(
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
-      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes, maintLogsRes, maintItemsRes, careEventsRes] =
+      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes, maintLogsRes, maintItemsRes, careEventsRes, activeOxyRes] =
         await Promise.all([
           supabase
             .from("medications")
@@ -421,6 +423,16 @@ export function useHandoverPrefill(
             .gte("occurred_at", startIso)
             .lt("occurred_at", endIso)
             .order("occurred_at", { ascending: true }),
+          // Live state of the current tank — a manual pause that started
+          // before the shift window is still worth one line in the handover.
+          supabase
+            .from("oxygen_tanks")
+            .select("id, paused_at, pause_reason")
+            .eq("family_id", familyId)
+            .is("replaced_at", null)
+            .order("started_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
         ]);
 
       const meds = (medsRes.data ?? []) as Medication[];
@@ -609,6 +621,19 @@ export function useHandoverPrefill(
             oxygenFlowChanged: labels.oxygenFlowChanged,
             oxygenFlowChangedMany: labels.oxygenFlowChangedMany,
           }),
+        );
+      }
+
+      // Live state: a manually paused tank is called out even when the pause
+      // started before the shift window — the next caregiver must know the
+      // countdown and alarms are off.
+      const activeOxy = activeOxyRes.data as {
+        paused_at: string | null;
+        pause_reason: string | null;
+      } | null;
+      if (activeOxy?.paused_at && activeOxy.pause_reason === "manual") {
+        noteLines.push(
+          `• ${labels.oxygenPausedSince.replace("{{time}}", formatTimeIn(activeOxy.paused_at, tz))}`,
         );
       }
 

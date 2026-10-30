@@ -2021,7 +2021,10 @@ export type Database = {
           last_checked_at: string | null
           low_alert_sent_at: string | null
           notes: string | null
+          pause_reason: string | null
           paused_at: string | null
+          paused_by: string | null
+          paused_caregiver_profile_id: string | null
           paused_seconds: number
           replaced_at: string | null
           started_at: string
@@ -2040,7 +2043,10 @@ export type Database = {
           last_checked_at?: string | null
           low_alert_sent_at?: string | null
           notes?: string | null
+          pause_reason?: string | null
           paused_at?: string | null
+          paused_by?: string | null
+          paused_caregiver_profile_id?: string | null
           paused_seconds?: number
           replaced_at?: string | null
           started_at?: string
@@ -2059,7 +2065,10 @@ export type Database = {
           last_checked_at?: string | null
           low_alert_sent_at?: string | null
           notes?: string | null
+          pause_reason?: string | null
           paused_at?: string | null
+          paused_by?: string | null
+          paused_caregiver_profile_id?: string | null
           paused_seconds?: number
           replaced_at?: string | null
           started_at?: string
@@ -2072,6 +2081,13 @@ export type Database = {
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oxygen_tanks_paused_caregiver_profile_id_fkey"
+            columns: ["paused_caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "caregiver_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2726,12 +2742,45 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      set_family_hospital_mode:
-        | { Args: { _family_id: string; _on: boolean }; Returns: string }
-        | {
-            Args: { _family_id: string; _on: boolean; _paused?: Json }
-            Returns: string
-          }
+      set_family_hospital_mode: {
+        Args: { _family_id: string; _on: boolean; _paused?: Json }
+        Returns: string
+      }
+      set_oxygen_tank_paused: {
+        Args: {
+          _caregiver_profile_id?: string
+          _paused: boolean
+          _tank_id: string
+        }
+        Returns: {
+          change_reason: string | null
+          check_reminder_sent_at: string | null
+          created_at: string
+          created_by: string | null
+          critical_alert_sent_at: string | null
+          family_id: string
+          flow_lpm: number
+          id: string
+          last_checked_at: string | null
+          low_alert_sent_at: string | null
+          notes: string | null
+          pause_reason: string | null
+          paused_at: string | null
+          paused_by: string | null
+          paused_caregiver_profile_id: string | null
+          paused_seconds: number
+          replaced_at: string | null
+          started_at: string
+          tank_type: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "oxygen_tanks"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       shares_family_with: {
         Args: { _me: string; _other_user: string }
         Returns: boolean

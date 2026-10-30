@@ -4,6 +4,7 @@ import {
   isOxygenCheckOverdue,
   lastInteractionAt,
   resolveCheckIntervalMinutes,
+  shouldNagManualPause,
   shouldSendCheckReminder,
 } from "./check-reminder";
 
@@ -215,5 +216,59 @@ describe("high-flow interval cap", () => {
     expect(shouldSendCheckReminder(at(181, 4860))).toBe(true);
     expect(shouldSendCheckReminder(at(170, null))).toBe(false);
     expect(isOxygenCheckOverdue(at(181, null))).toBe(true);
+  });
+});
+
+describe("manual pause reminder (sweep paused pass)", () => {
+  // The sweep calls shouldSendCheckReminder with startedAt = paused_at and
+  // tankTotalMinutes = null for manually paused tanks.
+  const paused = {
+    startedAt: minsAgo(200), // paused_at
+    lastCheckedAt: null as string | null,
+    checkReminderSentAt: null as string | null,
+    intervalMinutes: 180,
+    tankTotalMinutes: null,
+    now: NOW,
+  };
+
+  it("fires after the interval measured from paused_at", () => {
+    expect(shouldSendCheckReminder(paused)).toBe(true);
+    expect(shouldSendCheckReminder({ ...paused, startedAt: minsAgo(60) })).toBe(false);
+  });
+
+  it("resets after a confirm while still paused", () => {
+    expect(
+      shouldSendCheckReminder({
+        ...paused,
+        lastCheckedAt: minsAgo(10),
+        checkReminderSentAt: minsAgo(190),
+      }),
+    ).toBe(false);
+    expect(shouldSendCheckReminder({ ...paused, lastCheckedAt: minsAgo(200) })).toBe(true);
+  });
+
+  it("uses the family interval uncapped (tankTotalMinutes: null)", () => {
+    expect(shouldSendCheckReminder({ ...paused, startedAt: minsAgo(170) })).toBe(false);
+    expect(shouldSendCheckReminder({ ...paused, startedAt: minsAgo(181) })).toBe(true);
+  });
+
+  it("the banner's overdue predicate mirrors the same clock", () => {
+    expect(isOxygenCheckOverdue({ ...paused, startedAt: minsAgo(181) })).toBe(true);
+    expect(isOxygenCheckOverdue({ ...paused, startedAt: minsAgo(170) })).toBe(false);
+  });
+});
+
+describe("shouldNagManualPause (sweep gate)", () => {
+  it("hospital-paused and legacy unmarked tanks never get the reminder", () => {
+    expect(shouldNagManualPause({ pausedAt: minsAgo(200), pauseReason: "hospital" })).toBe(false);
+    expect(shouldNagManualPause({ pausedAt: minsAgo(200), pauseReason: null })).toBe(false);
+  });
+
+  it("manually paused tanks do", () => {
+    expect(shouldNagManualPause({ pausedAt: minsAgo(200), pauseReason: "manual" })).toBe(true);
+  });
+
+  it("running tanks are not paused at all", () => {
+    expect(shouldNagManualPause({ pausedAt: null, pauseReason: null })).toBe(false);
   });
 });
