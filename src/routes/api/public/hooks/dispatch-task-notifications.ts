@@ -5,6 +5,11 @@ import { VAPID_PUBLIC_KEY } from "@/lib/push/keys";
 import { createRecipientResolver, type NotifyCategory } from "@/lib/push/recipients";
 import { isPaused } from "@/lib/hospital/paused";
 import { fetchAllPages, fetchInChunks } from "@/lib/push/batching";
+import {
+  DEFAULT_FAMILY_TZ,
+  expandRecurrence,
+  shouldSendLatePush,
+} from "@/lib/schedule/recurrence";
 
 // Public cron endpoint. Called every minute by pg_cron with the project's
 // anon `apikey` header. Runs four passes per call, all deduped per-occurrence
@@ -122,9 +127,13 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         let dispatched = 0;
 
         // Preload per-family timezone + language + hospital-pause once.
-        const { data: allFams, error: famErr } = await supabaseAdmin
-          .from("families")
-          .select("id, timezone, notification_language, at_hospital_since, hospital_paused");
+        const { rows: allFams, error: famErr } = await fetchAllPages((from, to) =>
+          supabaseAdmin
+            .from("families")
+            .select("id, timezone, notification_language, at_hospital_since, hospital_paused")
+            .order("id")
+            .range(from, to),
+        );
         if (famErr) console.error("task-sweep: families query failed", famErr.message);
         const famInfo = new Map<
           string,
@@ -133,7 +142,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
           (allFams ?? []).map((f) => [
             f.id,
             {
-              tz: f.timezone ?? "Europe/Stockholm",
+              tz: f.timezone ?? DEFAULT_FAMILY_TZ,
               lang: (f.notification_language === "en" ? "en" : "sv") as Lang,
               tasksPaused: isPaused(
                 { at_hospital_since: f.at_hospital_since, hospital_paused: f.hospital_paused },
@@ -144,7 +153,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         );
         const infoFor = (familyId: string) =>
           famInfo.get(familyId) ?? {
-            tz: "Europe/Stockholm",
+            tz: DEFAULT_FAMILY_TZ,
             lang: "sv" as Lang,
             tasksPaused: false,
           };
@@ -315,7 +324,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         for (const m of slmMasters) {
           // Without override info we could push cancelled occurrences — skip.
           if (slmFailedMasters.has(m.id)) continue;
-          const occs = expandOccurrences(m, windowStart, now);
+          const occs = expandRecurrence(m, windowStart, now, infoFor(m.family_id).tz);
           for (const occ of occs) {
             const iso = occ.toISOString();
             const key = `${m.id}@${iso}`;
@@ -381,8 +390,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         // -------- PASS 2: late --------
         for (const c of slmCandidates) {
           if (infoFor(c.family_id).tasksPaused) continue;
-          const dueMs = c.occurrence_ms + c.late_after_minutes * 60_000;
-          if (now.getTime() < dueMs) continue;
+          if (!shouldSendLatePush(c, now.getTime())) continue;
           if (await hasCompletion(supabaseAdmin, c.master_id, c.occurrence_at))
             continue;
           if (!(await tryClaim(c.master_id, c.occurrence_at, "late"))) continue;
@@ -531,7 +539,7 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
         for (const m of masters) {
           if (!m.reminder_minutes || !m.recurrence_freq) continue;
           if (remFailedMasters.has(m.id)) continue;
-          const occs = expandOccurrences(m, now, lookAheadEnd);
+          const occs = expandRecurrence(m, now, lookAheadEnd, infoFor(m.family_id).tz);
           for (const occ of occs) {
             const iso = occ.toISOString();
             if (overrideKey.has(`${m.id}@${iso}`)) continue;
@@ -605,144 +613,6 @@ export const Route = createFileRoute("/api/public/hooks/dispatch-task-notificati
     },
   },
 });
-
-// ---- Occurrence expander (server-safe port of expandMaster) ----
-const MS_HOUR = 60 * 60 * 1000;
-const MS_DAY = 24 * MS_HOUR;
-const EXPAND_CAP = 200;
-
-function parseHHMM(s: string): [number, number] | null {
-  const m = /^(\d{1,2}):(\d{2})$/.exec(s.trim());
-  if (!m) return null;
-  const hh = Number(m[1]);
-  const mm = Number(m[2]);
-  if (!(hh >= 0 && hh <= 23) || !(mm >= 0 && mm <= 59)) return null;
-  return [hh, mm];
-}
-
-function expandOccurrences(
-  master: {
-    starts_at: string;
-    recurrence_freq: string | null;
-    recurrence_interval: number | null;
-    recurrence_byweekday: number[] | null;
-    recurrence_times_of_day: string[] | null;
-  },
-  rangeStart: Date,
-  rangeEnd: Date,
-): Date[] {
-  const out: Date[] = [];
-  const freq = master.recurrence_freq;
-  if (!freq) return out;
-  const interval = Math.max(1, master.recurrence_interval ?? 1);
-  const start = new Date(master.starts_at);
-  if (start >= rangeEnd) return out;
-
-  const emit = (base: Date) => {
-    const times: Array<[number, number]> = [];
-    const list = (master.recurrence_times_of_day ?? [])
-      .map(parseHHMM)
-      .filter((x): x is [number, number] => !!x);
-    if (list.length > 0) times.push(...list);
-    else times.push([start.getUTCHours(), start.getUTCMinutes()]);
-    for (const [hh, mm] of times) {
-      const occ = new Date(
-        Date.UTC(
-          base.getUTCFullYear(),
-          base.getUTCMonth(),
-          base.getUTCDate(),
-          hh,
-          mm,
-          0,
-          0,
-        ),
-      );
-      if (occ >= start && occ >= rangeStart && occ < rangeEnd) out.push(occ);
-    }
-  };
-
-  if (freq === "hourly") {
-    const stepMs = interval * MS_HOUR;
-    let t = start.getTime();
-    if (t < rangeStart.getTime()) {
-      const skips = Math.ceil((rangeStart.getTime() - t) / stepMs);
-      t = t + skips * stepMs;
-    }
-    let n = 0;
-    while (t < rangeEnd.getTime() && n < EXPAND_CAP) {
-      out.push(new Date(t));
-      t += stepMs;
-      n++;
-    }
-    return out;
-  }
-
-  if (freq === "daily") {
-    const cursor = new Date(Math.max(start.getTime(), rangeStart.getTime()));
-    cursor.setUTCHours(0, 0, 0, 0);
-    const startDay = new Date(start);
-    startDay.setUTCHours(0, 0, 0, 0);
-    let n = 0;
-    while (cursor < rangeEnd && n < EXPAND_CAP) {
-      const diffDays = Math.round(
-        (cursor.getTime() - startDay.getTime()) / MS_DAY,
-      );
-      if (diffDays >= 0 && diffDays % interval === 0) emit(cursor);
-      cursor.setUTCDate(cursor.getUTCDate() + 1);
-      n++;
-    }
-    return out;
-  }
-
-  if (freq === "weekly") {
-    const weekdays = (master.recurrence_byweekday ?? []).filter(
-      (w) => w >= 0 && w <= 6,
-    );
-    if (weekdays.length === 0) return out;
-    const cursor = new Date(Math.max(start.getTime(), rangeStart.getTime()));
-    cursor.setUTCHours(0, 0, 0, 0);
-    let n = 0;
-    while (cursor < rangeEnd && n < EXPAND_CAP * 7) {
-      if (weekdays.includes(cursor.getUTCDay())) emit(cursor);
-      cursor.setUTCDate(cursor.getUTCDate() + 1);
-      n++;
-    }
-    return out;
-  }
-
-  if (freq === "monthly") {
-    const dom = start.getUTCDate();
-    let y = Math.max(start.getUTCFullYear(), rangeStart.getUTCFullYear());
-    let mo =
-      y === start.getUTCFullYear() ? start.getUTCMonth() : 0;
-    if (y === rangeStart.getUTCFullYear() && mo < rangeStart.getUTCMonth()) {
-      mo = rangeStart.getUTCMonth();
-    }
-    let n = 0;
-    while (n < EXPAND_CAP) {
-      const daysInMonth = new Date(Date.UTC(y, mo + 1, 0)).getUTCDate();
-      if (dom <= daysInMonth) {
-        const totalMonths =
-          (y - start.getUTCFullYear()) * 12 + (mo - start.getUTCMonth());
-        if (totalMonths >= 0 && totalMonths % interval === 0) {
-          emit(new Date(Date.UTC(y, mo, dom)));
-        }
-      }
-      mo += 1;
-      if (mo > 11) {
-        mo = 0;
-        y += 1;
-      }
-      const probe = new Date(Date.UTC(y, mo, Math.min(dom, 28)));
-      if (probe >= rangeEnd) break;
-      n++;
-    }
-    return out;
-  }
-
-  return out;
-}
-
 
 async function hasCompletion(
   client: Awaited<

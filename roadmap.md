@@ -23,3 +23,10 @@
 - [x] Split routines status in scaffolds; reset keeps created
 - [x] Dashboard card: routines reminder; remove feed/neb/glucose task offers
 - [x] i18n, tests, live verification
+
+## Recurrence timezone fix (done)
+- [x] Shared tz-aware expander used by app + task sweep
+- [x] useAppointments waits for family tz; family-tz day ranges on Today/Planner/Calendar/banners
+- [x] Late push only when late_after_minutes > 0 and notify_start
+- [x] Page families in task + oxygen sweeps
+- [x] Tests + read-only completion count

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { expandRecurrence } from "@/lib/schedule/recurrence";
 
 type AppointmentRow = Database["public"]["Tables"]["appointments"]["Row"];
 
@@ -131,191 +132,33 @@ export const CARE_TASK_KINDS: AppointmentKind[] = APPOINTMENT_KINDS.filter(
 
 
 // ---------------------------------------------------------------------------
-// Recurrence expansion
+// Recurrence expansion — shared, family-timezone aware (see
+// src/lib/schedule/recurrence.ts). The push sweep uses the same function.
 // ---------------------------------------------------------------------------
 
-const MS_HOUR = 60 * 60 * 1000;
-const MS_DAY = 24 * MS_HOUR;
-const SAFETY_CAP = 500; // per master, per window
-
 /**
- * Parse "HH:MM" → [hours, minutes]. Returns null when malformed.
+ * Pure: expand masters into instances for [start, end) in `tz`, applying
+ * overrides keyed by `${master_id}@${occurrence ISO}`. Exported for the
+ * client/server parity test.
  */
-function parseHHMM(s: string): [number, number] | null {
-  const m = /^(\d{1,2}):(\d{2})$/.exec(s.trim());
-  if (!m) return null;
-  const hh = Number(m[1]);
-  const mm = Number(m[2]);
-  if (!(hh >= 0 && hh <= 23) || !(mm >= 0 && mm <= 59)) return null;
-  return [hh, mm];
-}
-
-/**
- * Expand a calendar "anchor day" (year/month/day) into one occurrence per
- * configured time-of-day (or a single occurrence at the master's start time
- * when no times-of-day are set).
- */
-function expandDayWithTimes(
-  master: Appointment,
-  anchorYear: number,
-  anchorMonth: number, // 0-11
-  anchorDay: number,
-  rangeStart: Date,
-  rangeEnd: Date,
+export function expandMastersToInstances(
+  masters: Appointment[],
+  overrideMap: Map<string, Appointment>,
   start: Date,
-  out: Date[],
-) {
-  const times: Array<[number, number]> = [];
-  const list = (master.recurrence_times_of_day ?? [])
-    .map(parseHHMM)
-    .filter((x): x is [number, number] => !!x);
-  if (list.length > 0) {
-    times.push(...list);
-  } else {
-    times.push([start.getHours(), start.getMinutes()]);
-  }
-  for (const [hh, mm] of times) {
-    const occ = new Date(anchorYear, anchorMonth, anchorDay, hh, mm, 0, 0);
-    if (occ >= start && occ >= rangeStart && occ < rangeEnd) {
-      out.push(occ);
+  end: Date,
+  tz: string,
+): ExpandedAppointment[] {
+  const out: ExpandedAppointment[] = [];
+  for (const m of masters) {
+    for (const occ of expandRecurrence(m, start, end, tz)) {
+      const key = `${m.id}@${occ.toISOString()}`;
+      const inst = instanceFromMaster(m, occ, overrideMap.get(key) ?? null);
+      if (inst) out.push(inst);
     }
   }
-}
-
-function expandMaster(
-  master: Appointment,
-  rangeStart: Date,
-  rangeEnd: Date,
-): Date[] {
-  const out: Date[] = [];
-  if (!master.recurrence_freq) return out;
-  const interval = Math.max(1, master.recurrence_interval ?? 1);
-  const start = new Date(master.starts_at);
-  if (start >= rangeEnd) return out;
-
-  if (master.recurrence_freq === "hourly") {
-    const stepMs = interval * MS_HOUR;
-    let t = start.getTime();
-    if (t < rangeStart.getTime()) {
-      const diff = rangeStart.getTime() - t;
-      const skips = Math.ceil(diff / stepMs);
-      t = t + skips * stepMs;
-    }
-    let n = 0;
-    while (t < rangeEnd.getTime() && n < SAFETY_CAP) {
-      out.push(new Date(t));
-      t += stepMs;
-      n++;
-    }
-    return out;
-  }
-
-  if (master.recurrence_freq === "daily") {
-    // Walk day-by-day so we can emit multiple times-of-day per day.
-    const cursor = new Date(Math.max(start.getTime(), rangeStart.getTime()));
-    cursor.setHours(0, 0, 0, 0);
-    // Align to the daily interval relative to master's start day.
-    const startDay = new Date(start);
-    startDay.setHours(0, 0, 0, 0);
-    let n = 0;
-    while (cursor < rangeEnd && n < SAFETY_CAP) {
-      const diffDays = Math.round(
-        (cursor.getTime() - startDay.getTime()) / MS_DAY,
-      );
-      if (diffDays >= 0 && diffDays % interval === 0) {
-        expandDayWithTimes(
-          master,
-          cursor.getFullYear(),
-          cursor.getMonth(),
-          cursor.getDate(),
-          rangeStart,
-          rangeEnd,
-          start,
-          out,
-        );
-      }
-      cursor.setDate(cursor.getDate() + 1);
-      n++;
-    }
-    return out;
-  }
-
-  if (master.recurrence_freq === "weekly") {
-    const weekdays = (master.recurrence_byweekday ?? []).filter(
-      (w) => w >= 0 && w <= 6,
-    );
-    if (weekdays.length === 0) return out;
-    const cursor = new Date(Math.max(start.getTime(), rangeStart.getTime()));
-    cursor.setHours(0, 0, 0, 0);
-    let n = 0;
-    while (cursor < rangeEnd && n < SAFETY_CAP * 7) {
-      if (weekdays.includes(cursor.getDay())) {
-        expandDayWithTimes(
-          master,
-          cursor.getFullYear(),
-          cursor.getMonth(),
-          cursor.getDate(),
-          rangeStart,
-          rangeEnd,
-          start,
-          out,
-        );
-      }
-      cursor.setDate(cursor.getDate() + 1);
-      n++;
-    }
-    return out;
-  }
-
-  if (master.recurrence_freq === "monthly") {
-    // Same day-of-month as the master start. Skip months where that
-    // day doesn't exist (e.g. Feb 30).
-    const dom = start.getDate();
-    // Move to first candidate month at-or-after rangeStart.
-    let y = Math.max(start.getFullYear(), rangeStart.getFullYear());
-    let mo =
-      y === start.getFullYear()
-        ? start.getMonth()
-        : 0;
-    // If rangeStart is later in same year, advance to its month.
-    if (y === rangeStart.getFullYear() && mo < rangeStart.getMonth()) {
-      mo = rangeStart.getMonth();
-    }
-    let n = 0;
-    while (n < SAFETY_CAP) {
-      const daysInMonth = new Date(y, mo + 1, 0).getDate();
-      if (dom <= daysInMonth) {
-        // Honour interval (months) relative to master start.
-        const totalMonths =
-          (y - start.getFullYear()) * 12 + (mo - start.getMonth());
-        if (totalMonths >= 0 && totalMonths % interval === 0) {
-          expandDayWithTimes(
-            master,
-            y,
-            mo,
-            dom,
-            rangeStart,
-            rangeEnd,
-            start,
-            out,
-          );
-        }
-      }
-      // step one month forward
-      mo += 1;
-      if (mo > 11) {
-        mo = 0;
-        y += 1;
-      }
-      const probe = new Date(y, mo, Math.min(dom, 28), 0, 0, 0, 0);
-      if (probe >= rangeEnd) break;
-      n++;
-    }
-    return out;
-  }
-
   return out;
 }
+
 
 function asExpanded(a: Appointment): ExpandedAppointment {
   return {
@@ -364,14 +207,20 @@ function instanceFromMaster(
 // Queries
 // ---------------------------------------------------------------------------
 
+/**
+ * `tz` is the family's timezone (families.timezone, or Europe/Stockholm when
+ * the row has none). Pass `undefined` while the family row is loading — the
+ * query stays disabled; we never fall back to the browser's timezone.
+ */
 export function useAppointments(
   familyId: string | undefined | null,
   start: Date,
   end: Date,
+  tz: string | undefined,
 ) {
   return useQuery({
-    queryKey: ["appointments", familyId, start.toISOString(), end.toISOString()],
-    enabled: !!familyId,
+    queryKey: ["appointments", familyId, start.toISOString(), end.toISOString(), tz],
+    enabled: !!familyId && !!tz,
     queryFn: async (): Promise<ExpandedAppointment[]> => {
       // 1. Plain (non-recurring, non-override) rows inside the window
       const plainRes = await supabase
@@ -424,15 +273,7 @@ export function useAppointments(
       for (const p of (plainRes.data ?? []) as Appointment[]) {
         out.push(asExpanded(p));
       }
-      for (const m of masters) {
-        const occs = expandMaster(m, start, end);
-        for (const occ of occs) {
-          const key = `${m.id}@${occ.toISOString()}`;
-          const ov = overrideMap.get(key) ?? null;
-          const inst = instanceFromMaster(m, occ, ov);
-          if (inst) out.push(inst);
-        }
-      }
+      out.push(...expandMastersToInstances(masters, overrideMap, start, end, tz!));
       out.sort(
         (a, b) =>
           new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),

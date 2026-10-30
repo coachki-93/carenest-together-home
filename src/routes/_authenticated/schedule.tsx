@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { DEFAULT_FAMILY_TZ, shiftDateStr, startOfDayIn } from "@/lib/schedule/recurrence";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -192,7 +193,9 @@ function SchedulePage() {
   const { data: membership } = useMyMembership();
   const familyId = membership?.family_id;
   const { data: family } = useFamily(familyId);
-  const tz = family?.timezone ?? "Europe/Stockholm";
+  const tz = family?.timezone ?? DEFAULT_FAMILY_TZ;
+  // Undefined until the family row loads → useAppointments stays disabled.
+  const apptTz = family ? tz : undefined;
   const { data: child } = useFamilyChild(familyId);
   const { data: meds = [] } = useMedications(familyId);
   const { activeId: activeCaregiverId } = useActiveCaregiverProfile(familyId, user?.id);
@@ -200,6 +203,14 @@ function SchedulePage() {
 
   const [day, setDay] = useState<Date>(() => startOfDay(new Date()));
   const dayEnd = useMemo(() => addDays(day, 1), [day]);
+  // Task range: the selected calendar day, midnight-to-midnight in family tz.
+  const { apptDayStart, apptDayEnd } = useMemo(() => {
+    const ds = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
+    return {
+      apptDayStart: startOfDayIn(ds, tz),
+      apptDayEnd: startOfDayIn(shiftDateStr(ds, 1), tz),
+    };
+  }, [day, tz]);
   const isToday = isSameDay(day, new Date());
 
   const dayLabel = useMemo(() => {
@@ -212,7 +223,7 @@ function SchedulePage() {
   }, [i18n.language, day]);
 
   const { data: logs = [] } = useMedLogs(familyId, day, dayEnd);
-  const { data: appointments = [] } = useAppointments(familyId, day, dayEnd);
+  const { data: appointments = [] } = useAppointments(familyId, apptDayStart, apptDayEnd, apptTz);
   const { data: shifts = [] } = useShifts(familyId);
   const doses = useMemo(
     () => buildTodaysDoses(meds, logs, family?.timezone ?? "Europe/Stockholm", day),

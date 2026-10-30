@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { wallClockIn } from "@/lib/time/family-tz";
+import { DEFAULT_FAMILY_TZ, shiftDateStr, startOfDayIn } from "@/lib/schedule/recurrence";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
@@ -361,16 +363,6 @@ function buildNotesSpec(
   return null;
 }
 
-function startOfDay(d: Date) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-function endOfDay(d: Date) {
-  const x = startOfDay(d);
-  x.setDate(x.getDate() + 1);
-  return x;
-}
 
 function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -419,11 +411,20 @@ function DashboardPage() {
     return { currentShifts: current, nextShifts: next };
   }, [shifts, nowTick]);
 
-  const todayStart = useMemo(() => startOfDay(new Date()), []);
-  const todayEnd = useMemo(() => endOfDay(new Date()), []);
+  // Today = midnight-to-midnight in the family timezone (never the browser's).
+  const familyTz = family?.timezone ?? DEFAULT_FAMILY_TZ;
+  const apptTz = family ? familyTz : undefined;
+  const todayStart = useMemo(
+    () => startOfDayIn(wallClockIn(new Date(), familyTz).todayStr, familyTz),
+    [familyTz],
+  );
+  const todayEnd = useMemo(
+    () => startOfDayIn(shiftDateStr(wallClockIn(new Date(), familyTz).todayStr, 1), familyTz),
+    [familyTz],
+  );
   const { data: meds = [], isLoading: medsLoading } = useMedications(familyId);
   const { data: logs = [], isLoading: logsLoading } = useMedLogs(familyId, todayStart, todayEnd);
-  const { data: appointments = [], isLoading: apptsLoading } = useAppointments(familyId, todayStart, todayEnd);
+  const { data: appointments = [], isLoading: apptsLoading } = useAppointments(familyId, todayStart, todayEnd, apptTz);
   const scheduleLoading = !!familyId && (medsLoading || logsLoading || apptsLoading || childLoading);
 
   const logDose = useLogDose();

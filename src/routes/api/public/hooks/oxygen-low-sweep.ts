@@ -1,3 +1,4 @@
+import { fetchAllPages } from "@/lib/push/batching";
 import { createFileRoute } from "@tanstack/react-router";
 import { computeRemaining, durationMinutes, type OxygenTankRow, type TankType } from "@/lib/oxygen/tanks";
 import { authorizeCronRequest } from "@/lib/push/cron-auth";
@@ -39,11 +40,16 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
           )
           .is("replaced_at", null);
 
-        const { data: families } = await supabaseAdmin
-          .from("families")
-          .select(
-            "id, oxygen_warn_minutes, oxygen_critical_minutes, oxygen_check_interval_minutes, at_hospital_since, hospital_paused, notification_language, timezone",
-          );
+        const { rows: families, error: famErr } = await fetchAllPages((from, to) =>
+          supabaseAdmin
+            .from("families")
+            .select(
+              "id, oxygen_warn_minutes, oxygen_critical_minutes, oxygen_check_interval_minutes, at_hospital_since, hospital_paused, notification_language, timezone",
+            )
+            .order("id")
+            .range(from, to),
+        );
+        if (famErr) console.error("oxygen-sweep: families query failed", famErr.message);
         const famSettings = new Map<
           string,
           { warn: number; crit: number; checkInterval: number | null; lang: "sv" | "en"; tz: string }
