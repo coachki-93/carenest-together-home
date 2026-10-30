@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { DEFAULT_FAMILY_TZ, shiftDateStr, startOfDayIn } from "@/lib/schedule/recurrence";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { BellRing, ChevronRight } from "lucide-react";
@@ -24,23 +25,23 @@ export function AppointmentsReminderBanner({ familyId }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: family } = useFamily(familyId);
-  const tz = family?.timezone ?? "Europe/Stockholm";
+  const tz = family?.timezone ?? DEFAULT_FAMILY_TZ;
+  // Undefined until the family row loads → useAppointments stays disabled.
+  const apptTz = family ? tz : undefined;
 
   // 2-day look-ahead cap matches the max reminder (1440 min = 1 day),
   // with a bit of slack for tz math across midnight.
-  const start = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
-  const end = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() + 3);
-    return d;
-  }, []);
+  // Day boundaries are midnight in the family timezone.
+  const start = useMemo(
+    () => startOfDayIn(wallClockIn(new Date(), tz).todayStr, tz),
+    [tz],
+  );
+  const end = useMemo(
+    () => startOfDayIn(shiftDateStr(wallClockIn(new Date(), tz).todayStr, 3), tz),
+    [tz],
+  );
 
-  const { data: appts = [] } = useAppointments(familyId, start, end);
+  const { data: appts = [] } = useAppointments(familyId, start, end, apptTz);
   const { data: completions = [] } = useAppointmentCompletions(familyId, start, end);
 
   const due = useMemo(() => {

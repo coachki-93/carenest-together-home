@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
+import { DEFAULT_FAMILY_TZ, shiftDateStr, startOfDayIn } from "@/lib/schedule/recurrence";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -122,7 +123,9 @@ function AppointmentsPage() {
   const { user } = useSession();
   const familyId = membership?.family_id ?? null;
   const { data: family } = useFamily(familyId);
-  const tz = family?.timezone ?? "Europe/Stockholm";
+  const tz = family?.timezone ?? DEFAULT_FAMILY_TZ;
+  // Undefined until the family row loads → useAppointments stays disabled.
+  const apptTz = family ? tz : undefined;
 
   // Anchor is any date inside the visible month.
   const [anchor, setAnchor] = useState<Date>(() => new Date());
@@ -145,7 +148,7 @@ function AppointmentsPage() {
     [anchor, tz],
   );
 
-  const { data: allAppts = [] } = useAppointments(familyId, gridStart, gridEnd);
+  const { data: allAppts = [] } = useAppointments(familyId, gridStart, gridEnd, apptTz);
   const visits = useMemo(
     () => allAppts.filter((a) => isVisitKind(a.kind)),
     [allAppts],
@@ -1418,29 +1421,20 @@ function buildMonthGrid(
 } {
   const p = wallClockIn(anchor, tz);
   const [year, month] = p.todayStr.split("-").map(Number);
-  // First of month in browser-local time — good enough anchor to walk 42 days
-  // and derive family-tz day strings for each.
-  const first = new Date(year, month - 1, 1, 12, 0, 0, 0);
-  // Grid starts on Monday of the week containing the 1st.
-  const firstWeekday = first.getDay(); // 0=Sun..6=Sat
+  // Walk calendar date strings; boundaries are midnight in the family tz.
+  const firstStr = `${year}-${String(month).padStart(2, "0")}-01`;
+  const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay(); // 0=Sun
   const backDays = (firstWeekday + 6) % 7; // days to previous Monday
-  const gridStart = new Date(first);
-  gridStart.setDate(first.getDate() - backDays);
-  gridStart.setHours(0, 0, 0, 0);
+  const gridStartStr = shiftDateStr(firstStr, -backDays);
 
   const days: GridDay[] = [];
-  const cursor = new Date(gridStart);
   for (let i = 0; i < 42; i++) {
-    const partsCursor = wallClockIn(cursor, tz);
-    const [cy, cm, cd] = partsCursor.todayStr.split("-").map(Number);
-    days.push({
-      dateStr: partsCursor.todayStr,
-      dayOfMonth: cd,
-      inMonth: cy === year && cm === month,
-    });
-    cursor.setDate(cursor.getDate() + 1);
+    const ds = shiftDateStr(gridStartStr, i);
+    const [cy, cm, cd] = ds.split("-").map(Number);
+    days.push({ dateStr: ds, dayOfMonth: cd, inMonth: cy === year && cm === month });
   }
-  const gridEnd = new Date(cursor);
+  const gridStart = startOfDayIn(gridStartStr, tz);
+  const gridEnd = startOfDayIn(shiftDateStr(gridStartStr, 42), tz);
   return {
     gridStart,
     gridEnd,

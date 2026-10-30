@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { DEFAULT_FAMILY_TZ, shiftDateStr, startOfDayIn } from "@/lib/schedule/recurrence";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { CalendarHeart, ChevronRight } from "lucide-react";
@@ -28,24 +29,22 @@ export function AppointmentsTodayBanner({ familyId }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: family } = useFamily(familyId);
-  const tz = family?.timezone ?? "Europe/Stockholm";
+  const tz = family?.timezone ?? DEFAULT_FAMILY_TZ;
+  // Undefined until the family row loads → useAppointments stays disabled.
+  const apptTz = family ? tz : undefined;
 
   // Widen the window slightly on each side so tz math near midnight is safe;
   // the filter below picks the actual family-timezone "today".
-  const start = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() - 1);
-    return d;
-  }, []);
-  const end = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() + 2);
-    return d;
-  }, []);
+  const start = useMemo(
+    () => startOfDayIn(shiftDateStr(wallClockIn(new Date(), tz).todayStr, -1), tz),
+    [tz],
+  );
+  const end = useMemo(
+    () => startOfDayIn(shiftDateStr(wallClockIn(new Date(), tz).todayStr, 2), tz),
+    [tz],
+  );
 
-  const { data: appts = [] } = useAppointments(familyId, start, end);
+  const { data: appts = [] } = useAppointments(familyId, start, end, apptTz);
   const { data: completions = [] } = useAppointmentCompletions(familyId, start, end);
 
   const upcoming = useMemo(() => {
