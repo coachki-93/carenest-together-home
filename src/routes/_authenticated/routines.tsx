@@ -251,6 +251,12 @@ function RoutinesPage() {
     }
   }
 
+  // Onboarding with no matching suggestions: go straight on, as before.
+  useEffect(() => {
+    if (initialised && groups.length === 0 && search.from === "onboarding") finish();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialised, groups.length, search.from]);
+
   const name = child?.name ?? "";
 
   return (

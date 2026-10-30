@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { readScaffoldsMap } from "@/lib/care-needs/scaffold-status";
+import { capabilitiesWithTemplates } from "@/lib/care-needs/routine-templates";
 import { useTranslation } from "react-i18next";
 import { Loader2, Plus, X, Baby, RotateCcw } from "lucide-react";
 import { z } from "zod";
@@ -51,6 +53,7 @@ function ChildProfilePage() {
   const { data: membership } = useMyMembership();
   const { data: child, isLoading } = useFamilyChild(membership?.family_id);
   const updateChild = useUpdateChild();
+  const navigate = useNavigate();
   const canEdit = membership?.role === "owner";
 
   const [name, setName] = useState("");
@@ -117,6 +120,18 @@ function ChildProfilePage() {
 
       });
       toast.success(t("childPage.saved"));
+      // Newly added needs with suggestions and no routines decision yet →
+      // open the guided setup for just those needs.
+      const prevRaw = (child as unknown as { care_needs?: unknown }).care_needs;
+      const prevCaps = new Set(parseCareNeeds(prevRaw).capabilities);
+      const scaffoldMap = readScaffoldsMap(prevRaw);
+      const withTemplates = capabilitiesWithTemplates();
+      const fresh = careNeeds.capabilities.filter(
+        (c) => !prevCaps.has(c) && withTemplates.has(c) && !scaffoldMap[c]?.routines?.status,
+      );
+      if (fresh.length > 0) {
+        navigate({ to: "/routines", search: { needs: fresh.join(","), from: "child" } });
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("childPage.saveError"));
     }

@@ -107,7 +107,7 @@ function ChildOnboarding() {
         {step === 6 && (
           <StepDone
             onBack={() => goTo(5)}
-            onFinish={() => navigate({ to: "/dashboard", search: { tour: 1 } as never })}
+            onFinish={() => navigate({ to: "/routines", search: { from: "onboarding" } })}
           />
         )}
 
