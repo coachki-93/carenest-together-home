@@ -159,6 +159,20 @@ export function expandMastersToInstances(
   return out;
 }
 
+/**
+ * Mirrors the database write rule on appointments: the family owner, or the
+ * creator of the task. For an occurrence of a recurring series the series
+ * creator decides (overrides follow the series). Expanded instances spread
+ * the master row, so `created_by` is already the series creator there.
+ */
+export function canManageAppointment(
+  appt: Pick<ExpandedAppointment, "created_by">,
+  ctx: { userId: string | null | undefined; isOwner: boolean },
+): boolean {
+  if (ctx.isOwner) return true;
+  return !!ctx.userId && appt.created_by === ctx.userId;
+}
+
 
 function asExpanded(a: Appointment): ExpandedAppointment {
   return {
