@@ -8,6 +8,7 @@ export type SubscriptionRow = {
     | "incomplete_expired"
     | "unpaid"
     | "paused"
+    | "none"
     | null;
   plan: "founding" | "standard" | null;
   trial_ends_at: string | null;
