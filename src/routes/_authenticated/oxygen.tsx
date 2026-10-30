@@ -167,11 +167,65 @@ function CurrentTankCard({
   const info = computeRemaining(tank);
   const tankLabel = TANKS[tank.tank_type as TankType]?.label ?? tank.tank_type;
   const confirm = useConfirmTank();
+  const pause = usePauseTank();
+  const resume = useResumeTank();
+  const actor = useCurrentActor(tank.family_id);
+  const [pauseOpen, setPauseOpen] = useState(false);
+  const isManualPaused = !!tank.paused_at && tank.pause_reason === "manual";
+
+  // Who paused it — caregiver profile name first, then the user's full name.
+  const { data: pauserName } = useQuery({
+    queryKey: ["oxygen-pauser", tank.id],
+    enabled: isManualPaused,
+    queryFn: async () => {
+      if (tank.paused_caregiver_profile_id) {
+        const { data } = await supabase
+          .from("caregiver_profiles")
+          .select("name")
+          .eq("id", tank.paused_caregiver_profile_id)
+          .maybeSingle();
+        if (data?.name) return data.name as string;
+      }
+      if (tank.paused_by) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", tank.paused_by)
+          .maybeSingle();
+        if (data?.full_name) return data.full_name as string;
+      }
+      return null;
+    },
+  });
 
   async function confirmTank() {
     try {
       await confirm.mutateAsync({ tankId: tank.id });
       toast.success(t("oxygen.confirmed"));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("oxygen.saveError"));
+    }
+  }
+
+  async function pauseTank() {
+    const guard = guardActingProfile(actor);
+    if (guard.blocked) {
+      toast.error(t("actor.selectProfilePrompt"));
+      return;
+    }
+    try {
+      await pause.mutateAsync({ tankId: tank.id, caregiverProfileId: guard.caregiverProfileId });
+      toast.success(t("oxygen.pausedToast"));
+      setPauseOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("oxygen.saveError"));
+    }
+  }
+
+  async function resumeTank() {
+    try {
+      await resume.mutateAsync({ tankId: tank.id });
+      toast.success(t("oxygen.resumed"));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("oxygen.saveError"));
     }
@@ -200,10 +254,22 @@ function CurrentTankCard({
 
       {info ? (
         <>
-          {info.paused && (
+          {info.paused && !isManualPaused && (
             <div className="card-soft p-3 flex items-center gap-3 border border-red-200 bg-red-50 text-red-900">
               <Hospital className="size-5 shrink-0" />
               <p className="text-sm font-medium">{t("oxygen.pausedHospital")}</p>
+            </div>
+          )}
+          {isManualPaused && tank.paused_at && (
+            <div className="card-soft p-3 flex items-center gap-3 border bg-muted/50">
+              <Pause className="size-5 shrink-0 text-muted-foreground" />
+              <p className="text-sm font-medium">
+                {pauserName
+                  ? t("oxygen.pausedSinceBy", { time: format(new Date(tank.paused_at), "HH:mm"), name: pauserName })
+                  : t("oxygen.pausedSince", { time: format(new Date(tank.paused_at), "HH:mm") })}
+                {" — "}
+                {t("oxygen.pausedManualHint")}
+              </p>
             </div>
           )}
           <div className="text-center py-4">
