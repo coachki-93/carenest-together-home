@@ -1,138 +1,198 @@
-# Two small fixes: oxygen fail-safe + PWA theme colour
+# Manual "pause oxygen at home" feature
 
-## Scope
+A caregiver can pause the active tank at home (e.g. child disconnected for a bath), separate from hospital mode. A paused tank silences all oxygen alarms, so the feature is built fail-safe: a persistent banner + a periodic "still paused?" push make sure it is never forgotten.
 
-Exactly four files. No package/dependency changes. No CSS token changes.
+## 1 — Migration (shown here in full before applying)
 
----
+```sql
+-- New columns on oxygen_tanks
+ALTER TABLE public.oxygen_tanks
+  ADD COLUMN pause_reason text,
+  ADD COLUMN paused_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN paused_caregiver_profile_id uuid REFERENCES public.caregiver_profiles(id) ON DELETE SET NULL;
 
-## 1. Oxygen fail-safe — `src/lib/oxygen/tanks.ts`
+ALTER TABLE public.oxygen_tanks
+  ADD CONSTRAINT oxygen_tanks_pause_reason_check
+  CHECK (pause_reason IS NULL OR pause_reason IN ('hospital', 'manual'));
 
-`TANKS` is typed `Record<TankType, ...>` with one key (`liv_mini_2l`), but the
-type is a lie at runtime: every call site passes
-`tank.tank_type as TankType` from a plain `string` DB column. Any row with a
-tank type outside that key makes `TANKS[type]` `undefined`, and
-`TANKS[type].flows` throws.
+-- Backfill: today only hospital mode can pause a tank
+UPDATE public.oxygen_tanks
+  SET pause_reason = 'hospital'
+  WHERE paused_at IS NOT NULL AND pause_reason IS NULL;
 
-Blast radius today:
+-- Manual pause/resume RPC
+CREATE OR REPLACE FUNCTION public.set_oxygen_tank_paused(
+  _tank_id uuid,
+  _paused boolean,
+  _caregiver_profile_id uuid DEFAULT NULL
+)
+RETURNS public.oxygen_tanks
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $function$
+DECLARE
+  v_uid uuid := auth.uid();
+  v_row public.oxygen_tanks%ROWTYPE;
+BEGIN
+  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
 
-- `durationMinutes` is called in the sweep's check-reminder pass
-  (`oxygen-low-sweep.ts:191`) and in `OxygenCheckBanner.tsx:46`. In the sweep,
-  the throw lands inside the per-tank `try` and skips that tank's safety
-  reminder; on the Today page it breaks the render.
-- `flowOptions` is called in `oxygen.tsx:302` with the constant
-  `DEFAULT_TANK`, so it is safe today — hardened anyway for symmetry.
+  SELECT * INTO v_row FROM public.oxygen_tanks WHERE id = _tank_id FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Tank not found'; END IF;
+  IF NOT public.is_family_member(v_row.family_id, v_uid) THEN
+    RAISE EXCEPTION 'Not a family member';
+  END IF;
+  IF v_row.replaced_at IS NOT NULL THEN
+    RAISE EXCEPTION 'Tank is no longer active';
+  END IF;
+  IF NOT public.caregiver_profile_in_family(_caregiver_profile_id, v_row.family_id) THEN
+    RAISE EXCEPTION 'Caregiver profile does not belong to this family';
+  END IF;
 
-### Diff
+  IF _paused THEN
+    IF v_row.paused_at IS NOT NULL THEN
+      RAISE EXCEPTION 'Tank is already paused';
+    END IF;
+    UPDATE public.oxygen_tanks
+      SET paused_at = now(),
+          pause_reason = 'manual',
+          paused_by = v_uid,
+          paused_caregiver_profile_id = _caregiver_profile_id,
+          updated_at = now()
+      WHERE id = _tank_id
+      RETURNING * INTO v_row;
+  ELSE
+    IF v_row.paused_at IS NULL THEN
+      RAISE EXCEPTION 'Tank is not paused';
+    END IF;
+    IF v_row.pause_reason IS NOT NULL AND v_row.pause_reason <> 'manual' THEN
+      RAISE EXCEPTION 'Tank is paused by hospital mode — turn off hospital mode to resume';
+    END IF;
+    UPDATE public.oxygen_tanks
+      SET paused_seconds = paused_seconds + GREATEST(0, EXTRACT(EPOCH FROM (now() - paused_at))::bigint),
+          paused_at = NULL,
+          pause_reason = NULL,
+          paused_by = NULL,
+          paused_caregiver_profile_id = NULL,
+          last_checked_at = now(),
+          updated_at = now()
+      WHERE id = _tank_id
+      RETURNING * INTO v_row;
+  END IF;
 
-```diff
- export function flowOptions(type: TankType): number[] {
--  return TANKS[type].flows.map((f) => f.flow);
-+  return TANKS[type]?.flows.map((f) => f.flow) ?? [];
- }
+  RETURN v_row;
+END;
+$function$;
 
- export function durationMinutes(type: TankType, flow: number): number | null {
--  const row = TANKS[type].flows.find((f) => Math.abs(f.flow - flow) < 1e-9);
-+  const row = TANKS[type]?.flows.find((f) => Math.abs(f.flow - flow) < 1e-9);
-   return row ? row.minutes : null;
- }
+REVOKE ALL ON FUNCTION public.set_oxygen_tank_paused(uuid, boolean, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.set_oxygen_tank_paused(uuid, boolean, uuid) TO authenticated, service_role;
+
+-- Hospital mode: stamp pause_reason on the tanks it pauses; on OFF only
+-- resume hospital-paused tanks so a manually paused tank stays paused.
+CREATE OR REPLACE FUNCTION public.set_family_hospital_mode(_family_id uuid, _on boolean, _paused jsonb DEFAULT NULL::jsonb)
+ RETURNS timestamp with time zone
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE v_ts timestamptz;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+  IF NOT public.is_family_owner(_family_id, auth.uid()) THEN
+    RAISE EXCEPTION 'Only the family owner can change hospital mode';
+  END IF;
+  IF _on THEN
+    UPDATE public.families
+      SET at_hospital_since = COALESCE(at_hospital_since, now()),
+          hospital_paused = COALESCE(_paused, hospital_paused),
+          updated_at = now()
+      WHERE id = _family_id
+      RETURNING at_hospital_since INTO v_ts;
+
+    UPDATE public.oxygen_tanks
+      SET paused_at = now(),
+          pause_reason = 'hospital',
+          updated_at = now()
+      WHERE family_id = _family_id
+        AND replaced_at IS NULL
+        AND paused_at IS NULL
+        AND (
+          SELECT COALESCE((f.hospital_paused ->> 'oxygen')::boolean, true)
+          FROM public.families f WHERE f.id = _family_id
+        );
+  ELSE
+    UPDATE public.families
+      SET at_hospital_since = NULL,
+          updated_at = now()
+      WHERE id = _family_id
+      RETURNING at_hospital_since INTO v_ts;
+
+    UPDATE public.oxygen_tanks
+      SET paused_seconds = paused_seconds + GREATEST(0, EXTRACT(EPOCH FROM (now() - paused_at))::bigint),
+          paused_at = NULL,
+          pause_reason = NULL,
+          updated_at = now()
+      WHERE family_id = _family_id
+        AND replaced_at IS NULL
+        AND paused_at IS NOT NULL
+        AND (pause_reason = 'hospital' OR pause_reason IS NULL);
+  END IF;
+  RETURN v_ts;
+END;
+$function$;
+
+REVOKE ALL ON FUNCTION public.set_family_hospital_mode(uuid, boolean, jsonb) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.set_family_hospital_mode(uuid, boolean, jsonb) TO authenticated, service_role;
 ```
 
-Both are already null-returning for an unknown *flow*; optional chaining makes
-an unknown *type* behave identically. `computeRemaining` already returns `null`
-when `durationMinutes` returns `null`, so no other call site needs touching.
+Notes on the migration:
+- The 3-arg `set_family_hospital_mode` is the one the app calls. A legacy 2-arg overload still exists in the DB but is unused by the app; leaving it untouched (it pauses without stamping `pause_reason`, which the new OFF path still resumes via the `pause_reason IS NULL` clause — consistent). Flagging rather than dropping it, since dropping is a breaking change you didn't ask for.
+- `paused_by` FKs `auth.users` — against the general project rule, but it mirrors the existing `oxygen_tanks.created_by` FK and matches your spec exactly.
 
-### Tests — `src/lib/oxygen/tanks.test.ts`
+## 2 — "Still paused?" reminder in `src/routes/api/public/hooks/oxygen-low-sweep.ts`
 
-Add `flowOptions` and `type TankType` to the import, then two cases:
+Replace the blanket `if (tank.paused_at) continue;` with:
+- `pause_reason = 'hospital'` (or null) or family oxygen-paused → skip, as today.
+- `pause_reason = 'manual'` → skip Pass A and the normal Pass B; instead run `shouldSendCheckReminder({ startedAt: tank.paused_at, lastCheckedAt: tank.last_checked_at, checkReminderSentAt: tank.check_reminder_sent_at, intervalMinutes: checkInterval, tankTotalMinutes: null, now })`. On fire: push + stamp `check_reminder_sent_at`.
+- New copy block (family language): sv "⏸️ Syrgasen är pausad" / "Pausad sedan {HH:MM}. Fortfarande avstängd? Tryck Återuppta i appen när ni kopplar på igen."; en "⏸️ Oxygen is paused" / "Paused since {HH:MM}. Still off? Tap Resume in the app when you reconnect." Time formatted in the family timezone (needs `timezone` added to the families select). Category `"oxygen"`, tag `oxygen-paused-{tank.id}`, url `/oxygen`. Per-tank try/catch kept.
+- Tank select gains `pause_reason`.
 
-```diff
--import { computeRemaining, durationMinutes, type OxygenTankRow } from "./tanks";
-+import {
-+  computeRemaining,
-+  durationMinutes,
-+  flowOptions,
-+  type OxygenTankRow,
-+  type TankType,
-+} from "./tanks";
-```
+## 3 — Oxygen page + hooks
 
-```diff
-   it("old 13 rows unchanged", () => {
-     for (const [f, m] of OLD) expect(durationMinutes("liv_mini_2l", f)).toBe(m);
-   });
-+
-+  // FAIL-SAFE: a DB row whose tank_type is not in TANKS must not throw.
-+  // durationMinutes feeds the sweep's check-reminder pass and the Today banner.
-+  it("unknown tank type returns null / [] instead of throwing", () => {
-+    expect(durationMinutes("unknown" as TankType, 0.1)).toBeNull();
-+    expect(flowOptions("unknown" as TankType)).toEqual([]);
-+  });
- });
-```
+- `src/lib/data/oxygen.ts`: new `usePauseTank` / `useResumeTank` calling `supabase.rpc("set_oxygen_tank_paused", ...)`, invalidating the oxygen queries.
+- `src/routes/_authenticated/oxygen.tsx`:
+  - Running tank: "Pausa" outline button → small confirm dialog ("Pausa syrgasen? Nedräkningen stannar och larmen pausas tills du återupptar."). Uses `guardActingProfile` like other caregiver writes.
+  - Manually paused tank: neutral info row "Pausad sedan {HH:MM} av {name}" (caregiver profile name if set, else the pausing user's full name, else nothing) + prominent "Återuppta" button. "Change flow" and "Confirm" hidden; "Replace tank" kept.
+  - Hospital-paused tank: unchanged (existing `oxygen.pausedHospital`, no resume button).
 
-All 17 existing durations and every status assertion stay untouched and must
-still pass.
+## 4 — Today banner (`OxygenCheckBanner.tsx`)
 
-### Note on the requested `check-reminder.test.ts` case
+Extend the existing component:
+- Manually paused tank → calm neutral (muted, not amber) persistent banner: "Syrgas pausad sedan {HH:MM}" + "Återuppta" button (calls `useResumeTank`).
+- When `isOxygenCheckOverdue({ startedAt: tank.paused_at, lastCheckedAt, intervalMinutes, tankTotalMinutes: null, now })` is true → switches to the amber styling and adds a "Fortfarande avstängd" button calling the existing `useConfirmTank` (stamps `last_checked_at`, resets both clocks).
+- Hospital-paused tank → no banner (existing `tank.paused_at` early-return becomes reason-aware).
 
-`expect(effectiveCheckIntervalMinutes(180, null)).toBe(180)` **already exists**
-in that file (inside `describe("high-flow interval cap")`). I am not adding a
-duplicate — flagging instead of doing, per your instruction. Say the word if you
-want it moved into its own named `describe("effectiveCheckIntervalMinutes")`
-block.
+## 5 — Handover prefill (`handover-prefill.ts`)
 
----
+The current oxygen query only returns tanks started/replaced inside the shift window, so a tank paused before the shift wouldn't appear. Adding a small separate query for the currently active tank (`replaced_at IS NULL`); if its `pause_reason = 'manual'` at prefill time, append one line "Syrgas pausad sedan {HH:MM}" / "Oxygen paused since {HH:MM}" in family tz.
 
-## 2. PWA theme colour `#6C63FF` → `#6426DB`
+## 6 — i18n
 
-Exactly two places, as specified:
+New keys in `en.ts` + `sv.ts` under `oxygen.*`: pause/resume button labels, confirm dialog copy, "paused since … by …", banner title/body, "Still off?" confirm label, push copy lives in the sweep (not i18n, matching existing push copy). Exact key parity; natural Swedish.
 
-### `public/manifest.webmanifest`
+## 7 — Tests & verification
 
-```diff
-   "background_color": "#ffffff",
--  "theme_color": "#6C63FF",
-+  "theme_color": "#6426DB",
-```
+- `check-reminder.test.ts`: manual-paused reminder fires after the interval measured from `paused_at`; resets after a confirm; hospital-paused tanks never reach the predicate (guarded in the sweep — covered by a pure test asserting the sweep's gate inputs); running-tank behaviour unchanged.
+- `tanks.test.ts`: assert `computeRemaining` output for a running tank is byte-identical before/after (no change expected — guard test).
+- Live DB checks (via `lovable auth-session` + SQL/RPC): pause→resume accumulates `paused_seconds`; non-member RPC call denied; resuming a hospital-paused tank raises; hospital ON→OFF leaves a manually paused tank paused and resumes a hospital-paused one.
+- Full `vitest`, `tsgo --noEmit`, en/sv key parity.
+- No package or dependency changes.
 
-### `src/routes/__root.tsx`
+## Flags / deviations from the brief
 
-```diff
-       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
--      { name: "theme-color", content: "#6C63FF" },
-+      { name: "theme-color", content: "#6426DB" },
-```
-
-`--primary` and every other CSS token stay as they are; `background_color`
-stays `#ffffff`.
-
----
-
-## Flagged, not changed
-
-Other `#6C63FF` literals exist in the repo and are **out of scope** for this
-pass — listed so you can decide separately:
-
-- `src/styles.css:89` — a comment (`/* #6C63FF-ish */`) next to `--primary`.
-- `src/lib/email-templates/*.tsx` (5 files) — button background colours in
-  signup / recovery / magic-link / invite / email-change emails.
-- `src/routes/_authenticated/dashboard.tsx:2033` and
-  `src/components/carenest/ProfileSelector.tsx:39` — avatar colour fallbacks.
-- `src/routes/index.tsx:251` — a hardcoded demo chip colour.
-
----
-
-## Verification
-
-1. `bunx vitest run` — full suite, including the new tanks cases.
-2. `tsgo --noEmit` — clean.
-3. Confirm the two theme-colour edits landed and nothing else in
-   `manifest.webmanifest` / `__root.tsx` changed.
-
-## Files changed (expected)
-
-- `src/lib/oxygen/tanks.ts`
-- `src/lib/oxygen/tanks.test.ts`
-- `public/manifest.webmanifest`
-- `src/routes/__root.tsx`
+1. **2-arg hospital-mode overload left in place** (see migration notes) — dropping it is a breaking change; the new OFF logic covers its rows via `pause_reason IS NULL`.
+2. **Handover prefill needs an extra query** — the existing window query can't see a tank paused before the shift; a tiny active-tank lookup is the clean fix.
+3. **Sweep needs `families.timezone` in its select** to format "{HH:MM}" in family tz — one added column, no behaviour change.
+4. **`paused_by` → auth.users FK** follows your spec and the existing `created_by` precedent, though it deviates from the general "no auth.users FKs" project rule.
