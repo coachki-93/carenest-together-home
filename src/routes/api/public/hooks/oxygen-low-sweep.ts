@@ -82,6 +82,9 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
             checkTitle: "🫁 Kontrollera syrgastuben",
             checkBody: (flow: string) =>
               `Bekräfta nivå och flöde. Appen räknar med ${flow} l/min — stämmer det?`,
+            pausedTitle: "⏸️ Syrgasen är pausad",
+            pausedBody: (time: string) =>
+              `Pausad sedan ${time}. Fortfarande avstängd? Tryck Återuppta i appen när ni kopplar på igen.`,
           },
           en: {
             criticalTitle: "🟥 Oxygen tank nearly empty",
@@ -93,6 +96,9 @@ export const Route = createFileRoute("/api/public/hooks/oxygen-low-sweep")({
             checkTitle: "🫁 Check the oxygen tank",
             checkBody: (flow: string) =>
               `Confirm the level and flow. The app assumes ${flow} l/min — is that still correct?`,
+            pausedTitle: "⏸️ Oxygen is paused",
+            pausedBody: (time: string) =>
+              `Paused since ${time}. Still off? Tap Resume in the app when you reconnect.`,
           },
         } as const;
 
