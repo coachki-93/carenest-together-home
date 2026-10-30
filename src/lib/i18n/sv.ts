@@ -1375,6 +1375,8 @@ export const sv = {
     deleteSeries: "Ta bort serien",
     scopeTitle: "Tillämpa ändringarna på…",
     scopeBody: "Detta event är en del av en återkommande serie.",
+    occurrenceDayHint: "”Endast denna” kan ändra tiden, inte dagen. Vill du flytta den till en annan dag, ställ in den här förekomsten och lägg till en engångsuppgift.",
+    occurrenceDayLocked: "En enskild förekomst kan bara flyttas inom samma dag.",
     scopeThis: "Bara detta event",
     scopeSeries: "Alla event i serien",
   },

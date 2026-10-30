@@ -1375,6 +1375,8 @@ export const en = {
     deleteSeries: "Delete series",
     scopeTitle: "Apply changes to…",
     scopeBody: "This event is part of a repeating series.",
+    occurrenceDayHint: "\"This occurrence only\" can change the time, not the day. To move it to another day, cancel this occurrence and add a one-off task.",
+    occurrenceDayLocked: "A single occurrence can only move within the same day.",
     scopeThis: "This event only",
     scopeSeries: "All events in the series",
   },

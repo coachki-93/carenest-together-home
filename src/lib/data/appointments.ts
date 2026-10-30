@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { expandRecurrence } from "@/lib/schedule/recurrence";
+import { expandRecurrence, isSameFamilyDay } from "@/lib/schedule/recurrence";
 
 type AppointmentRow = Database["public"]["Tables"]["appointments"]["Row"];
 
@@ -383,6 +383,8 @@ type InstanceOverrideInput = {
   child_id: string | null;
   created_by: string;
   master_id: string;
+  /** Family timezone; used to enforce the same-day rule. */
+  tz: string;
   occurrence_start: string; // ISO of the original occurrence being overridden
   patch: {
     title: string;
