@@ -42,6 +42,8 @@ interface Labels {
   oxygenLegacyChange: string;
   oxygenFlowChanged: string;
   oxygenFlowChangedMany: string;
+  /** "Oxygen paused since {{time}}" — live state of a manually paused tank. */
+  oxygenPausedSince: string;
   hospital: string;
   carePlaceIssue: string;
   taskNote: string;
