@@ -163,3 +163,17 @@ describe("shouldSendLatePush", () => {
     expect(shouldSendLatePush(c, t0 + 10 * 60_000)).toBe(true);
   });
 });
+
+import { isSameFamilyDay } from "./recurrence";
+describe("isSameFamilyDay (single-occurrence date lock)", () => {
+  const tz = "Europe/Stockholm";
+  it("allows a time change on the same Stockholm day", () => {
+    expect(isSameFamilyDay("2026-11-02T20:30:00Z", "2026-11-02T07:00:00Z", tz)).toBe(true);
+  });
+  it("rejects a move to the next day", () => {
+    expect(isSameFamilyDay("2026-11-03T08:00:00Z", "2026-11-02T08:00:00Z", tz)).toBe(false);
+  });
+  it("uses family tz, not UTC: 23:30 UTC is the next Stockholm day", () => {
+    expect(isSameFamilyDay("2026-11-02T23:30:00Z", "2026-11-02T08:00:00Z", tz)).toBe(false);
+  });
+});

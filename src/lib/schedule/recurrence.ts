@@ -135,3 +135,12 @@ export function shouldSendLatePush(
   if (!c.notify_start) return false;
   return nowMs >= c.occurrence_ms + c.late_after_minutes * 60_000;
 }
+
+/**
+ * "This occurrence only" edits may change the time but not the date:
+ * the new start must fall on the same calendar day (family timezone)
+ * as the original occurrence slot.
+ */
+export function isSameFamilyDay(aIso: string, bIso: string, tz: string): boolean {
+  return wallClockIn(new Date(aIso), tz).todayStr === wallClockIn(new Date(bIso), tz).todayStr;
+}

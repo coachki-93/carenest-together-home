@@ -104,6 +104,7 @@ import {
   useUpdateAppointment,
   useDeleteAppointment,
   useUpdateAppointmentInstance,
+  OCCURRENCE_DAY_LOCKED,
   useDeleteAppointmentInstance,
   canManageAppointment,
   type ExpandedAppointment,
@@ -570,6 +571,7 @@ function SchedulePage() {
                 created_by: user.id,
                 master_id: editing.master_id,
                 occurrence_start: editing.occurrence_start,
+                tz,
                 patch: {
                   title: values.title,
                   notes: values.notes,
@@ -619,7 +621,7 @@ function SchedulePage() {
             setApptOpen(false);
             setEditing(null);
           } catch (e) {
-            toast.error((e as Error).message);
+            toast.error((e as Error).message === OCCURRENCE_DAY_LOCKED ? t("scheduleEvents.occurrenceDayLocked") : (e as Error).message);
           }
         }}
         saving={
@@ -1161,6 +1163,9 @@ function AppointmentDialog({
 
   const checklistChanged =
     isInstance && !sameChecklist(cleanChecklist(checklist), initialChecklist);
+  // "This occurrence only" keeps the original day (family tz); only time moves.
+  const dateChanged =
+    isInstance && !!editing && date !== dateInputIn(new Date(editing.occurrence_start), tz);
 
   function toggleWeekday(i: number) {
     setWeekdays((prev) =>
@@ -1581,6 +1586,9 @@ function AppointmentDialog({
                   {t("scheduleEvents.checklist.scopeHint")}
                 </span>
               )}
+              <span className={"block mt-2" + (dateChanged ? " font-medium" : "")}>
+                {t("scheduleEvents.occurrenceDayHint")}
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
@@ -1589,7 +1597,7 @@ function AppointmentDialog({
             </AlertDialogCancel>
             <AlertDialogAction
               className="rounded-full"
-              disabled={checklistChanged}
+              disabled={checklistChanged || dateChanged}
               onClick={() => {
                 if (pendingValues) onSave(pendingValues, "this");
                 setScopeOpen(false);

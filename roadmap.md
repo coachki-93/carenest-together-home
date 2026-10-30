@@ -40,3 +40,4 @@
 - [x] Today late/missed uses moved time (confirmed)
 - [x] In-app occurrence verification
 - [ ] Live 5-min moved-push check — needs publish (cron runs the published code)
+- [ ] Move a single occurrence of a recurring task to another day (currently date-locked; workaround: cancel occurrence + one-off task). Needs cross-midnight display/sweep handling.

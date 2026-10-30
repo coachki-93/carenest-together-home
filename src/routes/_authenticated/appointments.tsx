@@ -69,6 +69,7 @@ import {
   type RecurrenceFreq,
   type VisitKind,
 } from "@/lib/data/appointments";
+import { isSameFamilyDay } from "@/lib/schedule/recurrence";
 import { wallClockIn, formatTimeIn, dateInputIn, zonedWallClockToDate } from "@/lib/time/family-tz";
 
 export const Route = createFileRoute("/_authenticated/appointments")({
@@ -863,12 +864,17 @@ function EventDialog({
 
     if (pendingScope === "save") {
       if (scope === "this") {
+        if (!isSameFamilyDay(b.starts_at, editing.occurrence_start, tz)) {
+          toast.error(t("scheduleEvents.occurrenceDayLocked"));
+          return;
+        }
         await updateInstance.mutateAsync({
           family_id: familyId,
           child_id: null,
           created_by: userId,
           master_id: editing.master_id!,
           occurrence_start: editing.occurrence_start,
+          tz,
           patch: {
             title: b.common.title,
             notes: b.common.notes,
