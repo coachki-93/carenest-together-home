@@ -158,6 +158,7 @@ function HandoverPage() {
       hospital: t("handoverPage.prefill.hospital"),
       carePlaceIssue: t("handoverPage.prefill.carePlaceIssue"),
       taskNote: t("handoverPage.prefill.taskNote"),
+      checklistUnticked: t("handoverPage.prefill.checklistUnticked"),
       tidySkipped: t("handoverPage.prefill.tidySkipped"),
       maintenanceDone: t("handoverPage.prefill.maintenanceDone"),
       maintenanceOverdue: t("handoverPage.prefill.maintenanceOverdue"),

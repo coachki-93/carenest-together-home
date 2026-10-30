@@ -393,6 +393,7 @@ export const en = {
     },
   },
   taskAction: {
+    checklistUnticked: "{{x}} of {{y}} steps aren't ticked. Mark as done anyway?",
     doneTitle: "Mark as done",
     doneBody: "Log \"{{title}}\" as completed.",
     skipTitle: "Skip this task",
@@ -446,6 +447,7 @@ export const en = {
     viewProfile: "View profile",
   },
   dashboard: {
+    checklistToggle: "Checklist {{done}}/{{total}}",
     today: "Today",
     morning: "Good morning",
     afternoon: "Good afternoon",
@@ -819,6 +821,7 @@ export const en = {
       hospital: "Family was at hospital during this shift (oxygen paused).",
       carePlaceIssue: "Care-place check flagged",
       taskNote: "Note",
+      checklistUnticked: "{{task}} done – not ticked: {{labels}}",
       tidySkipped: "Tidy skipped",
       maintenanceDone: "Maintenance done",
       maintenanceOverdue: "Overdue maintenance",
@@ -999,6 +1002,17 @@ export const en = {
     selectProfilePrompt: "Pick which caregiver profile you're acting as before continuing.",
   },
   scheduleEvents: {
+    checklist: {
+      title: "Checklist",
+      add: "Add step",
+      placeholder: "Step {{n}}",
+      count: "{{n}}/{{max}} steps",
+      moveUp: "Move up",
+      moveDown: "Move down",
+      remove: "Remove step",
+      seriesOnlyHint: "Steps belong to the whole series. To change them, choose “Whole series” when saving.",
+      scopeHint: "You changed the steps. Steps can only be saved for the whole series.",
+    },
     new: "Add care task",
     newTitle: "Add to schedule",
     editTitle: "Edit event",

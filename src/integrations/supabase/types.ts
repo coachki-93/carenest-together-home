@@ -48,6 +48,7 @@ export type Database = {
         Row: {
           appointment_id: string
           caregiver_profile_id: string | null
+          checklist_result: Json | null
           completed_at: string | null
           completed_by: string | null
           created_at: string
@@ -67,6 +68,7 @@ export type Database = {
         Insert: {
           appointment_id: string
           caregiver_profile_id?: string | null
+          checklist_result?: Json | null
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
@@ -86,6 +88,7 @@ export type Database = {
         Update: {
           appointment_id?: string
           caregiver_profile_id?: string | null
+          checklist_result?: Json | null
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
@@ -167,6 +170,7 @@ export type Database = {
           all_day: boolean
           allow_ongoing: boolean
           amount_ml: number | null
+          checklist: Json
           child_id: string | null
           color: string | null
           created_at: string
@@ -196,6 +200,7 @@ export type Database = {
           all_day?: boolean
           allow_ongoing?: boolean
           amount_ml?: number | null
+          checklist?: Json
           child_id?: string | null
           color?: string | null
           created_at?: string
@@ -225,6 +230,7 @@ export type Database = {
           all_day?: boolean
           allow_ongoing?: boolean
           amount_ml?: number | null
+          checklist?: Json
           child_id?: string | null
           color?: string | null
           created_at?: string

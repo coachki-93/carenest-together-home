@@ -89,6 +89,13 @@ import {
   formatTimeIn,
   zonedWallClockToDate,
 } from "@/lib/time/family-tz";
+import { ChecklistEditor } from "@/components/carenest/ChecklistEditor";
+import {
+  cleanChecklist,
+  parseChecklist,
+  sameChecklist,
+  type ChecklistStep,
+} from "@/lib/schedule/checklist";
 import {
   CARE_TASK_KINDS,
   useAppointments,
@@ -134,6 +141,7 @@ type SavePayload = {
   missed_after_minutes: number;
   allow_ongoing: boolean;
   timer_minutes: number | null;
+  checklist: ChecklistStep[];
 };
 
 export const Route = createFileRoute("/_authenticated/schedule")({
@@ -585,6 +593,7 @@ function SchedulePage() {
                     missed_after_minutes: values.missed_after_minutes,
                     allow_ongoing: values.allow_ongoing,
                     timer_minutes: values.timer_minutes,
+                    checklist: values.checklist,
                   }
                 : values;
               await updateAppt.mutateAsync({ id, patch });
@@ -968,6 +977,8 @@ function AppointmentDialog({
   const [lateAfter, setLateAfter] = useState<string>("0");
   const [missedAfter, setMissedAfter] = useState<string>("15");
   const [allowOngoing, setAllowOngoing] = useState<boolean>(false);
+  const [checklist, setChecklist] = useState<ChecklistStep[]>([]);
+  const [initialChecklist, setInitialChecklist] = useState<ChecklistStep[]>([]);
   const [scopeOpen, setScopeOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState<SavePayload | null>(null);
 
@@ -1009,6 +1020,9 @@ function AppointmentDialog({
       setLateAfter(String((editing as { late_after_minutes?: number }).late_after_minutes ?? 0));
       setMissedAfter(String((editing as { missed_after_minutes?: number }).missed_after_minutes ?? 15));
       setAllowOngoing(!!(editing as { allow_ongoing?: boolean }).allow_ongoing);
+      const loadedChecklist = parseChecklist((editing as { checklist?: unknown }).checklist);
+      setChecklist(loadedChecklist);
+      setInitialChecklist(loadedChecklist);
     } else {
       setTitle("");
       setKind("task");
@@ -1027,6 +1041,8 @@ function AppointmentDialog({
       setLateAfter("0");
       setMissedAfter("15");
       setAllowOngoing(false);
+      setChecklist([]);
+      setInitialChecklist([]);
     }
   }, [open, editing, defaultDay]);
 
@@ -1106,6 +1122,7 @@ function AppointmentDialog({
       missed_after_minutes: Math.max(0, parseInt(missedAfter, 10) || 15),
       allow_ongoing: allowOngoing,
       timer_minutes: null,
+      checklist: cleanChecklist(checklist),
     };
   }
 
@@ -1120,6 +1137,9 @@ function AppointmentDialog({
     }
     onSave(values, "series");
   }
+
+  const checklistChanged =
+    isInstance && !sameChecklist(cleanChecklist(checklist), initialChecklist);
 
   function toggleWeekday(i: number) {
     setWeekdays((prev) =>
@@ -1463,6 +1483,12 @@ function AppointmentDialog({
               </p>
             </div>
 
+            <ChecklistEditor steps={checklist} onChange={setChecklist} />
+            {isInstance && (
+              <p className="text-xs text-muted-foreground -mt-2 px-1">
+                {t("scheduleEvents.checklist.seriesOnlyHint")}
+              </p>
+            )}
 
             {isInstance && (
               <p className="text-xs text-muted-foreground rounded-xl bg-muted/50 p-3">
@@ -1512,6 +1538,11 @@ function AppointmentDialog({
             <AlertDialogTitle>{t("scheduleEvents.scopeTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
               {t("scheduleEvents.scopeBody")}
+              {checklistChanged && (
+                <span className="block mt-2 font-medium">
+                  {t("scheduleEvents.checklist.scopeHint")}
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
@@ -1520,6 +1551,7 @@ function AppointmentDialog({
             </AlertDialogCancel>
             <AlertDialogAction
               className="rounded-full"
+              disabled={checklistChanged}
               onClick={() => {
                 if (pendingValues) onSave(pendingValues, "this");
                 setScopeOpen(false);

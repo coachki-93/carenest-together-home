@@ -63,6 +63,7 @@ export function TaskActionDialog({
   submitting,
   vitalSpec,
   notesSpec,
+  checklistWarning,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -75,6 +76,8 @@ export function TaskActionDialog({
   submitting?: boolean;
   vitalSpec?: VitalSpec | null;
   notesSpec?: NotesSpec | null;
+  /** Only shown for "done" when some checklist steps are unticked. */
+  checklistWarning?: { unticked: number; total: number } | null;
 }) {
   const { t } = useTranslation();
   const [profileId, setProfileId] = useState<string | null>(defaultProfileId);
@@ -168,6 +171,17 @@ export function TaskActionDialog({
           <DialogTitle>{heading}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
+        {act === "done" && checklistWarning && checklistWarning.unticked > 0 && (
+          <div
+            role="alert"
+            className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-sm font-medium"
+          >
+            {t("taskAction.checklistUnticked", {
+              x: checklistWarning.unticked,
+              y: checklistWarning.total,
+            })}
+          </div>
+        )}
 
         <div className="space-y-4">
           {showVital && vitalSpec && (

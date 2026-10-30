@@ -8,6 +8,13 @@
       "when": 1793390905915,
       "tag": "0000_manual_oxygen_pause",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793394665252,
+      "tag": "0001_task_checklists",
+      "breakpoints": true
     }
   ]
 }

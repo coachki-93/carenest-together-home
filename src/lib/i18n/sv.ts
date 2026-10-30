@@ -393,6 +393,7 @@ export const sv = {
     },
   },
   taskAction: {
+    checklistUnticked: "{{x}} av {{y}} steg är inte avbockade. Markera som klar ändå?",
     doneTitle: "Markera som klar",
     doneBody: "Logga \"{{title}}\" som utförd.",
     skipTitle: "Hoppa över denna uppgift",
@@ -446,6 +447,7 @@ export const sv = {
     viewProfile: "Visa profil",
   },
   dashboard: {
+    checklistToggle: "Checklista {{done}}/{{total}}",
     today: "Idag",
     morning: "God morgon",
     afternoon: "God eftermiddag",
@@ -819,6 +821,7 @@ export const sv = {
       hospital: "Familjen var på sjukhus under passet (syrgas pausad).",
       carePlaceIssue: "Vårdplats-kontroll flaggad",
       taskNote: "Anteckning",
+      checklistUnticked: "{{task}} klar – ej avbockat: {{labels}}",
       tidySkipped: "Städning hoppad",
       maintenanceDone: "Underhåll utfört",
       maintenanceOverdue: "Försenat underhåll",
@@ -999,6 +1002,17 @@ export const sv = {
     selectProfilePrompt: "Välj vilken vårdgivarprofil du agerar som innan du fortsätter.",
   },
   scheduleEvents: {
+    checklist: {
+      title: "Checklista",
+      add: "Lägg till steg",
+      placeholder: "Steg {{n}}",
+      count: "{{n}}/{{max}} steg",
+      moveUp: "Flytta upp",
+      moveDown: "Flytta ned",
+      remove: "Ta bort steg",
+      seriesOnlyHint: "Stegen gäller hela serien. Välj ”Hela serien” när du sparar för att ändra dem.",
+      scopeHint: "Du har ändrat stegen. Steg kan bara sparas för hela serien.",
+    },
     new: "Lägg till vårduppgift",
     newTitle: "Lägg till i schemat",
     editTitle: "Redigera event",
