@@ -31,7 +31,8 @@
 - [x] Page families in task + oxygen sweeps
 - [x] Tests + read-only completion count
 
-## Task write access (owner or creator) — awaiting approval
-- [ ] Migration: policies, can_manage_appointment(id, family, user), immutables trigger
-- [ ] Client canManage mirrors series rule (Planner + visits calendar gate)
-- [ ] API verification as caregiver + owner
+## Task write access (owner or creator) (done)
+- [x] Migration: policies, can_manage_appointment(id, family, user), immutables trigger
+- [x] Client canManage mirrors series rule (Planner + visits calendar gate)
+- [x] API verification as caregiver + owner
+- [ ] Flagged: 'this occurrence only' edit/cancel fails (upsert can't use the partial unique index) — needs your go-ahead
