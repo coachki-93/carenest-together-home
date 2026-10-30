@@ -342,7 +342,7 @@ export function useHandoverPrefill(
       const startIso = shiftStart.toISOString();
       const endIso = shiftEnd.toISOString();
 
-      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes, maintLogsRes, maintItemsRes, careEventsRes] =
+      const [medsRes, logsRes, apptsRes, complRes, vitalsRes, oxyRes, familyRes, cpAnswersRes, cpChecksRes, tidyRes, maintLogsRes, maintItemsRes, careEventsRes, activeOxyRes] =
         await Promise.all([
           supabase
             .from("medications")
@@ -423,6 +423,16 @@ export function useHandoverPrefill(
             .gte("occurred_at", startIso)
             .lt("occurred_at", endIso)
             .order("occurred_at", { ascending: true }),
+          // Live state of the current tank — a manual pause that started
+          // before the shift window is still worth one line in the handover.
+          supabase
+            .from("oxygen_tanks")
+            .select("id, paused_at, pause_reason")
+            .eq("family_id", familyId)
+            .is("replaced_at", null)
+            .order("started_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
         ]);
 
       const meds = (medsRes.data ?? []) as Medication[];
