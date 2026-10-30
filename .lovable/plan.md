@@ -1,198 +1,79 @@
-# Manual "pause oxygen at home" feature
+# Checklists inside tasks
 
-A caregiver can pause the active tank at home (e.g. child disconnected for a bath), separate from hospital mode. A paused tank silences all oxygen alarms, so the feature is built fail-safe: a persistent banner + a periodic "still paused?" push make sure it is never forgotten.
-
-## 1 — Migration (shown here in full before applying)
+## 1. Migration (shown for approval, not applied yet)
 
 ```sql
--- New columns on oxygen_tanks
-ALTER TABLE public.oxygen_tanks
-  ADD COLUMN pause_reason text,
-  ADD COLUMN paused_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  ADD COLUMN paused_caregiver_profile_id uuid REFERENCES public.caregiver_profiles(id) ON DELETE SET NULL;
+ALTER TABLE public.appointments
+  ADD COLUMN checklist jsonb NOT NULL DEFAULT '[]'::jsonb;
 
-ALTER TABLE public.oxygen_tanks
-  ADD CONSTRAINT oxygen_tanks_pause_reason_check
-  CHECK (pause_reason IS NULL OR pause_reason IN ('hospital', 'manual'));
+ALTER TABLE public.appointments
+  ADD CONSTRAINT appointments_checklist_shape
+  CHECK (jsonb_typeof(checklist) = 'array' AND jsonb_array_length(checklist) <= 20);
 
--- Backfill: today only hospital mode can pause a tank
-UPDATE public.oxygen_tanks
-  SET pause_reason = 'hospital'
-  WHERE paused_at IS NOT NULL AND pause_reason IS NULL;
+ALTER TABLE public.appointment_completions
+  ADD COLUMN checklist_result jsonb NULL;
 
--- Manual pause/resume RPC
-CREATE OR REPLACE FUNCTION public.set_oxygen_tank_paused(
-  _tank_id uuid,
-  _paused boolean,
-  _caregiver_profile_id uuid DEFAULT NULL
-)
-RETURNS public.oxygen_tanks
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $function$
-DECLARE
-  v_uid uuid := auth.uid();
-  v_row public.oxygen_tanks%ROWTYPE;
-BEGIN
-  IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
-
-  SELECT * INTO v_row FROM public.oxygen_tanks WHERE id = _tank_id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'Tank not found'; END IF;
-  IF NOT public.is_family_member(v_row.family_id, v_uid) THEN
-    RAISE EXCEPTION 'Not a family member';
-  END IF;
-  IF v_row.replaced_at IS NOT NULL THEN
-    RAISE EXCEPTION 'Tank is no longer active';
-  END IF;
-  IF NOT public.caregiver_profile_in_family(_caregiver_profile_id, v_row.family_id) THEN
-    RAISE EXCEPTION 'Caregiver profile does not belong to this family';
-  END IF;
-
-  IF _paused THEN
-    IF v_row.paused_at IS NOT NULL THEN
-      RAISE EXCEPTION 'Tank is already paused';
-    END IF;
-    UPDATE public.oxygen_tanks
-      SET paused_at = now(),
-          pause_reason = 'manual',
-          paused_by = v_uid,
-          paused_caregiver_profile_id = _caregiver_profile_id,
-          updated_at = now()
-      WHERE id = _tank_id
-      RETURNING * INTO v_row;
-  ELSE
-    IF v_row.paused_at IS NULL THEN
-      RAISE EXCEPTION 'Tank is not paused';
-    END IF;
-    IF v_row.pause_reason IS NOT NULL AND v_row.pause_reason <> 'manual' THEN
-      RAISE EXCEPTION 'Tank is paused by hospital mode — turn off hospital mode to resume';
-    END IF;
-    UPDATE public.oxygen_tanks
-      SET paused_seconds = paused_seconds + GREATEST(0, EXTRACT(EPOCH FROM (now() - paused_at))::bigint),
-          paused_at = NULL,
-          pause_reason = NULL,
-          paused_by = NULL,
-          paused_caregiver_profile_id = NULL,
-          last_checked_at = now(),
-          updated_at = now()
-      WHERE id = _tank_id
-      RETURNING * INTO v_row;
-  END IF;
-
-  RETURN v_row;
-END;
-$function$;
-
-REVOKE ALL ON FUNCTION public.set_oxygen_tank_paused(uuid, boolean, uuid) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.set_oxygen_tank_paused(uuid, boolean, uuid) TO authenticated, service_role;
-
--- Hospital mode: stamp pause_reason on the tanks it pauses; on OFF only
--- resume hospital-paused tanks so a manually paused tank stays paused.
-CREATE OR REPLACE FUNCTION public.set_family_hospital_mode(_family_id uuid, _on boolean, _paused jsonb DEFAULT NULL::jsonb)
- RETURNS timestamp with time zone
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE v_ts timestamptz;
-BEGIN
-  IF auth.uid() IS NULL THEN
-    RAISE EXCEPTION 'Not authenticated';
-  END IF;
-  IF NOT public.is_family_owner(_family_id, auth.uid()) THEN
-    RAISE EXCEPTION 'Only the family owner can change hospital mode';
-  END IF;
-  IF _on THEN
-    UPDATE public.families
-      SET at_hospital_since = COALESCE(at_hospital_since, now()),
-          hospital_paused = COALESCE(_paused, hospital_paused),
-          updated_at = now()
-      WHERE id = _family_id
-      RETURNING at_hospital_since INTO v_ts;
-
-    UPDATE public.oxygen_tanks
-      SET paused_at = now(),
-          pause_reason = 'hospital',
-          updated_at = now()
-      WHERE family_id = _family_id
-        AND replaced_at IS NULL
-        AND paused_at IS NULL
-        AND (
-          SELECT COALESCE((f.hospital_paused ->> 'oxygen')::boolean, true)
-          FROM public.families f WHERE f.id = _family_id
-        );
-  ELSE
-    UPDATE public.families
-      SET at_hospital_since = NULL,
-          updated_at = now()
-      WHERE id = _family_id
-      RETURNING at_hospital_since INTO v_ts;
-
-    UPDATE public.oxygen_tanks
-      SET paused_seconds = paused_seconds + GREATEST(0, EXTRACT(EPOCH FROM (now() - paused_at))::bigint),
-          paused_at = NULL,
-          pause_reason = NULL,
-          updated_at = now()
-      WHERE family_id = _family_id
-        AND replaced_at IS NULL
-        AND paused_at IS NOT NULL
-        AND (pause_reason = 'hospital' OR pause_reason IS NULL);
-  END IF;
-  RETURN v_ts;
-END;
-$function$;
-
-REVOKE ALL ON FUNCTION public.set_family_hospital_mode(uuid, boolean, jsonb) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.set_family_hospital_mode(uuid, boolean, jsonb) TO authenticated, service_role;
+COMMENT ON COLUMN public.appointments.checklist IS
+  'Array of {id,label}. Read from the series master only (recurrence_parent_id IS NULL); override rows keep the default [] and are ignored.';
+COMMENT ON COLUMN public.appointment_completions.checklist_result IS
+  'Snapshot array of {id,label,done} at completion time.';
 ```
 
-Notes on the migration:
-- The 3-arg `set_family_hospital_mode` is the one the app calls. A legacy 2-arg overload still exists in the DB but is unused by the app; leaving it untouched (it pauses without stamping `pause_reason`, which the new OFF path still resumes via the `pause_reason IS NULL` clause — consistent). Flagging rather than dropping it, since dropping is a breaking change you didn't ask for.
-- `paused_by` FKs `auth.users` — against the general project rule, but it mirrors the existing `oxygen_tanks.created_by` FK and matches your spec exactly.
+Existing rows get `[]`, so the CHECK passes. The CHECK is immutable, so it's fine as a constraint. I'm not adding label-length or item-shape checks in the database; the dialog enforces 20 steps and 120 characters. I can add a validation trigger if you'd like that on the server too.
 
-## 2 — "Still paused?" reminder in `src/routes/api/public/hooks/oxygen-low-sweep.ts`
+### Override check: works, with one flag
+- `instanceFromMaster` spreads `...master` and then overrides only title, notes, location, kind, all_day, amount_ml and the times. If I leave `checklist` off that list, every occurrence (including overridden ones) shows the master's checklist. That's the behaviour you asked for.
+- Override rows are written by `useUpdateAppointmentInstance` / `useDeleteAppointmentInstance` with a `patch` that won't include `checklist`. They get the column default `[]`, which is never read.
+- **Flag:** when you edit one occurrence ("this one only"), the dialog must hide or disable the Checklist section, or show it read-only with "Edit the series to change steps". Otherwise an edit there would silently do nothing. My plan is read-only plus that hint.
+- Completions key on `appointment_id` = master id (and occurrence_at), so the snapshot attaches correctly for overridden occurrences too.
 
-Replace the blanket `if (tank.paused_at) continue;` with:
-- `pause_reason = 'hospital'` (or null) or family oxygen-paused → skip, as today.
-- `pause_reason = 'manual'` → skip Pass A and the normal Pass B; instead run `shouldSendCheckReminder({ startedAt: tank.paused_at, lastCheckedAt: tank.last_checked_at, checkReminderSentAt: tank.check_reminder_sent_at, intervalMinutes: checkInterval, tankTotalMinutes: null, now })`. On fire: push + stamp `check_reminder_sent_at`.
-- New copy block (family language): sv "⏸️ Syrgasen är pausad" / "Pausad sedan {HH:MM}. Fortfarande avstängd? Tryck Återuppta i appen när ni kopplar på igen."; en "⏸️ Oxygen is paused" / "Paused since {HH:MM}. Still off? Tap Resume in the app when you reconnect." Time formatted in the family timezone (needs `timezone` added to the families select). Category `"oxygen"`, tag `oxygen-paused-{tank.id}`, url `/oxygen`. Per-tank try/catch kept.
-- Tank select gains `pause_reason`.
+### RLS: no changes needed
+Current policies (checked live):
+- `appointments` UPDATE/INSERT: any family member (INSERT also requires `created_by = auth.uid()`). These are row-level, so they cover the new column.
+- `appointment_completions` INSERT/UPDATE: family member plus `caregiver_profile_in_family(caregiver_profile_id, family_id)`. These also cover `checklist_result`.
+I won't touch either.
 
-## 3 — Oxygen page + hooks
+## 2. Planner: create/edit dialog (schedule.tsx)
+- A new "Checklist / Checklista" section: a list of rows with a text input (maxLength 120), up/down buttons to reorder, and a remove button. "Add step / Lägg till steg" is disabled at 20, with a counter "n/20 steg". Ids come from `crypto.randomUUID()`. Blank labels are trimmed and dropped on save.
+- `checklist` goes through `useCreateAppointment` / `useUpdateAppointment` (series scope) like the other fields.
+- **Permission (answer):** it is **not owner-only.** Edit and delete controls show when `created_by === user.id || role === "owner"`, so a caregiver can edit tasks they created. At the database level, any family member can update any task. The checklist follows the same rule as the rest of the task. If you want checklists owner-only, that is a separate decision. It would also make sense to tighten the update policy then, since the UI gate alone is cosmetic.
 
-- `src/lib/data/oxygen.ts`: new `usePauseTank` / `useResumeTank` calling `supabase.rpc("set_oxygen_tank_paused", ...)`, invalidating the oxygen queries.
-- `src/routes/_authenticated/oxygen.tsx`:
-  - Running tank: "Pausa" outline button → small confirm dialog ("Pausa syrgasen? Nedräkningen stannar och larmen pausas tills du återupptar."). Uses `guardActingProfile` like other caregiver writes.
-  - Manually paused tank: neutral info row "Pausad sedan {HH:MM} av {name}" (caregiver profile name if set, else the pausing user's full name, else nothing) + prominent "Återuppta" button. "Change flow" and "Confirm" hidden; "Replace tank" kept.
-  - Hospital-paused tank: unchanged (existing `oxygen.pausedHospital`, no resume button).
+## 3. Today (dashboard.tsx)
+- For a task with `checklist.length > 0`, the expanded row lists the steps as checkbox rows. Ticks live in local state, keyed by occurrence.
+- Tapping Klar with unticked steps opens an AlertDialog: "X av Y steg är inte avbockade. Markera som klar ändå?" with Cancel / "Markera klar".
+- The save uses the existing `useLogAppointmentCompletion` path (same `guardActingProfile` + `caregiver_profile_id`) and adds `checklist_result: steps.map(s => ({id, label, done}))`. I'll add the field to the mutation's input type.
+- Ticks are lost if you leave the page before Klar. That is the expected trade-off for local state.
 
-## 4 — Today banner (`OxygenCheckBanner.tsx`)
+### On "ongoing" for live ticks (opinion, not built)
+I'd recommend it as a follow-up. Upserting `status: "ongoing"` with a partial `checklist_result` on each tick would let ticks survive a reload and show other caregivers progress mid-task. The `ongoing` status and `ongoing_started_*` fields already exist. Caveats:
+- Only tasks with `allow_ongoing` use it today, and the ongoing UI and timers would light up for checklist tasks.
+- Every tick becomes a network write.
+- The late/missed notifier would need to keep treating ongoing as "in progress".
+For v1, local state is simpler and safer.
 
-Extend the existing component:
-- Manually paused tank → calm neutral (muted, not amber) persistent banner: "Syrgas pausad sedan {HH:MM}" + "Återuppta" button (calls `useResumeTank`).
-- When `isOxygenCheckOverdue({ startedAt: tank.paused_at, lastCheckedAt, intervalMinutes, tankTotalMinutes: null, now })` is true → switches to the amber styling and adds a "Fortfarande avstängd" button calling the existing `useConfirmTank` (stamps `last_checked_at`, resets both clocks).
-- Hospital-paused tank → no banner (existing `tank.paused_at` early-return becomes reason-aware).
+## 4. Handover (src/lib/data/handover-prefill.ts)
+In the existing completions loop: for status `done` with `checklist_result` containing any `done: false`, add the note line
+`{task} klar – ej avbockat: {label1, label2}` (en: `{task} done – not ticked: {labels}`) using a new i18n key. Add a test to `handover-prefill.test.ts`, plus a pure helper test for "unticked labels".
 
-## 5 — Handover prefill (`handover-prefill.ts`)
+## 5. i18n (en + sv, exact parity)
+Keys under `scheduleEvents.checklist*` and `dashboard.checklist*`:
+- Checklist / Checklista
+- Add step / Lägg till steg
+- Step {{n}} / Steg {{n}}
+- {{n}}/20 steps / {{n}}/20 steg
+- Edit the series to change steps / Redigera hela serien för att ändra steg
+- Confirm title and body: "{{x}} of {{y}} steps aren't ticked. Mark as done anyway?" / "{{x}} av {{y}} steg är inte avbockade. Markera som klar ändå?"
+- Confirm button
+- Handover line
 
-The current oxygen query only returns tanks started/replaced inside the shift window, so a tank paused before the shift wouldn't appear. Adding a small separate query for the currently active tank (`replaced_at IS NULL`); if its `pause_reason = 'manual'` at prefill time, append one line "Syrgas pausad sedan {HH:MM}" / "Oxygen paused since {HH:MM}" in family tz.
+## 6. Verification
+Apply the migration, then:
+- Check the columns and constraint exist.
+- Live trace: create a task with 3 steps → Today → tick 2 → Klar → confirmation → saved snapshot read back → handover shows the line.
+- Edit the checklist afterwards and confirm the history is unchanged.
+- An override occurrence still shows the master's steps.
+- Full vitest, tsgo, en/sv parity.
 
-## 6 — i18n
-
-New keys in `en.ts` + `sv.ts` under `oxygen.*`: pause/resume button labels, confirm dialog copy, "paused since … by …", banner title/body, "Still off?" confirm label, push copy lives in the sweep (not i18n, matching existing push copy). Exact key parity; natural Swedish.
-
-## 7 — Tests & verification
-
-- `check-reminder.test.ts`: manual-paused reminder fires after the interval measured from `paused_at`; resets after a confirm; hospital-paused tanks never reach the predicate (guarded in the sweep — covered by a pure test asserting the sweep's gate inputs); running-tank behaviour unchanged.
-- `tanks.test.ts`: assert `computeRemaining` output for a running tank is byte-identical before/after (no change expected — guard test).
-- Live DB checks (via `lovable auth-session` + SQL/RPC): pause→resume accumulates `paused_seconds`; non-member RPC call denied; resuming a hospital-paused tank raises; hospital ON→OFF leaves a manually paused tank paused and resumes a hospital-paused one.
-- Full `vitest`, `tsgo --noEmit`, en/sv key parity.
-- No package or dependency changes.
-
-## Flags / deviations from the brief
-
-1. **2-arg hospital-mode overload left in place** (see migration notes) — dropping it is a breaking change; the new OFF logic covers its rows via `pause_reason IS NULL`.
-2. **Handover prefill needs an extra query** — the existing window query can't see a tank paused before the shift; a tiny active-tank lookup is the clean fix.
-3. **Sweep needs `families.timezone` in its select** to format "{HH:MM}" in family tz — one added column, no behaviour change.
-4. **`paused_by` → auth.users FK** follows your spec and the existing `created_by` precedent, though it deviates from the general "no auth.users FKs" project rule.
+## Not in this step / possible conflicts for next step
+- Routine setup and care-need suggestions aren't included. A suggestion that creates tasks can just write `checklist` on the master. No conflict, but suggested steps need stable ids if a template later updates them.
+- If you later split a series ("this and following"), today's split only covers "this" or "series", so there's nothing to copy for now.
