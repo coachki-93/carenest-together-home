@@ -3514,6 +3514,11 @@ export const sv = {
     },
   },
   billing: {
+    errors: {
+      customerNotFound: "Det här betalningskontot finns inte längre — teckna abonnemang igen. Kontakta support om abonnemanget fortfarande är aktivt.",
+      subscriptionExists: "Familjen har redan ett aktivt abonnemang. Kontakta support om du inte kan hantera det.",
+      generic: "Det gick inte att öppna betalningen. Försök igen eller kontakta support.",
+    },
     banner: {
       trial_one: "Provperiod — 1 dag kvar. Teckna abonnemang för att fortsätta logga efter det.",
       trial_other: "Provperiod — {{count}} dagar kvar. Teckna abonnemang för att fortsätta logga efter det.",
@@ -3544,6 +3549,7 @@ export const sv = {
       statusPastDue: "Betalningen misslyckades. Respittid slutar {{date}}.",
       statusCanceled: "Avslutat. Teckna abonnemang för att logga igen.",
       statusInactive: "Inte aktivt. Teckna abonnemang för att kunna logga.",
+      statusExpired: "Avslutat {{date}}. Teckna abonnemang för att logga igen.",
       statusNone: "Inget abonnemang än.",
       dataPreserved: "Om abonnemanget upphör blir appen endast läsning. Er data raderas aldrig.",
     },

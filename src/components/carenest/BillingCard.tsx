@@ -10,6 +10,8 @@ import {
 } from "@/lib/billing/billing.functions";
 import { useFamilySubscription } from "@/lib/billing/use-subscription";
 import { toast } from "@/lib/notify";
+import { billingErrorKey } from "@/lib/billing/billing-errors";
+import { billingStatus } from "@/lib/billing/subscription-state";
 
 interface Props {
   familyId: string;
@@ -32,6 +34,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
   const checkoutFn = useServerFn(createCheckoutSession);
   const portalFn = useServerFn(createPortalSession);
   const [redirecting, setRedirecting] = useState(false);
+  const [customerMissing, setCustomerMissing] = useState(false);
 
   const startCheckout = useMutation({
     mutationFn: async () => {
@@ -48,7 +51,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
       setRedirecting(true);
       window.location.assign(res.url);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(t(billingErrorKey(e))),
     meta: { suppressGlobalError: true },
   });
 
@@ -63,7 +66,10 @@ export function BillingCard({ familyId, isOwner }: Props) {
       setRedirecting(true);
       window.location.assign(res.url);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      if (e.message === "customer_not_found") setCustomerMissing(true);
+      toast.error(t(billingErrorKey(e)));
+    },
     meta: { suppressGlobalError: true },
   });
 
@@ -73,7 +79,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
   // Portal requires an existing Stripe customer. `isActive` is true during
   // trials (by design, for access-gating), but a trial family has no customer
   // yet — gating on it sent them to a Portal call that always failed.
-  const hasCustomer = !!s?.row?.stripe_customer_id;
+  const hasCustomer = !!s?.row?.stripe_customer_id && !customerMissing;
   // A paid plan only exists once Stripe has a subscription. Trial families
   // have plan: null, which previously fell through to "founding".
   const hasSubscription = !!s?.row?.stripe_subscription_id;
@@ -155,6 +161,7 @@ export function BillingCard({ familyId, isOwner }: Props) {
               </Button>
             )}
           </div>
+          {customerMissing && <p className="text-sm text-muted-foreground">{t("billing.errors.customerNotFound")}</p>}
 
           {hasCustomer && (
             <p className="text-xs text-muted-foreground">
@@ -183,21 +190,24 @@ function StatusLine({
   const { t } = useTranslation();
   if (!state) return null;
   const { row } = state;
+  const status = billingStatus(state);
   let line: string;
-  if (!row || !row.status) {
+  if (status === "none") {
     line = t("billing.card.statusNone");
+  } else if (status === "expired" && state.endsAt) {
+    line = t("billing.card.statusExpired", { date: dateFmt.format(state.endsAt) });
   } else if (state.isTrial && state.endsAt) {
     line = t("billing.card.statusTrial", {
       date: dateFmt.format(state.endsAt),
       count: state.daysRemaining ?? 0,
     });
-  } else if (row.status === "active" && state.endsAt) {
-    line = row.cancel_at_period_end
+  } else if ((status === "active" || status === "cancelScheduled") && state.endsAt) {
+    line = status === "cancelScheduled"
       ? t("billing.card.statusCancelsAt", { date: dateFmt.format(state.endsAt) })
       : t("billing.card.statusActive", { date: dateFmt.format(state.endsAt) });
   } else if (state.isPastDue && state.endsAt) {
     line = t("billing.card.statusPastDue", { date: dateFmt.format(state.endsAt) });
-  } else if (row.status === "canceled") {
+  } else if (row?.status === "canceled") {
     line = t("billing.card.statusCanceled");
   } else {
     line = t("billing.card.statusInactive");

@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Open
-- [ ] Stripe test-mode IDs bug (uploaded brief): find test-only family_subscriptions rows, show data fix before applying, harden createPortalSession against resource_missing, never show raw Stripe errors, fix BillingCard status line to use derived state. Plan first.
+- [ ] Stripe billing fix: approved row correction applied; verify guarded recovery, translated errors, shared status, checkout/webhook/portal.
 - [ ] Marketing: 100-paying-families plan presented (plan.md saved 2026-10-30); awaiting user's choice of first action (recommendation card: discoverability fix).
 
 ## Done
