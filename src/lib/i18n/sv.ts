@@ -2638,7 +2638,7 @@ export const sv = {
       contactKicker: "Fortfarande fast?",
       contactTitle: "Hittade du inte svaret?",
       contactBody:
-        "Hör av dig så hjälper vi till. En riktig människa läser varje meddelande — vi svarar oftast inom en eller ett par dagar.",
+        "Hör av dig så hjälper vi till. En riktig människa läser varje meddelande — vi svarar oftast inom en till två dagar.",
     },
     contact: {
       metaTitle: "Kontakta Tillsa — vi läser varje meddelande",
@@ -2665,7 +2665,7 @@ export const sv = {
       errorMessageLong: "Håll meddelandet under 5000 tecken.",
       successTitle: "Tack — vi har fått ditt meddelande",
       successBody:
-        "Vi hör av oss till e-postadressen du angav, oftast inom en eller ett par dagar.",
+        "Vi hör av oss till e-postadressen du angav, oftast inom en till två dagar.",
       successAgain: "Skicka ett till meddelande",
       errorTitle: "Det gick inte att skicka",
       errorBody: "Något gick fel när meddelandet skickades. Försök igen om en stund.",
@@ -2715,7 +2715,7 @@ export const sv = {
       data4Headline: "Inga tredjepartsspårare.",
       data4Title: "Inga tredjepartsspårare.",
       data4Body: "Vårdloggar, vitalvärden och överlämningar skickas inte till analys- eller annonstjänster.",
-      dataFootnote: "Er data lagras inom EU. Enligt GDPR behandlar vi den för att hjälpa er att ge vård — det är ett stöd, inte medicinsk eller juridisk rådgivning. Ni kan exportera eller radera familjens data när som helst genom att kontakta oss.",
+      dataFootnote: "Appens databas ligger inom EU; betalningar via Stripe kan behandlas utanför EU, enligt integritetspolicyn. Enligt GDPR behandlar vi den för att hjälpa er att ge vård — det är ett stöd, inte medicinsk eller juridisk rådgivning. Ni kan exportera eller radera familjens data när som helst genom att kontakta oss.",
       contactTitle: "Hör av dig",
       contactBody: "Frågor, feedback eller en berättelse att dela? Skicka ett mejl — en människa läser varje meddelande.",
       faqKicker: "Fler frågor",
@@ -2730,7 +2730,7 @@ export const sv = {
         q4Q: "Är Tillsa bara för komplex vård?",
         q4A: "Nej. Grunderna — schema, mediciner, överlämningar, inköp — fungerar för alla familjer som samordnar vård. Det komplexa lagret (syrgas, vitalintervall, maskinunderhåll) finns där när ni behöver det.",
         q5Q: "Hur når vi er?",
-        q5A: "Skriv till oss på {{email}} — vi läser allt och svarar oftast inom en eller ett par dagar.",
+        q5A: "Skriv till oss på {{email}} — vi läser allt och svarar oftast inom en till två dagar.",
       },
     },
   },

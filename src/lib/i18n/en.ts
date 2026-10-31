@@ -2716,7 +2716,7 @@ export const en = {
       data4Headline: "No third-party trackers.",
       data4Title: "No third-party trackers.",
       data4Body: "Care logs, vitals and handovers are not fed to analytics or advertising services.",
-      dataFootnote: "Your data is hosted in the EU. Under GDPR, we process this data to help you provide care — it's an aid, not medical or legal advice. You can export or delete your family's data at any time by writing to us.",
+      dataFootnote: "The app's database is hosted in the EU; payments via Stripe may be processed outside the EU, as described in the Privacy policy. Under GDPR, we process this data to help you provide care — it's an aid, not medical or legal advice. You can export or delete your family's data at any time by writing to us.",
       contactTitle: "Say hello",
       contactBody: "Questions, feedback, or a story to share? Email us — a person reads every message.",
       faqKicker: "More questions",
