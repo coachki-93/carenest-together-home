@@ -141,8 +141,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Tillsa" },
       { name: "twitter:description", content: "Tillsa is a web app for coordinating care for medically complex children." },
-      { property: "og:image", content: "https://tillsa.app/og/og-default.png" },
-      { name: "twitter:image", content: "https://tillsa.app/og/og-default.png" },
+      { property: "og:image", content: "https://tillsa.app/og/tillsa-share.jpg" },
+      { name: "twitter:image", content: "https://tillsa.app/og/tillsa-share.jpg" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
