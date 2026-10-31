@@ -3558,7 +3558,7 @@ export const en = {
   legal: {
     "privacy": {
       "title": "Privacy Policy",
-      "updated": "Last updated: 2026-08-03",
+      "updated": "Last updated: 2026-10-31",
       "intro": "How Tillsa handles your family's data.",
       "sections": [
         {
@@ -3600,17 +3600,27 @@ export const en = {
         {
           "heading": "6. Where your data is stored, and who processes it",
           "body": [
-            "We keep the number of third parties to a minimum:",
-            "— Supabase — our database and authentication provider. Your data is hosted in the European Union.",
-            "— Stripe — processes subscription payments. Stripe may process some data outside the EU (e.g. the United States) under its own safeguards; we never see or store your full card details.",
-            "— Push notifications — delivered using self-hosted web push (VAPID). Notification delivery does not route your data through a third-party push provider (no Firebase or OneSignal).",
+            "We keep the number of third parties to a minimum. These services receive personal data from Tillsa:",
+            "— Supabase — our database and authentication provider. The app's database is hosted in the European Union.",
+            "— Lovable / Cloudflare — runs the app's server functions and serves its pages. Requests, including your IP address and sign-in token, pass through Cloudflare's global network and may be handled at the location nearest you, which can be outside the EU; it is not where the app's data is stored.",
+            "— Stripe — processes subscription payments and receives your email address and billing details. Stripe may process some data outside the EU (e.g. the United States) under its own safeguards; we never see or store your full card details.",
+            "— Lovable Email (sent via Mailgun's EU servers) — sends account emails such as sign-up confirmation and password reset, and forwards messages from the contact form. It receives your email address and the content of those emails (for the contact form: your name, email address and message). Lovable's email service may process this data outside the EU.",
+            "— Proton Mail — stores email sent to support@tillsa.app, including contact-form messages. Proton is based in Switzerland.",
+            "— Browser push services (Google, Apple, Mozilla) — if you turn on notifications, they are delivered through your browser vendor's push service. The notification content is encrypted end to end, so the push service cannot read it, but it handles delivery and sees technical data such as your device's push address and when a notification is sent.",
+            "— Google and Apple sign-in — if you choose to sign in with Google or Apple, that provider handles your sign-in under its own privacy policy and receives the fact that you signed in to Tillsa; we receive your name and email address.",
             "We do not sell your data, and we do not share it with anyone other than the processors above, except where legally required."
           ]
         },
         {
           "heading": "7. International transfers",
           "body": [
-            "Your core data (database, authentication) stays in the EU. The main exception is Stripe for payments, which may involve transfers outside the EU under Stripe's own transfer safeguards (e.g. Standard Contractual Clauses)."
+            "The app's database and authentication data are stored in the EU. Exceptions where data may be processed outside the EU:",
+            "— Stripe, for payments, under Stripe's own transfer safeguards (e.g. Standard Contractual Clauses).",
+            "— Lovable / Cloudflare, which may handle requests at network locations outside the EU.",
+            "— Lovable Email, whose email service may process email data outside the EU.",
+            "— Browser push services (Google, Apple, Mozilla), which deliver encrypted notifications and may do so outside the EU.",
+            "— Google and Apple, if you choose to sign in with them.",
+            "These transfers rely on the providers' safeguards, such as Standard Contractual Clauses or the EU–US Data Privacy Framework. Proton Mail is in Switzerland, which the EU recognises as providing an adequate level of protection."
           ]
         },
         {
