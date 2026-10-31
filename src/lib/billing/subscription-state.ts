@@ -88,6 +88,12 @@ export function hasLiveSubscription(state: SubscriptionState | undefined): boole
   return !!state?.row?.stripe_subscription_id && state.isActive;
 }
 
+/** Mirrors the DB trigger public.set_family_founding_member: 2027-01-01 00:00 Europe/Stockholm (UTC+1). */
+export const FOUNDING_DEADLINE = new Date("2027-01-01T00:00:00+01:00");
+export function isFoundingAt(createdAt: Date): boolean {
+  return createdAt.getTime() < FOUNDING_DEADLINE.getTime();
+}
+
 export function checkoutPlan(foundingMember: boolean): "founding" | "standard" {
   return foundingMember ? "founding" : "standard";
 }

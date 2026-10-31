@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { billingPresentation, billingStatus, checkoutPlan, deriveState, hasLiveSubscription, hasProtectedSubscription, type SubscriptionRow } from "./subscription-state";
+import { billingPresentation, billingStatus, checkoutPlan, deriveState, hasLiveSubscription, hasProtectedSubscription, isFoundingAt, type SubscriptionRow } from "./subscription-state";
 import { resolvePriceId } from "./stripe.server";
 import { billingErrorKey, isMissingCustomer } from "./billing-errors";
 
@@ -84,5 +84,21 @@ describe("billing recovery and shared derived state", () => {
   it("maps missing-customer and unknown provider failures to safe translated keys", () => {
     expect(billingErrorKey(new Error("customer_not_found"))).toBe("billing.errors.customerNotFound");
     expect(billingErrorKey(new Error("No such customer: private provider details"))).toBe("billing.errors.generic");
+  });
+});
+describe("founding deadline (family created by 31 Dec 2026, Stockholm)", () => {
+  it.each([
+    ["2026-12-31T23:59:00+01:00", true, 199],
+    ["2027-01-01T00:00:00+01:00", false, 299],
+  ] as const)("created %s → founding=%s, card = checkout = %s kr", (at, founding, kr) => {
+    vi.stubEnv("STRIPE_PRICE_FOUNDING", "price_199");
+    vi.stubEnv("STRIPE_PRICE_STANDARD", "price_299");
+    try {
+      const f = isFoundingAt(new Date(at));
+      expect(f).toBe(founding);
+      const card = billingPresentation(deriveState(row({ status: "none", stripe_subscription_id: null })), f);
+      expect(card.priceKr).toBe(kr);
+      expect(resolvePriceId(f)).toBe(`price_${card.priceKr}`);
+    } finally { vi.unstubAllEnvs(); }
   });
 });
