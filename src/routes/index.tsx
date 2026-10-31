@@ -42,7 +42,7 @@ import { AppleGlyph, AndroidGlyph } from "@/components/carenest/BrandGlyphs";
 import { FaqSection } from "@/components/carenest/FaqSection";
 
 const SITE = "https://tillsa.app";
-const OG_IMAGE = SITE + "/og-image.jpg";
+const OG_IMAGE = SITE + "/og/tillsa-share.jpg";
 
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 

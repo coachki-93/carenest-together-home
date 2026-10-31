@@ -8,7 +8,7 @@ import { ContactForm } from "@/components/carenest/ContactForm";
 import { resolveHeadLanguage, OG_LOCALE } from "@/lib/i18n/head";
 
 const SITE = "https://tillsa.app";
-const OG_IMAGE = SITE + "/og-image.jpg";
+const OG_IMAGE = SITE + "/og/tillsa-share.jpg";
 
 export const Route = createFileRoute("/contact")({
   head: () => {
