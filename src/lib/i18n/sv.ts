@@ -3558,7 +3558,7 @@ export const sv = {
   legal: {
     "privacy": {
       "title": "Integritetspolicy",
-      "updated": "Senast uppdaterad: 2026-08-03",
+      "updated": "Senast uppdaterad: 2026-10-31",
       "intro": "Hur Tillsa hanterar er familjs uppgifter.",
       "sections": [
         {
@@ -3600,17 +3600,27 @@ export const sv = {
         {
           "heading": "6. Var dina uppgifter lagras, och vem som behandlar dem",
           "body": [
-            "Vi håller antalet tredje parter till ett minimum:",
-            "— Supabase — vår databas- och autentiseringsleverantör. Dina uppgifter lagras inom EU.",
-            "— Stripe — hanterar prenumerationsbetalningar. Stripe kan behandla vissa uppgifter utanför EU (t.ex. USA) enligt egna skyddsåtgärder; vi ser eller lagrar aldrig dina fullständiga kortuppgifter.",
-            "— Push-notiser — levereras via egenhostad web-push (VAPID). Notisleverans dirigerar inte dina uppgifter genom en tredjeparts push-leverantör (ingen Firebase eller OneSignal).",
+            "Vi håller antalet tredje parter till ett minimum. Dessa tjänster tar emot personuppgifter från Tillsa:",
+            "— Supabase — vår databas- och autentiseringsleverantör. Appens databas ligger inom EU.",
+            "— Lovable / Cloudflare — driver appens serverfunktioner och levererar dess sidor. Förfrågningar, inklusive din IP-adress och inloggningstoken, går genom Cloudflares globala nätverk och kan hanteras på den plats som ligger närmast dig, vilket kan vara utanför EU; det är inte där appens data lagras.",
+            "— Stripe — hanterar prenumerationsbetalningar och får din e-postadress och dina betaluppgifter. Stripe kan behandla vissa uppgifter utanför EU (t.ex. USA) enligt egna skyddsåtgärder; vi ser eller lagrar aldrig dina fullständiga kortuppgifter.",
+            "— Lovable Email (skickas via Mailguns EU-servrar) — skickar kontomejl som bekräftelse vid registrering och återställning av lösenord, och vidarebefordrar meddelanden från kontaktformuläret. Tjänsten får din e-postadress och innehållet i mejlen (för kontaktformuläret: ditt namn, din e-postadress och ditt meddelande). Lovables e-posttjänst kan behandla dessa uppgifter utanför EU.",
+            "— Proton Mail — lagrar mejl som skickas till support@tillsa.app, inklusive meddelanden från kontaktformuläret. Proton finns i Schweiz.",
+            "— Webbläsarnas push-tjänster (Google, Apple, Mozilla) — om du slår på notiser levereras de via din webbläsartillverkares push-tjänst. Notisens innehåll är krypterat hela vägen, så push-tjänsten kan inte läsa det, men den sköter leveransen och ser tekniska uppgifter som enhetens push-adress och när en notis skickas.",
+            "— Inloggning med Google och Apple — om du väljer att logga in med Google eller Apple hanterar den leverantören din inloggning enligt sin egen integritetspolicy och får veta att du loggat in i Tillsa; vi får ditt namn och din e-postadress.",
             "Vi säljer inte dina uppgifter och delar dem inte med någon annan än leverantörerna ovan, utom där lagen kräver det."
           ]
         },
         {
           "heading": "7. Överföringar till tredjeland",
           "body": [
-            "Dina kärnuppgifter (databas, autentisering) stannar inom EU. Det huvudsakliga undantaget är Stripe för betalningar, som kan innebära överföringar utanför EU enligt Stripes egna skyddsåtgärder (t.ex. standardavtalsklausuler)."
+            "Appens databas och autentiseringsuppgifter lagras inom EU. Undantag där uppgifter kan behandlas utanför EU:",
+            "— Stripe, för betalningar, enligt Stripes egna skyddsåtgärder (t.ex. standardavtalsklausuler).",
+            "— Lovable / Cloudflare, som kan hantera förfrågningar på nätverksplatser utanför EU.",
+            "— Lovable Email, vars e-posttjänst kan behandla e-postuppgifter utanför EU.",
+            "— Webbläsarnas push-tjänster (Google, Apple, Mozilla), som levererar krypterade notiser och kan göra det utanför EU.",
+            "— Google och Apple, om du väljer att logga in med dem.",
+            "Dessa överföringar sker enligt leverantörernas skyddsåtgärder, till exempel standardavtalsklausuler eller EU–US Data Privacy Framework. Proton Mail finns i Schweiz, som EU anser har adekvat skyddsnivå."
           ]
         },
         {
