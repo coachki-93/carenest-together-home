@@ -3664,7 +3664,7 @@ export const sv = {
     },
     "terms": {
       "title": "Användarvillkor",
-      "updated": "Senast uppdaterad: 2026-08-03",
+      "updated": "Senast uppdaterad: 2026-10-31",
       "intro": "Villkoren som gäller när du använder Tillsa.",
       "sections": [
         {

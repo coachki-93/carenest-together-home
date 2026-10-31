@@ -3664,7 +3664,7 @@ export const en = {
     },
     "terms": {
       "title": "Terms of Service",
-      "updated": "Last updated: 2026-08-03",
+      "updated": "Last updated: 2026-10-31",
       "intro": "The terms that apply when you use Tillsa.",
       "sections": [
         {
