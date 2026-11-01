@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import i18next from "i18next";
+import { formatLocaleNumber } from "@/lib/format/locale-number";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -409,8 +411,7 @@ const STALE_HOURS: Partial<Record<VitalType, number>> = {
 
 // Precision per type when displaying numeric value.
 function fmtVal(type: VitalType, n: number): string {
-  if (type === "temperature") return n.toFixed(1);
-  return Math.round(n).toString();
+  return formatLocaleNumber(n, i18next.language ?? "en", type === "temperature" ? 1 : 0);
 }
 
 function useNow(intervalMs: number): number {
@@ -1061,7 +1062,7 @@ function HistoryRow({
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-bold flex flex-wrap items-center gap-x-1.5 gap-y-1">
-          <span>{Number(vital.value)} {vital.unit}</span>
+          <span>{formatLocaleNumber(Number(vital.value), lang, vital.type === "temperature" ? 1 : 0)} {vital.unit}</span>
           <span className="text-muted-foreground font-semibold">
             · {t(`vitals.${vitalI18nKey(vital.vital_type)}` as const)}
           </span>
