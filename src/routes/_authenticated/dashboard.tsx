@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { wallClockIn } from "@/lib/time/family-tz";
+import { formatLocaleNumber, medRouteKey } from "@/lib/format/locale-number";
 import { DEFAULT_FAMILY_TZ, shiftDateStr, startOfDayIn } from "@/lib/schedule/recurrence";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -565,7 +566,7 @@ function DashboardPage() {
       const med = d.medication;
       const amount = med.dose_amount ?? "";
       const unit = med.dose_unit ?? "";
-      const detail = [amount && unit ? `${amount} ${unit}` : amount || unit, med.route]
+      const detail = [amount && unit ? `${amount} ${unit}` : amount || unit, med.route ? t(medRouteKey(med.route)) : null]
         .filter(Boolean)
         .join(" • ");
       const logStatus = d.log?.status;
@@ -1518,7 +1519,7 @@ function DashboardPage() {
                       )
                     : "—";
                   const fmt = (n: number) =>
-                    Number.isFinite(n) ? (Math.abs(n) >= 10 ? n.toFixed(0) : n.toFixed(1)) : "—";
+                    formatLocaleNumber(n, i18n.language, Math.abs(n) >= 10 ? 0 : 1);
                   const toneFor = (
                     type: "heart_rate" | "spo2" | "temperature",
                     v: number | undefined,
@@ -1561,7 +1562,7 @@ function DashboardPage() {
                           <VitalTile
                             icon={Thermometer}
                             label={t("vitals.temp")}
-                            value={temp ? Number(temp.value).toFixed(1) : "—"}
+                            value={temp ? formatLocaleNumber(Number(temp.value), i18n.language, 1) : "—"}
                             unit={temp?.unit ?? DEFAULT_UNIT.temperature}
                             tone={toneFor("temperature", temp ? Number(temp.value) : undefined, "warning")}
                           />
