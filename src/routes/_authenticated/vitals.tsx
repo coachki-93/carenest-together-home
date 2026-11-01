@@ -1062,7 +1062,7 @@ function HistoryRow({
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-bold flex flex-wrap items-center gap-x-1.5 gap-y-1">
-          <span>{formatLocaleNumber(Number(vital.value), lang, vital.type === "temperature" ? 1 : 0)} {vital.unit}</span>
+          <span>{vital.vital_type === "temperature" ? formatLocaleNumber(Number(vital.value), lang, 1) : Number(vital.value).toLocaleString(lang === "sv" ? "sv-SE" : "en-US", { maximumFractionDigits: 2, useGrouping: false })} {vital.unit}</span>
           <span className="text-muted-foreground font-semibold">
             · {t(`vitals.${vitalI18nKey(vital.vital_type)}` as const)}
           </span>

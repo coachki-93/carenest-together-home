@@ -146,6 +146,8 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         },
       },
       allow_promotion_codes: true,
+      // A 100%-discounted subscription (comps, hardship) must not demand a card.
+      payment_method_collection: "if_required",
       billing_address_collection: "auto",
     });
 
