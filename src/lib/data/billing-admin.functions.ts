@@ -126,6 +126,8 @@ const CreateCouponSchema = z
     percentOff: z.number().int().min(10).max(100),
     duration: z.enum(["once", "repeating", "forever"]),
     durationInMonths: z.number().int().min(1).max(36).optional(),
+    // null = explicitly unlimited; omitted = single-use (default 1).
+    maxRedemptions: z.number().int().min(1).max(10000).nullable().default(1),
   })
   .superRefine((v, ctx) => {
     if (v.duration === "repeating" && v.durationInMonths == null) {
@@ -169,6 +171,9 @@ export const adminCreateCoupon = createServerFn({ method: "POST" })
       promo = await stripe.promotionCodes.create({
         promotion: { type: "coupon", coupon: coupon.id },
         code: data.code,
+        ...(data.maxRedemptions != null
+          ? { max_redemptions: data.maxRedemptions }
+          : {}),
         metadata: { created_by_admin: userId },
       });
     } catch (e) {
@@ -192,6 +197,7 @@ export const adminCreateCoupon = createServerFn({ method: "POST" })
       percent_off: dto.percentOff,
       duration: dto.duration,
       duration_in_months: dto.durationInMonths,
+      max_redemptions: dto.maxRedemptions,
       promotion_code_id: dto.promotionCodeId,
       coupon_id: dto.couponId,
     });

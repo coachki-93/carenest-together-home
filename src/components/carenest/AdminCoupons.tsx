@@ -42,6 +42,7 @@ const clientSchema = z
     percentOff: z.number().int().min(10).max(100),
     duration: z.enum(["once", "repeating", "forever"]),
     durationInMonths: z.number().int().min(1).max(36).optional(),
+    maxRedemptions: z.number().int().min(1).max(10000).nullable(),
   })
   .superRefine((v, ctx) => {
     if (v.duration === "repeating" && v.durationInMonths == null) {
@@ -71,6 +72,8 @@ export function AdminCoupons() {
     "once",
   );
   const [months, setMonths] = useState<number>(3);
+  const [maxUses, setMaxUses] = useState<number>(1);
+  const [unlimited, setUnlimited] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deactivateTarget, setDeactivateTarget] =
     useState<AdminCouponDTO | null>(null);
@@ -81,6 +84,7 @@ export function AdminCoupons() {
       percentOff: number;
       duration: "once" | "repeating" | "forever";
       durationInMonths?: number;
+      maxRedemptions: number | null;
     }) => create({ data: payload }),
     onSuccess: () => {
       toast.success(t("admin.coupons.created"));
@@ -88,6 +92,8 @@ export function AdminCoupons() {
       setPercentOff(20);
       setDuration("once");
       setMonths(3);
+      setMaxUses(1);
+      setUnlimited(false);
       setFormError(null);
       void qc.invalidateQueries({ queryKey: ["admin", "coupons"] });
     },
@@ -112,6 +118,7 @@ export function AdminCoupons() {
       percentOff,
       duration,
       ...(duration === "repeating" ? { durationInMonths: months } : {}),
+      maxRedemptions: unlimited ? null : maxUses,
     };
     const parsed = clientSchema.safeParse(payload);
     if (!parsed.success) {
@@ -211,6 +218,28 @@ export function AdminCoupons() {
               />
             </div>
           )}
+          <div className="space-y-1.5">
+            <Label htmlFor="coupon-max">{t("admin.coupons.fieldMaxUses")}</Label>
+            <Input
+              id="coupon-max"
+              type="number"
+              min={1}
+              max={10000}
+              value={maxUses}
+              disabled={unlimited}
+              onChange={(e) =>
+                setMaxUses(Number.parseInt(e.target.value, 10) || 0)
+              }
+            />
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={unlimited}
+                onChange={(e) => setUnlimited(e.target.checked)}
+              />
+              {t("admin.coupons.fieldUnlimited")}
+            </label>
+          </div>
           <div className="md:col-span-2 lg:col-span-4 flex items-center justify-between gap-4">
             {formError ? (
               <p className="text-sm text-red-700">{formError}</p>
@@ -265,7 +294,9 @@ export function AdminCoupons() {
                     </td>
                     <td className="py-2 pr-4">{c.percentOff ?? "—"}%</td>
                     <td className="py-2 pr-4">{fmtDuration(c)}</td>
-                    <td className="py-2 pr-4">{c.timesRedeemed}</td>
+                    <td className="py-2 pr-4">
+                      {c.timesRedeemed} / {c.maxRedemptions ?? "∞"}
+                    </td>
                     <td className="py-2 pr-4">
                       {c.active ? (
                         <span className="text-emerald-700 font-semibold">
