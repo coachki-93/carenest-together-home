@@ -1,3 +1,5 @@
+import i18next from "i18next";
+import { formatLocaleNumber } from "@/lib/format/locale-number";
 // Duration tables for oxygen tanks. Values come directly from the
 // manufacturer's spec sheet and are not user data.
 
@@ -46,8 +48,8 @@ export function durationMinutes(type: TankType, flow: number): number | null {
   return row ? row.minutes : null;
 }
 
-export function formatFlow(flow: number): string {
-  return flow.toFixed(2).replace(".", ",") + " l/min";
+export function formatFlow(flow: number, lang: string = i18next.language || "sv"): string {
+  return formatLocaleNumber(flow, lang, 2) + " l/min";
 }
 
 /** Format minutes as "Xd Yh" / "Yh Zm" / "Zm". */
