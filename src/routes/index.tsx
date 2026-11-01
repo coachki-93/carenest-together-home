@@ -1090,7 +1090,7 @@ function Hero() {
 }
 
 function HeroDevice() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <div className="mk-hero-device relative mx-auto w-full max-w-[1080px]">
       {/* Faint violet glow behind the device for separation */}
@@ -1098,7 +1098,7 @@ function HeroDevice() {
       {/* Soft elliptical ground shadow */}
       <div aria-hidden className="mk-hero-glow mk-hero-glow--shadow" />
       <img
-        src="/landing/hero-dashboard.webp"
+        src={i18n.language === "sv" ? "/landing/hero-dashboard.webp" : "/landing/hero-dashboard-en.webp"}
         alt={t("marketing.hero.dashboardAlt")}
         width={1920}
         height={1806}
